@@ -4,6 +4,7 @@
 	import Logout from "../components/Logout.svelte"
 	import Auth from "../components/Auth.svelte"
 	import Avatar from "../components/Avatar.svelte"
+	import logo from "$lib/assets/logo.svg"
 
 	let show = false // menu state
 </script>
@@ -15,7 +16,7 @@
 				<!-- Website Logo -->
 				<div>
 					<a href="/" class="flex items-center py-4 px-2">
-						<img src="/assets/logo.svg" class="mr-3 h-8" alt="WaspBot Logo" />
+						<img src={logo} class="mr-3 h-8" alt="WaspBot Logo" />
 						<span class="font-bold text-white text-lg">WaspBot</span>
 					</a>
 				</div>

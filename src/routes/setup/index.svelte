@@ -44,7 +44,7 @@
 		<p class="text-lg text-center pt-4">
 			Use
 			<a
-				href="https://github.com/Torwent/waspbot-setup/releases/download/latest/setup.{fileExtensions[0]}"
+				href="https://github.com/torwent/waspbot-setup/releases/latest/download/setup.{fileExtensions[0]}"
 				class="hover:underline text-blue-500"
 			>
 				setup.{fileExtensions[0]}
@@ -59,7 +59,7 @@
 		<p class="text-center pt-24">
 			For a {osNames[1]} install script you can get it here:
 			<a
-				href="https://github.com/Torwent/waspbot-setup/releases/download/latest/setup.{fileExtensions[1]}"
+				href="https://github.com/torwent/waspbot-setup/releases/latest/download/setup.{fileExtensions[1]}"
 				class="hover:underline text-blue-500"
 			>
 				setup.{fileExtensions[1]}
@@ -73,7 +73,7 @@
 		<p class="text-center pt-8">
 			For a {osNames[2]} install script you can get it here:
 			<a
-				href="https://github.com/Torwent/waspbot-setup/releases/download/latest/setup.{fileExtensions[2]}"
+				href="https://github.com/torwent/waspbot-setup/releases/latest/download/setup.{fileExtensions[2]}"
 				class="hover:underline text-blue-500"
 			>
 				setup.{fileExtensions[2]}

@@ -1,8 +1,12 @@
+<script>
+	import logo from "$lib/assets/logo.svg"
+</script>
+
 <footer class="p-4 bg-white sm:p-6 dark:bg-gray-800">
 	<div class="md:flex md:justify-between">
 		<div class="mb-6 md:mb-0">
 			<a href="https://waspbot.com" class="flex items-center">
-				<img src="/assets/logo.svg" class="mr-3 h-8" alt="WaspBot Logo" />
+				<img src={logo} class="mr-3 h-8" alt="WaspBot Logo" />
 				<span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
 					WaspBot
 				</span>
