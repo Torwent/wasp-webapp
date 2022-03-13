@@ -1,4 +1,5 @@
 <script>
+	import { slide } from "svelte/transition"
 	import DropDownEntry from "./DropDownEntry.svelte"
 	export let title
 	export let entries
@@ -50,8 +51,10 @@
 		{/if}
 	</button>
 	{#if show}
-		{#each $entries as entry}
-			<DropDownEntry {entry} />
-		{/each}
+		<div in:slide={{ duration: 700 }} out:slide={{ duration: 500 }}>
+			{#each $entries as entry}
+				<DropDownEntry {entry} />
+			{/each}
+		</div>
 	{/if}
 </div>

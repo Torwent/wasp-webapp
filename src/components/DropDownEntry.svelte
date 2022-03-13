@@ -1,4 +1,5 @@
 <script>
+	import { slide } from "svelte/transition"
 	import Markdown from "$lib/Markdown.svelte"
 	let show = false
 	export let entry
@@ -47,7 +48,11 @@
 		{/if}
 	</button>
 	{#if show}
-		<article class="markdown-body border-t-2 border-gray-800">
+		<article
+			in:slide={{ duration: 500 }}
+			out:slide={{ duration: 400 }}
+			class="markdown-body border-t-2 border-gray-800"
+		>
 			<Markdown src={entry.content} />
 		</article>
 	{/if}

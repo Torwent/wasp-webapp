@@ -8,7 +8,7 @@
 		<span class="font-semibold place-items-center px-4">{$profile.display_name}</span>
 	{/if}
 	<div
-		class="rounded-full w-12 h-12 shadow-lg  border-yellow-600 hover:bg-white hover:border-yellow-400 border-2 flex place-items-center"
+		class="rounded-full w-12 h-12 shadow-lg bg-gray-100 border-yellow-600 hover:bg-white hover:border-yellow-400 border-2 flex place-items-center"
 	>
 		{@html avatar}
 	</div>
