@@ -1,5 +1,5 @@
 <script>
-	import CardEntry from "./CardEntry.svelte"
+	import DropDownEntry from "./DropDownEntry.svelte"
 	export let title
 	export let entries
 
@@ -51,7 +51,7 @@
 	</button>
 	{#if show}
 		{#each $entries as entry}
-			<CardEntry {entry} />
+			<DropDownEntry {entry} />
 		{/each}
 	{/if}
 </div>
