@@ -18,4 +18,25 @@
 	h3 {
 		@apply text-lg;
 	}
+	.primary-color {
+		@apply bg-gray-900;
+	}
+	.bg-color {
+		@apply bg-gray-900;
+	}
+	.bg-color1 {
+		@apply bg-gray-700;
+	}
+	.bg-accent {
+		@apply bg-orange-800;
+	}
+	.text-color1 {
+		@apply text-white;
+	}
+	.text-color2 {
+		@apply text-gray-200;
+	}
+	.text-color3 {
+		@apply text-gray-200;
+	}
 }
