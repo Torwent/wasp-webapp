@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from "svelte"
+	import DownloadButton from "../../components/DownloadButton.svelte"
 
 	let checkedOS = false
 	let osNames
@@ -42,46 +43,43 @@
 			{osNames[0]} was detected as your operating system.
 		</h1>
 		<p class="text-lg text-center pt-4">
-			Use
-			<a
-				href="https://github.com/torwent/waspbot-setup/releases/latest/download/setup.{fileExtensions[0]}"
-				class="hover:underline text-blue-500"
-			>
-				setup.{fileExtensions[0]}
-			</a>
-			for an automated install of WaspBot.
+			For an automated install script get use setup.{fileExtensions[0]}:
+			<DownloadButton
+				url="{`https://github.com/torwent/waspbot-setup/releases/latest/download/setup.${fileExtensions[0]}`},"
+				text={`setup.${fileExtensions[0]}`}
+			/>
 		</p>
 		<p class="text-center pb-24">
 			For a manual instalation guide for {osNames[0]} you can go
-			<a href="/blog/{blogIDs[0]}" class="text-blue-500 hover:underline">here</a>.
+			<a href="/blog/{blogIDs[0]}" class="text-accent-color hover:underline">here</a>.
 		</p>
 
 		<p class="text-center pt-24">
 			For a {osNames[1]} install script you can get it here:
 			<a
 				href="https://github.com/torwent/waspbot-setup/releases/latest/download/setup.{fileExtensions[1]}"
-				class="hover:underline text-blue-500"
+				class="hover:underline text-accent-color"
 			>
 				setup.{fileExtensions[1]}
 			</a>
 		</p>
 		<p class="text-center">
 			For a manual instalation guide for {osNames[1]} you can go
-			<a href="/blog/{blogIDs[1]}" class="text-blue-500 hover:underline">here</a>.
+			<a href="/blog/{blogIDs[1]}" class="text-accent-color hover:underline">here</a>.
 		</p>
 
 		<p class="text-center pt-8">
 			For a {osNames[2]} install script you can get it here:
 			<a
 				href="https://github.com/torwent/waspbot-setup/releases/latest/download/setup.{fileExtensions[2]}"
-				class="hover:underline text-blue-500"
+				class="hover:underline text-accent-color"
 			>
 				setup.{fileExtensions[2]}
 			</a>
 		</p>
 		<p class="text-center">
 			For a manual instalation guide for {osNames[2]} you can go
-			<a href="/blog/{blogIDs[2]}" class="text-blue-500 hover:underline">here</a>.
+			<a href="/blog/{blogIDs[2]}" class="text-accent-color hover:underline">here</a>.
 		</p>
 	</div>
 {:else}Checking your operating system...{/if}

@@ -5,14 +5,14 @@
 
 <script>
 	import Markdown from "$lib/Markdown.svelte"
-	export let post
+	export let currentScript
 </script>
 
 <main>
-	<h1 class="mb-4 font-bold text-3xl">{post.title}</h1>
-	<h2 class="font-semibold leading-normal mb-4">{post.description}</h2>
+	<h1 class="mb-4 font-bold text-3xl">{currentScript.title}</h1>
+	<h2 class="font-semibold leading-normal mb-4">{currentScript.description}</h2>
 	<article class="markdown-body border-t-2 border-gray-800">
-		<Markdown src={post.content} />
+		<Markdown src={currentScript.content} />
 	</article>
 </main>
 

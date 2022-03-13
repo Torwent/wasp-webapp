@@ -9,7 +9,7 @@
 	let show = false // menu state
 </script>
 
-<nav class="relative px-2 sm:px-4 py-2.5 bg-accent">
+<nav class="relative px-2 sm:px-4 py-2.5 accent-color">
 	<div class="max-w-6xl mx-auto px-4 top-0">
 		<div class="flex justify-between">
 			<div class="flex space-x-7">
@@ -24,25 +24,29 @@
 				<div class="hidden md:flex items-center space-x-1 text-color2">
 					<a
 						href="/"
-						class="py-4 px-2 text-color1 border-b-4 border-white transition duration-300 hover:shadow-sm"
+						class="py-4 px-2 hover:text-color1 border-b-0
+						border-white transition duration-300 hover:shadow-sm"
 					>
 						Home
 					</a>
 					<a
 						href="/setup"
-						class="py-4 px-2 hover:text-color1 transition duration-300 hover:shadow-sm"
+						class="py-4 px-2 hover:text-color1 border-b-0
+						border-white transition duration-300 hover:shadow-sm"
 					>
 						Setup
 					</a>
 					<a
 						href="/scripts"
-						class="py-4 px-2 hover:text-color1 transition duration-300 hover:shadow-sm"
+						class="py-4 px-2 hover:text-color1 border-b-0
+						border-white transition duration-300 hover:shadow-sm"
 					>
 						Scripts
 					</a>
 					<a
 						href="/faq"
-						class="py-4 px-2 hover:text-color1 transition duration-300 hover:shadow-sm"
+						class="py-4 px-2 hover:text-color1 border-b-0
+						border-white transition duration-300 hover:shadow-sm"
 					>
 						FAQ
 					</a>

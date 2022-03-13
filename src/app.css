@@ -29,7 +29,7 @@
 		@apply bg-gray-700;
 	}
 
-	.bg-accent {
+	.accent-color {
 		@apply bg-orange-800;
 	}
 
@@ -41,5 +41,8 @@
 	}
 	.text-color3 {
 		@apply text-gray-200;
+	}
+	.text-accent-color {
+		@apply text-orange-700;
 	}
 }
