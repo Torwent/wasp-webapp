@@ -1,9 +1,7 @@
 <script>
 	import "../app.css"
 	import { supabase } from "../lib/supabase.js"
-
 	import { user } from "../stores/authStore.js"
-
 	import { loadTodos } from "../stores/todoStore.js"
 	import Navbar from "../components/Navbar.svelte"
 	import Discord from "../components/Discord.svelte"

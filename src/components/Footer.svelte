@@ -2,7 +2,7 @@
 	import logo from "$lib/assets/logo.svg"
 </script>
 
-<footer class="p-4 bg-white sm:p-6 dark:bg-gray-800">
+<footer class="p-4 sm:p-6 bg-amber-500 shadow-md">
 	<div class="md:flex md:justify-between">
 		<div class="mb-6 md:mb-0">
 			<a href="https://waspbot.com" class="flex items-center">
