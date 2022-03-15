@@ -5,13 +5,13 @@
 	export let entry
 </script>
 
-<div
-	class="focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
-	on:click={() => (show = !show)}
->
+<div on:click={() => (show = !show)}>
 	<button
 		type="button"
-		class="inline-flex justify-between w-full border border-gray-500 shadow-sm px-4 py-2 bg-gray-600 text-sm font-medium text-gray-300 hover:bg-gray-500"
+		class="inline-flex justify-between w-full border shadow-sm px-4 py-2 text-sm font-medium
+		border-stone-100 bg-stone-50 hover:bg-stone-100 hover:border-stone-200
+		dark:border-stone-600 dark:bg-stone-700
+		dark:hover:bg-stone-600 dark:hover:border-stone-700"
 		id="menu-button"
 		aria-expanded="true"
 		aria-haspopup="true"
@@ -19,7 +19,7 @@
 		{entry.title}
 		{#if show}
 			<svg
-				class="-mr-1 ml-2 h-5 w-5"
+				class="-mr-1 ml-2 h-5 w-5 rotate-180"
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 20 20"
 				fill="currentColor"
@@ -33,7 +33,7 @@
 			</svg>
 		{:else}
 			<svg
-				class="-mr-1 ml-2 h-5 w-5 rotate-180"
+				class="-mr-1 ml-2 h-5 w-5"
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 20 20"
 				fill="currentColor"
@@ -49,9 +49,9 @@
 	</button>
 	{#if show}
 		<article
-			in:slide={{ duration: 500 }}
-			out:slide={{ duration: 400 }}
-			class="markdown-body border-t-2 border-gray-800"
+			in:slide={{ duration: 300 }}
+			out:slide={{ duration: 300 }}
+			class="markdown-body border-t-2 border-stone-800"
 		>
 			<Markdown src={entry.content} />
 		</article>
@@ -65,9 +65,9 @@
 		padding-left: 0.5rem;
 		padding-right: 0.5rem;
 		--tw-bg-opacity: 1;
-		background-color: rgb(31 41 55);
+		background-color: rgb(41 37 36);
 	}
 	.markdown-body:hover {
-		background-color: rgb(55 65 81);
+		background-color: rgb(38 34 33);
 	}
 </style>

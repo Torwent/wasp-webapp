@@ -3,9 +3,11 @@
 	import TodoForm from "../components/TodoForm.svelte"
 	import TodoList from "../components/TodoList.svelte"
 	import { todos } from "../stores/todoStore.js"
+
+	import { fade } from "svelte/transition"
 </script>
 
-<main>
+<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
 	<h1 class="text-2xl font-bold text-center md:text-3xl py-16">
 		<div class="py-4">WaspBot</div>
 		<div>
@@ -21,7 +23,7 @@
 	{#each $todos as todo}
 		<TodoList {todo} index={todo.id} />
 	{/each}
-</main>
+</div>
 
 <style>
 	.animate-character {

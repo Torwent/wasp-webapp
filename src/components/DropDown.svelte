@@ -7,12 +7,12 @@
 	let show = false
 </script>
 
-<div
-	class="rounded-t-md shadow-sm  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-stone-100 focus:ring-amber-500"
->
+<div>
 	<button
 		type="button"
-		class="inline-flex justify-between w-full rounded-t border shadow-sm px-4 py-2 text-sm font-medium border-stone-700 bg-stone-800 hover:bg-stone-700"
+		class="inline-flex justify-between w-full rounded-t border shadow-sm px-4 py-2 text-sm font-medium 
+		border-stone-200 bg-stone-100 hover:bg-stone-50
+		dark:border-stone-700 dark:bg-stone-800 dark:hover:bg-stone-900"
 		id="menu-button"
 		aria-expanded="true"
 		aria-haspopup="true"
@@ -51,7 +51,7 @@
 		{/if}
 	</button>
 	{#if show}
-		<div in:slide={{ duration: 700 }} out:slide={{ duration: 500 }}>
+		<div in:slide={{ duration: 700 }} out:slide={{ duration: 300 }}>
 			{#each $entries as entry}
 				<DropDownEntry {entry} />
 			{/each}

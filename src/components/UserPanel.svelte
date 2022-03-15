@@ -46,6 +46,7 @@
 						name="username"
 						type="username"
 						placeholder={$profile.display_name}
+						autocomplete="off"
 						bind:value={username}
 					/>
 					<button

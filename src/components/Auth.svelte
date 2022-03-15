@@ -43,6 +43,7 @@
 					name="email"
 					type="email"
 					placeholder="Your email"
+					autocomplete="off"
 					bind:value={email}
 				/>
 				<button
