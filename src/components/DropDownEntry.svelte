@@ -51,7 +51,7 @@
 		<article
 			in:slide={{ duration: 300 }}
 			out:slide={{ duration: 300 }}
-			class="markdown-body border-t-2 border-stone-800"
+			class="markdown-body border-t-2 border-stone-100 dark:border-stone-800"
 		>
 			<Markdown src={entry.content} />
 		</article>
@@ -65,9 +65,23 @@
 		padding-left: 0.5rem;
 		padding-right: 0.5rem;
 		--tw-bg-opacity: 1;
-		background-color: rgb(41 37 36);
+		--color-accent-fg: orange;
 	}
-	.markdown-body:hover {
-		background-color: rgb(38 34 33);
+
+	@media (prefers-color-scheme: light) {
+		.markdown-body {
+			background-color: rgb(225 225 224);
+		}
+		.markdown-body:hover {
+			background-color: rgb(240 240 240);
+		}
+	}
+	@media (prefers-color-scheme: dark) {
+		.markdown-body {
+			background-color: rgb(43 38 38);
+		}
+		.markdown-body:hover {
+			background-color: rgb(38 34 33);
+		}
 	}
 </style>
