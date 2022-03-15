@@ -30,16 +30,16 @@
 	}
 </script>
 
-<div class="px-4 py-2">
-	<h1 class="text-2x1 font-bold text-center text-gray-800 md:text-3x1">Log In</h1>
+<div class="px-4 py-2 ">
+	<h1 class="text-2x1 font-bold text-center md:text-3x1">Log In</h1>
 	<form on:submit|preventDefault={handleLogin}>
 		<div class="flex flex-col text-sm mb-2">
 			<div class="flex flex-col text-sm mb-2">
-				<label for="email" class="text-center mt-2 py-2 font-bold mb-2 text-gray-800"
+				<label for="email" class="text-center mt-2 py-2 font-bold mb-2"
 					>Sign up/in via email link:</label
 				>
 				<input
-					class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
+					class="appearance-none shadow-sm border border-stone-200 p-2 focus:outline-none focus:border-stone-500 rounded-lg"
 					name="email"
 					type="email"
 					placeholder="Your email"
@@ -47,14 +47,14 @@
 				/>
 				<button
 					type="submit"
-					class="w-full shadow-sm rounded bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 my-2"
+					class="w-full shadow-sm rounded bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 text-white py-2 px-4 my-2"
 					disabled={loading}
 					on:click={() => setProvider("")}
 				>
 					Log In
 				</button>
 			</div>
-			<label for="social" class="text-center mt-2 py-2 font-bold mb-2 text-gray-800">
+			<label for="social" class="text-center mt-2 py-2 font-bold mb-2">
 				Or sign up/in with on of the following providers:
 			</label>
 			<div class="flex justify-center items-center flex-wrap space-x-2">

@@ -2,97 +2,134 @@
 	import logo from "$lib/assets/logo.svg"
 </script>
 
-<footer class="p-4 sm:p-6 bg-amber-500 shadow-md">
+<footer
+	class="p-4 sm:p-6 border-t border-stone-200 justify-between text-stone-500 dark:border-stone-200/5"
+>
 	<div class="md:flex md:justify-between">
 		<div class="mb-6 md:mb-0">
-			<a href="https://waspbot.com" class="flex items-center">
+			<a
+				href="https://waspbot.com"
+				class="flex items-centerhover:text-amber-500 dark:hover:text-amber-400"
+			>
 				<img src={logo} class="mr-3 h-8" alt="WaspBot Logo" />
-				<span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
-					WaspBot
-				</span>
+				<span class="self-center text-2xl font-semibold whitespace-nowrap"> WaspBot </span>
 			</a>
 		</div>
 		<div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
 			<div>
-				<h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
-					Resources
-				</h2>
-				<ul class="text-gray-600 dark:text-gray-400">
-					<li><a href="/setup" class="hover:underline">Setup</a></li>
+				<h2 class="mb-6 text-sm font-semibold uppercase text-white">Resources</h2>
+				<ul>
 					<li>
-						<a href="https://ollydev.github.io/SRL-Development" class="hover:underline">
+						<a href="/setup" class="hover:text-amber-500 dark:hover:text-amber-400"> Setup </a>
+					</li>
+					<li>
+						<a
+							href="https://ollydev.github.io/SRL-Development"
+							class="hover:text-amber-500 dark:hover:text-amber-400"
+						>
 							SRL Documentation
 						</a>
 					</li>
 					<li>
-						<a href="https://torwent.github.io/WaspLib" class="hover:underline">
+						<a
+							href="https://torwent.github.io/WaspLib"
+							class="hover:text-amber-500 dark:hover:text-amber-400"
+						>
 							WaspLib Documentation
 						</a>
 					</li>
 					<li>
-						<a href="https://github.com/ollydev/Simba" class="hover:underline"> Simba repo </a>
+						<a
+							href="https://github.com/ollydev/Simba"
+							class="hover:text-amber-500 dark:hover:text-amber-400"
+						>
+							Simba repo
+						</a>
 					</li>
 					<li>
-						<a href="https://github.com/ollydev/SRL-Development" class="hover:underline">
+						<a
+							href="https://github.com/ollydev/SRL-Development"
+							class="hover:text-amber-500 dark:hover:text-amber-400"
+						>
 							SRL repo
 						</a>
 					</li>
 					<li>
-						<a href="https://github.com/Torwent/WaspLib" class="hover:underline"> WaspLib repo </a>
+						<a
+							href="https://github.com/Torwent/WaspLib"
+							class="hover:text-amber-500 dark:hover:text-amber-400"
+						>
+							WaspLib repo
+						</a>
 					</li>
 				</ul>
 			</div>
 			<div>
-				<h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">
-					Special thanks:
-				</h2>
-				<ul class="text-gray-600 dark:text-gray-400">
+				<h2 class="mb-6 text-sm font-semibold uppercase text-white">Special thanks:</h2>
+				<ul>
 					<li>
-						<a href="https://github.com/Brandon-T" class="hover:underline ">Brandon-T</a>
+						<a
+							href="https://github.com/Brandon-T"
+							class="hover:text-amber-500 dark:hover:text-amber-400">Brandon-T</a
+						>
 					</li>
 					<li>
-						<a href="https://github.com/slackydev" class="hover:underline ">Jarl Holta</a>
+						<a
+							href="https://github.com/slackydev"
+							class="hover:text-amber-500 dark:hover:text-amber-400">Jarl Holta</a
+						>
 					</li>
 					<li>
-						<a href="https://github.com/MerlijnWajer" class="hover:underline ">Merlijn Wajer</a>
+						<a
+							href="https://github.com/MerlijnWajer"
+							class="hover:text-amber-500 dark:hover:text-amber-400">Merlijn Wajer</a
+						>
 					</li>
 					<li>
-						<a href="https://github.com/nielsAD" class="hover:underline ">Niels AD</a>
+						<a
+							href="https://github.com/nielsAD"
+							class="hover:text-amber-500 dark:hover:text-amber-400">Niels AD</a
+						>
 					</li>
 					<li>
-						<a href="https://github.com/ollydev" class="hover:underline ">Olly</a>
+						<a
+							href="https://github.com/ollydev"
+							class="hover:text-amber-500 dark:hover:text-amber-400">Olly</a
+						>
 					</li>
 					<li>
-						<a href="https://ollydev.github.io/SRL-Development" class="hover:underline ">
+						<a
+							href="https://ollydev.github.io/SRL-Development"
+							class="hover:underline hover:text-amber-500 dark:hover:text-amber-400"
+						>
 							Many SRL members...
 						</a>
 					</li>
 				</ul>
 			</div>
 			<div>
-				<h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Legal</h2>
-				<ul class="text-gray-600 dark:text-gray-400">
+				<h2 class="mb-6 text-sm font-semibold uppercase text-white">Legal</h2>
+				<ul>
 					<li class="mb-4">
-						<a href="/" class="hover:underline">Privacy Policy</a>
+						<a href="/" class="hover:text-amber-500 dark:hover:text-amber-400">Privacy Policy</a>
 					</li>
 					<li>
-						<a href="/" class="hover:underline">Terms &amp; Conditions</a>
+						<a href="/" class="hover:text-amber-500 dark:hover:text-amber-400"
+							>Terms &amp; Conditions</a
+						>
 					</li>
 				</ul>
 			</div>
 		</div>
 	</div>
-	<hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
-	<div class="sm:flex sm:items-center sm:justify-between">
-		<span class="text-sm text-gray-500 sm:text-center dark:text-gray-400"
-			>© 2022 <a href="https://waspbot.com" class="hover:underline">WaspBot™</a>. All Rights
-			Reserved.
+	<div class="sm:flex sm:items-center sm:justify-between p-8 sm:p-12">
+		<span class="text-sm sm:text-center"
+			>© 2022 <a href="https://waspbot.com" class="hover:text-amber-500 dark:hover:text-amber-400e"
+				>WaspBot™</a
+			>. All Rights Reserved.
 		</span>
 		<div class="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
-			<a
-				href="https://github.com/torwent"
-				class="text-gray-500 hover:text-gray-900 dark:hover:text-white"
-			>
+			<a href="https://github.com/torwent" class="hover:text-amber-500 dark:hover:text-amber-400">
 				<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 					<path
 						fill-rule="evenodd"
@@ -101,7 +138,7 @@
 					/>
 				</svg>
 			</a>
-			<a href="/" class="text-gray-500 hover:text-gray-900 dark:hover:text-white">
+			<a href="/" class="hover:text-amber-500 dark:hover:text-amber-400">
 				<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 					<path
 						fill-rule="evenodd"

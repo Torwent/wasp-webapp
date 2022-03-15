@@ -1,18 +1,21 @@
 <script>
 	import { user } from "../stores/authStore.js"
 	import { scale } from "svelte/transition"
-	import Logout from "../components/Logout.svelte"
+	import UserPanel from "../components/UserPanel.svelte"
 	import Auth from "../components/Auth.svelte"
 	import Avatar from "../components/Avatar.svelte"
 	import logo from "$lib/assets/logo.svg"
 
-	let tabs = [0, 1, 2, 3, 4]
+	let tabs = [0, 1, 2, 3]
 	let selectedTab = tabs[0]
 
 	let show = false // menu state
 </script>
 
-<nav class="relative px-2 sm:px-4 py-2.5 bg-amber-500 shadow-md text-amber-100">
+<nav
+	class="sticky top-0 z-40 w-full backdrop-blur flex-none transition-colors duration-500 lg:z-50 lg:border-b lg:border-stone-900/10 dark:border-stone-50/[0.06] bg-white supports-backdrop-blur:bg-white/95 dark:bg-stone-900/75
+"
+>
 	<div class="max-w-6xl mx-auto px-4 top-0">
 		<div class="flex justify-between">
 			<div class="flex space-x-7">
@@ -20,45 +23,41 @@
 				<div>
 					<a
 						href="/"
-						class="flex items-center py-4 px-2 link"
+						class="flex items-center py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
 						on:click={() => (selectedTab = tabs[0])}
-						class:text-white={selectedTab === 0}
+						class:text-orange-500={selectedTab === 0}
+						class:dark:text-orange-400={selectedTab === 0}
 					>
 						<img src={logo} class="mr-3 h-8" alt="WaspBot Logo" />
-						<span class="font-bold text-lg">WaspBot</span>
+						<span class="font-bold text-lg"> WaspBot </span>
 					</a>
 				</div>
 				<!-- Menu -->
 				<div class="hidden md:flex items-center space-x-1">
 					<a
-						href="/"
-						class="py-4 px-2 transition duration-300 hover:text-white"
-						on:click={() => (selectedTab = tabs[1])}
-						class:text-white={selectedTab === 1}
-					>
-						Home
-					</a>
-					<a
 						href="/setup"
-						class="py-4 px-2 transition duration-300 hover:text-white"
-						on:click={() => (selectedTab = tabs[2])}
-						class:text-white={selectedTab === 2}
+						class="font-semibold py-4 px-2 transition duration-300 dark:dark:hover:text-amber-100 hover:text-orange-400 hover:text-orange-400"
+						on:click={() => (selectedTab = tabs[1])}
+						class:text-orange-500={selectedTab === 1}
+						class:dark:text-orange-400={selectedTab === 1}
 					>
 						Setup
 					</a>
 					<a
 						href="/scripts"
-						class="py-4 px-2 transition duration-300 hover:text-white"
-						on:click={() => (selectedTab = tabs[3])}
-						class:text-white={selectedTab === 3}
+						class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
+						on:click={() => (selectedTab = tabs[2])}
+						class:text-orange-500={selectedTab === 2}
+						class:dark:text-orange-400={selectedTab === 2}
 					>
 						Scripts
 					</a>
 					<a
 						href="/faq"
-						class="py-4 px-2 transition duration-300 hover:text-white"
-						on:click={() => (selectedTab = tabs[4])}
-						class:text-white={selectedTab === 4}
+						class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
+						on:click={() => (selectedTab = tabs[3])}
+						class:text-orange-500={selectedTab === 3}
+						class:dark:text-orange-400={selectedTab === 3}
 					>
 						FAQ
 					</a>
@@ -85,10 +84,10 @@
 						<div
 							in:scale={{ duration: 100, start: 0.95 }}
 							out:scale={{ duration: 75, start: 0.95 }}
-							class="origin-top-right top-12 absolute right-0 w-80 py-10 mt-1 rounded-md shadow-lg container group max-w-sm items-center mx-auto content-div"
+							class="bg-stone-100 dark:bg-stone-800 origin-top-right top-14 absolute right-0 w-80 pt-4 mt-1 rounded-md shadow-lg container group max-w-sm items-center mx-auto content-div"
 						>
 							{#if $user}
-								<Logout />
+								<UserPanel />
 							{:else}
 								<Auth />
 							{/if}

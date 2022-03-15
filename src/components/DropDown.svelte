@@ -8,11 +8,11 @@
 </script>
 
 <div
-	class="rounded-t-md shadow-sm  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-indigo-500"
+	class="rounded-t-md shadow-sm  focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-stone-100 focus:ring-amber-500"
 >
 	<button
 		type="button"
-		class="inline-flex justify-between w-full rounded-t border border-gray-700 shadow-sm px-4 py-2 text-sm font-medium text-gray-400 bg-gray-800 hover:bg-gray-700"
+		class="inline-flex justify-between w-full rounded-t border shadow-sm px-4 py-2 text-sm font-medium border-stone-700 bg-stone-800 hover:bg-stone-700"
 		id="menu-button"
 		aria-expanded="true"
 		aria-haspopup="true"
