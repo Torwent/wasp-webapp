@@ -7,22 +7,24 @@
 	import { fade } from "svelte/transition"
 </script>
 
-<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
-	<h1 class="text-2xl font-bold text-center md:text-3xl py-16">
-		<div class="py-4">WaspBot</div>
-		<div>
-			100%
-			<span class="bg-clip-border animate-character pl-1"> color </span>
-			, 100% open source.
-		</div>
-	</h1>
+<div class="container mx-auto my-6 max-w-2xl flex-grow">
+	<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+		<h1 class="text-2xl font-bold text-center md:text-3xl py-16">
+			<div class="py-4">WaspBot</div>
+			<div>
+				100%
+				<span class="bg-clip-border animate-character pl-1"> color </span>
+				, 100% open source.
+			</div>
+		</h1>
 
-	<h2 class="text-center py-6">For help or questions join the discord community!</h2>
-	<Discord />
-	<TodoForm />
-	{#each $todos as todo}
-		<TodoList {todo} index={todo.id} />
-	{/each}
+		<h2 class="text-center py-6">For help or questions join the discord community!</h2>
+		<Discord />
+		<TodoForm />
+		{#each $todos as todo}
+			<TodoList {todo} index={todo.id} />
+		{/each}
+	</div>
 </div>
 
 <style>

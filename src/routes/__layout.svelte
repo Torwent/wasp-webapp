@@ -17,12 +17,10 @@
 
 <Navbar />
 
-<div class="container mx-auto my-6 max-w-2xl flex-grow">
-	{#if $user}
-		<slot />
-	{:else}
-		<slot />
-	{/if}
-</div>
+{#if $user}
+	<slot />
+{:else}
+	<slot />
+{/if}
 
 <Footer />

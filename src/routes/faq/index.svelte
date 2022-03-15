@@ -4,7 +4,11 @@
 	import DropDown from "../../components/DropDown.svelte"
 </script>
 
-<div class="pb-16" in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+<div
+	class="pb-16 container mx-auto my-6 max-w-2xl flex-grow"
+	in:fade={{ duration: 300, delay: 300 }}
+	out:fade={{ duration: 300 }}
+>
 	<DropDown title="FAQ" entries={questions} />
 	<DropDown title="Common Errors" entries={commonErrors} />
 </div>

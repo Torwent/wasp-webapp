@@ -13,10 +13,11 @@
 </script>
 
 <nav
-	class="sticky top-0 z-40 w-full backdrop-blur flex-none transition-colors duration-500 lg:z-50 lg:border-b lg:border-stone-900/10 dark:border-stone-50/[0.06] bg-white supports-backdrop-blur:bg-white/95 dark:bg-stone-900/75
-"
+	class="sticky top-0 z-40 w-full backdrop-blur flex-none transition-colors duration-500
+	lg:z-50 lg:border-b 
+	bg-white/60 supports-backdrop-blur:bg-white/95 dark:border-stone-50/[0.06] dark:bg-stone-900/60"
 >
-	<div class="max-w-6xl mx-auto px-4 top-0">
+	<div class="max-w-7xl mx-auto px-4">
 		<div class="flex justify-between">
 			<div class="flex space-x-7">
 				<!-- Website Logo -->

@@ -9,7 +9,11 @@
 	export let post
 </script>
 
-<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+<div
+	class="container mx-auto my-6 max-w-2xl flex-grow"
+	in:fade={{ duration: 300, delay: 300 }}
+	out:fade={{ duration: 300 }}
+>
 	<h1 class="mb-4 font-bold text-3xl">{post.title}</h1>
 	<h2 class="font-semibold leading-normal mb-4">{post.description}</h2>
 	<article class="markdown-body py-6 border-t-2 border-stone-300 dark:border-stone-800">
