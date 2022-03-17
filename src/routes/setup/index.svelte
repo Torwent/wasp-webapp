@@ -47,7 +47,7 @@
 			<p class="text-lg text-center pt-4">
 				For an automated install script download the following file:
 				<DownloadButton
-					url="{`https://github.com/torwent/waspbot-setup/releases/latest/download/setup.${fileExtensions[0]}`},"
+					url={`https://github.com/torwent/wasp-setup/releases/latest/download/setup.${fileExtensions[0]}`}
 					text={`setup.${fileExtensions[0]}`}
 				/>
 			</p>
@@ -62,7 +62,7 @@
 			<p class="text-center pt-24">
 				For a {osNames[1]} install script you can get it here:
 				<a
-					href="https://github.com/torwent/waspbot-setup/releases/latest/download/setup.{fileExtensions[1]}"
+					href="https://github.com/torwent/wasp-setup/releases/latest/download/setup.{fileExtensions[1]}"
 					class="font-semibold hover:underline text-amber-400 dark:text-amber-100"
 				>
 					setup.{fileExtensions[1]}
@@ -79,7 +79,7 @@
 			<p class="text-center pt-8">
 				For a {osNames[2]} install script you can get it here:
 				<a
-					href="https://github.com/torwent/waspbot-setup/releases/latest/download/setup.{fileExtensions[2]}"
+					href="https://github.com/torwent/wasp-setup/releases/latest/download/setup.{fileExtensions[2]}"
 					class="font-semibold  hover:underline text-amber-400 dark:text-amber-100"
 				>
 					setup.{fileExtensions[2]}

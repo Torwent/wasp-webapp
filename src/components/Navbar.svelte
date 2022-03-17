@@ -4,6 +4,7 @@
 	import UserPanel from "../components/UserPanel.svelte"
 	import Auth from "../components/Auth.svelte"
 	import Avatar from "../components/Avatar.svelte"
+	import DarkModeSwitch from "../components/DarkModeSwitch.svelte"
 	import logo from "$lib/assets/logo.svg"
 
 	let tabs = [0, 1, 2, 3]
@@ -65,7 +66,7 @@
 				</div>
 			</div>
 			<!-- Account -->
-			<div class="relative">
+			<div class="flex">
 				<div
 					on:mouseover={() => (show = true)}
 					on:focus={() => (show = true)}
@@ -85,7 +86,7 @@
 						<div
 							in:scale={{ duration: 100, start: 0.95 }}
 							out:scale={{ duration: 75, start: 0.95 }}
-							class="bg-stone-100 dark:bg-stone-800 origin-top-right top-14 absolute right-0 w-80 pt-4 mt-1 rounded-md shadow-lg container group max-w-sm items-center mx-auto content-div"
+							class="bg-stone-100 dark:bg-stone-800 top-14 lg:right-auto md:right-12 sm:right-16 absolute w-80 pt-4 mt-1 rounded-md shadow-lg container group max-w-sm items-center mx-auto content-div"
 						>
 							{#if $user}
 								<UserPanel />
@@ -95,13 +96,10 @@
 						</div>
 					{/if}
 				</div>
+				<div class="grid place-items-center h-full px-8">
+					<DarkModeSwitch />
+				</div>
 			</div>
 		</div>
 	</div>
 </nav>
-
-<style>
-	.selectedTab {
-		color: white;
-	}
-</style>

@@ -1,13 +1,16 @@
 <script>
 	import { fade } from "svelte/transition"
+	import Checkbox from "../../components/Checkbox.svelte"
 </script>
 
 <div class="flex" in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
 	<div class="h-full w-64 border-r border-stone-800">
 		<h4 class="text-center py-6">Filters</h4>
-		<div class="grid">
-			<span class="text-center px-4">Free</span>
-			<span class="text-center px-4">Premium</span>
+		<div class="flex justify-center">
+			<div>
+				<Checkbox label="Premium" />
+				<Checkbox label="Free" />
+			</div>
 		</div>
 	</div>
 	<div class="container mx-auto my-6 max-w-2xl flex-grow">
