@@ -1,6 +1,6 @@
 <script>
 	import { slide } from "svelte/transition"
-	import Markdown from "$lib/Markdown.svelte"
+	import { marked } from "marked"
 	let show = false
 	export let entry
 </script>
@@ -51,37 +51,9 @@
 		<article
 			in:slide={{ duration: 300 }}
 			out:slide={{ duration: 300 }}
-			class="markdown-body border-t-2 border-stone-100 dark:border-stone-800"
+			class="prose dark:prose-invert border-t-2 p-6 border-stone-100 dark:border-stone-800 bg-stone-300 dark:bg-stone-800/25"
 		>
-			<Markdown src={entry.content} />
+			{@html marked.parse(entry.content)}
 		</article>
 	{/if}
 </div>
-
-<style>
-	.markdown-body {
-		padding-top: 1rem;
-		padding-bottom: 1rem;
-		padding-left: 0.5rem;
-		padding-right: 0.5rem;
-		--tw-bg-opacity: 1;
-		--color-accent-fg: orange;
-	}
-
-	@media (prefers-color-scheme: light) {
-		.markdown-body {
-			background-color: rgb(225 225 224);
-		}
-		.markdown-body:hover {
-			background-color: rgb(240 240 240);
-		}
-	}
-	@media (prefers-color-scheme: dark) {
-		.markdown-body {
-			background-color: rgb(43 38 38);
-		}
-		.markdown-body:hover {
-			background-color: rgb(38 34 33);
-		}
-	}
-</style>

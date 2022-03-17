@@ -4,7 +4,7 @@
 </script>
 
 <script>
-	import Markdown from "$lib/Markdown.svelte"
+	import { marked } from "marked"
 	import { supabase } from "$lib/supabase.js"
 	export let post
 
@@ -21,7 +21,7 @@
 	}
 </script>
 
-<main>
+<div class="container mx-auto my-6 max-w-2xl flex-grow">
 	<form class="form my-6" on:submit|preventDefault={handleSubmit}>
 		<div class="flex flex-col text-sm mb-2">
 			<label for="title" class="font-bold mb-2 text-gray-800 "> Title: </label>
@@ -57,7 +57,7 @@
 				<div>{post.title}</div>
 				<div>{post.description}</div>
 				<article class="markdown-body">
-					<Markdown src={post.content} />
+					{@html marked.parse(post.content)}
 				</article>
 			</details>
 		</div>
@@ -68,4 +68,4 @@
 			Update
 		</button>
 	</form>
-</main>
+</div>

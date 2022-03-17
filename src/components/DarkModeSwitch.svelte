@@ -14,7 +14,7 @@
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 455 455"
 			xml:space="preserve"
-			class="fill-amber-500 hover:fill-amber-200 dark:fill-amber-400 dark:hover:fill-amber-100"
+			class="fill-amber-500 hover:fill-amber-100 dark:fill-orange-400 dark:hover:fill-amber-100"
 		>
 			<g>
 				<polygon
