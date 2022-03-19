@@ -1,6 +1,8 @@
 <script>
 	import { fade } from "svelte/transition"
+	import { scripts } from "../../stores/scriptsStore.js"
 	import Checkbox from "../../components/Checkbox.svelte"
+	import Card from "../../components/Card.svelte"
 </script>
 
 <div class="flex" in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
@@ -12,16 +14,21 @@
 				<Checkbox label="Free" />
 			</div>
 		</div>
-	</div>
-	<div class="container mx-auto my-6 max-w-2xl flex-grow">
-		<div class="flex justify-between">
-			<div class="py-16 px-16 rounded-md shadow-md hover:shadow-lg bg-stone-800 hover:bg-stone-700">
-				Free scripts
-			</div>
-			<div class="py-16 px-16 rounded-md shadow-md hover:shadow-lg bg-stone-800 hover:bg-stone-700">
-				Free scripts
+
+		<h4 class="text-center py-6">Skills</h4>
+		<div class="flex justify-center">
+			<div>
+				<Checkbox label="Combat" />
+				<Checkbox label="Magic" />
 			</div>
 		</div>
 	</div>
-	<div class="h-full w-64" />
+	<div
+		class="grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:px-20 container gap-3 mx-auto my-2 xl:max-w-full lg:max-w-6xl md:max-w-4xl sm:max-w-xl content-start pt-10"
+	>
+		{#each $scripts as script}
+			<Card {script} />
+		{/each}
+	</div>
+	<!--div class="h-full w-64" /-->
 </div>

@@ -12,7 +12,6 @@ export const loadQuestions = async () => {
 	}
 
 	questions.set(data)
-	console.log(data)
 }
 loadQuestions()
 
