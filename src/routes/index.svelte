@@ -1,9 +1,5 @@
 <script>
 	import Discord from "../components/Discord.svelte"
-	import TodoForm from "../components/TodoForm.svelte"
-	import TodoList from "../components/TodoList.svelte"
-	import { todos } from "../stores/todoStore.js"
-
 	import { fade } from "svelte/transition"
 </script>
 
@@ -20,10 +16,6 @@
 
 		<h2 class="text-center py-6">For help or questions join the discord community!</h2>
 		<Discord />
-		<TodoForm />
-		{#each $todos as todo}
-			<TodoList {todo} index={todo.id} />
-		{/each}
 	</div>
 </div>
 

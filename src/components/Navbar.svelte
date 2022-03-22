@@ -1,5 +1,5 @@
 <script>
-	import { user } from "../stores/authStore.js"
+	import { user, profile } from "../stores/authStore.js"
 	import { scale } from "svelte/transition"
 	import UserPanel from "../components/UserPanel.svelte"
 	import Auth from "../components/Auth.svelte"
@@ -7,7 +7,7 @@
 	import DarkModeSwitch from "../components/DarkModeSwitch.svelte"
 	import logo from "$lib/assets/logo.svg"
 
-	let tabs = [0, 1, 2, 3]
+	let tabs = [0, 1, 2, 3, 4]
 	let selectedTab = tabs[0]
 
 	let show = false // menu state
@@ -63,6 +63,17 @@
 					>
 						FAQ
 					</a>
+					{#if $profile.dev_state}
+						<a
+							href="/blog"
+							class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
+							on:click={() => (selectedTab = tabs[4])}
+							class:text-orange-500={selectedTab === 4}
+							class:dark:text-orange-400={selectedTab === 4}
+						>
+							Blog
+						</a>
+					{/if}
 				</div>
 			</div>
 			<!-- Account -->

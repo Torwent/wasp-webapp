@@ -1,6 +1,9 @@
 <script>
 	import { supabase } from "../lib/supabase.js"
-	import { user, reloadAvatar, profile } from "../stores/authStore.js"
+	import { user, profile } from "../stores/authStore.js"
+	import RoleBadges from "../components/RoleBadges.svelte"
+
+	console.log(user.id)
 
 	let loading = false
 	let username
@@ -51,12 +54,19 @@
 					/>
 					<button
 						type="submit"
-						class="w-full shadow-sm rounded bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 text-white py-2 px-4 my-2"
+						class="w-full shadow-sm rounded bg-orange-500 hover:bg-orange-400 dark:bg-orange-400 dark:hover:bg-amber-300 text-white py-2 px-4 my-2"
 						disabled={loading}
 						on:click={() => setProvider("")}
 					>
 						Update
 					</button>
+				</div>
+				<div class="flex justify-center">
+					{#if $profile}
+						<RoleBadges profile={$profile} />
+					{:else}
+						Loading roles...
+					{/if}
 				</div>
 				<label for="social" class="text-center mt-2 py-2 font-bold mb-2">
 					Connect auth providers:
@@ -131,7 +141,7 @@
 		</form>
 
 		<button
-			class="w-full shadow-sm rounded bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 text-white py-2 px-4 my-2"
+			class="w-full shadow-sm rounded bg-orange-500 hover:bg-orange-400 dark:bg-orange-400 dark:hover:bg-amber-300 text-white py-2 px-4 my-2"
 			on:click={logout}>Log Out</button
 		>
 	</div>
