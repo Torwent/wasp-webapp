@@ -5,6 +5,32 @@
 	export let entries
 
 	let show = false
+
+	let searchQuery = ""
+	let filteredEntries = []
+	let placeholderText = "Search..."
+
+	String.prototype.fuzzy = function (s) {
+		var hay = this.toLowerCase(),
+			i = 0,
+			n = -1,
+			l
+		s = s.toLowerCase()
+		for (; (l = s[i++]); ) if (!~(n = hay.indexOf(l, n + 1))) return false
+		return true
+	}
+
+	const handleSearch = () => {
+		filteredEntries = $entries
+		placeholderText = "Search..."
+		if (searchQuery === "") return
+
+		filteredEntries = $entries.filter((e) => e.title.fuzzy(searchQuery))
+		if (filteredEntries.length === 0) {
+			placeholderText = "Not found!"
+			searchQuery = ""
+		}
+	}
 </script>
 
 <div>
@@ -52,9 +78,35 @@
 	</button>
 	{#if show}
 		<div in:slide={{ duration: 700 }} out:slide={{ duration: 300 }}>
-			{#each $entries as entry}
-				<DropDownEntry {entry} />
-			{/each}
+			<div>
+				<form class="form" on:submit|preventDefault={handleSearch}>
+					<div class="flex flex-col text-sm">
+						<input
+							type="text"
+							bind:value={searchQuery}
+							name="search"
+							placeholder={placeholderText}
+							autocomplete="off"
+							class="appearance-none border px-4 py-2 focus:outline-none font-semibold 
+							border-stone-100 hover:border-stone-200
+							dark:border-stone-600 dark:hover:border-stone-700
+							bg-stone-50 hover:bg-stone-100  dark:bg-stone-700 dark:hover:bg-stone-600
+							placeholder-amber-600 dark:placeholder-amber-200
+							text-amber-500 dark:text-amber-400
+							focus:text-amber-600 dark:focus:text-amber-300"
+						/>
+					</div>
+				</form>
+			</div>
+			{#if filteredEntries.length !== 0}
+				{#each filteredEntries as entry}
+					<DropDownEntry {entry} />
+				{/each}
+			{:else}
+				{#each $entries as entry}
+					<DropDownEntry {entry} />
+				{/each}
+			{/if}
 		</div>
 	{/if}
 </div>
