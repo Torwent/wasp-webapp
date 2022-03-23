@@ -1,10 +1,10 @@
 <script context="module">
 	import { load } from "./_slug"
-	import { marked } from "marked"
 	export { load }
 </script>
 
 <script>
+	import Markdown from "$lib/Markdown.svelte"
 	import { fade } from "svelte/transition"
 	export let post
 </script>
@@ -17,6 +17,6 @@
 	<h1 class="mb-4 font-bold text-3xl">{post.title}</h1>
 	<h2 class="font-semibold leading-normal mb-4">{post.description}</h2>
 	<article class="prose dark:prose-invert py-6 border-t-2 border-stone-300 dark:border-stone-800">
-		{@html marked.parse(post.content)}
+		<Markdown src={post.content} />
 	</article>
 </div>

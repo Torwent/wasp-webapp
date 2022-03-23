@@ -4,7 +4,7 @@
 </script>
 
 <script>
-	import { marked } from "marked"
+	import Markdown from "$lib/Markdown.svelte"
 	import { supabase } from "$lib/supabase.js"
 	export let post
 
@@ -57,7 +57,7 @@
 				<div>{post.title}</div>
 				<div>{post.description}</div>
 				<article class="markdown-body">
-					{@html marked.parse(post.content)}
+					<Markdown src={post.content} />
 				</article>
 			</details>
 		</div>

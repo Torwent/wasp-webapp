@@ -1,6 +1,7 @@
 <script>
+	import Markdown from "$lib/Markdown.svelte"
 	import { slide } from "svelte/transition"
-	import { marked } from "marked"
+
 	let show = false
 	export let entry
 </script>
@@ -53,7 +54,7 @@
 			out:slide={{ duration: 300 }}
 			class="prose dark:prose-invert border-t-2 p-6 border-stone-100 dark:border-stone-800 bg-stone-300 dark:bg-stone-800/25"
 		>
-			{@html marked.parse(entry.content)}
+			<Markdown src={entry.content} />
 		</article>
 	{/if}
 </div>
