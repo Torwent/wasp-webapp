@@ -6,9 +6,32 @@
 	import Avatar from "../components/Avatar.svelte"
 	import DarkModeSwitch from "../components/DarkModeSwitch.svelte"
 	import logo from "$lib/assets/logo.svg"
+	import { page } from "$app/stores"
 
 	let tabs = [0, 1, 2, 3, 4]
-	let selectedTab = tabs[0]
+	let selectedTab
+
+	switch ($page.url.pathname) {
+		case "/":
+			selectedTab = tabs[0]
+			break
+
+		case "/setup":
+			selectedTab = tabs[1]
+			break
+
+		case "/scripts":
+			selectedTab = tabs[2]
+			break
+
+		case "/faq":
+			selectedTab = tabs[3]
+			break
+
+		case "/blog":
+			selectedTab = tabs[4]
+			break
+	}
 
 	let show = false // menu state
 </script>

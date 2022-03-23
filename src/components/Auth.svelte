@@ -13,7 +13,6 @@
 		try {
 			loading = true
 			if (authProvider === "") {
-				console.log(email)
 				var { error } = await supabase.auth.signIn({ email })
 			} else {
 				var { error } = await supabase.auth.signIn({ provider: authProvider })

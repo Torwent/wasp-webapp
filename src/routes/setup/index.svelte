@@ -40,7 +40,7 @@
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
 	{#if checkedOS}
-		<div>
+		<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
 			<h1 class="text-xl py-16 text-center text-amber-500 dark:text-amber-100 md:text-3xl">
 				{osNames[0]} was detected as your operating system.
 			</h1>
@@ -93,5 +93,11 @@
 				>.
 			</p>
 		</div>
-	{:else}Checking your operating system...{/if}
+	{:else}
+		<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+			<h1 class="text-xl py-16 text-center text-amber-500 dark:text-amber-100 md:text-3xl">
+				Checking your operating system...
+			</h1>
+		</div>
+	{/if}
 </div>

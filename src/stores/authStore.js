@@ -6,15 +6,24 @@ import * as style from "@dicebear/avatars-bottts-sprites"
 export const user = writable(false)
 export const profile = writable([])
 
-export const loadProfile = async () => {
+const loadProfile = async () => {
 	const { data, error } = await supabase.from("profile").select()
 
-	if (error) {
-		return console.error(error)
-	}
+	if (error) return console.error(error)
 
 	profile.set(data[0])
 }
+
+supabase.auth.onAuthStateChange((_, session) => {
+	user.set(session?.user)
+	if (session) {
+		loadProfile()
+	} else {
+		profile.set(false)
+	}
+})
+
+export const logout = () => supabase.auth.signOut()
 
 export const updateProfileAvatar = async (id, avatar) => {
 	const { error } = await supabase.from("profile").update({ avatar: avatar }).match({ id })
@@ -44,7 +53,6 @@ export var getSeed = () => {
 	if (!supabase.auth.currentUser) {
 		return String(Math.floor(Math.random() * 100000000))
 	} else {
-		loadProfile()
 		return supabase.auth.currentUser.id
 	}
 }

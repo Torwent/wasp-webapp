@@ -1,8 +1,5 @@
 <script>
 	export let profile
-	console.log("hello")
-	console.log(profile)
-	console.log("bye")
 </script>
 
 <div>

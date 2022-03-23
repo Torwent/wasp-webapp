@@ -1,16 +1,11 @@
 <script>
 	import { supabase } from "../lib/supabase.js"
-	import { user, profile } from "../stores/authStore.js"
+	import { profile, logout } from "../stores/authStore.js"
 	import RoleBadges from "../components/RoleBadges.svelte"
 
 	let loading = false
 	let username
 	let authProvider
-
-	const logout = () => {
-		supabase.auth.signOut()
-		user.set(false)
-	}
 
 	const setProvider = (str) => {
 		authProvider = str
@@ -19,15 +14,12 @@
 	const handleLogin = async () => {
 		try {
 			loading = true
-			if (authProvider === "") {
-				console.log(email)
-				var { error } = await supabase.auth.signIn({ email })
-			} else {
-				var { error } = await supabase.auth.signIn({ provider: authProvider })
-			}
+
+			if (authProvider === "") return
+
+			var { error } = await supabase.auth.signIn({ provider: authProvider })
 
 			if (error) throw error
-			if (authProvider === "") alert("Check your email for the login link!")
 		} catch (err) {
 			console.error(err)
 			alert(error.error_description || error.message)
