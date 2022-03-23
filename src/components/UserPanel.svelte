@@ -3,14 +3,13 @@
 	import { user, profile } from "../stores/authStore.js"
 	import RoleBadges from "../components/RoleBadges.svelte"
 
-	console.log(user.id)
-
 	let loading = false
 	let username
 	let authProvider
 
 	const logout = () => {
 		supabase.auth.signOut()
+		user.set(false)
 	}
 
 	const setProvider = (str) => {
@@ -141,8 +140,11 @@
 		</form>
 
 		<button
+			href="/"
 			class="w-full shadow-sm rounded bg-orange-500 hover:bg-orange-400 dark:bg-orange-400 dark:hover:bg-amber-300 text-white py-2 px-4 my-2"
-			on:click={logout}>Log Out</button
+			on:click={logout}
 		>
+			Log Out
+		</button>
 	</div>
 </div>
