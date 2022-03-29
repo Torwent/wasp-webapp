@@ -33,82 +33,25 @@
 	</div>
 
 	<!-- Body -->
-	<div class="flex flex-col bg-stone-800 rounded-b p-3">
+	<div class="flex flex-col bg-stone-100 dark:bg-stone-800 rounded-b p-3">
 		<!-- Title -->
-		<div class="text-md font-semibold text-gray-900 hover:underline truncate">
+		<div class="text-md font-semibold text-amber-500 hover:underline truncate">
 			{script.title}
 		</div>
 
 		<!-- Author - Category -->
-		<div class="text-xxs text-gray-400 truncate mt-1">
+		<div class="text-xs text-stone-400 truncate mt-1">
 			by
 
 			<!-- Author -->
-			<a href="/" class="font-semibold hover:underline"> {script.author} </a>
+			<a href="/user/{script.user_id}" class="font-semibold hover:underline">
+				{script.author}
+			</a>
 		</div>
 
 		<!-- content -->
-		<div class="text-sm text-gray-600 mt-4 mb-1">{script.description}</div>
-
-		<!-- Body -->
-		<div class="flex flex-row mt-2">
-			<!-- Detail Column -->
-			<div class="flex flex-col flex-auto">
-				<!-- Rating -->
-				<div class="flex flex-row group">
-					<i
-						class="mdi mdi-star text-xs text-amber-400 
-                            hover:text-amber-500 transition-all duration-200"
-						title="Worst"
-					/>
-
-					<i
-						class="mdi mdi-star text-xs text-amber-400 
-                            hover:text-amber-500 transition-all duration-200"
-						title="Bad"
-					/>
-
-					<i
-						class="mdi mdi-star text-xs text-amber-400 
-                            hover:text-amber-500 transition-all duration-200"
-						title="Not Bad"
-					/>
-
-					<i
-						class="mdi mdi-star text-xs text-amber-400 
-                            hover:text-amber-500 transition-all duration-200"
-						title="Good"
-					/>
-
-					<i
-						class="mdi mdi-star text-xs text-amber-400 
-                            hover:text-amber-500 transition-all duration-200"
-						title="Awesome"
-					/>
-
-					<div class="text-xxs text-gray-400 ml-1 hover:underline">({script.likes})</div>
-				</div>
-			</div>
-
-			<!-- Button Column -->
-			<div class="flex flex-row flex-auto justify-end">
-				<!-- Preview Link Button -->
-				<a
-					href="/"
-					class="flex text-xs border px-3 my-auto py-2 
-                        border-amber-500 group hover:bg-amber-500 
-                        rounded-xss
-                        transition-all duration-200"
-				>
-					<!-- Text -->
-					<div
-						class="text-xxs text-amber-700 font-semibold ml-2
-                            group-hover:text-white delay-100"
-					>
-						More Info
-					</div>
-				</a>
-			</div>
+		<div class="text-sm text-stone-500 mt-4 h-16">
+			{script.description}
 		</div>
 	</div>
 </div>

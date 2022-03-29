@@ -8,9 +8,7 @@
 	<a href="/blog/{post.id}">
 		<div class="flex flex-col p-3">
 			<!-- Title -->
-			<div
-				class="text-md font-semibold text-amber-500 dark:text-amber-100 hover:underline truncate"
-			>
+			<div class="text-md font-semibold text-amber-500 hover:underline truncate">
 				{post.title}
 			</div>
 

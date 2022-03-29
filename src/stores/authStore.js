@@ -25,30 +25,6 @@ supabase.auth.onAuthStateChange((_, session) => {
 
 export const logout = () => supabase.auth.signOut()
 
-export const updateProfileAvatar = async (id, avatar) => {
-	const { error } = await supabase.from("profile").update({ avatar: avatar }).match({ id })
-
-	if (error) {
-		return console.error(error)
-	}
-
-	profile.update((profile) => {
-		let index = -1
-		for (let i = 0; i < profile.length; i++) {
-			if (profile[i].id === id) {
-				index = i
-				break
-			}
-		}
-
-		if (index !== -1) {
-			profile[index].avatar = avatar
-		}
-
-		return profile
-	})
-}
-
 export var getSeed = () => {
 	if (!supabase.auth.currentUser) {
 		return String(Math.floor(Math.random() * 100000000))
@@ -65,4 +41,12 @@ export var reloadAvatar = () => {
 		scale: 75,
 		size: 50
 	})
+}
+
+export const updateUsername = async (id, username) => {
+	const { error } = await supabase.from("profile").update({ username: username }).match({ id: id })
+
+	if (error) {
+		console.log(error.message)
+	}
 }

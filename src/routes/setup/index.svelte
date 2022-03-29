@@ -4,100 +4,111 @@
 	import DownloadButton from "../../components/DownloadButton.svelte"
 
 	let checkedOS = false
-	let osNames
-	let fileExtensions
-	let blogIDs
+	let hasMac = false
+
+	let currentOS
+	let secondaryOS
 
 	onMount(async () => {
 		let userAgent = navigator.userAgent
-		osNames = ["Unknown OS"]
 		if (userAgent.indexOf("Win") != -1) {
-			osNames = ["Windows", "Linux", "MacOS"]
-			fileExtensions = ["cmd", "sh", "command"]
-			blogIDs = ["0", "1", "2"]
+			currentOS = { OS: "Windows", Extension: "cmd", BlogID: 0 }
+			secondaryOS = { OS: "Linux", Extension: "sh", BlogID: 1 }
 		} else if (userAgent.indexOf("Linux") != -1) {
 			if (userAgent.indexOf("Debian") != -1) {
-				osNames = ["Debian", "Windows", "MacOS"]
-				fileExtensions = ["sh", "cmd", "command"]
-				blogIDs = ["1", "0", "2"]
-			} else if (userAgent.indexOf("Ubuntu") != -1) {
-				osNames = ["Ubuntu", "Windows", "MacOS"]
-				fileExtensions = ["sh", "cmd", "command"]
-				blogIDs = ["1", "0", "2"]
+				currentOS = { OS: "Debian Linux", Extension: "sh", BlogID: 1 }
+				secondaryOS = { OS: "Windows", Extension: "cmd", BlogID: 0 }
+			} else if (userAgent.indexOf("Ubuntu Linux") != -1) {
+				currentOS = { OS: "Ubuntu", Extension: "sh", BlogID: 1 }
+				secondaryOS = { OS: "Windows", Extension: "cmd", BlogID: 0 }
 			} else {
-				osNames = ["Linux", "Windows", "MacOS"]
-				fileExtensions = ["sh", "cmd", "command"]
-				blogIDs = ["1", "0", "2"]
+				currentOS = { OS: "Linux", Extension: "sh", BlogID: 1 }
+				secondaryOS = { OS: "Windows", Extension: "cmd", BlogID: 0 }
 			}
 		} else if (userAgent.indexOf("Mac") != -1) {
-			osNames = ["MacOs", "Windows", "Linux"]
-			fileExtensions = ["command", "cmd", "sh"]
-			blogIDs = ["2", "0", "1"]
+			hasMac = true
+			currentOS = { OS: "MacOS", Extension: "cmd", BlogID: 0 }
+			secondaryOS = { OS: "Linux", Extension: "sh", BlogID: 1 }
 		}
 		checkedOS = true
 	})
 </script>
 
-<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+<div
+	class="container mx-auto my-6 max-w-2xl flex-grow"
+	in:fade={{ duration: 300, delay: 300 }}
+	out:fade={{ duration: 300 }}
+>
 	{#if checkedOS}
 		<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
-			<h1 class="text-xl py-16 text-center text-amber-500 dark:text-amber-100 md:text-3xl">
-				{osNames[0]} was detected as your operating system.
-			</h1>
-			<p class="text-lg text-center pt-4">
-				For an automated install script download the following file:
-				<DownloadButton
-					url={`https://github.com/torwent/wasp-setup/releases/latest/download/setup.${fileExtensions[0]}`}
-					text={`setup.${fileExtensions[0]}`}
-				/>
-			</p>
-			<p class="text-center pb-24">
-				For a manual instalation guide for {osNames[0]} you can go
-				<a
-					href="/blog/{blogIDs[0]}"
-					class="font-semibold text-amber-500 dark:text-amber-200 hover:underline">here</a
-				>.
-			</p>
-
+			<header>
+				<h1 class="text-xl py-16 text-center text-amber-500 dark:text-amber-100 md:text-3xl">
+					{currentOS.OS} was detected as your operating system.
+				</h1>
+				{#if !hasMac}
+					<p class="text-lg text-center pt-4">
+						For an automated install script download the following file:
+						<DownloadButton
+							url={`https://github.com/torwent/wasp-setup/releases/latest/download/setup.${currentOS.Extension}`}
+							text={`setup.${currentOS.Extension}`}
+						/>
+					</p>
+					<p class="text-center pb-24">
+						For a manual instalation guide for {currentOS.OS} you can go
+						<a
+							href="/blog/{currentOS.BlogID}"
+							class="font-semibold text-amber-500 dark:text-amber-200 hover:underline">here</a
+						>.
+					</p>
+				{:else}
+					<p class="text-lg text-center pt-4">Simba doesn't work with M1 Macs.</p>
+					<p class="text-lg text-center pt-4">
+						If you have an older Mac, it's possible to set things up you will have to figure things
+						on your own and there will be bugs still. The easiest approach would be to run things
+						through a VM and follow the setup guide for a different OS.
+					</p>
+				{/if}
+			</header>
+			{#if hasMac}
+				<p class="text-center pt-40">
+					For a Windows install script you can get it here:
+					<a
+						href="https://github.com/torwent/wasp-setup/releases/latest/download/setup.{currentOS.Extension}"
+						class="font-semibold hover:underline text-amber-400 dark:text-amber-100"
+					>
+						setup.{currentOS.Extension}
+					</a>
+				</p>
+				<p class="text-center">
+					For a manual instalation guide for {currentOS.OS} you can go
+					<a
+						href="/blog/{currentOS.BlogID}"
+						class="font-semibold hover:underline text-amber-400 dark:text-amber-100">here</a
+					>.
+				</p>
+			{/if}
 			<p class="text-center pt-24">
-				For a {osNames[1]} install script you can get it here:
+				For a {secondaryOS.OS} install script you can get it here:
 				<a
-					href="https://github.com/torwent/wasp-setup/releases/latest/download/setup.{fileExtensions[1]}"
+					href="https://github.com/torwent/wasp-setup/releases/latest/download/setup.{secondaryOS.Extension}"
 					class="font-semibold hover:underline text-amber-400 dark:text-amber-100"
 				>
-					setup.{fileExtensions[1]}
+					setup.{secondaryOS.Extension}
 				</a>
 			</p>
 			<p class="text-center">
-				For a manual instalation guide for {osNames[1]} you can go
+				For a manual instalation guide for {secondaryOS.OS} you can go
 				<a
-					href="/blog/{blogIDs[1]}"
-					class="font-semibold hover:underline text-amber-400 dark:text-amber-100">here</a
-				>.
-			</p>
-
-			<p class="text-center pt-8">
-				For a {osNames[2]} install script you can get it here:
-				<a
-					href="https://github.com/torwent/wasp-setup/releases/latest/download/setup.{fileExtensions[2]}"
-					class="font-semibold  hover:underline text-amber-400 dark:text-amber-100"
-				>
-					setup.{fileExtensions[2]}
-				</a>
-			</p>
-			<p class="text-center">
-				For a manual instalation guide for {osNames[2]} you can go
-				<a
-					href="/blog/{blogIDs[2]}"
+					href="/blog/{secondaryOS.BlogID}"
 					class="font-semibold hover:underline text-amber-400 dark:text-amber-100">here</a
 				>.
 			</p>
 		</div>
 	{:else}
-		<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+		<header in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
 			<h1 class="text-xl py-16 text-center text-amber-500 dark:text-amber-100 md:text-3xl">
 				Checking your operating system...
 			</h1>
-		</div>
+		</header>
 	{/if}
 </div>
