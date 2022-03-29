@@ -35,8 +35,12 @@
 	in:fade={{ duration: 300, delay: 300 }}
 	out:fade={{ duration: 300 }}
 >
+	<header class="text-center py-8">
+		<h3>Welcome to the DevBlog.</h3>
+		<p>Here you can find guide, tutorials and feature annoucements.</p>
+	</header>
 	<div>
-		<form class="form my-6" on:submit|preventDefault={handleSearch}>
+		<form class="form my-6 py-8" on:submit|preventDefault={handleSearch}>
 			<div class="flex flex-col text-sm mb-2">
 				<input
 					type="text"

@@ -12,9 +12,7 @@
 		<h1 class="text-2xl font-bold text-center md:text-3xl py-12">
 			<div class="py-4">WaspScripts</div>
 			<div>
-				100%
-				<span class="bg-clip-border animate-character pl-1"> color </span>
-				, 100% open source.
+				100% <span class="bg-clip-border animate-character pl-1">color</span>, 100% open source.
 			</div>
 		</h1>
 	</header>
@@ -25,11 +23,10 @@
 		<br />
 		If you are new to Simba and don't know what it is, Simba is just the oldest color botting program
 		still around, it's ancestor, SCAR dates back to RuneScape Classic.
-		<br />
-		If you want more information I recommend you check the <a href="/faq">FAQ</a>.
 	</p>
 	<h2 class="text-center py-6">
-		For more information, help and/or questions join the discord community!
+		For more information, help and/or questions look through the <a href="/faq">FAQ</a> or join the discord
+		community!
 	</h2>
 	<Discord />
 </div>
