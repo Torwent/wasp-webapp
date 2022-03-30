@@ -55,9 +55,9 @@
 		<p>Here you can find guide, tutorials and feature annoucements.</p>
 	</header>
 	<div class="py-6">
-		<form class="form my-6" on:submit|preventDefault={handleFilters}>
+		<form class="text-center form my-6" on:submit|preventDefault={handleFilters}>
 			<header class="py-4"><h3>Filter by level or search the a blog post:</h3></header>
-			<div class="flex space-x-5 mb-2">
+			<div class="justify-center flex space-x-5 mb-2">
 				<button
 					type="submit"
 					border-b-8
@@ -107,7 +107,7 @@
 		</form>
 	</div>
 
-	<div>
+	<div class="overflow-hidden">
 		{#if filteredPosts.length !== 0}
 			{#each filteredPosts as p}
 				<PostCard post={p} />

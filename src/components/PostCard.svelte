@@ -1,8 +1,11 @@
 <script>
+	import { fly } from "svelte/transition"
 	export let post
 </script>
 
 <div
+	in:fly={{ duration: 600, delay: 900, x: 500 }}
+	out:fly={{ duration: 600, x: -500 }}
 	class="flex flex-col shadow-md my-8 cursor-pointer hover:-translate-y-1 duration-300 w-full bg-stone-100 dark:bg-stone-800 rounded-md"
 >
 	<a href="/blog/{post.id}">
