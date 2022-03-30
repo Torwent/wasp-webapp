@@ -6,6 +6,9 @@
 	let searchQuery = ""
 	let filteredPosts = []
 	let placeholderText = "Search posts..."
+	let basicEnabled = false
+	let intermediateEnabled = false
+	let advancedEnabled = false
 
 	String.prototype.fuzzy = function (s) {
 		var hay = this.toLowerCase(),
@@ -23,10 +26,22 @@
 		if (searchQuery === "") return
 
 		filteredPosts = $posts.filter((post) => post.title.fuzzy(searchQuery))
-		if (filteredEntries.length === 0) {
+		if (filteredPosts.length === 0) {
 			placeholderText = "Not found!"
 			searchQuery = ""
 		}
+	}
+
+	const handleFilters = () => {
+		filteredPosts = $posts
+		if (!basicEnabled && !intermediateEnabled && !advancedEnabled) return
+
+		filteredPosts = $posts.filter(
+			(post) =>
+				(basicEnabled && post.level === 0) ||
+				(intermediateEnabled && post.level === 1) ||
+				(advancedEnabled && post.level === 2)
+		)
 	}
 </script>
 
@@ -39,8 +54,47 @@
 		<h3>Welcome to the DevBlog.</h3>
 		<p>Here you can find guide, tutorials and feature annoucements.</p>
 	</header>
-	<div>
-		<form class="form my-6 py-8" on:submit|preventDefault={handleSearch}>
+	<div class="py-6">
+		<form class="form my-6" on:submit|preventDefault={handleFilters}>
+			<header class="py-4"><h3>Filter by level or search the a blog post:</h3></header>
+			<div class="flex space-x-5 mb-2">
+				<button
+					type="submit"
+					border-b-8
+					class="flex space-x-5 text-xs py-1 px-8 font-bold rounded-full bg-sky-400 dark:bg-sky-500 border-sky-600 dark:border-sky-300 text-white"
+					class:border-r-8={basicEnabled}
+					class:pr-6={basicEnabled}
+					bind={basicEnabled}
+					on:click={() => (basicEnabled = !basicEnabled)}
+				>
+					Basic tutorial
+				</button>
+				<button
+					type="submit"
+					border-b-8
+					class="flex space-x-5 text-xs py-1 px-8 font-bold rounded-full bg-orange-400 dark:bg-orange-500 border-orange-600 dark:border-orange-300 text-white"
+					class:border-r-8={intermediateEnabled}
+					class:pr-6={intermediateEnabled}
+					bind={intermediateEnabled}
+					on:click={() => (intermediateEnabled = !intermediateEnabled)}
+				>
+					Intermidiate tutorial
+				</button>
+				<button
+					type="submit"
+					border-b-8
+					class="flex space-x-5 text-xs py-1 px-8 font-bold rounded-full bg-red-400 dark:bg-red-500 border-red-600 dark:border-red-300 text-white"
+					class:border-r-8={advancedEnabled}
+					class:pr-6={advancedEnabled}
+					bind={advancedEnabled}
+					on:click={() => (advancedEnabled = !advancedEnabled)}
+				>
+					Advanced tutorial
+				</button>
+			</div>
+		</form>
+
+		<form class="form my-6" on:submit|preventDefault={handleSearch}>
 			<div class="flex flex-col text-sm mb-2">
 				<input
 					type="text"

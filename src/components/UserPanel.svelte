@@ -37,12 +37,12 @@
 	<div class="my-4 justify-end">
 		<form on:submit|preventDefault={handleUserChange}>
 			<div class="flex flex-col text-sm mb-2">
-				<label for="email" class="text-center mt-2 py-2 font-bold mb-2">Username:</label>
+				<label for="username" class="text-center mt-2 py-2 font-bold mb-2">Username:</label>
 				<input
 					class="appearance-none shadow-sm border border-stone-200 p-2 focus:outline-none focus:border-stone-500 rounded-lg"
 					name="username"
 					type="username"
-					placeholder={$profile.display_name}
+					placeholder={$profile.username}
 					autocomplete="off"
 					bind:value={username}
 				/>
@@ -64,11 +64,11 @@
 				Loading roles...
 			{/if}
 		</div>
-		<form on:submit|preventDefault={handleLogin}>
+		<form on:submit|preventDefault={handleLogin} class="py-6 flex flex-col ">
 			<label for="social" class="text-center mt-2 py-2 font-bold mb-2">
 				Connect auth providers:
 			</label>
-			<div class="flex justify-center items-center flex-wrap space-x-2">
+			<div class="pt-2 flex justify-center items-center flex-wrap space-x-2">
 				<!-- Google -->
 				<button
 					type="submit"
