@@ -1,4 +1,5 @@
 <script>
+	import { fade } from "svelte/transition"
 	import { categories, subcategories } from "$lib/stores/categoryStore.js"
 	export let script
 
@@ -23,7 +24,11 @@
 </script>
 
 <!-- Product Card -->
-<div class="flex flex-col shadow-md cursor-pointer hover:-translate-y-1 duration-300 w-72">
+<div
+	in:fade={{ duration: 300, delay: 300 }}
+	out:fade={{ duration: 300 }}
+	class="flex flex-col shadow-md cursor-pointer hover:-translate-y-1 duration-300 w-72"
+>
 	<!-- Preview -->
 	<div class="inline relative group h-48">
 		<!-- Thumbnail -->
@@ -70,19 +75,17 @@
 		</div>
 
 		<!-- content -->
-		<div class="text-sm text-stone-500 mt-4 h-16">
+		<div class="text-sm text-stone-500 my-2 h-16">
 			{script.description}
 		</div>
-	</div>
 
-	<div class="flex flex-col bg-stone-100 dark:bg-stone-800 rounded-b p-3">
-		{#each mainEmojis as me}
-			{me}
-		{/each}
-		<br />
-
-		{#each subEmojis as se}
-			{se}
-		{/each}
+		<span>
+			{#each mainEmojis as me}
+				{me}
+			{/each}
+			{#each subEmojis as se}
+				{se}
+			{/each}
+		</span>
 	</div>
 </div>
