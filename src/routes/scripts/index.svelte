@@ -13,17 +13,12 @@
 		in:fly={{ duration: 600, delay: 600, x: -100 }}
 		out:fly={{ duration: 300, x: -100 }}
 	>
-		<h4 class="text-center py-4">Filters</h4>
-		<div class="flex justify-center text-sm">
-			<div>
-				<Checkbox label="Premium" />
-				<Checkbox label="Free" />
-			</div>
-		</div>
-
 		<h4 class="text-center py-6">Categories</h4>
 		<div class="flex justify-center font-semibold text-sm">
 			<div>
+				<Checkbox label="Premium👑" />
+				<Checkbox label="Free🎈" />
+				<br />
 				{#each $categories as category}
 					<Checkbox label={category.name + category.emoji} />
 					<div class="flex pb-3">
