@@ -1,7 +1,7 @@
 <script>
 	import { fade } from "svelte/transition"
-	import { posts } from "../../stores/postStore.js"
-	import PostCard from "../../components/PostCard.svelte"
+	import { posts } from "$lib/stores/postStore.js"
+	import PostCard from "$lib/components/PostCard.svelte"
 
 	let searchQuery = ""
 	let filteredPosts = []

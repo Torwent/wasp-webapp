@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabase.js"
+import { supabase } from "$lib/supabase.js"
 import { writable } from "svelte/store"
 import { createAvatar } from "@dicebear/avatars"
 import * as style from "@dicebear/avatars-bottts-sprites"

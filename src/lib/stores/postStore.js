@@ -1,4 +1,4 @@
-import { supabase } from "../lib/supabase.js"
+import { supabase } from "$lib/supabase.js"
 import { writable } from "svelte/store"
 
 export const posts = writable([])

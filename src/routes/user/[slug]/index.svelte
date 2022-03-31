@@ -5,7 +5,7 @@
 
 <script>
 	import { fade } from "svelte/transition"
-	import RoleBadges from "../../../components/RoleBadges.svelte"
+	import RoleBadges from "$lib/components/RoleBadges.svelte"
 	export let user
 </script>
 

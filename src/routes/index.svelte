@@ -1,5 +1,5 @@
 <script>
-	import Discord from "../components/Discord.svelte"
+	import Discord from "$lib/components/Discord.svelte"
 	import { fade } from "svelte/transition"
 </script>
 

@@ -1,9 +1,8 @@
 <script>
 	import { fade } from "svelte/transition"
-	import { questions, commonErrors } from "../../stores/questionStore"
-	import DropDown from "../../components/DropDown.svelte"
-
-	import Discord from "../../components/Discord.svelte"
+	import { questions, commonErrors } from "$lib/stores/questionStore"
+	import DropDown from "$lib/components/DropDown.svelte"
+	import Discord from "$lib/components/Discord.svelte"
 </script>
 
 <div

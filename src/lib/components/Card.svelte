@@ -1,5 +1,25 @@
 <script>
+	import { categories, subcategories } from "$lib/stores/categoryStore.js"
 	export let script
+
+	let mainEmojis = []
+	let subEmojis = []
+
+	$: for (let c of script.categories) {
+		for (let c2 of $categories) {
+			if (c === c2.name) {
+				mainEmojis += c2.emoji
+			}
+		}
+	}
+
+	$: for (let c of script.subcategories) {
+		for (let sub of $subcategories) {
+			if (c === sub.name) {
+				subEmojis += sub.emoji
+			}
+		}
+	}
 </script>
 
 <!-- Product Card -->
@@ -53,5 +73,16 @@
 		<div class="text-sm text-stone-500 mt-4 h-16">
 			{script.description}
 		</div>
+	</div>
+
+	<div class="flex flex-col bg-stone-100 dark:bg-stone-800 rounded-b p-3">
+		{#each mainEmojis as me}
+			{me}
+		{/each}
+		<br />
+
+		{#each subEmojis as se}
+			{se}
+		{/each}
 	</div>
 </div>

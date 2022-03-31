@@ -1,8 +1,8 @@
 <script>
 	import { fade, fly } from "svelte/transition"
-	import { scripts } from "../../stores/scriptsStore.js"
-	import Checkbox from "../../components/Checkbox.svelte"
-	import Card from "../../components/Card.svelte"
+	import { scripts } from "$lib/stores/scriptsStore.js"
+	import Checkbox from "$lib/components/Checkbox.svelte"
+	import Card from "$lib/components/Card.svelte"
 </script>
 
 <div class="flex" in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
@@ -22,7 +22,17 @@
 		<h4 class="text-center py-6">Skills</h4>
 		<div class="flex justify-center">
 			<div>
-				<Checkbox label="Combat" />
+				<Checkbox label="Combat🗡️" />
+				<Checkbox label="Attack🗡️" />
+				<Checkbox label="Strength" />
+				<Checkbox label="Defence" />
+				<Checkbox label="Ranged" />
+				<Checkbox label="Prayer" />
+				<Checkbox label="Magic" />
+				<Checkbox label="Magic" />
+				<Checkbox label="Magic" />
+				<Checkbox label="Magic" />
+				<Checkbox label="Magic" />
 				<Checkbox label="Magic" />
 			</div>
 		</div>

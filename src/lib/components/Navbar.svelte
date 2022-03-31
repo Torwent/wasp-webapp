@@ -1,10 +1,10 @@
 <script>
-	import { user, profile } from "../stores/authStore.js"
+	import { user, profile } from "$lib/stores/authStore.js"
 	import { scale } from "svelte/transition"
-	import UserPanel from "../components/UserPanel.svelte"
-	import Auth from "../components/Auth.svelte"
-	import Avatar from "../components/Avatar.svelte"
-	import DarkModeSwitch from "../components/DarkModeSwitch.svelte"
+	import UserPanel from "$lib/components/UserPanel.svelte"
+	import Auth from "$lib/components/Auth.svelte"
+	import Avatar from "$lib/components/Avatar.svelte"
+	import DarkModeSwitch from "$lib/components/DarkModeSwitch.svelte"
 	import logo from "$lib/assets/logo.svg"
 	import { page } from "$app/stores"
 

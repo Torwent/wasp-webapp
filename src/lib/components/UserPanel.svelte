@@ -1,7 +1,7 @@
 <script>
-	import { supabase } from "../lib/supabase.js"
-	import { profile, logout, updateUsername } from "../stores/authStore.js"
-	import RoleBadges from "../components/RoleBadges.svelte"
+	import { supabase } from "$lib/supabase.js"
+	import { profile, logout, updateUsername } from "$lib/stores/authStore.js"
+	import RoleBadges from "$lib/components/RoleBadges.svelte"
 
 	let loading = false
 	let username
