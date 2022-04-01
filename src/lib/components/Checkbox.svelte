@@ -12,7 +12,7 @@
 		bind:checked
 	/>
 	<label
-		class="form-check-label inline-block cursor-pointer hover:text-amber-200"
+		class="form-check-label inline-block cursor-pointer dark:hover:text-amber-100 hover:text-orange-400"
 		for={label}
 		class:text-amber-500={checked}
 	>
