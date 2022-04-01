@@ -1,15 +1,15 @@
 <script>
 	import { fade } from "svelte/transition"
 	import { categories, subcategories } from "$lib/stores/categoryStore.js"
+	import EmojiTooltip from "$lib/components/EmojiTooltip.svelte"
 	export let script
 
-	let mainEmojis = []
-	let subEmojis = []
+	let emojis = []
 
 	$: for (let c of script.categories) {
 		for (let c2 of $categories) {
 			if (c === c2.name) {
-				mainEmojis += c2.emoji
+				emojis.push({ tooltip: c2.name, icon: c2.emoji })
 			}
 		}
 	}
@@ -17,7 +17,7 @@
 	$: for (let c of script.subcategories) {
 		for (let sub of $subcategories) {
 			if (c === sub.name) {
-				subEmojis += sub.emoji
+				emojis.push({ tooltip: sub.name, icon: sub.emoji })
 			}
 		}
 	}
@@ -79,13 +79,10 @@
 			{script.description}
 		</div>
 
-		<span>
-			{#each mainEmojis as me}
-				{me}
+		<div class="grid grid-cols-12">
+			{#each emojis as emoji}
+				<EmojiTooltip {emoji} />
 			{/each}
-			{#each subEmojis as se}
-				{se}
-			{/each}
-		</span>
+		</div>
 	</div>
 </div>
