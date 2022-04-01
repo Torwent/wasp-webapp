@@ -5,14 +5,14 @@
 
 <div class="form-check">
 	<input
-		class="form-check-input h-4 w-4 border border-stone-300 rounded-sm bg-white checked:bg-amber-500 checked:border-amber-500 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer accent-amber-500"
+		class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-amber-500"
 		type="checkbox"
 		value=""
 		id={label}
 		bind:checked
 	/>
 	<label
-		class="form-check-label inline-block cursor-pointer"
+		class="form-check-label inline-block cursor-pointer hover:text-amber-200"
 		for={label}
 		class:text-amber-500={checked}
 	>
