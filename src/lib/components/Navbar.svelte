@@ -60,7 +60,7 @@
 				<div class="hidden md:flex items-center space-x-1">
 					<a
 						href="/setup"
-						class="font-semibold py-4 px-2 transition duration-300 dark:dark:hover:text-amber-100 hover:text-orange-400"
+						class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
 						on:click={() => (selectedTab = tabs[1])}
 						class:text-orange-500={selectedTab === 1}
 						class:dark:text-orange-400={selectedTab === 1}
