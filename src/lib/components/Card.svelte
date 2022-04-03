@@ -32,7 +32,11 @@
 	<!-- Preview -->
 	<div class="inline relative group h-48">
 		<!-- Thumbnail -->
-		<img class="absolute rounded-t object-cover h-full w-full" src={script.cover_img} alt="" />
+		<img
+			class="absolute rounded-t object-cover h-full w-full"
+			src={script.cover_img}
+			alt="Missing img"
+		/>
 
 		<!-- Hover Bar -->
 		<div
