@@ -35,6 +35,7 @@
 	}
 
 	const handleFilters = () => {
+		searchQuery = ""
 		filteredScripts = $scripts
 		let checked = $checkboxes
 			.filter((checkbox) => checkbox.checked)
@@ -47,7 +48,6 @@
 				script.categories.some((c) => checked.includes(c)) ||
 				script.subcategories.some((c) => checked.includes(c))
 		)
-		console.log(filteredScripts.title)
 	}
 
 	$: {

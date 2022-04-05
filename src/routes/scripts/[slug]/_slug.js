@@ -6,15 +6,15 @@ import { supabase } from "$lib/supabase.js"
 export async function load({ params }) {
 	const { slug } = params
 
-	const { data: posts, error } = await supabase.from("posts").select("*").eq("id", slug)
+	const { data: posts, error } = await supabase.from("scripts").select("*").eq("id", slug)
 
 	if (!error) {
-		const post = posts[0]
+		const script = posts[0]
 
-		if (post) {
+		if (script) {
 			return {
 				props: {
-					post
+					script
 				}
 			}
 		}
@@ -22,6 +22,6 @@ export async function load({ params }) {
 
 	return {
 		status: 404,
-		error: new Error(`blog/${slug} not found.`)
+		error: new Error(`scripts/${slug} not found.`)
 	}
 }
