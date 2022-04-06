@@ -6,12 +6,18 @@
 <script>
 	import Markdown from "$lib/Markdown.svelte"
 	import { fade } from "svelte/transition"
+	import { profile } from "$lib/stores/authStore"
+	import DownloadButton from "$lib/components/DownloadButton.svelte"
 	export let script
 </script>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
 	<div class="group w-full">
-		<img class="inset-0 z-0 object-none h-96 w-full" src={script.cover_img} alt="missing img" />
+		<img
+			class="inset-0 z-0 object-none h-96 w-full"
+			src={script.assets_path + "cover.png"}
+			alt="missing img"
+		/>
 
 		<div class="text-center w-full h-32 absolute inset-0 z-10 top-80 text-amber-500">
 			<h1 class="mb-4 font-bold text-4xl">{script.title}</h1>
@@ -28,14 +34,56 @@
 	</div>
 
 	<div class="container mx-auto my-6 max-w-2xl flex-grow">
-		{#if script.categories.includes("Free")}
-			This is a free script.
-		{:else if script.categories.includes("Premium")}
-			This is a premium script.
-		{/if}
-
 		<article class="prose dark:prose-invert py-6">
 			<Markdown src={script.content} />
 		</article>
+
+		<div class="text-center">
+			{#if script.categories.includes("Free")}
+				<DownloadButton
+					url={script.path + script.title.toLowerCase().replace(" ", "_") + ".simba"}
+					text={`Download ${script.title}`}
+				/>
+				<h3 class="py-6">
+					This is a free script, if you want to learn how to install and easily manage all
+					FreeWaspScripts check this
+					<a
+						href="/blog/3"
+						class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
+					>
+						guide</a
+					>.
+				</h3>
+			{:else if script.categories.includes("Premium")}
+				{#if !$profile.id}
+					<h3 class="py-6">Please login to be able to download this script.</h3>
+				{:else if $profile.premium || $profile.vip}
+					<DownloadButton
+						url={script.path + script.title.toLowerCase().replace(" ", "_") + ".simba"}
+						text={`Download ${script.title}`}
+					/>
+					<h4 class="py-6">
+						This is a premium script, if you don't know what to do with this file, follow this
+						<a
+							href="/blog/4"
+							class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
+						>
+							guide</a
+						>.
+					</h4>
+				{:else}
+					<h3 class="py-6">This is a premium script and you are not premium.</h3>
+					<h4>
+						To be able to download this script join
+						<a
+							href="/premium"
+							class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
+						>
+							Premium
+						</a>!
+					</h4>
+				{/if}
+			{/if}
+		</div>
 	</div>
 </div>

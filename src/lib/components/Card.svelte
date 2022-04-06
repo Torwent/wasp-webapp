@@ -36,7 +36,7 @@
 
 			<img
 				class="absolute rounded-t object-cover h-full w-full"
-				src={script.cover_img}
+				src={script.assets_path + "cover.png"}
 				alt="Missing img"
 			/>
 

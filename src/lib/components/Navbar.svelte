@@ -6,7 +6,6 @@
 	import Auth from "$lib/components/Auth.svelte"
 	import Avatar from "$lib/components/Avatar.svelte"
 	import DarkModeSwitch from "$lib/components/DarkModeSwitch.svelte"
-	import logo from "$lib/assets/logo.svg"
 	import { page } from "$app/stores"
 
 	let tabs = [0, 1, 2, 3, 4]
@@ -84,7 +83,7 @@
 					>
 						FAQ
 					</a>
-					{#if $profile.dev_state}
+					{#if $profile.dev}
 						<a
 							href="/blog"
 							class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
