@@ -1,6 +1,7 @@
 <script>
 	import { user, profile } from "$lib/stores/authStore.js"
 	import { scale } from "svelte/transition"
+	import Logo from "$lib/components/Logo.svelte"
 	import UserPanel from "$lib/components/UserPanel.svelte"
 	import Auth from "$lib/components/Auth.svelte"
 	import Avatar from "$lib/components/Avatar.svelte"
@@ -43,7 +44,6 @@
 	<div class="max-w-7xl mx-auto px-4">
 		<div class="flex justify-between">
 			<div class="flex space-x-7">
-				<!-- Website Logo -->
 				<div>
 					<a
 						href="/"
@@ -51,9 +51,10 @@
 						on:click={() => (selectedTab = tabs[0])}
 						class:text-orange-500={selectedTab === 0}
 						class:dark:text-orange-400={selectedTab === 0}
+						class:fill-orange-500={selectedTab === 0}
+						class:dark:fill-orange-400={selectedTab === 0}
 					>
-						<img src={logo} class="mr-3 h-8" alt="WaspBot Logo" />
-						<span class="font-bold text-lg"> WaspBot </span>
+						<Logo {selectedTab} />
 					</a>
 				</div>
 				<!-- Menu -->

@@ -1,5 +1,5 @@
 <script>
-	import logo from "$lib/assets/logo.svg"
+	import Logo from "$lib/components/Logo.svelte"
 </script>
 
 <footer
@@ -7,12 +7,8 @@
 >
 	<div class="md:flex md:justify-between">
 		<div class="mb-6 md:mb-0">
-			<a
-				href="https://waspbot.com"
-				class="flex items-centerhover:text-amber-500 dark:hover:text-amber-400"
-			>
-				<img src={logo} class="mr-3 h-8" alt="WaspBot Logo" />
-				<span class="self-center text-2xl font-semibold whitespace-nowrap"> WaspBot </span>
+			<a href="/" class="flex items-centerhover:text-amber-500 dark:hover:text-amber-400">
+				<Logo />
 			</a>
 		</div>
 		<div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">

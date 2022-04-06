@@ -6,13 +6,13 @@
 <script>
 	import Markdown from "$lib/Markdown.svelte"
 	import { supabase } from "$lib/supabase.js"
-	export let post
+	export let script
 
 	const handleSubmit = async () => {
-		let id = post.id
+		let id = script.id
 		const { error } = await supabase
 			.from("posts")
-			.update({ title: post.title, description: post.description, content: post.content })
+			.update({ title: script.title, description: script.description, content: script.content })
 			.match({ id })
 
 		if (error) {
@@ -29,7 +29,7 @@
 				type="text"
 				name="title"
 				class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
-				bind:value={post.title}
+				bind:value={script.title}
 			/>
 		</div>
 		<div class="flex flex-col text-sm mb-2">
@@ -39,7 +39,7 @@
 				type="text"
 				name="description"
 				class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
-				bind:value={post.description}
+				bind:value={script.description}
 			/>
 		</div>
 		<div class="flex flex-col text-sm mb-2">
@@ -48,16 +48,16 @@
 				type="text"
 				name="content"
 				class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
-				bind:value={post.content}
+				bind:value={script.content}
 			/>
 		</div>
 		<div class="flex flex-col text-sm mb-2">
 			<details>
 				<summary>Preview</summary>
-				<div>{post.title}</div>
-				<div>{post.description}</div>
+				<div>{script.title}</div>
+				<div>{script.description}</div>
 				<article class="markdown-body">
-					<Markdown src={post.content} />
+					<Markdown src={script.content} />
 				</article>
 			</details>
 		</div>

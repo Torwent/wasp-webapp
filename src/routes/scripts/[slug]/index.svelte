@@ -7,8 +7,6 @@
 	import Markdown from "$lib/Markdown.svelte"
 	import { fade } from "svelte/transition"
 	export let script
-
-	console.log(script.categories.includes("Free"))
 </script>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
@@ -32,7 +30,9 @@
 	<div class="container mx-auto my-6 max-w-2xl flex-grow">
 		{#if script.categories.includes("Free")}
 			This is a free script.
-		{:else if script.categories.includes("Premium")}{/if}
+		{:else if script.categories.includes("Premium")}
+			This is a premium script.
+		{/if}
 
 		<article class="prose dark:prose-invert py-6">
 			<Markdown src={script.content} />
