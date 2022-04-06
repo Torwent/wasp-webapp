@@ -51,8 +51,6 @@
 						on:click={() => (selectedTab = tabs[0])}
 						class:text-orange-500={selectedTab === 0}
 						class:dark:text-orange-400={selectedTab === 0}
-						class:fill-orange-500={selectedTab === 0}
-						class:dark:fill-orange-400={selectedTab === 0}
 					>
 						<Logo {selectedTab} />
 					</a>

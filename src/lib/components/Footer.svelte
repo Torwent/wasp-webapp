@@ -7,7 +7,7 @@
 >
 	<div class="md:flex md:justify-between">
 		<div class="mb-6 md:mb-0">
-			<a href="/" class="flex items-centerhover:text-amber-500 dark:hover:text-amber-400">
+			<a href="/" class="flex items-center hover:text-amber-500 dark:hover:text-amber-400">
 				<Logo />
 			</a>
 		</div>
