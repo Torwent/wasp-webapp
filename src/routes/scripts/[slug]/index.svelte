@@ -8,6 +8,8 @@
 	import { fade } from "svelte/transition"
 	import { profile } from "$lib/stores/authStore"
 	import DownloadButton from "$lib/components/DownloadButton.svelte"
+	import Carousel from "$lib/components/carousel.svelte"
+
 	export let script
 </script>
 
@@ -34,9 +36,9 @@
 	</div>
 
 	<div class="container mx-auto my-6 max-w-2xl flex-grow">
-		<article class="prose dark:prose-invert py-6">
-			<Markdown src={script.content} />
-		</article>
+		<div class="container h-96 w-full mx-auto my-3">
+			<Carousel gallery={[0, 1, 2]} />
+		</div>
 
 		<div class="text-center">
 			{#if script.categories.includes("Free")}
@@ -85,5 +87,9 @@
 				{/if}
 			{/if}
 		</div>
+
+		<article class="prose dark:prose-invert py-6 text-center">
+			<Markdown src={script.content} />
+		</article>
 	</div>
 </div>
