@@ -37,7 +37,10 @@
 
 	<div class="container mx-auto my-6 max-w-2xl flex-grow">
 		<div class="container h-96 w-full mx-auto my-3">
-			<Carousel gallery={[0, 1, 2]} />
+			<Carousel
+				bucket="imgs"
+				folder={"scripts/" + script.title.toLowerCase().replace(" ", "_") + "/assets"}
+			/>
 		</div>
 
 		<div class="text-center">
