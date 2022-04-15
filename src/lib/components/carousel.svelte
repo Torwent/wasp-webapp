@@ -47,15 +47,14 @@
 		}
 
 		if (index < 0) {
-			index = gallery.length - 1
-		} else if (index > gallery.length - 1) {
+			index = $gallery.length - 1
+		} else if (index > $gallery.length - 1) {
 			index = 0
 		}
 	}
 
 	const handleSlider = (i) => {
 		index = i
-		console.log(i)
 	}
 </script>
 
@@ -65,7 +64,6 @@
 		<div class="overflow-hidden relative h-48 rounded-lg sm:h-64 xl:h-80 2xl:h-96">
 			<!-- Item {obj.index} -->
 			<div class="duration-700 ease-in-out text-center" data-carousel-item="active">
-				{$gallery[index]}
 				<img src={$gallery[index]} alt="missing img" />
 			</div>
 		</div>
@@ -75,25 +73,25 @@
 			{#each $gallery as img, i}
 				<button
 					type="button"
-					class="w-3 h-3 rounded-full bg-white/50 dark:bg-gray-600/50 hover:bg-white dark:hover:bg-gray-800"
+					class="w-3 h-3 rounded-full bg-stone-600 hover:bg-orange-400 dark:hover:bg-orange-500 opacity-50"
 					on:click={() => handleSlider(i)}
-					class:bg-white={index === i}
-					class:dark:bg-white={index === i}
+					class:bg-amber-400={index === i}
+					class:dark:bg-amber-500={index === i}
 				/>
 			{/each}
 		</div>
 
-		<!-- Slider controls -->
+		<!-- Button controls -->
 		<button
 			type="button"
 			class="flex absolute top-0 left-0 z-30 justify-center items-center px-4 h-full cursor-pointer group focus:outline-none"
 			on:click={() => handleControls(false)}
 		>
 			<span
-				class="inline-flex justify-center items-center w-8 h-8 rounded-full sm:w-10 sm:h-10 bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none"
+				class="inline-flex justify-center items-center w-8 h-8 rounded-full sm:w-10 sm:h-10 bg-white/30 dark:bg-stone-800/30 group-hover:bg-white/50 dark:group-hover:bg-stone-800/60 group-focus:ring-2 group-focus:ring-amber-400/70 dark:group-focus:ring-amber-500/70 group-focus:outline-none"
 			>
 				<svg
-					class="w-5 h-5 text-white sm:w-6 sm:h-6 dark:text-gray-800"
+					class="w-5 h-5 text-orange-400 dark:text-orange-500 sm:w-6 sm:h-6"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
@@ -114,10 +112,10 @@
 			on:click={() => handleControls(true)}
 		>
 			<span
-				class="inline-flex justify-center items-center w-8 h-8 rounded-full sm:w-10 sm:h-10 bg-white/30 dark:bg-gray-800/30 group-hover:bg-white/50 dark:group-hover:bg-gray-800/60 group-focus:ring-4 group-focus:ring-white dark:group-focus:ring-gray-800/70 group-focus:outline-none"
+				class="inline-flex justify-center items-center w-8 h-8 rounded-full sm:w-10 sm:h-10 bg-white/30 dark:bg-stone-800/30 group-hover:bg-white/50 dark:group-hover:bg-stone-800/60 group-focus:ring-2 group-focus:ring-amber-400/70 dark:group-focus:ring-amber-500/70 group-focus:outline-none"
 			>
 				<svg
-					class="w-5 h-5 text-white sm:w-6 sm:h-6 dark:text-gray-800"
+					class="w-5 h-5 text-orange-400 dark:text-orange-500 sm:w-6 sm:h-6"
 					fill="none"
 					stroke="currentColor"
 					viewBox="0 0 24 24"
