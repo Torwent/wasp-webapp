@@ -7,7 +7,7 @@
 	export let bucket
 	export let folder
 
-	export const loadFiles = async () => {
+	const loadFiles = async () => {
 		const { data, error } = await supabase.storage.from(bucket).list(folder, {
 			limit: 20,
 			offset: 0,
@@ -33,7 +33,6 @@
 		}
 
 		gallery.set(imgURLs)
-		console.log($gallery)
 	}
 	loadFiles()
 
