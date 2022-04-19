@@ -5,12 +5,25 @@
 
 <script>
 	import Markdown from "$lib/Markdown.svelte"
+	import ScriptDownloadButton from "$lib/components/ScriptDownloadButton.svelte"
+	import Carousel from "$lib/components/Carousel.svelte"
 	import { fade } from "svelte/transition"
 	import { profile } from "$lib/stores/authStore"
-	import DownloadButton from "$lib/components/DownloadButton.svelte"
-	import Carousel from "$lib/components/carousel.svelte"
 
 	export let script
+	let path
+
+	if (script.categories.includes("Premium")) {
+		path = "premium/"
+	} else {
+		path = "free/"
+	}
+
+	path +=
+		script.title.toLowerCase().replace(" ", "_") +
+		"/" +
+		script.title.toLowerCase().replace(" ", "_") +
+		".simba"
 </script>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
@@ -45,10 +58,7 @@
 
 		<div class="text-center">
 			{#if script.categories.includes("Free")}
-				<DownloadButton
-					url={script.path + script.title.toLowerCase().replace(" ", "_") + ".simba"}
-					text={`Download ${script.title}`}
-				/>
+				<ScriptDownloadButton {path} text={`Download ${script.title}`} />
 				<h3 class="py-6">
 					This is a free script, if you want to learn how to install and easily manage all
 					FreeWaspScripts check this
@@ -63,10 +73,7 @@
 				{#if !$profile.id}
 					<h3 class="py-6">Please login to be able to download this script.</h3>
 				{:else if $profile.premium || $profile.vip}
-					<DownloadButton
-						url={script.path + script.title.toLowerCase().replace(" ", "_") + ".simba"}
-						text={`Download ${script.title}`}
-					/>
+					<ScriptDownloadButton {path} text={`Download ${script.title}`} />
 					<h4 class="py-6">
 						This is a premium script, if you don't know what to do with this file, follow this
 						<a

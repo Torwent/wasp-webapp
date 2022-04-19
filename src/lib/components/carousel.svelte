@@ -1,40 +1,13 @@
 <script>
-	import { supabase } from "$lib/supabase"
-	import { writable } from "svelte/store"
-
-	export const gallery = writable([])
+	import { loadPublicFiles } from "$lib/stores/fileStore.js"
 
 	export let bucket
 	export let folder
+	let gallery
 
-	const loadFiles = async () => {
-		const { data, error } = await supabase.storage.from(bucket).list(folder, {
-			limit: 20,
-			offset: 0,
-			sortBy: { column: "name", order: "asc" }
-		})
-
-		if (error) {
-			return console.error(error)
-		}
-
-		let imgURLs = []
-
-		for (let i of data) {
-			const { publicURL, errorUrl } = supabase.storage
-				.from(bucket)
-				.getPublicUrl(folder + "/" + i.name)
-
-			if (errorUrl) {
-				return console.error(error)
-			}
-
-			imgURLs.push(publicURL.replaceAll(" ", "%20"))
-		}
-
-		gallery.set(imgURLs)
-	}
-	loadFiles()
+	loadPublicFiles(bucket, folder).then((value) => {
+		gallery = value
+	})
 
 	let index = 0
 
@@ -46,8 +19,8 @@
 		}
 
 		if (index < 0) {
-			index = $gallery.length - 1
-		} else if (index > $gallery.length - 1) {
+			index = gallery.length - 1
+		} else if (index > gallery.length - 1) {
 			index = 0
 		}
 	}
@@ -57,19 +30,19 @@
 	}
 </script>
 
-{#if $gallery}
+{#if gallery}
 	<div id="indicators-carousel" class="rounded-md h-96  relative" data-carousel="static">
 		<!-- Carousel wrapper -->
 		<div class="overflow-hidden relative h-48 rounded-lg sm:h-64 xl:h-80 2xl:h-96">
 			<!-- Item {obj.index} -->
 			<div class="duration-700 ease-in-out text-center" data-carousel-item="active">
-				<img src={$gallery[index]} alt="missing img" />
+				<img src={gallery[index]} alt="missing img" />
 			</div>
 		</div>
 
 		<!-- Slider indicators -->
 		<div class="flex absolute bottom-5 left-1/2 z-30 space-x-3 -translate-x-1/2">
-			{#each $gallery as img, i}
+			{#each gallery as img, i}
 				<button
 					type="button"
 					class="w-3 h-3 rounded-full bg-stone-600 hover:bg-orange-400 dark:hover:bg-orange-500 opacity-50"
