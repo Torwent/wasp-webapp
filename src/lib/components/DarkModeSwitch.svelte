@@ -1,7 +1,6 @@
 <script>
-	import { fade } from "svelte/transition"
 	export let checked = true
-	function toggle() {
+	const toggle = () => {
 		checked = !checked
 		window.document.getElementById("wasp-webapp").classList.toggle("dark")
 	}
