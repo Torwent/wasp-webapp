@@ -83,17 +83,16 @@
 					>
 						FAQ
 					</a>
-					{#if $profile.dev}
-						<a
-							href="/blog"
-							class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
-							on:click={() => (selectedTab = tabs[4])}
-							class:text-orange-500={selectedTab === 4}
-							class:dark:text-orange-400={selectedTab === 4}
-						>
-							Blog
-						</a>
-					{/if}
+
+					<a
+						href="/blog"
+						class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
+						on:click={() => (selectedTab = tabs[4])}
+						class:text-orange-500={selectedTab === 4}
+						class:dark:text-orange-400={selectedTab === 4}
+					>
+						Blog
+					</a>
 				</div>
 			</div>
 			<!-- Account -->
