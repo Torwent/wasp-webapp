@@ -2,7 +2,6 @@
 	import "../app.css"
 	import Navbar from "$lib/components/Navbar.svelte"
 	import Footer from "$lib/components/Footer.svelte"
-	import DiscordButton from "$lib/components/Discord.svelte"
 	import Discord from "$lib/components/Discord.svelte"
 </script>
 
