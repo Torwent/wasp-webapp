@@ -43,4 +43,4 @@
 		/>
 	</g>
 </svg>
-<span class="font-bold text-lg"> WaspBot </span>
+<span class="font-bold text-lg"> WaspScripts </span>
