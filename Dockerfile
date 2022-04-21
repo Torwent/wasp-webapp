@@ -1,6 +1,6 @@
 ### Build Step
 # pull the Node.js Docker image
-FROM node:16.2 as builder
+FROM node:16.2.0-alpine3.13 AS builder
 
 # change working directory
 WORKDIR /usr/src/app
