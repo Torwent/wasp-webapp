@@ -1,0 +1,12 @@
+ersion: "3.8"
+
+services:
+  container_name: "nodeserver"
+  nodeserver:
+    build:
+      context: .
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+  networks:
+    driver: bridge
