@@ -1,8 +1,8 @@
 ersion: "3.9"
 
 services:
-  container_name: "nodeserver"
   nodeserver:
+    container_name: "nodeserver"
     build:
       context: .
     ports:
