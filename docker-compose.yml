@@ -1,16 +1,14 @@
 version: "3.9"
 
 services:
-  nodeserver:
-    container_name: "nodeserver"
+  wasp-webapp:
+    container_name: "wasp-webapp"
     build:
       context: .
-    ports:
-      - "3000:3000"
     restart: unless-stopped
     networks:
-      - proxy
+      - wasp-server_proxy
 
 networks:
-  proxy:
-    driver: bridge
+  wasp-server_proxy:
+    external: true
