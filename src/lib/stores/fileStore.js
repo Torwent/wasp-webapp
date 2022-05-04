@@ -28,8 +28,16 @@ export const loadPublicFiles = async (bucket, folder) => {
 	return imgURLs
 }
 
-export const getSignedURL = async (bucket, file) => {
-	const { signedURL, error } = await supabase.storage.from(bucket).createSignedUrl(file, 10)
+export const getSignedURL = async (bucket, path, file) => {
+	const { data, dirError } = await supabase.storage.from(bucket).list(path)
+
+	if (dirError) return console.error(dirError)
+
+	data.sort((a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0))
+
+	path += data[0].name + "/" + file
+
+	const { signedURL, error } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
 
 	if (error) {
 		return console.error(error)

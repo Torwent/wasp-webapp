@@ -11,19 +11,15 @@
 	import { profile } from "$lib/stores/authStore"
 
 	export let script
-	let path
+	let premium
 
 	if (script.categories.includes("Premium")) {
-		path = "premium/"
+		premium = true
 	} else {
-		path = "free/"
+		premium = false
 	}
 
-	path +=
-		script.title.toLowerCase().replace(" ", "_") +
-		"/" +
-		script.title.toLowerCase().replace(" ", "_") +
-		".simba"
+	let script_name = script.title.toLowerCase().replace(" ", "_") + ".simba"
 </script>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
@@ -58,7 +54,7 @@
 
 		<div class="text-center">
 			{#if script.categories.includes("Free")}
-				<ScriptDownloadButton {path} text={`Download ${script.title}`} />
+				<ScriptDownloadButton {premium} {script_name} text={`Download ${script.title}`} />
 				<h3 class="py-6">
 					This is a free script, if you want to learn how to install and easily manage all
 					FreeWaspScripts check this
@@ -73,7 +69,7 @@
 				{#if !$profile.id}
 					<h3 class="py-6">Please login to be able to download this script.</h3>
 				{:else if $profile.premium || $profile.vip}
-					<ScriptDownloadButton {path} text={`Download ${script.title}`} />
+					<ScriptDownloadButton {premium} {script_name} text={`Download ${script.title}`} />
 					<h4 class="py-6">
 						This is a premium script, if you don't know what to do with this file, follow this
 						<a

@@ -1,11 +1,20 @@
 <script>
 	import { getSignedURL } from "$lib/stores/fileStore.js"
-	export let path
+	export let premium
+	export let script_name
 	export let text
+
+	let path
 	let url
 
+	if (premium) {
+		path = "premium/"
+	} else {
+		path = "free/"
+	}
+
 	let download = () => {
-		getSignedURL("scripts", path).then((value) => {
+		getSignedURL("scripts", path, script_name).then((value) => {
 			url = value
 			window.document.getElementById("download-button").click()
 		})
