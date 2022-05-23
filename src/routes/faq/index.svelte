@@ -12,13 +12,18 @@
 >
 	<header class="py-12 text-center">
 		<h2>Welcome to the Frequently Asked Questions and Common Errors section.</h2>
-		<p class="py-6">
-			Hopefully you find what you are looking for here, if not feel free to join the discord server
-			and ask around!
-		</p>
-		<Discord />
 	</header>
 
 	<DropDown title="FAQ" entries={questions} />
 	<DropDown title="Common Errors" entries={commonErrors} />
+
+	<header class="py-12 text-center">
+		<p class="py-6">
+			Hopefully you found what you were looking for here, if not feel free to join the discord
+			server and ask around!
+		</p>
+		<a href="https://discord.com/invite/YMYUahmww9">
+			<Discord />
+		</a>
+	</header>
 </div>

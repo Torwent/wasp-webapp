@@ -13,7 +13,9 @@
 	<p class="text-center mx-auto pt-4 pb-12 text-red-500 font-bold">
 		If you want to actually use my work you should join the discord server:
 	</p>
-	<Discord />
+	<a href="https://discord.com/invite/YMYUahmww9">
+		<Discord />
+	</a>
 
 	<slot />
 </main>

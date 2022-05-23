@@ -28,7 +28,9 @@
 		For more information, help and/or questions look through the <a href="/faq">FAQ</a> or join the discord
 		community!
 	</h2>
-	<Discord />
+	<a href="https://discord.com/invite/YMYUahmww9">
+		<Discord />
+	</a>
 </div>
 
 <style>
