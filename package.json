@@ -30,6 +30,7 @@
 		"@supabase/supabase-js": "^1.31.1",
 		"@sveltejs/adapter-node": "^1.0.0-next.73",
 		"@tailwindcss/typography": "^0.5.2",
+		"discord.js": "^13.7.0",
 		"highlight.js": "^11.5.0",
 		"markdown-it": "^12.3.2"
 	}
