@@ -9,3 +9,5 @@ export const discord = new DiscordJS.Client({
 discord.on("ready", () => {
 	console.log("wasp-webapp bridge ready!")
 })
+
+discord.login(token)
