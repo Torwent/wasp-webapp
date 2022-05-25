@@ -51,13 +51,15 @@ export const updateUsername = async (id, username) => {
 	}
 }
 
-export const updateRoles = async (id) => {
+export const updateRoles = async (id, dev, test, prem, vip) => {
 	const { error } = await supabase
 		.from("profile")
-		.update({ dev: false, premium: false, vip: false })
+		.update({ dev: dev, tester: test, premium: prem, vip: vip })
 		.match({ id: id })
 
 	if (error) {
 		console.log(error.message)
 	}
+
+	loadProfile(id)
 }
