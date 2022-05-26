@@ -7,6 +7,7 @@
 
 <Navbar />
 <main class="min-h-screen">
+	<!--
 	<h1 class="text-center mx-auto pt-12 text-red-500 font-bold">
 		THIS IS WORK IN PROGRESS AND NOT EVERYTHING IS FUNCTIONAL
 	</h1>
@@ -16,7 +17,7 @@
 	<a href="https://discord.com/invite/YMYUahmww9">
 		<Discord />
 	</a>
-
+	-->
 	<slot />
 </main>
 <Footer />
