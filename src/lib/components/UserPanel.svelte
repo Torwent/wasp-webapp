@@ -9,7 +9,8 @@
 		ws.addEventListener("open", () => {
 			console.log("Connection open!")
 			let id = $profile.discord_id
-			ws.send(id)
+
+			if (id !== "") ws.send(id)
 		})
 
 		ws.addEventListener("message", async ({ data }) => {

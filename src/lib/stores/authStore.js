@@ -1,4 +1,4 @@
-import { supabase } from "$lib/supabase.js"
+import { supabase, getServiceSupabase } from "$lib/supabase.js"
 import { writable } from "svelte/store"
 import { createAvatar } from "@dicebear/avatars"
 import * as style from "@dicebear/avatars-bottts-sprites"
@@ -12,6 +12,20 @@ const loadProfile = async (id) => {
 	if (error) return console.error(error)
 
 	profile.set(data[0])
+}
+
+export const updateRoles = async (id, d, t, p, v) => {
+	const ssb = getServiceSupabase()
+	ssb.auth.signOut()
+
+	const { error } = await ssb
+		.from("profile")
+		.update({ dev: d, tester: t, premium: p, vip: v })
+		.eq("id", id)
+
+	if (error) console.log(error)
+
+	loadProfile(id)
 }
 
 supabase.auth.onAuthStateChange((_, session) => {
@@ -44,22 +58,9 @@ export var reloadAvatar = () => {
 }
 
 export const updateUsername = async (id, username) => {
-	const { error } = await supabase.from("profile").update({ username: username }).match({ id: id })
+	const { error } = await supabase.from("profile").update({ username: username }).eq("id", id)
 
 	if (error) {
 		console.log(error.message)
 	}
-}
-
-export const updateRoles = async (id, dev, test, prem, vip) => {
-	const { error } = await supabase
-		.from("profile")
-		.update({ dev: dev, tester: test, premium: prem, vip: vip })
-		.match({ id: id })
-
-	if (error) {
-		console.log(error.message)
-	}
-
-	loadProfile(id)
 }
