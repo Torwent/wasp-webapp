@@ -25,9 +25,16 @@
 	{/if}
 	{#if profile.vip}
 		<span
-			class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-rose-500 dark:bg-rose-400 text-white rounded-full"
+			class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-red-600 dark:bg-red-500 text-white rounded-full"
 		>
 			VIP
+		</span>
+	{/if}
+	{#if profile.tester}
+		<span
+			class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-green-500 dark:bg-green-400 text-white rounded-full"
+		>
+			Tester
 		</span>
 	{/if}
 </div>
