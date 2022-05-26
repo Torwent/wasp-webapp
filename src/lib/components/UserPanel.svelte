@@ -5,7 +5,7 @@
 
 	let ws
 	onMount(() => {
-		ws = new WebSocket("ws://localhost:4100")
+		ws = new WebSocket("ws://wasp-discord:4100")
 		ws.addEventListener("open", () => {
 			console.log("Connection open!")
 			let id = $profile.discord_id
