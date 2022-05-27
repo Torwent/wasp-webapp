@@ -7,7 +7,12 @@
 	const handleLogin = async () => {
 		try {
 			loading = true
-			let { error } = await supabase.auth.signIn({ provider: "discord" })
+			let { error } = await supabase.auth.signIn(
+				{ provider: "discord" },
+				{
+					redirectTo: window.location.origin
+				}
+			)
 		} catch (error) {
 			console.error(error)
 		} finally {
