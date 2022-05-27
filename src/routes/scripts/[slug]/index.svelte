@@ -79,6 +79,15 @@
 							guide</a
 						>.
 					</h4>
+
+					<h4 class="py-6">
+						If you prefer to download all premium scripts in a zip you can download them here:
+					</h4>
+					<ScriptDownloadButton
+						{premium}
+						script_name="wasp-premium.zip"
+						text="Download wasp-premium.zip"
+					/>
 				{:else}
 					<h3 class="py-6">This is a premium script and you are not premium.</h3>
 					<h4>
