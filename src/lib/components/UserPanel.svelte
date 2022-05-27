@@ -5,7 +5,14 @@
 
 	let ws
 	onMount(() => {
-		ws = new WebSocket("wss://waspscripts.com/wss")
+		let protocol = "ws://"
+		if (window.location.protocol === "https:") {
+			protocol = "wss://"
+		}
+
+		let wsUri = protocol + "waspscripts.com/wss"
+
+		ws = new WebSocket(wsUri)
 		ws.addEventListener("open", () => {
 			console.log("Connection open!")
 			let id = $profile.discord_id
