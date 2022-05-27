@@ -14,20 +14,26 @@
 
 		ws = new WebSocket(wsUri)
 		ws.addEventListener("open", () => {
-			console.log("Connection open!")
+			console.log("Connection open to wasp-discord!")
 			let id = $profile.discord_id
 
 			if (id !== "") ws.send(id)
 		})
 
 		ws.addEventListener("message", async ({ data }) => {
+			console.log("Received a reply from wasp-discord!", data)
 			let hasDev = data.includes("864744526894333963")
 			let hasPremium = data.includes("820985772140134440")
 			let hasVip = data.includes("931167526681972746")
 			let hasTester = data.includes("907209408860291113")
 
 			updateRoles($profile.id, hasDev, hasTester, hasPremium, hasVip)
+			console.log("Closing the connection to wasp-discord...")
 			ws.close()
+		})
+
+		ws.addEventListener("close", () => {
+			console.log("Connection to wasp-discord closed!")
 		})
 	})
 </script>

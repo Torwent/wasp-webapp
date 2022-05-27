@@ -20,7 +20,7 @@
 					</li>
 					<li>
 						<a
-							href="https://ollydev.github.io/SRL-Development"
+							href="https://villavu.github.io/SRL-Development"
 							class="hover:text-amber-500 dark:hover:text-amber-400"
 						>
 							SRL Documentation
@@ -36,7 +36,7 @@
 					</li>
 					<li>
 						<a
-							href="https://github.com/ollydev/Simba"
+							href="https://github.com/villavu/Simba"
 							class="hover:text-amber-500 dark:hover:text-amber-400"
 						>
 							Simba repo
@@ -44,7 +44,7 @@
 					</li>
 					<li>
 						<a
-							href="https://github.com/ollydev/SRL-Development"
+							href="https://github.com/villavu/SRL-Development"
 							class="hover:text-amber-500 dark:hover:text-amber-400"
 						>
 							SRL repo
@@ -70,9 +70,8 @@
 						>
 					</li>
 					<li>
-						<a
-							href="https://github.com/slackydev"
-							class="hover:text-amber-500 dark:hover:text-amber-400">Jarl Holta</a
+						<a href="/dev/slackydev" class="hover:text-amber-500 dark:hover:text-amber-400"
+							>Jarl Holta</a
 						>
 					</li>
 					<li>
@@ -121,7 +120,7 @@
 	<div class="sm:flex sm:items-center sm:justify-between p-8 sm:p-12">
 		<span class="text-sm sm:text-center"
 			>© 2022 <a href="https://waspbot.com" class="hover:text-amber-500 dark:hover:text-amber-400e"
-				>WaspBot™</a
+				>WaspScripts™</a
 			>. All Rights Reserved.
 		</span>
 		<div class="flex mt-4 space-x-6 sm:justify-center sm:mt-0">

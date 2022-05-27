@@ -8,7 +8,7 @@
 	import DarkModeSwitch from "$lib/components/DarkModeSwitch.svelte"
 	import { page } from "$app/stores"
 
-	let tabs = [0, 1, 2, 3, 4]
+	let tabs = [0, 1, 2, 3, 4, 5]
 	let selectedTab
 
 	switch ($page.url.pathname) {
@@ -24,12 +24,16 @@
 			selectedTab = tabs[2]
 			break
 
-		case "/faq":
+		case "/premium":
 			selectedTab = tabs[3]
 			break
 
-		case "/blog":
+		case "/faq":
 			selectedTab = tabs[4]
+			break
+
+		case "/blog":
+			selectedTab = tabs[5]
 			break
 	}
 
@@ -75,11 +79,20 @@
 						Scripts
 					</a>
 					<a
-						href="/faq"
+						href="/premium"
 						class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
 						on:click={() => (selectedTab = tabs[3])}
 						class:text-orange-500={selectedTab === 3}
 						class:dark:text-orange-400={selectedTab === 3}
+					>
+						Premium
+					</a>
+					<a
+						href="/faq"
+						class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
+						on:click={() => (selectedTab = tabs[4])}
+						class:text-orange-500={selectedTab === 4}
+						class:dark:text-orange-400={selectedTab === 4}
 					>
 						FAQ
 					</a>
@@ -87,9 +100,9 @@
 					<a
 						href="/blog"
 						class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
-						on:click={() => (selectedTab = tabs[4])}
-						class:text-orange-500={selectedTab === 4}
-						class:dark:text-orange-400={selectedTab === 4}
+						on:click={() => (selectedTab = tabs[5])}
+						class:text-orange-500={selectedTab === 5}
+						class:dark:text-orange-400={selectedTab === 5}
 					>
 						Blog
 					</a>
