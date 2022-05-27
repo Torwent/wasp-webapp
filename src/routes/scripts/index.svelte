@@ -78,9 +78,9 @@
 	}
 </script>
 
-<div class="flex" in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+<div class="flex max-h-screen" in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
 	<div
-		class="w-64 border-r dark:border-stone-800 sticky bottom-0"
+		class="w-64 border-r dark:border-stone-800 sticky bottom-0 min-h-full overflow-y-scroll no-scrollbar"
 		in:fly={{ duration: 600, delay: 600, x: -100 }}
 		out:fly={{ duration: 300, x: -100 }}
 	>
@@ -120,7 +120,7 @@
 		</div>
 	</div>
 
-	<div class="overflow-y-scroll no-scrollbar max-h-screen">
+	<div class="overflow-y-scroll no-scrollbar max-h-full">
 		<form class="form my-6 place-items-center" on:submit|preventDefault={handleSearch}>
 			<div class="flex flex-col text-sm mb-2 max-w-2xl m-auto">
 				<input
