@@ -33,9 +33,9 @@ export const getSignedURL = async (bucket, path, file) => {
 
 	if (dirError) return console.error(dirError)
 
-	data.sort((a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0))
+	//data.sort((a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0))
 
-	path += data[0].name + "/" + file
+	path += data[data.length - 1].name + "/" + file
 
 	const { signedURL, error } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
 
