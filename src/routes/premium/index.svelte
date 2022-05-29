@@ -1,6 +1,6 @@
 <script>
 	import { fade } from "svelte/transition"
-	import { user, profile } from "$lib/stores/authStore"
+	import { profile } from "$lib/stores/authStore"
 
 	let show = false
 </script>
@@ -10,16 +10,21 @@
 	in:fade={{ duration: 300, delay: 300 }}
 	out:fade={{ duration: 300 }}
 >
-	{#if $profile.vip || $profile.premium}
+	{#if $profile.vip || $profile.premium || $profile.tester}
 		<header class="py-8">
 			<h2>
 				Thank you for having joined
 				{#if $profile.vip}
 					<span class="text-red-600 dark:text-red-500">VIP</span>
-				{:else}
+				{:else if $profile.premium}
 					<span class="text-orange-500 dark:text-orange-400">Premium</span>
+				{:else if $profile.tester}
+					<span class="text-green-500 dark:text-green-400">Tester</span>
+					you already have access to every script and you don't need to buy
+					<span class="text-orange-500 dark:text-orange-400">Premium</span>.
+					<br />
+					But of course, I appreciate it if you do!
 				{/if}
-				!
 			</h2>
 		</header>
 	{/if}

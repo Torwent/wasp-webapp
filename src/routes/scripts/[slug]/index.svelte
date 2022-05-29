@@ -68,7 +68,7 @@
 			{:else if script.categories.includes("Premium")}
 				{#if !$profile.id}
 					<h3 class="py-6">Please login to be able to download this script.</h3>
-				{:else if $profile.premium || $profile.vip}
+				{:else if $profile.premium || $profile.vip || $profile.tester}
 					<ScriptDownloadButton {premium} {script_name} text={`Download ${script.title}`} />
 					<h4 class="py-6">
 						This is a premium script, if you don't know what to do with this file, follow this
