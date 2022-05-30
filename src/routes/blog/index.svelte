@@ -53,7 +53,7 @@
 >
 	<header class="text-center py-8">
 		<h3>Welcome to the DevBlog.</h3>
-		<p>Here you can find guide, tutorials and feature annoucements.</p>
+		<p>Here you can find guides, tutorials and feature annoucements.</p>
 	</header>
 	<div class="py-6">
 		<form class="text-center form my-6" on:submit|preventDefault={handleFilters}>

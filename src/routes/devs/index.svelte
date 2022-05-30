@@ -1,14 +1,12 @@
 <script>
 	import { fade } from "svelte/transition"
-	import { posts } from "$lib/stores/stores.js"
+	import { devs, loadData } from "$lib/stores/stores.js"
 	import PostCard from "$lib/components/PostCard.svelte"
+	loadData("devs", devs)
 
 	let searchQuery = ""
-	let filteredPosts = []
-	let placeholderText = "Search posts..."
-	let basicEnabled = false
-	let intermediateEnabled = false
-	let advancedEnabled = false
+	let filteredDevs = []
+	let placeholderText = "Search devs..."
 
 	String.prototype.fuzzy = function (s) {
 		var hay = this.toLowerCase(),
@@ -21,27 +19,15 @@
 	}
 
 	const handleSearch = () => {
-		filteredPosts = $posts
-		placeholderText = "Search posts..."
+		filteredDevs = $devs
+		placeholderText = "Search devs..."
 		if (searchQuery === "") return
 
-		filteredPosts = $posts.filter((post) => post.title.fuzzy(searchQuery))
-		if (filteredPosts.length === 0) {
+		filteredDevs = $devs.filter((post) => post.title.fuzzy(searchQuery))
+		if (filteredDevs.length === 0) {
 			placeholderText = "Not found!"
 			searchQuery = ""
 		}
-	}
-
-	const handleFilters = () => {
-		filteredPosts = $posts
-		if (!basicEnabled && !intermediateEnabled && !advancedEnabled) return
-
-		filteredPosts = $posts.filter(
-			(post) =>
-				(basicEnabled && post.level === 0) ||
-				(intermediateEnabled && post.level === 1) ||
-				(advancedEnabled && post.level === 2)
-		)
 	}
 </script>
 
@@ -51,49 +37,15 @@
 	out:fade={{ duration: 300 }}
 >
 	<header class="text-center py-8">
-		<h3>Welcome to the DevBlog.</h3>
-		<p>Here you can find guide, tutorials and feature annoucements.</p>
+		<h3>Welcome to the Devs setion.</h3>
+		<p>
+			Here you can find information about the developers that made <b>WaspScripts</b> possible.
+		</p>
+		<p>
+			Only <b>Torwent</b> works for <b>WaspScripts</b> but without their work none of this would be possible.
+		</p>
 	</header>
 	<div class="py-6">
-		<form class="text-center form my-6" on:submit|preventDefault={handleFilters}>
-			<header class="py-4"><h3>Filter by level or search the a blog post:</h3></header>
-			<div class="justify-center flex space-x-5 mb-2">
-				<button
-					type="submit"
-					border-b-8
-					class="flex space-x-5 text-xs py-1 px-8 font-bold rounded-full bg-sky-400 dark:bg-sky-500 border-sky-600 dark:border-sky-300 text-white"
-					class:border-r-8={basicEnabled}
-					class:pr-6={basicEnabled}
-					bind={basicEnabled}
-					on:click={() => (basicEnabled = !basicEnabled)}
-				>
-					Basic tutorial
-				</button>
-				<button
-					type="submit"
-					border-b-8
-					class="flex space-x-5 text-xs py-1 px-8 font-bold rounded-full bg-orange-400 dark:bg-orange-500 border-orange-600 dark:border-orange-300 text-white"
-					class:border-r-8={intermediateEnabled}
-					class:pr-6={intermediateEnabled}
-					bind={intermediateEnabled}
-					on:click={() => (intermediateEnabled = !intermediateEnabled)}
-				>
-					Intermidiate tutorial
-				</button>
-				<button
-					type="submit"
-					border-b-8
-					class="flex space-x-5 text-xs py-1 px-8 font-bold rounded-full bg-red-400 dark:bg-red-500 border-red-600 dark:border-red-300 text-white"
-					class:border-r-8={advancedEnabled}
-					class:pr-6={advancedEnabled}
-					bind={advancedEnabled}
-					on:click={() => (advancedEnabled = !advancedEnabled)}
-				>
-					Advanced tutorial
-				</button>
-			</div>
-		</form>
-
 		<form class="form my-6" on:submit|preventDefault={handleSearch}>
 			<div class="flex flex-col text-sm mb-2">
 				<input
@@ -108,16 +60,16 @@
 	</div>
 
 	<div class="overflow-hidden">
-		{#if filteredPosts.length !== 0}
-			{#each filteredPosts as p}
-				<PostCard post={p} />
+		{#if filteredDevs.length !== 0}
+			{#each filteredDevs as d}
+				<PostCard post={d} />
 			{/each}
-		{:else if $posts}
-			{#each $posts as p}
-				<PostCard post={p} />
+		{:else if $devs}
+			{#each $devs as d}
+				<PostCard post={d} />
 			{/each}
 		{:else}
-			Loading posts...
+			Loading devs...
 		{/if}
 	</div>
 </div>
