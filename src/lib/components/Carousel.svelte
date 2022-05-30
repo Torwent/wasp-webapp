@@ -1,5 +1,5 @@
 <script>
-	import { loadPublicFiles } from "$lib/stores/fileStore.js"
+	import { loadPublicFiles } from "$lib/supabaseStorage.js"
 
 	export let bucket
 	export let folder

@@ -64,39 +64,20 @@
 				<h2 class="mb-6 text-sm font-semibold uppercase text-white">Special thanks:</h2>
 				<ul>
 					<li>
-						<a
-							href="https://github.com/Brandon-T"
-							class="hover:text-amber-500 dark:hover:text-amber-400">Brandon-T</a
+						<a href="/devs/Brandon" class="hover:text-amber-500 dark:hover:text-amber-400"
+							>Brandon</a
 						>
 					</li>
 					<li>
-						<a href="/dev/slackydev" class="hover:text-amber-500 dark:hover:text-amber-400"
+						<a href="/devs/Slacky" class="hover:text-amber-500 dark:hover:text-amber-400"
 							>Jarl Holta</a
 						>
 					</li>
 					<li>
-						<a
-							href="https://github.com/MerlijnWajer"
-							class="hover:text-amber-500 dark:hover:text-amber-400">Merlijn Wajer</a
-						>
+						<a href="/devs/Olly" class="hover:text-amber-500 dark:hover:text-amber-400">Olly</a>
 					</li>
 					<li>
-						<a
-							href="https://github.com/nielsAD"
-							class="hover:text-amber-500 dark:hover:text-amber-400">Niels AD</a
-						>
-					</li>
-					<li>
-						<a
-							href="https://github.com/ollydev"
-							class="hover:text-amber-500 dark:hover:text-amber-400">Olly</a
-						>
-					</li>
-					<li>
-						<a
-							href="https://ollydev.github.io/SRL-Development"
-							class="hover:underline hover:text-amber-500 dark:hover:text-amber-400"
-						>
+						<a href="/devs" class="hover:underline hover:text-amber-500 dark:hover:text-amber-400">
 							Many SRL members...
 						</a>
 					</li>

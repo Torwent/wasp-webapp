@@ -1,5 +1,5 @@
 <script>
-	import { getSignedURL } from "$lib/stores/fileStore.js"
+	import { getSignedURL } from "$lib/supabaseStorage.js"
 	export let premium
 	export let script_name
 	export let text

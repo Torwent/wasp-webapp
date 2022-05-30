@@ -1,10 +1,12 @@
 <script>
 	import { writable } from "svelte/store"
 	import { fade, fly } from "svelte/transition"
-	import { scripts } from "$lib/stores/scriptsStore.js"
+	import { scripts, categories, subcategories, loadData } from "$lib/stores/stores.js"
 	import Card from "$lib/components/Card.svelte"
 
-	import { categories, subcategories } from "$lib/stores/categoryStore.js"
+	loadData("scripts", scripts)
+	loadData("categories", categories)
+	loadData("subcategories", subcategories)
 
 	let searchQuery = ""
 	let filteredScripts = []
