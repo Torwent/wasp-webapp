@@ -17,10 +17,12 @@
 	<div class="flex justify-between">
 		<header>
 			<h1 class="mb-4 font-bold text-3xl">
-				{#if dev.real_name !== ""}
+				{#if dev.real_name}
 					{dev.real_name} /
 				{/if}
-				{dev.username}
+				{#if dev.username}
+					{dev.username}
+				{/if}
 			</h1>
 		</header>
 
