@@ -78,7 +78,7 @@
 					</li>
 					<li>
 						<a href="/devs" class="hover:underline hover:text-amber-500 dark:hover:text-amber-400">
-							Many SRL members...
+							Many more devs...
 						</a>
 					</li>
 				</ul>

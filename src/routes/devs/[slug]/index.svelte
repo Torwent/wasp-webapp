@@ -69,6 +69,6 @@
 	</div>
 	<article class="prose dark:prose-invert py-6 border-t-2 border-stone-300 dark:border-stone-800">
 		<h3>Worked on:</h3>
-		<Markdown src={dev.achievements} />
+		<Markdown src={dev.description} />
 	</article>
 </div>

@@ -1,7 +1,7 @@
 <script>
 	import { fade } from "svelte/transition"
 	import { devs, loadData } from "$lib/stores/stores.js"
-	import PostCard from "$lib/components/PostCard.svelte"
+	import DevCard from "$lib/components/DevCard.svelte"
 	loadData("devs", devs)
 
 	let searchQuery = ""
@@ -62,11 +62,11 @@
 	<div class="overflow-hidden">
 		{#if filteredDevs.length !== 0}
 			{#each filteredDevs as d}
-				<PostCard post={d} />
+				<DevCard dev={d} />
 			{/each}
 		{:else if $devs}
 			{#each $devs as d}
-				<PostCard post={d} />
+				<DevCard dev={d} />
 			{/each}
 		{:else}
 			Loading devs...
