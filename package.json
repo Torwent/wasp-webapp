@@ -31,6 +31,7 @@
 		"@sveltejs/adapter-node": "^1.0.0-next.73",
 		"@tailwindcss/typography": "^0.5.2",
 		"highlight.js": "^11.5.0",
-		"markdown-it": "^12.3.2"
+		"markdown-it": "^12.3.2",
+		"svelte-media-query": "^1.1.2"
 	}
 }

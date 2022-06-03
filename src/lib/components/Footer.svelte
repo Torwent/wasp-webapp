@@ -3,7 +3,7 @@
 </script>
 
 <footer
-	class="p-4 sm:p-6 border-t border-stone-200 justify-between text-stone-500 dark:border-stone-200/5"
+	class="p-4 z-40 sticky sm:p-6 border-t border-stone-200 justify-between text-stone-500 dark:border-stone-200/5"
 >
 	<div class="md:flex md:justify-between">
 		<div class="mb-6 md:mb-0">
