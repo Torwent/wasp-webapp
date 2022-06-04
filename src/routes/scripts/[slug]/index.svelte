@@ -22,6 +22,11 @@
 	let script_name = script.title.toLowerCase().replace(" ", "_") + ".simba"
 </script>
 
+<svelte:head>
+	<title>Wasp Scripts: {script.title}</title>
+	<meta name="description" content={script.description} />
+</svelte:head>
+
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
 	<div class="group w-full">
 		<img

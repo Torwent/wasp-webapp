@@ -5,6 +5,14 @@
 	let show = false
 </script>
 
+<svelte:head>
+	<title>Wasp Scripts Premium</title>
+	<meta
+		name="description"
+		content="Get Wasp Scripts premium role and gain access to exclusive scripts."
+	/>
+</svelte:head>
+
 <div
 	class="container mx-auto my-6 max-w-5xl flex-grow text-center"
 	in:fade={{ duration: 300, delay: 300 }}

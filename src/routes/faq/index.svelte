@@ -8,6 +8,14 @@
 	loadData("common_errors", commonErrors)
 </script>
 
+<svelte:head>
+	<title>Qasp Scripts FAQ and Common Errors</title>
+	<meta
+		name="description"
+		content="Frequently Asked Questions and Common Errors is a curated list of issues people may face while using Simba and/or Wasp Scripts and how to solve them."
+	/>
+</svelte:head>
+
 <div
 	class="pb-16 container mx-auto my-6 max-w-2xl flex-grow"
 	in:fade={{ duration: 300, delay: 300 }}

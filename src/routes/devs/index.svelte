@@ -31,6 +31,14 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Developers that make Wasp Scripts possible</title>
+	<meta
+		name="description"
+		content="List of developers that are behind the project directly and/or indirerectly."
+	/>
+</svelte:head>
+
 <div
 	class="container mx-auto my-6 max-w-2xl flex-grow"
 	in:fade={{ duration: 300, delay: 300 }}

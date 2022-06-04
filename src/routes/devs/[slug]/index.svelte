@@ -9,6 +9,11 @@
 	export let dev
 </script>
 
+<svelte:head>
+	<title>SRL Developer: {dev.username}</title>
+	<meta name="description" content={dev.description} />
+</svelte:head>
+
 <div
 	class="container mx-auto my-6 max-w-2xl flex-grow"
 	in:fade={{ duration: 300, delay: 300 }}

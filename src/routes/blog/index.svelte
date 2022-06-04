@@ -46,6 +46,14 @@
 	}
 </script>
 
+<svelte:head>
+	<title>Wasp Scripts Blog</title>
+	<meta
+		name="description"
+		content="Learn how to make OldSchool RuneScape botting scripts today. Find the large collection of Simba tutorials available and unleach the power of Simba."
+	/>
+</svelte:head>
+
 <div
 	class="container mx-auto my-6 max-w-2xl flex-grow"
 	in:fade={{ duration: 300, delay: 300 }}

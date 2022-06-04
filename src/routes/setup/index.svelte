@@ -34,6 +34,11 @@
 	})
 </script>
 
+<svelte:head>
+	<title>Wasp Scripts Setup</title>
+	<meta name="description" content="Fully setup Simba and Wasp Scripts from scratch." />
+</svelte:head>
+
 <div
 	class="container mx-auto my-6 max-w-2xl flex-grow"
 	in:fade={{ duration: 300, delay: 300 }}

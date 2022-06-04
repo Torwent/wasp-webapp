@@ -3,6 +3,14 @@
 	import { fade } from "svelte/transition"
 </script>
 
+<svelte:head>
+	<title>Wasp Scripts</title>
+	<meta
+		name="description"
+		content="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts."
+	/>
+</svelte:head>
+
 <div
 	class="container mx-auto my-6 max-w-2xl flex-grow"
 	in:fade={{ duration: 300, delay: 300 }}
