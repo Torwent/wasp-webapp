@@ -4,23 +4,22 @@
 	import EmojiTooltip from "$lib/components/EmojiTooltip.svelte"
 	export let script
 
-	let emojis = []
+	let allCategories = [...$categories, ...$subcategories]
 
-	$: for (let c of script.categories) {
-		for (let c2 of $categories) {
-			if (c === c2.name) {
-				emojis.push({ tooltip: c2.name, icon: c2.emoji })
+	const loadEmojis = (cats) => {
+		let result = []
+		for (let c of cats) {
+			for (let c2 of allCategories) {
+				if (c === c2.name) {
+					result.push({ tooltip: c2.name, icon: c2.emoji })
+				}
 			}
 		}
+
+		return result
 	}
 
-	$: for (let c of script.subcategories) {
-		for (let sub of $subcategories) {
-			if (c === sub.name) {
-				emojis.push({ tooltip: sub.name, icon: sub.emoji })
-			}
-		}
-	}
+	$: emojis = loadEmojis([...script.categories, ...script.subcategories])
 </script>
 
 <!-- Product Card -->

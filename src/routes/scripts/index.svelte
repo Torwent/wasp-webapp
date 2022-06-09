@@ -37,6 +37,7 @@
 
 	const handleFilters = () => {
 		searchQuery = ""
+		filteredScripts = []
 		filteredScripts = $scripts
 		let checked = $checkboxes
 			.filter((checkbox) => checkbox.checked)
@@ -44,11 +45,11 @@
 
 		if (checked.length === 0) return
 
-		filteredScripts = $scripts.filter(
-			(script) =>
-				script.categories.some((c) => checked.includes(c)) ||
-				script.subcategories.some((c) => checked.includes(c))
-		)
+		filteredScripts = $scripts.filter((script) => {
+			let allCat = [...script.categories, ...script.subcategories]
+
+			return allCat.some((c) => checked.includes(c))
+		})
 	}
 
 	$: {
