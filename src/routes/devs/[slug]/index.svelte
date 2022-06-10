@@ -6,6 +6,7 @@
 <script>
 	import Markdown from "$lib/Markdown.svelte"
 	import { fade } from "svelte/transition"
+	import { user } from "$lib/stores/authStore"
 	export let dev
 </script>
 
@@ -78,4 +79,17 @@
 		<h3>Worked on:</h3>
 		<Markdown src={dev.description} />
 	</article>
+
+	{#if $user.id === dev.id || $user.id === "4dbcf43d-cc8a-48e3-aead-2c55a3f302ee"}
+		<a href="/devs/{dev.username}/edit">
+			<button
+				data-mdb-ripple="true"
+				data-mdb-ripple-color="light"
+				class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center justify-between 
+			bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
+			>
+				Edit
+			</button>
+		</a>
+	{/if}
 </div>

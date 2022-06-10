@@ -6,8 +6,6 @@
 <div class="flex justify-center">
 	<button
 		type="button"
-		data-mdb-ripple="true"
-		data-mdb-ripple-color="light"
 		class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
 		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
 	>
