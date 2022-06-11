@@ -32,7 +32,7 @@
 		<img
 			class="inset-0 z-0 object-none h-96 w-full"
 			src={script.assets_path + "cover.png"}
-			alt="missing img"
+			alt={script.assets_alt}
 		/>
 
 		<div class="text-center w-full h-32 absolute inset-0 z-10 top-80 text-amber-500">
