@@ -136,11 +136,32 @@
 		context.strokeRect(3, 3, 497, 18)
 	}
 
+	const drawInvTab = (canvas, context, x, y) => {
+		context.strokeStyle = "rgba(255, 0, 0, 1)"
+
+		let BX1 = canvas.width - 240 + 6 + 3 * 33
+		let BY1 = canvas.height - 333
+		let BX2 = BX1 + 30
+		let BY2 = BY1 + 33
+
+		context.strokeRect(BX1, BY1, 30, 33)
+	}
+
 	onMount(() => {
 		let canvas = document.getElementById("canvas"),
 			context = canvas.getContext("2d")
 
+		let x
+		let y
+
 		window.addEventListener("resize", resizeCanvas, false)
+
+		window.onmousemove = function (event) {
+			x = event.clientX
+			y = event.clientY
+
+			drawInvTab(canvas, context, x, y)
+		}
 
 		function resizeCanvas() {
 			canvas.width = canvas.parentElement.clientWidth
