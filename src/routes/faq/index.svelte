@@ -9,10 +9,10 @@
 </script>
 
 <svelte:head>
-	<title>Qasp Scripts FAQ and Common Errors</title>
+	<title>FAQ and Errors - Waspscripts</title>
 	<meta
 		name="description"
-		content="Frequently Asked Questions and Common Errors is a curated list of issues people may face while using Simba and/or Wasp Scripts and how to solve them."
+		content="Need help botting osrs? See if what you are looking for is in this list."
 	/>
 </svelte:head>
 

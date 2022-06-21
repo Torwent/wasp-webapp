@@ -8,7 +8,7 @@
 	out:fly={{ duration: 600, x: -500 }}
 	class="flex flex-col shadow-md my-8 cursor-pointer hover:-translate-y-1 duration-300 w-full bg-stone-100 dark:bg-stone-800 rounded-md"
 >
-	<a href="/blog/{post.id}">
+	<a href="/blog/{encodeURI(post.title)}">
 		<div class="flex flex-col p-3">
 			<!-- Title -->
 			<div class="text-md font-semibold text-amber-500 hover:underline truncate">

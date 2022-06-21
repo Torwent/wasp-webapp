@@ -6,10 +6,10 @@
 </script>
 
 <svelte:head>
-	<title>Wasp Scripts Premium</title>
+	<title>Premium - Waspscripts</title>
 	<meta
 		name="description"
-		content="Get Wasp Scripts premium role and gain access to exclusive scripts."
+		content="Get Waspscripts premium role and gain access to exclusive scripts. With premium you have scripts for nearly all skills in OSRS."
 	/>
 </svelte:head>
 

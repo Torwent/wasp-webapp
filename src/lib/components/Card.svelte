@@ -23,7 +23,7 @@
 </script>
 
 <!-- Product Card -->
-<a href="/scripts/{script.id}">
+<a href="/scripts/{encodeURI(script.title)}">
 	<div
 		in:fade={{ duration: 300, delay: 300 }}
 		out:fade={{ duration: 300 }}
@@ -36,7 +36,7 @@
 			<img
 				class="absolute rounded-t object-cover h-full w-full"
 				src={script.assets_path + "cover0.png"}
-				alt="Missing img"
+				alt={script.assets_alt}
 			/>
 
 			<!-- Hover Effect -->

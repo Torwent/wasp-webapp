@@ -12,31 +12,34 @@
 	onMount(async () => {
 		let userAgent = navigator.userAgent
 		if (userAgent.indexOf("Win") != -1) {
-			currentOS = { OS: "Windows", Extension: "cmd", BlogID: 0 }
-			secondaryOS = { OS: "Linux", Extension: "sh", BlogID: 1 }
+			currentOS = { OS: "Windows", Extension: "cmd", BlogID: "Setup%20(Windows)" }
+			secondaryOS = { OS: "Linux", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
 		} else if (userAgent.indexOf("Linux") != -1) {
 			if (userAgent.indexOf("Debian") != -1) {
-				currentOS = { OS: "Debian Linux", Extension: "sh", BlogID: 1 }
-				secondaryOS = { OS: "Windows", Extension: "cmd", BlogID: 0 }
+				currentOS = { OS: "Debian Linux", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
+				secondaryOS = { OS: "Windows", Extension: "cmd", BlogID: "Setup%20(Windows)" }
 			} else if (userAgent.indexOf("Ubuntu Linux") != -1) {
-				currentOS = { OS: "Ubuntu", Extension: "sh", BlogID: 1 }
-				secondaryOS = { OS: "Windows", Extension: "cmd", BlogID: 0 }
+				currentOS = { OS: "Ubuntu", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
+				secondaryOS = { OS: "Windows", Extension: "cmd", BlogID: "Setup%20(Windows)" }
 			} else {
-				currentOS = { OS: "Linux", Extension: "sh", BlogID: 1 }
-				secondaryOS = { OS: "Windows", Extension: "cmd", BlogID: 0 }
+				currentOS = { OS: "Linux", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
+				secondaryOS = { OS: "Windows", Extension: "cmd", BlogID: "Setup%20(Windows)" }
 			}
 		} else if (userAgent.indexOf("Mac") != -1) {
 			hasMac = true
-			currentOS = { OS: "MacOS", Extension: "cmd", BlogID: 0 }
-			secondaryOS = { OS: "Linux", Extension: "sh", BlogID: 1 }
+			currentOS = { OS: "MacOS", Extension: "cmd", BlogID: "Setup%20(Windows)" }
+			secondaryOS = { OS: "Linux", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
 		}
 		checkedOS = true
 	})
 </script>
 
 <svelte:head>
-	<title>Wasp Scripts Setup</title>
-	<meta name="description" content="Fully setup Simba and Wasp Scripts from scratch." />
+	<title>Botting setup - Waspscripts</title>
+	<meta
+		name="description"
+		content="Fully setup Simba and Wasp Scripts from scratch to bot OldSchool RuneScape. Start your road to max on osrs today!"
+	/>
 </svelte:head>
 
 <div

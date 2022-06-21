@@ -167,7 +167,7 @@
 	<title>Wasp Scripts</title>
 	<meta
 		name="description"
-		content="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts."
+		content="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
 	/>
 </svelte:head>
 
