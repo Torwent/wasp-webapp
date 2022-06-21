@@ -11,7 +11,7 @@
 </script>
 
 <svelte:head>
-	<title>SRL Developer: {dev.username}</title>
+	<title>{dev.username} - Waspscripts</title>
 	<meta name="description" content={dev.description} />
 </svelte:head>
 

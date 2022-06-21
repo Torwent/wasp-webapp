@@ -32,7 +32,7 @@
 </script>
 
 <svelte:head>
-	<title>Developers that make Wasp Scripts possible</title>
+	<title>Developers - Waspscripts</title>
 	<meta
 		name="description"
 		content="List of developers that are behind the project directly and/or indirerectly."

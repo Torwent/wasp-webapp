@@ -23,7 +23,7 @@
 </script>
 
 <!-- Product Card -->
-<a href="/scripts/{script.id}">
+<a href="/scripts/{encodeURI(script.title)}">
 	<div
 		in:fade={{ duration: 300, delay: 300 }}
 		out:fade={{ duration: 300 }}

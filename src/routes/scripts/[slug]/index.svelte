@@ -23,7 +23,7 @@
 </script>
 
 <svelte:head>
-	<title>Wasp Scripts: {script.title}</title>
+	<title>{script.title} - Waspscripts</title>
 	<meta name="description" content={script.description} />
 </svelte:head>
 
@@ -64,7 +64,7 @@
 					This is a free script, if you want to learn how to install and easily manage all
 					FreeWaspScripts check this
 					<a
-						href="/blog/3"
+						href="/blog/Simba%20packages"
 						class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
 					>
 						guide</a
@@ -76,12 +76,8 @@
 				{:else if $profile.premium || $profile.vip || $profile.tester}
 					<ScriptDownloadButton {premium} {script_name} text={`Download ${script.title}`} />
 					<h4 class="py-6">
-						This is a premium script, if you don't know what to do with this file, follow this
-						<a
-							href="/blog/4"
-							class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
-						>
-							guide</a
+						This is a premium script, you need to manually move it to <b
+							>Simba/Scripts/wasp-premium</b
 						>.
 					</h4>
 

@@ -10,7 +10,7 @@
 </script>
 
 <svelte:head>
-	<title>Wasp Scripts post: {post.title}</title>
+	<title>{post.title} - Waspscripts</title>
 	<meta name="description" content={post.description} />
 </svelte:head>
 

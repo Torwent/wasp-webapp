@@ -6,7 +6,10 @@ import { supabase } from "$lib/supabase.js"
 export async function load({ params }) {
 	const { slug } = params
 
-	const { data: posts, error } = await supabase.from("scripts").select("*").eq("id", slug)
+	const { data: posts, error } = await supabase
+		.from("scripts")
+		.select("*")
+		.eq("title", decodeURI(slug))
 
 	if (!error) {
 		const script = posts[0]

@@ -47,10 +47,10 @@
 </script>
 
 <svelte:head>
-	<title>Wasp Scripts Blog</title>
+	<title>Dev Blog - Waspscripts</title>
 	<meta
 		name="description"
-		content="Learn how to make OldSchool RuneScape botting scripts today. Find the large collection of Simba tutorials available and unleach the power of Simba."
+		content="Guides and tutorials to bot and develop scripts for OldSchool RuneScape. Find the large collection of Simba tutorials available and unleach the power of Simba and max on osrs."
 	/>
 </svelte:head>
 

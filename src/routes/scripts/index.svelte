@@ -82,10 +82,10 @@
 </script>
 
 <svelte:head>
-	<title>Wasp Scripts Scripts</title>
+	<title>OSRS bot scripts - Waspscripts</title>
 	<meta
 		name="description"
-		content="Large script collection to bot OldSchool RuneScape with the power of Simba, SRL and WaspLib."
+		content="Large script collection to bot OldSchool RuneScape with Simba, SRL and WaspLib. Get that 99 on osrs today!"
 	/>
 </svelte:head>
 
