@@ -9,7 +9,7 @@
 </script>
 
 <svelte:head>
-	<title>FAQ and Common Errors - Waspscripts</title>
+	<title>FAQ and Errors - Waspscripts</title>
 	<meta
 		name="description"
 		content="Need help botting osrs? See if what you are looking for is in this list."
