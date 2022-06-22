@@ -313,7 +313,7 @@
 		canvasData.data[index + 3] = a
 	}
 
-	const drawInvTab = (canvas, context, x, y) => {
+	const drawInvTab = (canvas, context, MouseX, MouseY) => {
 		context.strokeStyle = "rgba(255, 0, 0, 1)"
 		let canvasData = context.getImageData(0, 0, canvas.width, canvas.height)
 
@@ -334,7 +334,7 @@
 		rect.Left.x = BX1
 		rect.Left.y = BY2
 
-		let p = Rowp({ x: x, y: y }, rect)
+		let p = Rowp({ x: MouseX, y: MouseY }, rect)
 		drawPixel(canvas, canvasData, p.x, p.y, 255, 0, 0, 110)
 		context.putImageData(canvasData, 0, 0)
 	}
