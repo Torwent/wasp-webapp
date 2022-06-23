@@ -156,15 +156,14 @@
 
 		if (f < 0) {
 			result.result = Math.hypot(p.x - sA.x, p.y - sA.y)
-		} else if (f === 0) {
-			result.nearest.x = Math.round(sA.x + f * dx)
-			result.nearest.y = Math.round(sA.y + f * dy)
-			result.result = Math.hypot(p.x - result.nearest.x, p.y - result.nearest.y)
 		} else if (f > 1) {
 			result.nearest = sB
 			result.result = Math.hypot(p.x - sB.x, p.y - sB.y)
 		}
 
+		result.nearest.x = Math.round(sA.x + f * dx)
+		result.nearest.y = Math.round(sA.y + f * dy)
+		result.result = Math.hypot(p.x - result.nearest.x, p.y - result.nearest.y)
 		return result
 	}
 
