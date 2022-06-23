@@ -291,7 +291,7 @@
 		let t, dist
 		let Result = {}
 
-		p = RandomPoint(rect, 0.4 / 1.5)
+		p = RandomPoint(rect, 4.0 / 1.5)
 
 		e = NearestEdgeTo(p, rect)
 
