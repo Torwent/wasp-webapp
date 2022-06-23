@@ -129,7 +129,7 @@
 		context.stroke()
 	}
 
-	const drawXPBar = (canvas, context) => {
+	const drawXPBarnUpText = (canvas, context) => {
 		context.strokeStyle = "rgba(255, 255, 0, 1)"
 		context.strokeRect(canvas.width - 358 - 15, 0, 118, 28)
 
@@ -300,17 +300,51 @@
 		t = Math.atan2(p.y - from.y, p.x - from.x) + (Math.random() - 0.5) * Smoothness
 		Result.x = Math.round(p.x + Math.cos(t) * SkewedRand(dist * force, 0, dist))
 		Result.y = Math.round(p.y + Math.sin(t) * SkewedRand(dist * force, 0, dist))
-		console.log(Result)
+
 		return Result
 	}
 
-	const drawPixel = (canvas, canvasData, x, y, r, g, b, a) => {
-		let index = (x + y * canvas.width) * 4
+	const clearPixel = (context, i, canvasData) => {
+		canvasData.data[i + 0] = 0
+		canvasData.data[i + 1] = 0
+		canvasData.data[i + 2] = 0
+		canvasData.data[i + 3] = 0
+		context.putImageData(canvasData, 0, 0)
+	}
 
-		canvasData.data[index + 0] = r
-		canvasData.data[index + 1] = g
-		canvasData.data[index + 2] = b
-		canvasData.data[index + 3] = a
+	const drawPixel = (context, canvas, canvasData, x, y) => {
+		const setPixel = (i) => {
+			if (
+				canvasData.data[i + 0] == 0 &&
+				canvasData.data[i + 1] >= 0 &&
+				canvasData.data[i + 1] < 255
+			) {
+				canvasData.data[i + 1] = 255
+			} else if (
+				canvasData.data[i + 0] >= 0 &&
+				canvasData.data[i + 0] < 255 &&
+				canvasData.data[i + 1] == 255
+			) {
+				canvasData.data[i + 0] += 15
+			} else if (
+				canvasData.data[i + 0] == 255 &&
+				canvasData.data[i + 1] <= 255 &&
+				canvasData.data[i + 1] > 0
+			) {
+				canvasData.data[i + 1] -= 15
+			}
+
+			canvasData.data[i + 2] = 0
+			canvasData.data[i + 3] = 255
+			context.putImageData(canvasData, 0, 0)
+			//setTimeout(clearPixel, 1500, context, i, canvasData) //something wrong with this? it's clearing all dots every 1500 instead of the timed out ones.
+		}
+
+		for (let i = 0; i < 3; i++) {
+			for (let j = 0; j < 3; j++) {
+				setPixel((x - 1 + i + (y - 1 + j) * canvas.width) * 4)
+			}
+		}
 	}
 
 	const drawInvTab = (canvas, context, MouseX, MouseY) => {
@@ -335,8 +369,7 @@
 		rect.Left.y = BY2
 
 		let p = Rowp({ x: MouseX, y: MouseY }, rect)
-		drawPixel(canvas, canvasData, p.x, p.y, 255, 0, 0, 110)
-		context.putImageData(canvasData, 0, 0)
+		drawPixel(context, canvas, canvasData, p.x, p.y)
 	}
 
 	onMount(() => {
@@ -347,13 +380,17 @@
 		let y
 
 		window.addEventListener("resize", resizeCanvas, false)
-
-		window.onmousemove = function (event) {
-			x = event.clientX
-			y = event.clientY
-
-			drawInvTab(canvas, context, x, y)
+		window.onmousemove = (e) => {
+			x = e.clientX
+			y = e.clientY
 		}
+
+		function drawHitBox() {
+			drawInvTab(canvas, context, x, y)
+			requestAnimationFrame(drawHitBox)
+		}
+
+		drawHitBox()
 
 		function resizeCanvas() {
 			canvas.width = canvas.parentElement.clientWidth
@@ -364,13 +401,13 @@
 			drawChatButtons(canvas, context)
 			drawGametabs(canvas, context)
 			drawMinimap(canvas, context)
-			drawXPBar(canvas, context)
+			drawXPBarnUpText(canvas, context)
 			//2 passes to remove all transparency.... there has to be a bette solution...
 			drawChatbox(canvas, context)
 			drawChatButtons(canvas, context)
 			drawGametabs(canvas, context)
 			drawMinimap(canvas, context)
-			drawXPBar(canvas, context)
+			drawXPBarnUpText(canvas, context)
 		}
 		resizeCanvas()
 	})
