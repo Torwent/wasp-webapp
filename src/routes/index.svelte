@@ -5,17 +5,10 @@
 	import { Rowp } from "$lib/simbacode/srl.js"
 	import { drawInterface } from "$lib/simbacode/interface.js"
 
-	const clearPixel = (context, i, canvasData) => {
-		canvasData.data[i + 0] = 0
-		canvasData.data[i + 1] = 0
-		canvasData.data[i + 2] = 0
-		canvasData.data[i + 3] = 0
-		context.putImageData(canvasData, 0, 0)
-	}
+	let canvasData
 
-	const clearPixel2 = (context, i, canvasData) => {
+	const clearPixel = (context, i) => {
 		if (canvasData.data[i + 0] == 0 && canvasData.data[i + 1] == 0) {
-			canvasData.data[i + 2] = 0
 			canvasData.data[i + 3] = 0
 		} else if (canvasData.data[i + 0] == 0 && canvasData.data[i + 1] > 0) {
 			canvasData.data[i + 1] = 0
@@ -26,18 +19,20 @@
 			canvasData.data[i + 0] > 0 &&
 			canvasData.data[i + 1] <= 255
 		) {
-			canvasData.data[i + 0] -= 15
+			canvasData.data[i + 0] = 0
 		} else if (
 			canvasData.data[i + 0] <= 255 &&
 			canvasData.data[i + 1] > 255 &&
 			canvasData.data[i + 1] >= 0
 		) {
-			canvasData.data[i + 1] += 15
+			canvasData.data[i + 1] = 255
 		}
+
+		canvasData.data[i + 2] = 0
 		context.putImageData(canvasData, 0, 0)
 	}
 
-	const drawPixel = (context, canvas, canvasData, x, y) => {
+	const drawPixel = (context, canvas, x, y) => {
 		const setPixel = (i) => {
 			if (
 				canvasData.data[i + 0] == 0 &&
@@ -50,44 +45,32 @@
 				canvasData.data[i + 0] < 255 &&
 				canvasData.data[i + 1] == 255
 			) {
-				canvasData.data[i + 0] += 15
+				canvasData.data[i + 0] = 255
 			} else if (
 				canvasData.data[i + 0] == 255 &&
 				canvasData.data[i + 1] <= 255 &&
 				canvasData.data[i + 1] > 0
 			) {
-				canvasData.data[i + 1] -= 15
+				canvasData.data[i + 1] = 0
 			}
 
 			canvasData.data[i + 2] = 0
 			canvasData.data[i + 3] = 255
 			context.putImageData(canvasData, 0, 0)
-			setTimeout(
-				clearPixel2,
-				1500,
-				context,
-				i,
-				context.getImageData(0, 0, canvas.width, canvas.height)
-			) //something wrong with this? it's clearing all dots every 1500 instead of the timed out ones.
+			setTimeout(clearPixel, 40000, context, i)
 		}
 
-		for (let i = 0; i < 3; i++) {
-			for (let j = 0; j < 3; j++) {
-				setPixel((x - 1 + i + (y - 1 + j) * canvas.width) * 4)
-			}
-		}
+		setPixel((x + y * canvas.width) * 4)
 	}
 
-	const drawInvTab = (canvas, context, MouseX, MouseY) => {
+	const drawInvTabHits = (canvas, context, MouseX, MouseY) => {
 		context.strokeStyle = "rgba(255, 0, 0, 1)"
-		let canvasData = context.getImageData(0, 0, canvas.width, canvas.height)
+		canvasData = context.getImageData(0, 0, canvas.width, canvas.height)
 
 		let BX1 = canvas.width - 240 + 6 + 3 * 33
 		let BY1 = canvas.height - 333
 		let BX2 = BX1 + 30
 		let BY2 = BY1 + 33
-
-		context.strokeRect(BX1, BY1, 30, 33)
 
 		let rect = { Top: {}, Right: {}, Btm: {}, Left: {} }
 		rect.Top.x = BX1
@@ -100,7 +83,7 @@
 		rect.Left.y = BY2
 
 		let p = Rowp({ x: MouseX, y: MouseY }, rect)
-		drawPixel(context, canvas, canvasData, p.x, p.y)
+		drawPixel(context, canvas, p.x, p.y)
 	}
 
 	onMount(() => {
@@ -112,12 +95,12 @@
 
 		window.addEventListener("resize", resizeCanvas, false)
 		window.onmousemove = (e) => {
-			x = e.clientX
-			y = e.clientY
+			x = e.pageX
+			y = e.pageY - document.documentElement.scrollTop
 		}
 
 		function drawHitBox() {
-			drawInvTab(canvas, context, x, y)
+			drawInvTabHits(canvas, context, x, y)
 			requestAnimationFrame(drawHitBox)
 		}
 
@@ -126,6 +109,8 @@
 		function resizeCanvas() {
 			canvas.width = canvas.parentElement.clientWidth
 			canvas.height = window.innerHeight - 100
+			if (canvas.width < 768) canvas.width = 768
+			if (canvas.height < 600) canvas.height = 600
 
 			// Redraw everything after resizing the window
 			drawInterface(canvas, context)
@@ -174,7 +159,7 @@
 	</div>
 	<div class="py-6">
 		<header>
-			<h2 class="text-2xl font-bold text-center md:text-3xl py-12">
+			<h2 class="text-2xl font-bold text-center md:text-3xl py-16">
 				<span> Advanced mouse movements and click patterns </span>
 			</h2>
 		</header>

@@ -1,7 +1,5 @@
 const drawChatbox = (canvas, context) => {
-	context.strokeStyle = "rgb(255, 255, 0)"
-
-	let chatY1 = canvas.height - 164
+	let chatY1 = canvas.height - 165
 	context.sRect(0, chatY1, 518, 141)
 
 	for (let i = 0; i < 8; i++) {
@@ -14,10 +12,8 @@ const drawChatbox = (canvas, context) => {
 }
 
 const drawChatButtons = (canvas, context) => {
-	context.strokeStyle = "rgb(255, 255, 0)"
-
-	let buttonsY1 = canvas.height - 22
-	//context.sRect(0, buttonsY1, 518, 22)
+	let buttonsY1 = canvas.height - 23
+	context.sRect(0, buttonsY1, 518, 22)
 
 	for (let i = 0; i < 7; i++) {
 		context.sRect(3 + i * 62, buttonsY1, 58, 21)
@@ -27,10 +23,8 @@ const drawChatButtons = (canvas, context) => {
 }
 
 const drawGametabs = (canvas, context) => {
-	context.strokeStyle = "rgb(255, 255, 0)"
-
-	let tabsX1 = canvas.width - 240
-	let tabsY1 = canvas.height - 334
+	let tabsX1 = canvas.width - 241
+	let tabsY1 = canvas.height - 335
 	context.sRect(tabsX1, tabsY1, 240, 334)
 
 	for (let i = 0; i < 7; i++) {
@@ -43,9 +37,7 @@ const drawGametabs = (canvas, context) => {
 }
 
 const drawMinimap = (canvas, context) => {
-	context.strokeStyle = "rgb(255, 255, 0)"
-
-	let mmX1 = canvas.width - 157
+	let mmX1 = canvas.width - 158
 	let mmY1 = 8
 	//context.sRect(mmX1, mmY1, 151, 151)
 
@@ -125,10 +117,12 @@ const drawMinimap = (canvas, context) => {
 }
 
 const drawXPBarnUpText = (canvas, context) => {
-	context.strokeStyle = "rgb(255, 255, 0)"
-	context.sRect(canvas.width - 358 - 15, 0, 118, 28)
+	context.sRect(canvas.width - 359 - 15, 0, 118, 28)
+	let w
+	if (canvas.width > 900) w = 497
+	else w = canvas.width - 359 - 20
 
-	context.sRect(3, 3, 497, 18)
+	context.sRect(3, 3, w, 18)
 }
 
 export const drawInterface = (canvas, context) => {
@@ -137,9 +131,20 @@ export const drawInterface = (canvas, context) => {
 		y = parseInt(y) + 0.5
 		this.strokeRect(x, y, w, h)
 	}
+
+	context.strokeStyle = "rgb(249 115 22)"
+	context.fillStyle = "rgb(249 115 22)"
+
+	context.sRect(0, 0, canvas.width - 1, canvas.height - 1)
+
 	drawChatbox(canvas, context)
 	drawChatButtons(canvas, context)
 	drawGametabs(canvas, context)
 	drawMinimap(canvas, context)
 	drawXPBarnUpText(canvas, context)
+
+	context.font = "20px sans-serif"
+	let textString = "The click pattern generated is in relation to your mouse position.",
+		textWidth = context.measureText(textString).width
+	context.fillText(textString, canvas.width / 2 - textWidth / 2, 230)
 }
