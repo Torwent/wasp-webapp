@@ -20,6 +20,36 @@ export const get = async () => {
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
       </url>
+      <url>
+        <loc>${website}/blog</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+      </url>
+      <url>
+        <loc>${website}/devs</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+      </url>
+      <url>
+        <loc>${website}/faq</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+      </url>
+      <url>
+        <loc>${website}/premium</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+      </url>
+      <url>
+        <loc>${website}/scripts</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+      </url>
+      <url>
+        <loc>${website}/setup</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+      </url>
     </urlset>`
 	}
 }
