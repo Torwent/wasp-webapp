@@ -1,53 +1,53 @@
-export const drawChatbox = (canvas, context) => {
-	context.strokeStyle = "rgba(255, 255, 0, 1)"
+const drawChatbox = (canvas, context) => {
+	context.strokeStyle = "rgb(255, 255, 0)"
 
 	let chatY1 = canvas.height - 164
-	context.strokeRect(0, chatY1, 518, 141)
+	context.sRect(0, chatY1, 518, 141)
 
 	for (let i = 0; i < 8; i++) {
-		context.strokeRect(10, chatY1 + 14 * i + 8, 483, 13)
+		context.sRect(10, chatY1 + 14 * i + 8, 483, 13)
 	}
 
-	context.strokeRect(10, chatY1 + 120, 508, 15)
+	context.sRect(10, chatY1 + 120, 508, 15)
 
-	context.strokeRect(498, chatY1 + 8, 16, 112)
+	context.sRect(498, chatY1 + 8, 16, 112)
 }
 
-export const drawChatButtons = (canvas, context) => {
-	context.strokeStyle = "rgba(255, 255, 0, 1)"
+const drawChatButtons = (canvas, context) => {
+	context.strokeStyle = "rgb(255, 255, 0)"
 
 	let buttonsY1 = canvas.height - 22
-	//context.strokeRect(0, buttonsY1, 518, 22)
+	//context.sRect(0, buttonsY1, 518, 22)
 
 	for (let i = 0; i < 7; i++) {
-		context.strokeRect(3 + i * 62, buttonsY1, 58, 21)
+		context.sRect(3 + i * 62, buttonsY1, 58, 21)
 	}
 
-	context.strokeRect(436, buttonsY1, 79, 21)
+	context.sRect(436, buttonsY1, 79, 21)
 }
 
-export const drawGametabs = (canvas, context) => {
-	context.strokeStyle = "rgba(255, 255, 0, 1)"
+const drawGametabs = (canvas, context) => {
+	context.strokeStyle = "rgb(255, 255, 0)"
 
 	let tabsX1 = canvas.width - 240
 	let tabsY1 = canvas.height - 334
-	context.strokeRect(tabsX1, tabsY1, 240, 334)
+	context.sRect(tabsX1, tabsY1, 240, 334)
 
 	for (let i = 0; i < 7; i++) {
-		context.strokeRect(tabsX1 + 6 + i * 33, tabsY1 + 1, 30, 33)
+		context.sRect(tabsX1 + 6 + i * 33, tabsY1 + 1, 30, 33)
 	}
 
 	for (let i = 0; i < 7; i++) {
-		context.strokeRect(tabsX1 + 6 + i * 33, tabsY1 + 298, 30, 33)
+		context.sRect(tabsX1 + 6 + i * 33, tabsY1 + 298, 30, 33)
 	}
 }
 
-export const drawMinimap = (canvas, context) => {
-	context.strokeStyle = "rgba(255, 255, 0, 1)"
+const drawMinimap = (canvas, context) => {
+	context.strokeStyle = "rgb(255, 255, 0)"
 
 	let mmX1 = canvas.width - 157
 	let mmY1 = 8
-	//context.strokeRect(mmX1, mmY1, 151, 151)
+	//context.sRect(mmX1, mmY1, 151, 151)
 
 	let coords = [
 		[0, -76],
@@ -124,9 +124,22 @@ export const drawMinimap = (canvas, context) => {
 	context.stroke()
 }
 
-export const drawXPBarnUpText = (canvas, context) => {
-	context.strokeStyle = "rgba(255, 255, 0, 1)"
-	context.strokeRect(canvas.width - 358 - 15, 0, 118, 28)
+const drawXPBarnUpText = (canvas, context) => {
+	context.strokeStyle = "rgb(255, 255, 0)"
+	context.sRect(canvas.width - 358 - 15, 0, 118, 28)
 
-	context.strokeRect(3, 3, 497, 18)
+	context.sRect(3, 3, 497, 18)
+}
+
+export const drawInterface = (canvas, context) => {
+	context.sRect = function (x, y, w, h) {
+		x = parseInt(x) + 0.5
+		y = parseInt(y) + 0.5
+		this.strokeRect(x, y, w, h)
+	}
+	drawChatbox(canvas, context)
+	drawChatButtons(canvas, context)
+	drawGametabs(canvas, context)
+	drawMinimap(canvas, context)
+	drawXPBarnUpText(canvas, context)
 }

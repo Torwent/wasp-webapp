@@ -3,13 +3,7 @@
 	import Discord from "$lib/components/Discord.svelte"
 	import { fade } from "svelte/transition"
 	import { Rowp } from "$lib/simbacode/srl.js"
-	import {
-		drawChatbox,
-		drawChatButtons,
-		drawGametabs,
-		drawMinimap,
-		drawXPBarnUpText
-	} from "$lib/simbacode/interface.js"
+	import { drawInterface } from "$lib/simbacode/interface.js"
 
 	const clearPixel = (context, i, canvasData) => {
 		canvasData.data[i + 0] = 0
@@ -134,17 +128,7 @@
 			canvas.height = window.innerHeight - 100
 
 			// Redraw everything after resizing the window
-			drawChatbox(canvas, context)
-			drawChatButtons(canvas, context)
-			drawGametabs(canvas, context)
-			drawMinimap(canvas, context)
-			drawXPBarnUpText(canvas, context)
-			//2 passes to remove all transparency.... there has to be a bette solution...
-			drawChatbox(canvas, context)
-			drawChatButtons(canvas, context)
-			drawGametabs(canvas, context)
-			drawMinimap(canvas, context)
-			drawXPBarnUpText(canvas, context)
+			drawInterface(canvas, context)
 		}
 		resizeCanvas()
 	})
