@@ -125,7 +125,7 @@ const drawXPBarnUpText = (canvas, context) => {
 	context.sRect(3, 3, w, 18)
 }
 
-export const drawInterface = (canvas, context) => {
+export const drawInterface = (canvas, context, mediaquery) => {
 	context.sRect = function (x, y, w, h) {
 		x = parseInt(x) + 0.5
 		y = parseInt(y) + 0.5
@@ -135,16 +135,20 @@ export const drawInterface = (canvas, context) => {
 	context.strokeStyle = "rgb(249 115 22)"
 	context.fillStyle = "rgb(249 115 22)"
 
-	context.sRect(0, 0, canvas.width - 1, canvas.height - 1)
+	if (mediaquery) {
+		context.sRect(0, 0, canvas.width - 1, canvas.height - 1)
 
-	drawChatbox(canvas, context)
-	drawChatButtons(canvas, context)
+		drawChatbox(canvas, context)
+		drawChatButtons(canvas, context)
+		drawXPBarnUpText(canvas, context)
+	}
 	drawGametabs(canvas, context)
 	drawMinimap(canvas, context)
-	drawXPBarnUpText(canvas, context)
 
-	context.font = "20px sans-serif"
-	let textString = "The click pattern generated is in relation to your mouse position.",
-		textWidth = context.measureText(textString).width
-	context.fillText(textString, canvas.width / 2 - textWidth / 2, 230)
+	if (mediaquery) {
+		context.font = "20px sans-serif"
+		let textString = "The click pattern generated is in relation to your mouse position.",
+			textWidth = context.measureText(textString).width
+		context.fillText(textString, canvas.width / 2 - textWidth / 2, 230)
+	}
 }

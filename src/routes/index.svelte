@@ -100,7 +100,9 @@
 		}
 
 		function drawHitBox() {
-			drawInvTabHits(canvas, context, x, y)
+			for (let i = 0; i < 5; i++) {
+				drawInvTabHits(canvas, context, x, y)
+			}
 			requestAnimationFrame(drawHitBox)
 		}
 
@@ -109,11 +111,10 @@
 		function resizeCanvas() {
 			canvas.width = canvas.parentElement.clientWidth
 			canvas.height = window.innerHeight - 100
-			if (canvas.width < 768) canvas.width = 768
 			if (canvas.height < 600) canvas.height = 600
 
 			// Redraw everything after resizing the window
-			drawInterface(canvas, context)
+			drawInterface(canvas, context, window.matchMedia("(min-width: 768px)").matches)
 		}
 		resizeCanvas()
 	})
