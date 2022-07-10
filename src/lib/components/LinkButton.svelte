@@ -1,6 +1,7 @@
 <script>
 	export let url
 	export let text
+	export let arrow = true
 </script>
 
 <div class="flex justify-center">
@@ -10,18 +11,20 @@
 		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
 	>
 		<a href={url} class="px-2">{text}</a>
-		<svg
-			class="-mr-1 ml-2 h-5 w-5 rotate-180 animate-bounce"
-			xmlns="http://www.w3.org/2000/svg"
-			viewBox="0 0 20 20"
-			fill="currentColor"
-			aria-hidden="true"
-		>
-			<path
-				fill-rule="evenodd"
-				d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-				clip-rule="evenodd"
-			/>
-		</svg>
+		{#if arrow}
+			<svg
+				class="-mr-1 ml-2 h-5 w-5 rotate-180 animate-bounce"
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 20 20"
+				fill="currentColor"
+				aria-hidden="true"
+			>
+				<path
+					fill-rule="evenodd"
+					d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
+					clip-rule="evenodd"
+				/>
+			</svg>
+		{/if}
 	</button>
 </div>

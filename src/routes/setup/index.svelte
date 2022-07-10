@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from "svelte"
 	import { fade } from "svelte/transition"
-	import DownloadButton from "$lib/components/DownloadButton.svelte"
+	import DownloadButton from "$lib/components/LinkButton.svelte"
 
 	let checkedOS = false
 	let hasMac = false
