@@ -1,8 +1,10 @@
 <script>
 	import { writable } from "svelte/store"
+	import { profile } from "$lib/stores/authStore"
 	import { fade, fly } from "svelte/transition"
 	import { scripts, categories, subcategories, loadData } from "$lib/stores/stores.js"
 	import Card from "$lib/components/Card.svelte"
+	import LinkButton from "$lib/components/LinkButton.svelte"
 
 	loadData("scripts", scripts)
 	loadData("categories", categories)
@@ -132,6 +134,9 @@
 	</div>
 
 	<div class="overflow-y-scroll no-scrollbar max-h-full">
+		{#if $profile.dev}
+			<LinkButton text="Add Script" url="/scripts/add" arrow={false} />
+		{/if}
 		<form class="form my-6 place-items-center" on:submit|preventDefault={handleSearch}>
 			<div class="flex flex-col text-sm mb-2 max-w-2xl m-auto">
 				<input
