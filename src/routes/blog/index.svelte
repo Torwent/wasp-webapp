@@ -1,5 +1,6 @@
 <script>
 	import { fade } from "svelte/transition"
+	import { profile } from "$lib/stores/authStore"
 	import { posts, loadData } from "$lib/stores/stores.js"
 	import PostCard from "$lib/components/PostCard.svelte"
 	loadData("posts", posts)
@@ -115,6 +116,21 @@
 			</div>
 		</form>
 	</div>
+
+	{#if $profile.id === "4dbcf43d-cc8a-48e3-aead-2c55a3f302ee"}
+		<div class="grid place-items-center">
+			<a href="/blog/add">
+				<button
+					data-mdb-ripple="true"
+					data-mdb-ripple-color="light"
+					class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center justify-between 
+			bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
+				>
+					Add
+				</button>
+			</a>
+		</div>
+	{/if}
 
 	<div class="overflow-hidden">
 		{#if filteredPosts.length !== 0}
