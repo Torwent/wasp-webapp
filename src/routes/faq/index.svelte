@@ -33,8 +33,6 @@
 			Hopefully you found what you were looking for here, if not feel free to join the discord
 			server and ask around!
 		</p>
-		<a href="https://discord.com/invite/YMYUahmww9">
-			<Discord />
-		</a>
+		<Discord />
 	</header>
 </div>

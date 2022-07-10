@@ -154,9 +154,8 @@
 			For more information, help and/or questions look through the <a href="/faq">FAQ</a> or join the
 			discord community!
 		</h2>
-		<a href="https://discord.com/invite/YMYUahmww9">
-			<Discord />
-		</a>
+
+		<Discord />
 	</div>
 	<div class="py-6">
 		<header>
