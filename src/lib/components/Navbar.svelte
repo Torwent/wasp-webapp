@@ -82,6 +82,7 @@
 									href="/"
 									class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
 									on:click={() => (selectedTab = tabs[0])}
+									on:click={() => (showMenu = false)}
 									class:text-orange-500={selectedTab === 0}
 									class:dark:text-orange-400={selectedTab === 0}
 								>
@@ -92,6 +93,7 @@
 								href="/setup"
 								class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
 								on:click={() => (selectedTab = tabs[1])}
+								on:click={() => (showMenu = false)}
 								class:text-orange-500={selectedTab === 1}
 								class:dark:text-orange-400={selectedTab === 1}
 							>
@@ -101,6 +103,7 @@
 								href="/scripts"
 								class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
 								on:click={() => (selectedTab = tabs[2])}
+								on:click={() => (showMenu = false)}
 								class:text-orange-500={selectedTab === 2}
 								class:dark:text-orange-400={selectedTab === 2}
 							>
@@ -110,6 +113,7 @@
 								href="/premium"
 								class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
 								on:click={() => (selectedTab = tabs[3])}
+								on:click={() => (showMenu = false)}
 								class:text-orange-500={selectedTab === 3}
 								class:dark:text-orange-400={selectedTab === 3}
 							>
@@ -119,6 +123,7 @@
 								href="/faq"
 								class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
 								on:click={() => (selectedTab = tabs[4])}
+								on:click={() => (showMenu = false)}
 								class:text-orange-500={selectedTab === 4}
 								class:dark:text-orange-400={selectedTab === 4}
 							>
@@ -129,6 +134,7 @@
 								href="/blog"
 								class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
 								on:click={() => (selectedTab = tabs[5])}
+								on:click={() => (showMenu = false)}
 								class:text-orange-500={selectedTab === 5}
 								class:dark:text-orange-400={selectedTab === 5}
 							>
