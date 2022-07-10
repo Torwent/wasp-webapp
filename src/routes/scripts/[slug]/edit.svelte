@@ -9,15 +9,16 @@
 	export let script
 
 	const handleSubmit = async () => {
-		let id = script.id
 		const { error } = await supabase
-			.from("posts")
+			.from("scripts")
 			.update({ title: script.title, description: script.description, content: script.content })
-			.match({ id })
+			.match({ id: script.id })
 
 		if (error) {
 			return console.error(error)
 		}
+
+		location.reload()
 	}
 </script>
 
@@ -57,9 +58,11 @@
 		<div class="flex flex-col text-sm mb-2">
 			<details>
 				<summary>Preview</summary>
-				<div>{script.title}</div>
-				<div>{script.description}</div>
-				<article class="markdown-body">
+				<h1 class="mb-4 font-bold text-3xl">{script.title}</h1>
+				<h2 class="font-semibold leading-normal mb-4">{script.description}</h2>
+				<article
+					class="prose dark:prose-invert py-6 border-t-2 border-stone-300 dark:border-stone-800"
+				>
 					<Markdown src={script.content} />
 				</article>
 			</details>

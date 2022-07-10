@@ -1,19 +1,18 @@
-<script context="module">
-	import { load } from "./_slug"
-	export { load }
-</script>
-
 <script>
 	import Markdown from "$lib/Markdown.svelte"
 	import { supabase } from "$lib/supabase.js"
 	import { user } from "$lib/stores/authStore"
-	export let post
+	let post = { title: "", description: "", content: "", level: 0 }
 
 	const handleSubmit = async () => {
-		const { error } = await supabase
-			.from("posts")
-			.update({ title: post.title, description: post.description, content: post.content })
-			.match({ id: post.id })
+		const { error } = await supabase.from("posts").insert([
+			{
+				title: post.title,
+				description: post.description,
+				content: post.content,
+				level: post.level
+			}
+		])
 
 		if (error) {
 			return console.error(error)
@@ -57,6 +56,18 @@
 					bind:value={post.content}
 				/>
 			</div>
+
+			<div class="flex flex-col text-sm mb-2">
+				<label for="level" class="font-bold mb-2"> Level (0-2): </label>
+				<textarea
+					type="text"
+					name="level"
+					class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
+					bind:value={post.level}
+				/>
+			</div>
+
 			<div class="flex flex-col text-sm mb-2">
 				<details>
 					<summary>Preview</summary>
