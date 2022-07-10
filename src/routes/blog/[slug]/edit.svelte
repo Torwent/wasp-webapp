@@ -26,30 +26,33 @@
 	{#if $user.id === "4dbcf43d-cc8a-48e3-aead-2c55a3f302ee"}
 		<form class="form my-6" on:submit|preventDefault={handleSubmit}>
 			<div class="flex flex-col text-sm mb-2">
-				<label for="title" class="font-bold mb-2 text-gray-800 "> Title: </label>
+				<label for="title" class="font-bold mb-2"> Title: </label>
 				<input
 					type="text"
 					name="title"
-					class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
+					class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
 					bind:value={post.title}
 				/>
 			</div>
 			<div class="flex flex-col text-sm mb-2">
-				<label for="description" class="font-bold mb-2 text-gray-800 "> Description: </label>
+				<label for="description" class="font-bold mb-2"> Description: </label>
 
 				<input
 					type="text"
 					name="description"
-					class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
+					class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
 					bind:value={post.description}
 				/>
 			</div>
 			<div class="flex flex-col text-sm mb-2">
-				<label for="content" class="font-bold mb-2 text-gray-800 "> Content: </label>
+				<label for="content" class="font-bold mb-2"> Content: </label>
 				<textarea
 					type="text"
 					name="content"
-					class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
+					class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
 					bind:value={post.content}
 				/>
 			</div>
@@ -63,12 +66,15 @@
 					</article>
 				</details>
 			</div>
-			<button
-				type="submit"
-				class="w-full shadow-sm rounded bg-blue-500 hover:bg-blue-600 text-white py-2 px-4"
-			>
-				Update
-			</button>
+			<div class="flex justify-center">
+				<button
+					type="submit"
+					class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
+		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
+				>
+					<span class="px-2">Update</span>
+				</button>
+			</div>
 		</form>
 	{:else}
 		You don't have permission to edit this post.

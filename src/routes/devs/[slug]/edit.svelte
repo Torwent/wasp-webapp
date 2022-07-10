@@ -34,7 +34,8 @@
 				<input
 					type="text"
 					name="real_name"
-					class="appearance-none shadow-sm border border-orange-200 p-2 focus:outline-none focus:border-orange-500 rounded-md text-black"
+					class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
 					bind:value={dev.real_name}
 				/>
 			</div>
@@ -44,7 +45,8 @@
 				<input
 					type="text"
 					name="username"
-					class="appearance-none shadow-sm border border-orange-200 p-2 focus:outline-none focus:border-orange-500 rounded-md text-black"
+					class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
 					bind:value={dev.username}
 				/>
 			</div>
@@ -54,7 +56,8 @@
 				<input
 					type="text"
 					name="github"
-					class="appearance-none shadow-sm border border-orange-200 p-2 focus:outline-none focus:border-orange-500 rounded-md text-black"
+					class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
 					bind:value={dev.github}
 				/>
 			</div>
@@ -66,7 +69,8 @@
 				<input
 					type="text"
 					name="paypal_id"
-					class="appearance-none shadow-sm border border-orange-200 p-2 focus:outline-none focus:border-orange-500 rounded-md text-black"
+					class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
 					bind:value={dev.paypal_id}
 				/>
 			</div>
@@ -76,18 +80,21 @@
 				<textarea
 					type="text"
 					name="description"
-					class="appearance-none shadow-sm border border-orange-200 p-2 focus:outline-none focus:border-orange-500 rounded-md text-black"
+					class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
 					bind:value={dev.description}
 				/>
 			</div>
 
-			<button
-				type="submit"
-				class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center justify-between 
-			bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
-			>
-				Update
-			</button>
+			<div class="flex justify-center">
+				<button
+					type="submit"
+					class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
+		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
+				>
+					<span class="px-2">Update</span>
+				</button>
+			</div>
 		</form>
 	{:else}
 		You don't have permission to edit this post.
