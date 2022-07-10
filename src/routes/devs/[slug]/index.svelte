@@ -42,7 +42,7 @@
 					/>
 				</svg>
 			</a>
-			{#if dev.paypal !== ""}
+			{#if dev.paypal_id !== "" && dev.paypal_id !== null}
 				<form
 					action="https://www.paypal.com/donate"
 					method="post"
