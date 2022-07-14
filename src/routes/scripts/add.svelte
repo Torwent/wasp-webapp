@@ -1,19 +1,30 @@
 <script>
 	import Markdown from "$lib/Markdown.svelte"
 	import { supabase } from "$lib/supabase.js"
+	import { categories, subcategories, loadData } from "$lib/stores/stores.js"
+	import MultiSelect from "$lib/components/MultiSelect.svelte"
+
 	let script = { title: "", description: "", content: "", categoires: [], subcategories: [] }
 
+	let categoriesValue = []
+	let subcategoriesValue = []
+
+	loadData("categories", categories)
+	loadData("subcategories", subcategories)
+
 	const handleSubmit = async () => {
-		/*let id = script.id
-		const { error } = await supabase
-			.from("posts")
-			.update({ title: script.title, description: script.description, content: script.content })
-			.match({ id })
+		/*const { error } = await supabase.from("scripts_test").insert({
+			title: script.title,
+			description: script.description,
+			content: script.content,
+			categories: categoriesValue,
+			subcategories: subcategoriesValue
+		})
 
 		if (error) {
 			return console.error(error)
 		}
-        */
+		*/
 		console.log("This is a placeholder and serves no purpose right now!")
 	}
 </script>
@@ -35,6 +46,19 @@
 
 	<form class="form my-6" on:submit|preventDefault={handleSubmit}>
 		<div class="flex flex-col text-sm mb-2">
+			<details>
+				<summary>Preview</summary>
+				<h1 class="mb-4 font-bold text-3xl">{script.title}</h1>
+				<h2 class="font-semibold leading-normal mb-4">{script.description}</h2>
+				<article
+					class="prose dark:prose-invert py-6 border-t-2 border-stone-300 dark:border-stone-800"
+				>
+					<Markdown src={script.content} />
+				</article>
+			</details>
+		</div>
+
+		<div class="flex flex-col text-sm mb-2">
 			<label for="title" class="font-bold mb-2"> Title: </label>
 			<input
 				type="text"
@@ -55,6 +79,25 @@
 				bind:value={script.description}
 			/>
 		</div>
+
+		<div class="flex flex-col text-sm mb-2">
+			<label for="categories" class="font-bold mb-2"> Categories: </label>
+			<MultiSelect id="cats" bind:value={categoriesValue}>
+				{#each $categories as cat}
+					<option value={cat.name}>{cat.emoji}{cat.name}</option>
+				{/each}
+			</MultiSelect>
+		</div>
+
+		<div class="flex flex-col text-sm mb-2">
+			<label for="categories" class="font-bold mb-2"> Subcategories: </label>
+			<MultiSelect id="subcats" bind:value={subcategoriesValue}>
+				{#each $subcategories as subcat}
+					<option value={subcat.name}>{subcat.emoji}{subcat.name}</option>
+				{/each}
+			</MultiSelect>
+		</div>
+
 		<div class="flex flex-col text-sm mb-2">
 			<label for="content" class="font-bold mb-2"> Content (Markdown): </label>
 			<textarea
@@ -65,19 +108,18 @@
 				bind:value={script.content}
 			/>
 		</div>
-		<div class="flex flex-col text-sm mb-2">
-			<details>
-				<summary>Preview</summary>
-				<h1 class="mb-4 font-bold text-3xl">{script.title}</h1>
-				<h2 class="font-semibold leading-normal mb-4">{script.description}</h2>
-				<article
-					class="prose dark:prose-invert py-6 border-t-2 border-stone-300 dark:border-stone-800"
+
+		<div class="flex justify-between">
+			<a href="/scripts">
+				<button
+					type="button"
+					class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
+		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
 				>
-					<Markdown src={script.content} />
-				</article>
-			</details>
-		</div>
-		<div class="flex justify-center">
+					<span class="px-2">Back</span>
+				</button>
+			</a>
+
 			<button
 				type="submit"
 				class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
