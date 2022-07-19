@@ -6,7 +6,7 @@ import * as style from "@dicebear/avatars-bottts-sprites"
 export const user = writable(false)
 export const profile = writable([])
 
-const loadProfile = async (id) => {
+export const loadProfile = async (id) => {
 	const { data, error } = await supabase.from("profile").select().eq("id", id)
 
 	if (error) return console.error(error)

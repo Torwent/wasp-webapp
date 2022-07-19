@@ -7,8 +7,10 @@
 	import Markdown from "$lib/Markdown.svelte"
 	import ScriptDownloadButton from "$lib/components/ScriptDownloadButton.svelte"
 	import Carousel from "$lib/components/Carousel.svelte"
+	import { getServiceSupabase } from "$lib/supabase.js"
 	import { fade } from "svelte/transition"
-	import { profile } from "$lib/stores/authStore"
+	import { profile, loadProfile } from "$lib/stores/authStore"
+	let tempDismiss = $profile.dismissed_warning
 
 	export let script
 	let premium
@@ -18,8 +20,25 @@
 	} else {
 		premium = false
 	}
-
 	let script_name = script.title.toLowerCase().replace(" ", "_") + ".simba"
+
+	const fullDismiss = async () => {
+		const ssb = getServiceSupabase()
+		ssb.auth.signOut()
+
+		const { error } = await ssb
+			.from("profile")
+			.update({ dismissed_warning: true })
+			.match({ id: $profile.id })
+
+		if (error) {
+			return console.error(error)
+		}
+
+		loadProfile($profile.id)
+
+		tempDismiss = true
+	}
 </script>
 
 <svelte:head>
@@ -28,6 +47,52 @@
 </svelte:head>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+	{#if script.categories.includes("Community") && !tempDismiss}
+		<div
+			class="fixed inset-0 bg-stone-900 bg-opacity-50 overflow-y-auto h-full w-full backdrop-blur transition-colors z-40"
+			in:fade={{ duration: 300, delay: 300 }}
+			out:fade={{ duration: 300 }}
+		>
+			<div class="m-auto my-36 p-12 max-w-4xl rounded-md shadow-md bg-stone-100 dark:bg-stone-800">
+				<div class="text-center px-8">
+					<h2 class="py-6 text-orange-500">⚠️This is a community script.⚠️</h2>
+					<h3 class="text-base">
+						Community scripts can be uploaded by anyone with the
+						<span class="text-sky-500 dark:text-sky-400"> Developer </span>
+						role and are not reviewed, therefore they can be malicious.
+					</h3>
+					<h3 class="text-base py-6">
+						You shouldn't use a community script you are not willing to review or that you don't
+						trust it's developer.
+					</h3>
+					<h3 class="text-base py-6">
+						Maintenance of the script is also responsibility of it's developer. So if the script
+						doesn't work or has bugs you need to report those issues to the developer.
+					</h3>
+					<div class="flex justify-between">
+						<button
+							type="button"
+							class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
+		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
+							on:click={() => (tempDismiss = true)}
+						>
+							<span class="px-2">I understand!</span>
+						</button>
+
+						<button
+							type="button"
+							class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
+		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
+							on:click={() => fullDismiss()}
+						>
+							<span class="px-2">I understand and I don't want to see this warning again!</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	{/if}
+
 	<div class="group w-full">
 		<img
 			class="inset-0 z-0 object-none h-96 w-full"

@@ -28,7 +28,7 @@
 					anchor.click()
 					window.URL.revokeObjectURL(blob)
 				})
-				.catch(() => console.log("An error in downloadin gthe file sorry"))
+				.catch(() => console.log("An error occured while downloading the file, sorry!"))
 		})
 	}
 </script>
