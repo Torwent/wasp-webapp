@@ -3,7 +3,7 @@
 	import { profile } from "$lib/stores/authStore"
 	import { fade, fly } from "svelte/transition"
 	import { scripts, categories, subcategories, loadData } from "$lib/stores/stores.js"
-	import Card from "$lib/components/Card.svelte"
+	import Card from "$lib/components/ScriptCard.svelte"
 	import LinkButton from "$lib/components/LinkButton.svelte"
 
 	loadData("scripts", scripts)
@@ -125,7 +125,7 @@
 							</label>
 						</div>
 					</div>
-					{#if checkbox.id === 2}
+					{#if checkbox.id === 4}
 						<br />
 					{/if}
 				{/each}
