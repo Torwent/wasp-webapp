@@ -104,7 +104,7 @@
 				type="text"
 				name="content"
 				class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
-                border-orange-200 focus:border-orange-600 text-black"
+                border-orange-200 focus:border-orange-600 text-black h-64"
 				bind:value={script.content}
 			/>
 		</div>

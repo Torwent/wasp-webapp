@@ -184,7 +184,8 @@
 			</div>
 		{/if}
 
-		<article class="prose dark:prose-invert py-6 text-center">
+		<h2 class="text-amber-500 dark:text-amber-200 text-center py-6">Description:</h2>
+		<article class="prose dark:prose-invert py-6">
 			<Markdown src={script.content} />
 		</article>
 	</div>
