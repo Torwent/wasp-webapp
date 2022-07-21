@@ -67,11 +67,10 @@
 	<div class="py-6">
 		<form class="text-center form my-6" on:submit|preventDefault={handleFilters}>
 			<header class="py-4"><h3>Filter by level or search the a blog post:</h3></header>
-			<div class="justify-center flex space-x-5 mb-2">
+			<div class="justify-center md:flex md:space-x-5 mb-2">
 				<button
 					type="submit"
-					border-b-8
-					class="flex space-x-5 text-xs py-1 px-8 font-bold rounded-full bg-sky-400 dark:bg-sky-500 border-sky-600 dark:border-sky-300 text-white"
+					class="w-full my-2 md:w-auto text-xs py-1 px-8 font-bold rounded-full bg-sky-400 dark:bg-sky-500 border-sky-600 dark:border-sky-300 text-white"
 					class:border-r-8={basicEnabled}
 					class:pr-6={basicEnabled}
 					bind={basicEnabled}
@@ -81,8 +80,7 @@
 				</button>
 				<button
 					type="submit"
-					border-b-8
-					class="flex space-x-5 text-xs py-1 px-8 font-bold rounded-full bg-orange-400 dark:bg-orange-500 border-orange-600 dark:border-orange-300 text-white"
+					class="w-full my-2 md:w-auto text-xs py-1 px-8 font-bold rounded-full bg-orange-400 dark:bg-orange-500 border-orange-600 dark:border-orange-300 text-white"
 					class:border-r-8={intermediateEnabled}
 					class:pr-6={intermediateEnabled}
 					bind={intermediateEnabled}
@@ -92,8 +90,7 @@
 				</button>
 				<button
 					type="submit"
-					border-b-8
-					class="flex space-x-5 text-xs py-1 px-8 font-bold rounded-full bg-red-400 dark:bg-red-500 border-red-600 dark:border-red-300 text-white"
+					class="w-full my-2 md:w-auto text-xs py-1 px-8 font-bold rounded-full bg-red-400 dark:bg-red-500 border-red-600 dark:border-red-300 text-white"
 					class:border-r-8={advancedEnabled}
 					class:pr-6={advancedEnabled}
 					bind={advancedEnabled}

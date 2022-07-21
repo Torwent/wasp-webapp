@@ -3,7 +3,8 @@
 </script>
 
 <footer
-	class="p-4 z-40 sticky sm:p-6 border-t border-stone-200 justify-between text-stone-500 dark:border-stone-200/5"
+	class="p-4 z-40 sticky sm:p-6 border-t border-stone-200 justify-between text-stone-500 dark:border-stone-200/5
+	backdrop-blur transition-colors duration-500 bg-white/60 supports-backdrop-blur:bg-white/95 dark:border-stone-50/[0.06] dark:bg-stone-900/60"
 >
 	<div class="md:flex md:justify-between">
 		<div class="mb-6 md:mb-0">

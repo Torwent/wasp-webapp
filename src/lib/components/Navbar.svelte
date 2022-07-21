@@ -43,7 +43,7 @@
 </script>
 
 <nav
-	class="sticky top-0 z-40 w-full backdrop-blur flex-none transition-colors duration-500 border-b 
+	class="sticky top-0 z-50 w-full backdrop-blur flex-none transition-colors duration-500 border-b 
 	bg-white/60 supports-backdrop-blur:bg-white/95 dark:border-stone-50/[0.06] dark:bg-stone-900/60"
 >
 	<div class="max-w-7xl mx-auto px-4">
