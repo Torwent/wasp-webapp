@@ -1,3 +1,4 @@
+<!-- Based on https://svelte.dev/repl/c7094fb1004b440482d2a88f4d1d7ef5?version=3.14.0 -->
 <script>
 	import { onMount } from "svelte"
 	import { fly } from "svelte/transition"

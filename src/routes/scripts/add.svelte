@@ -1,4 +1,5 @@
 <script>
+	import Dropzone from "svelte-file-dropzone"
 	import Markdown from "$lib/Markdown.svelte"
 	import { supabase } from "$lib/supabase.js"
 	import { categories, subcategories, loadData } from "$lib/stores/stores.js"
@@ -8,6 +9,17 @@
 
 	let categoriesValue = []
 	let subcategoriesValue = []
+
+	let file
+
+	function handleFilesSelect(e) {
+		console.log(e.detail)
+		const { acceptedFiles } = e.detail
+
+		if (acceptedFiles.length > 0) {
+			file = acceptedFiles[acceptedFiles.length - 1]
+		}
+	}
 
 	loadData("categories", categories)
 	loadData("subcategories", subcategories)
@@ -58,6 +70,7 @@
 			</details>
 		</div>
 
+		<!-- Title n Description -->
 		<div class="flex flex-col text-sm mb-2">
 			<label for="title" class="font-bold mb-2"> Title: </label>
 			<input
@@ -80,6 +93,7 @@
 			/>
 		</div>
 
+		<!-- Categories -->
 		<div class="flex flex-col text-sm mb-2">
 			<label for="categories" class="font-bold mb-2"> Categories: </label>
 			<MultiSelect id="cats" bind:value={categoriesValue}>
@@ -88,7 +102,6 @@
 				{/each}
 			</MultiSelect>
 		</div>
-
 		<div class="flex flex-col text-sm mb-2">
 			<label for="categories" class="font-bold mb-2"> Subcategories: </label>
 			<MultiSelect id="subcats" bind:value={subcategoriesValue}>
@@ -98,6 +111,7 @@
 			</MultiSelect>
 		</div>
 
+		<!-- Content -->
 		<div class="flex flex-col text-sm mb-2">
 			<label for="content" class="font-bold mb-2"> Content (Markdown): </label>
 			<textarea
@@ -107,6 +121,16 @@
                 border-orange-200 focus:border-orange-600 text-black h-64"
 				bind:value={script.content}
 			/>
+		</div>
+
+		<!-- File -->
+		<div class="flex flex-col text-sm mt-4 mb-2">
+			<Dropzone accept={".simba"} on:drop={handleFilesSelect} />
+			<ol>
+				{#if file}
+					<li>{file.name}</li>
+				{/if}
+			</ol>
 		</div>
 
 		<div class="flex justify-between">
