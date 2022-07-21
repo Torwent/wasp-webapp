@@ -3,7 +3,7 @@
 
 	export let bucket
 	export let folder
-	let gallery
+	let gallery = []
 
 	loadPublicFiles(bucket, folder).then((value) => {
 		gallery = value
@@ -28,9 +28,19 @@
 	const handleSlider = (i) => {
 		index = i
 	}
+
+	const checkValid = () => {
+		if (gallery.length === 0) return false
+
+		if (gallery.length === 1) {
+			if (gallery[0].includes(".emptyFolderPlaceholder")) return false
+		}
+
+		return true
+	}
 </script>
 
-{#if gallery}
+{#if checkValid()}
 	<div id="indicators-carousel" class="rounded-md h-96  relative" data-carousel="static">
 		<!-- Carousel wrapper -->
 		<div class="overflow-hidden relative h-48 rounded-lg sm:h-64 xl:h-80 2xl:h-96">

@@ -93,36 +93,36 @@
 		</div>
 	{/if}
 
-	<div class="group w-full">
+	<div class="group w-full absolute left-0 top-16">
 		<img
 			class="inset-0 z-0 object-none h-96 w-full"
 			src={script.assets_path + "cover.png"}
 			alt={script.assets_alt}
 		/>
 
-		<div class="text-center w-full h-32 absolute inset-0 z-10 top-80 text-amber-500">
+		<header class="text-center w-full h-32 absolute inset-0 z-10 top-64 text-amber-500">
 			<h1 class="mb-4 font-bold text-4xl">{script.title}</h1>
 			<h2 class="font-semibold leading-normal mb-4">{script.description}</h2>
-		</div>
+		</header>
 		<!-- Hover Effect -->
 		<div
-			class="absolute top-96
+			class="absolute top-80
                     h-16 w-full px-3 space-x-2
                     bg-none opacity-0 group-hover:opacity-100
-                    group-hover:bg-gradient-to-t from-black/20 via-gray-800/20 to-transparent 
+                    group-hover:bg-gradient-to-t from-white/20 via-white-800/20 dark:from-black/20 dark:via-gray-800/20 to-transparent 
                     transition-all ease-in-out duration-200 delay-100"
 		/>
 	</div>
 
-	<div class="container mx-auto my-6 max-w-2xl flex-grow">
-		<div class="container h-96 w-full mx-auto my-3">
+	<div class="container mx-auto mt-96 mb-6 max-w-2xl flex-grow">
+		<div class="container w-full mx-auto my-3">
 			<Carousel
 				bucket="imgs"
 				folder={"scripts/" + script.title.toLowerCase().replace(" ", "_") + "/assets"}
 			/>
 		</div>
 
-		<div class="text-center">
+		<div class="text-center py-12">
 			{#if script.categories.includes("Free")}
 				<ScriptDownloadButton {premium} {script_name} text={`Download ${script.title}`} />
 				<h3 class="py-6">

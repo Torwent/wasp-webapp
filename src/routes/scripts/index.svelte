@@ -91,7 +91,11 @@
 	/>
 </svelte:head>
 
-<div class="flex max-h-screen" in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+<div
+	class="flex max-h-screen absolute left-0"
+	in:fade={{ duration: 300, delay: 300 }}
+	out:fade={{ duration: 300 }}
+>
 	<div
 		class="w-64 border-r dark:border-stone-800 sticky bottom-0 min-h-full overflow-y-scroll no-scrollbar"
 		in:fly={{ duration: 600, delay: 600, x: -100 }}
