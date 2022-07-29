@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { supabase } from "$lib/supabase"
-	import Discord from "$lib/components/Discord.svelte"
 
-	let loading = false
+	let loading: boolean = false
 
 	const handleLogin = async () => {
 		try {

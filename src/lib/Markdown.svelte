@@ -3,15 +3,15 @@
 	import hljs from "highlight.js"
 	import "highlight.js/styles/github-dark.css"
 
-	export let src
-	let html
-	let md
-	$: if (md) html = md.render(src)
+	export let src: string
+	let html: string
+	let md: any
+
 	onMount(async () => {
 		const MarkdownIt = (await import("markdown-it")).default
 
 		md = new MarkdownIt("commonmark", {
-			highlight: function (code, lang, callback) {
+			highlight: function (code: string, lang: string, callback: void) {
 				if (lang && hljs.getLanguage(lang)) {
 					try {
 						return hljs.highlight(code, { language: lang }).value
@@ -22,6 +22,8 @@
 			}
 		})
 	})
+
+	$: if (md) html = md.render(src)
 </script>
 
 {@html html}

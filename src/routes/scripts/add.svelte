@@ -1,22 +1,23 @@
 <script lang="ts">
 	import Dropzone from "svelte-file-dropzone"
 	import Markdown from "$lib/Markdown.svelte"
-	import { supabase } from "$lib/supabase"
+	//import { supabase } from "$lib/supabase"
 	import { categories, subcategories, loadData } from "$lib/stores/stores"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
 
 	let script = { title: "", description: "", content: "", categoires: [], subcategories: [] }
 
-	let categoriesValue = []
-	let subcategoriesValue = []
+	let categoriesValue: { name: string; emoji: string }[] = []
+	let subcategoriesValue: { name: string; emoji: string }[] = []
 
-	let file
+	let file: any
 
-	function handleFilesSelect(e) {
+	function handleFilesSelect(e: any) {
 		console.log(e.detail)
 		const { acceptedFiles } = e.detail
 
 		if (acceptedFiles.length > 0) {
+			console.log(acceptedFiles[acceptedFiles.length - 1])
 			file = acceptedFiles[acceptedFiles.length - 1]
 		}
 	}

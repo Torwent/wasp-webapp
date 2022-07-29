@@ -2,7 +2,7 @@
 	import { fade } from "svelte/transition"
 	import { profile } from "$lib/stores/authStore"
 
-	let show = false
+	let show: boolean = false
 </script>
 
 <svelte:head>

@@ -7,7 +7,13 @@
 	import Markdown from "$lib/Markdown.svelte"
 	import { fade } from "svelte/transition"
 	import { user } from "$lib/stores/authStore"
-	export let dev
+	export let dev: {
+		id: string
+		username: string
+		description: string
+		real_name: string
+		paypal_id: string
+	}
 </script>
 
 <svelte:head>

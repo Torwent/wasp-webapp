@@ -12,8 +12,17 @@
 	import { profile, loadProfile } from "$lib/stores/authStore"
 	let tempDismiss = $profile.dismissed_warning
 
-	export let script
-	let premium
+	export let script: {
+		id: string
+		title: string
+		description: string
+		categories: string[]
+		subcategories?: string[]
+		content: string
+		assets_path: string
+		assets_alt: string
+	}
+	let premium: boolean
 
 	if (script.categories.includes("Premium")) {
 		premium = true

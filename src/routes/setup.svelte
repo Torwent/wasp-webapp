@@ -3,11 +3,17 @@
 	import { fade } from "svelte/transition"
 	import DownloadButton from "$lib/components/LinkButton.svelte"
 
-	let checkedOS = false
-	let hasMac = false
+	let checkedOS: boolean = false
+	let hasMac: boolean = false
 
-	let currentOS
-	let secondaryOS
+	interface OSInfo {
+		OS: string
+		Extension: string
+		BlogID: string
+	}
+
+	let currentOS: OSInfo
+	let secondaryOS: OSInfo
 
 	onMount(async () => {
 		let userAgent = navigator.userAgent

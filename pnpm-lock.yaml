@@ -10,7 +10,7 @@ specifiers:
   '@sveltejs/kit': next
   '@tailwindcss/typography': ^0.5.4
   autoprefixer: ^10.4.7
-  eslint: ^8.16.0
+  eslint: ^8.20.0
   eslint-config-prettier: ^8.3.0
   eslint-plugin-svelte3: ^4.0.0
   highlight.js: ^11.6.0
@@ -19,7 +19,7 @@ specifiers:
   prettier: ^2.6.2
   prettier-plugin-svelte: ^2.7.0
   svelte: ^3.44.0
-  svelte-check: ^2.7.1
+  svelte-check: ^2.8.0
   svelte-file-dropzone: 1.0.0-dev.1
   svelte-media-query: ^1.1.2
   svelte-preprocess: ^4.10.7
