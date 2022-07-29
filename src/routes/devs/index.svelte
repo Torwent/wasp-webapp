@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
 	import { fade } from "svelte/transition"
-	import { devs, loadData } from "$lib/stores/stores.js"
+	import { devs, loadData } from "$lib/stores/stores"
 	import DevCard from "$lib/components/DevCard.svelte"
 	loadData("devs", devs)
 

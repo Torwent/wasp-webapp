@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
 	import { writable } from "svelte/store"
 	import { profile } from "$lib/stores/authStore"
 	import { fade, fly } from "svelte/transition"
-	import { scripts, categories, subcategories, loadData } from "$lib/stores/stores.js"
+	import { scripts, categories, subcategories, loadData } from "$lib/stores/stores"
 	import Card from "$lib/components/ScriptCard.svelte"
 	import LinkButton from "$lib/components/LinkButton.svelte"
 

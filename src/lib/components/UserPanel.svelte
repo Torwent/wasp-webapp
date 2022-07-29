@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
 	import { onMount } from "svelte"
-	import { profile, logout, updateRoles } from "$lib/stores/authStore.js"
+	import { profile, logout, updateRoles } from "$lib/stores/authStore"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
 
 	let ws

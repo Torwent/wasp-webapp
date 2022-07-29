@@ -1,4 +1,4 @@
-import { supabase } from "$lib/supabase.js"
+import { supabase } from "$lib/supabase"
 
 /**
  * @type {import('@sveltejs/kit').Load}

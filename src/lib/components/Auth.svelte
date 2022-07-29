@@ -1,5 +1,5 @@
-<script>
-	import { supabase } from "$lib/supabase.js"
+<script lang="ts">
+	import { supabase } from "$lib/supabase"
 	import Discord from "$lib/components/Discord.svelte"
 
 	let loading = false

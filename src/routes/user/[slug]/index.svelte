@@ -3,10 +3,10 @@
 	export { load }
 </script>
 
-<script>
+<script lang="ts">
 	import { fade } from "svelte/transition"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
-	export let user
+	export let user: {display_name: string, id: string, avatar: string, dev: boolean, premium: boolean, vip: boolean, tester: boolean}
 </script>
 
 <div

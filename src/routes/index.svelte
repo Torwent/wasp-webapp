@@ -1,9 +1,9 @@
-<script>
+<script lang="ts">
 	import { onMount } from "svelte"
 	import Discord from "$lib/components/Discord.svelte"
 	import { fade } from "svelte/transition"
-	import { Rowp } from "$lib/simbacode/srl.js"
-	import { drawInterface } from "$lib/simbacode/interface.js"
+	import { Rowp } from "$lib/simbacode/srl"
+	import { drawInterface } from "$lib/simbacode/interface"
 
 	let canvasData
 

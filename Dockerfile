@@ -2,7 +2,7 @@
 FROM node:16.2.0-alpine3.13 AS builder
 WORKDIR /usr/src/app
 COPY . .
-RUN npm ci && npm run build && npm prune --production
+RUN pnpm install -P && pnpm run build
 
 ### Serve Step
 FROM node:16.2.0-alpine3.13

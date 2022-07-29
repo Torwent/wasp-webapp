@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
 	import { fade } from "svelte/transition"
 	import { profile } from "$lib/stores/authStore"
-	import { posts, loadData } from "$lib/stores/stores.js"
+	import { posts, loadData } from "$lib/stores/stores"
 	import PostCard from "$lib/components/PostCard.svelte"
 	loadData("posts", posts)
 

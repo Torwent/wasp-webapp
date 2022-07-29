@@ -3,11 +3,11 @@
 	export { load }
 </script>
 
-<script>
+<script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import { supabase } from "$lib/supabase.js"
+	import { supabase } from "$lib/supabase"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
-	import { categories, subcategories, loadData } from "$lib/stores/stores.js"
+	import { categories, subcategories, loadData } from "$lib/stores/stores"
 
 	export let script
 

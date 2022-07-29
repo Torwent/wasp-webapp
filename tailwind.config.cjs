@@ -1,8 +1,9 @@
 const colors = require("tailwindcss/colors")
 
+/** @type {import('tailwindcss').Config} */
 module.exports = {
-	content: ["./src/**/*.html", "./src/**/*.svelte"],
-	media: false, // or 'media' or 'class'
+	content: ["./src/**/*.{html,js,svelte,ts}"],
+	media: false,
 	darkMode: "class",
 	theme: {
 		extend: {
@@ -59,9 +60,6 @@ module.exports = {
 				}
 			}
 		}
-	},
-	variants: {
-		extend: {}
 	},
 	plugins: [require("@tailwindcss/typography")]
 }

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { slide } from "svelte/transition"
 	import DropDownEntry from "./DropDownEntry.svelte"
 	export let title

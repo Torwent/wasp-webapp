@@ -1,5 +1,5 @@
-<script>
-	export let profile
+<script lang="ts">
+	export let profile: {dev: boolean, premium: boolean, vip: boolean, tester: boolean}
 </script>
 
 <div>

@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
 	import Dropzone from "svelte-file-dropzone"
 	import Markdown from "$lib/Markdown.svelte"
-	import { supabase } from "$lib/supabase.js"
-	import { categories, subcategories, loadData } from "$lib/stores/stores.js"
+	import { supabase } from "$lib/supabase"
+	import { categories, subcategories, loadData } from "$lib/stores/stores"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
 
 	let script = { title: "", description: "", content: "", categoires: [], subcategories: [] }

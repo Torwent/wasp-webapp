@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
 	import MediaQuery from "svelte-media-query"
-	import { user } from "$lib/stores/authStore.js"
+	import { user } from "$lib/stores/authStore"
 	import { scale } from "svelte/transition"
 	import Logo from "$lib/components/Logo.svelte"
 	import UserPanel from "$lib/components/UserPanel.svelte"

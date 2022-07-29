@@ -3,11 +3,11 @@
 	export { load }
 </script>
 
-<script>
+<script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
 	import ScriptDownloadButton from "$lib/components/ScriptDownloadButton.svelte"
 	import Carousel from "$lib/components/Carousel.svelte"
-	import { getServiceSupabase } from "$lib/supabase.js"
+	import { getServiceSupabase } from "$lib/supabase"
 	import { fade } from "svelte/transition"
 	import { profile, loadProfile } from "$lib/stores/authStore"
 	let tempDismiss = $profile.dismissed_warning

@@ -3,8 +3,8 @@
 	export { load }
 </script>
 
-<script>
-	import { supabase } from "$lib/supabase.js"
+<script lang="ts">
+	import { supabase } from "$lib/supabase"
 	import { user } from "$lib/stores/authStore"
 
 	export let dev

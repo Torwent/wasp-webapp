@@ -3,7 +3,7 @@
 	export { load }
 </script>
 
-<script>
+<script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
 	import { fade } from "svelte/transition"
 	import { user } from "$lib/stores/authStore"

@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
 	import { fade } from "svelte/transition"
-	import { categories, subcategories } from "$lib/stores/stores.js"
+	import { categories, subcategories } from "$lib/stores/stores"
 	import EmojiTooltip from "$lib/components/EmojiTooltip.svelte"
 	export let script
 

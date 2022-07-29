@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import { onMount } from "svelte"
 	import hljs from "highlight.js"
 	import "highlight.js/styles/github-dark.css"

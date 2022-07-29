@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
 	import { fade } from "svelte/transition"
-	import { questions, commonErrors, loadData } from "$lib/stores/stores.js"
+	import { questions, commonErrors, loadData } from "$lib/stores/stores"
 	import DropDown from "$lib/components/DropDown.svelte"
 	import Discord from "$lib/components/Discord.svelte"
 

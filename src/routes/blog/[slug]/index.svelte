@@ -3,7 +3,7 @@
 	export { load }
 </script>
 
-<script>
+<script lang="ts">
 	import { profile } from "$lib/stores/authStore"
 	import Markdown from "$lib/Markdown.svelte"
 	import { fade } from "svelte/transition"
