@@ -121,7 +121,7 @@
 </script>
 
 <svelte:head>
-	<title>Wasp Scripts</title>
+	<title>WaspScripts</title>
 	<meta
 		name="description"
 		content="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
