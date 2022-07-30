@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from "svelte"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 	import Discord from "$lib/components/Discord.svelte"
 	import { fade } from "svelte/transition"
 	import { Rowp } from "$lib/simbacode/srl"
@@ -154,10 +155,9 @@
 </script>
 
 <svelte:head>
-	<title>WaspScripts</title>
-	<meta
-		name="description"
-		content="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
+	<MetaTags
+		title=""
+		description="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
 	/>
 </svelte:head>
 

@@ -2,6 +2,7 @@
 	import { onMount } from "svelte"
 	import { fade } from "svelte/transition"
 	import DownloadButton from "$lib/components/LinkButton.svelte"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 
 	let checkedOS: boolean = false
 	let hasMac: boolean = false
@@ -41,10 +42,10 @@
 </script>
 
 <svelte:head>
-	<title>Botting setup - Waspscripts</title>
-	<meta
-		name="description"
-		content="Fully setup Simba and Wasp Scripts from scratch to bot OldSchool RuneScape. Start your road to max on osrs today!"
+	<MetaTags
+		title="Setup"
+		description="Fully setup Simba and WaspScripts from scratch to bot OldSchool RuneScape. Start your road to max on osrs today!"
+		url="/setup"
 	/>
 </svelte:head>
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { fade } from "svelte/transition"
 	import { profile } from "$lib/stores/authStore"
 
@@ -6,10 +7,10 @@
 </script>
 
 <svelte:head>
-	<title>Premium - Waspscripts</title>
-	<meta
-		name="description"
-		content="Get Waspscripts premium role and gain access to exclusive scripts. With premium you have scripts for nearly all skills in OSRS."
+	<MetaTags
+		title="Premium"
+		description="Get WaspScripts premium role and gain access to exclusive scripts. With premium you have scripts for nearly all skills in OSRS."
+		url="/premium"
 	/>
 </svelte:head>
 

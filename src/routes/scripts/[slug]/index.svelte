@@ -7,6 +7,7 @@
 	import Markdown from "$lib/Markdown.svelte"
 	import ScriptDownloadButton from "$lib/components/ScriptDownloadButton.svelte"
 	import Carousel from "$lib/components/Carousel.svelte"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { getServiceSupabase } from "$lib/supabase"
 	import { fade } from "svelte/transition"
 	import { profile, loadProfile } from "$lib/stores/authStore"
@@ -51,8 +52,11 @@
 </script>
 
 <svelte:head>
-	<title>{script.title} - Waspscripts</title>
-	<meta name="description" content={script.description} />
+	<MetaTags
+		title={script.title}
+		description={script.description}
+		url={"/scripts/" + encodeURI(script.title)}
+	/>
 </svelte:head>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>

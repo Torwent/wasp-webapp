@@ -5,6 +5,7 @@
 
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { fade } from "svelte/transition"
 	import { user } from "$lib/stores/authStore"
 	export let dev: {
@@ -17,8 +18,11 @@
 </script>
 
 <svelte:head>
-	<title>{dev.username} - Waspscripts</title>
-	<meta name="description" content={dev.description} />
+	<MetaTags
+		title={dev.username}
+		description={dev.description}
+		url={"/devs/" + encodeURI(dev.username)}
+	/>
 </svelte:head>
 
 <div

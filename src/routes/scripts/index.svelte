@@ -5,6 +5,7 @@
 	import { scripts, categories, subcategories, loadData } from "$lib/stores/stores"
 	import Card from "$lib/components/ScriptCard.svelte"
 	import LinkButton from "$lib/components/LinkButton.svelte"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 
 	loadData("scripts", scripts)
 	loadData("categories", categories)
@@ -84,10 +85,14 @@
 </script>
 
 <svelte:head>
-	<title>OSRS bot scripts - Waspscripts</title>
 	<meta
 		name="description"
 		content="Large script collection to bot OldSchool RuneScape with Simba, SRL and WaspLib. Get that 99 on osrs today!"
+	/>
+	<MetaTags
+		title="Scripts"
+		description="Large script collection to bot OldSchool RuneScape with Simba, SRL and WaspLib. Get that 99 on osrs today!"
+		url="/scripts"
 	/>
 </svelte:head>
 

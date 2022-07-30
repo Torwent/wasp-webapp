@@ -3,6 +3,7 @@
 	import { profile } from "$lib/stores/authStore"
 	import { posts, loadData } from "$lib/stores/stores"
 	import PostCard from "$lib/components/PostCard.svelte"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 	loadData("posts", posts)
 
 	let searchQuery = ""
@@ -48,10 +49,10 @@
 </script>
 
 <svelte:head>
-	<title>Dev Blog - Waspscripts</title>
-	<meta
-		name="description"
-		content="Guides and tutorials to bot and develop scripts for OldSchool RuneScape. Find the large collection of Simba tutorials available and unleach the power of Simba and max on osrs."
+	<MetaTags
+		title="Dev Blog"
+		description="Guides and tutorials to bot and develop scripts for OldSchool RuneScape. Find the large collection of Simba tutorials available and unleach the power of Simba and max on osrs."
+		url="/blog"
 	/>
 </svelte:head>
 
