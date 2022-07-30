@@ -171,7 +171,9 @@
 			<h1 class="text-2xl font-bold text-center md:text-3xl py-12">
 				<div class="py-4">WaspScripts</div>
 				<div>
-					100% <span class="bg-clip-border animate-character pl-1">color</span>, 100% open source.
+					100% <span class="bg-clip-text animate-character text-transparent pl-1 inline-block"
+						>color</span
+					>, 100% open source.
 				</div>
 			</h1>
 		</header>
@@ -218,10 +220,7 @@
 			rgba(255, 0, 0, 1) 100%
 		);
 		background-size: 200% auto;
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
 		animation: textclip 10s linear infinite;
-		display: inline-block;
 	}
 
 	@keyframes textclip {
