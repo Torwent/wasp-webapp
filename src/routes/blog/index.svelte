@@ -39,7 +39,7 @@
 		if (!basicEnabled && !intermediateEnabled && !advancedEnabled) return
 
 		filteredPosts = $posts.filter(
-			(post) =>
+			(post: { level: number }) =>
 				(basicEnabled && post.level === 0) ||
 				(intermediateEnabled && post.level === 1) ||
 				(advancedEnabled && post.level === 2)

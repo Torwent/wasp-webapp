@@ -7,7 +7,13 @@
 	import Markdown from "$lib/Markdown.svelte"
 	import { supabase } from "$lib/supabase"
 	import { user } from "$lib/stores/authStore"
-	export let post
+	export let post: {
+		id: string
+		title: string
+		description: string
+		level: number
+		content: string
+	}
 
 	const handleSubmit = async () => {
 		const { error } = await supabase

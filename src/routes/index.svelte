@@ -5,9 +5,14 @@
 	import { Rowp } from "$lib/simbacode/srl"
 	import { drawInterface } from "$lib/simbacode/interface"
 
-	let canvasData
+	let canvasData: { data: { [x: string]: number } }
 
-	const clearPixel = (context, i) => {
+	const clearPixel = (
+		context: {
+			putImageData: (arg0: { data: { [x: string]: number } }, arg1: number, arg2: number) => void
+		},
+		i: number
+	) => {
 		if (canvasData.data[i + 0] == 0 && canvasData.data[i + 1] == 0) {
 			canvasData.data[i + 3] = 0
 		} else if (canvasData.data[i + 0] == 0 && canvasData.data[i + 1] > 0) {
@@ -32,8 +37,17 @@
 		context.putImageData(canvasData, 0, 0)
 	}
 
-	const drawPixel = (context, canvas, x, y) => {
-		const setPixel = (i) => {
+	const drawPixel = (
+		context: {
+			strokeStyle?: any
+			getImageData?: any
+			putImageData?: (arg0: { data: { [x: string]: number } }, arg1: number, arg2: number) => void
+		},
+		canvas: { width: number },
+		x: number,
+		y: number
+	) => {
+		const setPixel = (i: number) => {
 			if (
 				canvasData.data[i + 0] == 0 &&
 				canvasData.data[i + 1] >= 0 &&
@@ -63,7 +77,16 @@
 		setPixel((x + y * canvas.width) * 4)
 	}
 
-	const drawInvTabHits = (canvas, context, MouseX, MouseY) => {
+	const drawInvTabHits = (
+		canvas: { width: number; height: number } | null,
+		context: {
+			strokeStyle?: any
+			getImageData?: any
+			putImageData?: (arg0: { data: { [x: string]: number } }, arg1: number, arg2: number) => void
+		},
+		MouseX: any,
+		MouseY: any
+	) => {
 		context.strokeStyle = "rgba(255, 0, 0, 1)"
 		canvasData = context.getImageData(0, 0, canvas.width, canvas.height)
 
@@ -72,7 +95,17 @@
 		let BX2 = BX1 + 30
 		let BY2 = BY1 + 33
 
-		let rect = { Top: {}, Right: {}, Btm: {}, Left: {} }
+		interface TPoint {
+			x: number
+			y: number
+		}
+
+		let rect: { Top: TPoint; Right: TPoint; Btm: TPoint; Left: TPoint } = {
+			Top: { x: 0, y: 0 },
+			Right: { x: 0, y: 0 },
+			Btm: { x: 0, y: 0 },
+			Left: { x: 0, y: 0 }
+		}
 		rect.Top.x = BX1
 		rect.Top.y = BY1
 		rect.Right.x = BX2
@@ -82,16 +115,16 @@
 		rect.Left.x = BX1
 		rect.Left.y = BY2
 
-		let p = Rowp({ x: MouseX, y: MouseY }, rect)
+		let p: TPoint = Rowp({ x: MouseX, y: MouseY }, rect)
 		drawPixel(context, canvas, p.x, p.y)
 	}
 
 	onMount(() => {
-		let canvas = document.getElementById("canvas"),
+		let canvas: any = document.getElementById("canvas"),
 			context = canvas.getContext("2d")
 
-		let x
-		let y
+		let x: number
+		let y: number
 
 		window.addEventListener("resize", resizeCanvas, false)
 		window.onmousemove = (e) => {

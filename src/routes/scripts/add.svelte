@@ -5,19 +5,23 @@
 	import { categories, subcategories, loadData } from "$lib/stores/stores"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
 
-	let script = { title: "", description: "", content: "", categoires: [], subcategories: [] }
+	let script: {
+		title: string
+		description: string
+		content: string
+		categoires: string[]
+		subcategories: string[]
+	} = { title: "", description: "", content: "", categoires: [], subcategories: [] }
 
 	let categoriesValue: { name: string; emoji: string }[] = []
 	let subcategoriesValue: { name: string; emoji: string }[] = []
 
 	let file: any
 
-	function handleFilesSelect(e: any) {
-		console.log(e.detail)
+	function handleFilesSelect(e: { detail: { acceptedFiles: any } }) {
 		const { acceptedFiles } = e.detail
 
 		if (acceptedFiles.length > 0) {
-			console.log(acceptedFiles[acceptedFiles.length - 1])
 			file = acceptedFiles[acceptedFiles.length - 1]
 		}
 	}

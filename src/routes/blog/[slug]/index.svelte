@@ -7,7 +7,7 @@
 	import { profile } from "$lib/stores/authStore"
 	import Markdown from "$lib/Markdown.svelte"
 	import { fade } from "svelte/transition"
-	export let post
+	export let post: { title: string; description: string; content: string }
 </script>
 
 <svelte:head>

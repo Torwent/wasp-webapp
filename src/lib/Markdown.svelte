@@ -15,7 +15,9 @@
 				if (lang && hljs.getLanguage(lang)) {
 					try {
 						return hljs.highlight(code, { language: lang }).value
-					} catch (__) {}
+					} catch (error) {
+						console.error(error)
+					}
 				}
 
 				return "" // use external default escaping
