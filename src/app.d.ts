@@ -9,3 +9,6 @@ declare namespace App {
 	// interface Session {}
 	// interface Stuff {}
 }
+
+declare module "svelte-file-dropzone"
+declare module "markdown-it"
