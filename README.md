@@ -1,2 +1,2 @@
 # wasp-webapp
- waspbot.com webapp
+ https://waspscripts.com webapp
