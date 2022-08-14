@@ -3,17 +3,12 @@
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import Discord from "$lib/components/Discord.svelte"
 	import { fade } from "svelte/transition"
-	import { Rowp } from "$lib/simbacode/srl"
+	import { Rowp, type TBox, type TPoint, type TRectangle } from "$lib/simbacode/srl"
 	import { drawInterface } from "$lib/simbacode/interface"
 
-	let canvasData: { data: { [x: string]: number } }
+	let canvasData: ImageData
 
-	const clearPixel = (
-		context: {
-			putImageData: (arg0: { data: { [x: string]: number } }, arg1: number, arg2: number) => void
-		},
-		i: number
-	) => {
+	const clearPixel = (context: CanvasRenderingContext2D, i: number) => {
 		if (canvasData.data[i + 0] == 0 && canvasData.data[i + 1] == 0) {
 			canvasData.data[i + 3] = 0
 		} else if (canvasData.data[i + 0] == 0 && canvasData.data[i + 1] > 0) {
@@ -38,16 +33,7 @@
 		context.putImageData(canvasData, 0, 0)
 	}
 
-	const drawPixel = (
-		context: {
-			strokeStyle?: any
-			getImageData?: any
-			putImageData?: (arg0: { data: { [x: string]: number } }, arg1: number, arg2: number) => void
-		},
-		canvas: { width: number },
-		x: number,
-		y: number
-	) => {
+	const drawPixel = (context: CanvasRenderingContext2D, canvas: HTMLCanvasElement, p: TPoint) => {
 		const setPixel = (i: number) => {
 			if (
 				canvasData.data[i + 0] == 0 &&
@@ -75,67 +61,50 @@
 			setTimeout(clearPixel, 40000, context, i)
 		}
 
-		setPixel((x + y * canvas.width) * 4)
+		setPixel((p.x + p.y * canvas.width) * 4)
 	}
 
 	const drawInvTabHits = (
-		canvas: { width: number; height: number } | null,
-		context: {
-			strokeStyle?: any
-			getImageData?: any
-			putImageData?: (arg0: { data: { [x: string]: number } }, arg1: number, arg2: number) => void
-		},
-		MouseX: any,
-		MouseY: any
+		canvas: HTMLCanvasElement,
+		context: CanvasRenderingContext2D,
+		Mouse: TPoint
 	) => {
 		context.strokeStyle = "rgba(255, 0, 0, 1)"
 		canvasData = context.getImageData(0, 0, canvas.width, canvas.height)
 
-		let BX1 = canvas.width - 240 + 6 + 3 * 33
-		let BY1 = canvas.height - 333
-		let BX2 = BX1 + 30
-		let BY2 = BY1 + 33
-
-		interface TPoint {
-			x: number
-			y: number
+		let Box: TBox = {
+			x1: canvas.width - 240 + 6 + 3 * 33,
+			y1: canvas.height - 333,
+			x2: canvas.width - 240 + 6 + 3 * 33 + 30,
+			y2: canvas.height - 333 + 33
 		}
 
-		let rect: { Top: TPoint; Right: TPoint; Btm: TPoint; Left: TPoint } = {
-			Top: { x: 0, y: 0 },
-			Right: { x: 0, y: 0 },
-			Btm: { x: 0, y: 0 },
-			Left: { x: 0, y: 0 }
+		let rect: TRectangle = {
+			Top: { x: Box.x1, y: Box.y1 },
+			Right: { x: Box.x2, y: Box.y1 },
+			Btm: { x: Box.x2, y: Box.y2 },
+			Left: { x: Box.x1, y: Box.y2 }
 		}
-		rect.Top.x = BX1
-		rect.Top.y = BY1
-		rect.Right.x = BX2
-		rect.Right.y = BY1
-		rect.Btm.x = BX2
-		rect.Btm.y = BY2
-		rect.Left.x = BX1
-		rect.Left.y = BY2
 
-		let p: TPoint = Rowp({ x: MouseX, y: MouseY }, rect)
-		drawPixel(context, canvas, p.x, p.y)
+		let p: TPoint = Rowp({ x: Mouse.x, y: Mouse.y }, rect)
+		drawPixel(context, canvas, p)
 	}
 
 	onMount(() => {
 		let canvas: any = document.getElementById("canvas"),
 			context = canvas.getContext("2d")
 
-		let x: number
-		let y: number
+		let Mouse: TPoint = { x: 0, y: 0 }
 
 		window.addEventListener("resize", resizeCanvas, false)
 		window.onmousemove = (e) => {
-			x = e.pageX
-			y = e.pageY - document.documentElement.scrollTop
+			Mouse.x = e.pageX
+			Mouse.y = e.pageY - document.documentElement.scrollTop
 		}
 
 		function drawHitBox() {
 			for (let i = 0; i < 5; i++) {
-				drawInvTabHits(canvas, context, x, y)
+				drawInvTabHits(canvas, context, Mouse)
 			}
 			requestAnimationFrame(drawHitBox)
 		}
@@ -143,12 +112,11 @@
 		drawHitBox()
 
 		function resizeCanvas() {
-			canvas.width = canvas.parentElement.clientWidth
-			canvas.height = window.innerHeight - 100
-			if (canvas.height < 600) canvas.height = 600
+			canvas.width = 241
+			canvas.height = 335
 
 			// Redraw everything after resizing the window
-			drawInterface(canvas, context, window.matchMedia("(min-width: 768px)").matches)
+			drawInterface(canvas, context)
 		}
 		resizeCanvas()
 	})
@@ -199,7 +167,7 @@
 			</h2>
 		</header>
 
-		<canvas id="canvas" />
+		<canvas id="canvas" class="m-auto" />
 	</div>
 </div>
 
