@@ -1,11 +1,10 @@
 <script lang="ts">
 	import { getSignedURL } from "$lib/supabaseStorage"
-	export let premium
-	export let script_name
-	export let text
+	export let premium: boolean
+	export let script_name: string
+	export let text: string
 
-	let path
-	let url
+	let path: string
 
 	if (premium) {
 		path = "premium/"
@@ -15,7 +14,7 @@
 
 	let download = () => {
 		getSignedURL("scripts", path, script_name).then((value) => {
-			url = value
+			let url = value
 			fetch(url)
 				.then((resp) => resp.blob())
 				.then((blobobject) => {

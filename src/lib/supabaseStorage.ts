@@ -1,6 +1,6 @@
 import { supabase } from "$lib/supabase"
 
-export const loadPublicFiles = async (bucket, folder) => {
+export const loadPublicFiles = async (bucket: string, folder: string) => {
 	const { data, error } = await supabase.storage.from(bucket).list(folder, {
 		limit: 20,
 		offset: 0,
@@ -13,27 +13,36 @@ export const loadPublicFiles = async (bucket, folder) => {
 
 	let imgURLs = []
 
-	for (let i of data) {
-		const { publicURL, errorUrl } = supabase.storage
-			.from(bucket)
-			.getPublicUrl(folder + "/" + i.name)
+	if (data === null) return
 
-		if (errorUrl) {
+	for (let i of data) {
+		const { publicURL, error } = supabase.storage.from(bucket).getPublicUrl(folder + "/" + i.name)
+
+		if (error) {
 			return console.error(error)
 		}
 
-		imgURLs.push(publicURL.replaceAll(" ", "%20"))
+		if (publicURL !== null) {
+			imgURLs.push(publicURL.replaceAll(" ", "%20"))
+		}
 	}
 
 	return imgURLs
 }
 
-export const getSignedURL = async (bucket, path, file) => {
-	const { data, dirError } = await supabase.storage.from(bucket).list(path)
+const getFilePath = async (bucket: string, path: string) => {
+	const { data, error } = await supabase.storage.from(bucket).list(path)
 
-	if (dirError) return console.error(dirError)
+	if (data === null || error) return console.error(error)
 
 	//data.sort((a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0))
+	return data
+}
+
+export const getSignedURL = async (bucket: string, path: string, file: string) => {
+	let data = await getFilePath(bucket, path)
+
+	if (!data) return console.error("Path doesn't exist")
 
 	path += data[data.length - 1].name + "/" + file
 
