@@ -30,11 +30,11 @@ export const updateRoles = async (id: string, d: boolean, t: boolean, p: boolean
 
 supabase.auth.onAuthStateChange((_, session) => {
 	user.set(session?.user)
-	if (session) {
+	if (session && session?.user) {
 		loadProfile(session?.user.id)
-	} else {
-		profile.set(false)
+		return
 	}
+	profile.set(false)
 })
 
 export const logout = () => supabase.auth.signOut()
@@ -42,9 +42,8 @@ export const logout = () => supabase.auth.signOut()
 export var getSeed = () => {
 	if (!supabase.auth.currentUser) {
 		return String(Math.floor(Math.random() * 100000000))
-	} else {
-		return supabase.auth.currentUser.id
 	}
+	return supabase.auth.currentUser.id
 }
 
 export var avatar: string
