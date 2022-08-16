@@ -1,24 +1,25 @@
 <script lang="ts">
 	import Dropzone from "svelte-file-dropzone"
 	import Markdown from "$lib/Markdown.svelte"
-	//import { supabase } from "$lib/supabase"
-	import { categories, subcategories, loadData } from "$lib/stores/stores"
+	import { supabase } from "$lib/supabase"
+	import { uploadScript, type ScriptData } from "$lib/supabaseStorage"
+	import { categories, subcategories, loadData, type Script } from "$lib/stores/stores"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
 
-	let script: {
-		title: string
-		description: string
-		content: string
-		categoires: string[]
-		subcategories: string[]
-	} = { title: "", description: "", content: "", categoires: [], subcategories: [] }
+	let script: Script = {
+		title: "",
+		description: "",
+		content: "",
+		categories: [],
+		subcategories: []
+	}
 
 	let categoriesValue: { name: string; emoji: string }[] = []
 	let subcategoriesValue: { name: string; emoji: string }[] = []
 
-	let file: any
+	let file: File
 
-	function handleFilesSelect(e: { detail: { acceptedFiles: any } }) {
+	function handleFilesSelect(e: { detail: { acceptedFiles: File[] } }) {
 		const { acceptedFiles } = e.detail
 
 		if (acceptedFiles.length > 0) {
@@ -30,7 +31,9 @@
 	loadData("subcategories", subcategories)
 
 	const handleSubmit = async () => {
-		/*const { error } = await supabase.from("scripts_test").insert({
+		if (!file) return console.log("No file added!")
+
+		const { data, error } = await supabase.from("scripts_test").insert({
 			title: script.title,
 			description: script.description,
 			content: script.content,
@@ -41,8 +44,8 @@
 		if (error) {
 			return console.error(error)
 		}
-		*/
-		console.log("This is a placeholder and serves no purpose right now!")
+
+		uploadScript(data[0] as ScriptData, file)
 	}
 </script>
 
