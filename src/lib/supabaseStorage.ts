@@ -54,3 +54,51 @@ export const getSignedURL = async (bucket: string, path: string, file: string) =
 
 	return signedURL
 }
+
+export interface ScriptData {
+	id: string
+	title: string
+	revision: number
+}
+
+export const uploadFile = async (bucket: string, path: string, file: File) => {
+	const { error } = await supabase.storage.from(bucket).upload(path, file)
+
+	if (error) {
+		return console.error(error)
+	}
+}
+
+export const uploadScript = async (scriptData: ScriptData, file: File) => {
+	const pad = (n: number, size: number) => {
+		var s = n + ""
+		while (s.length < size) s = "0" + s
+		return s
+	}
+
+	let fileString = await file.text()
+	let regex = /{\$UNDEF SCRIPT_REVISION}{\$DEFINE SCRIPT_REVISION := '(\d*?)'}/
+	let replaceStr =
+		"{$UNDEF SCRIPT_REVISION}{$DEFINE SCRIPT_REVISION := '" + scriptData.revision.toString() + "'}"
+
+	if (fileString.match(regex)) {
+		console.log("here0")
+		fileString = fileString.replace(regex, replaceStr)
+	} else {
+		console.log("here1")
+		fileString = replaceStr.concat("\n").concat(fileString)
+	}
+	console.log(fileString)
+
+	file = new File([fileString], scriptData.id + ".simba", { type: "text/plain" })
+
+	let path =
+		scriptData.id +
+		"/" +
+		pad(scriptData.revision, 9) +
+		"/" +
+		scriptData.title.toLowerCase().replace(/\s/g, "_") +
+		".simba"
+
+	uploadFile("scripts", path, file)
+}
