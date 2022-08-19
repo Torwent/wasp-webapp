@@ -1,21 +1,18 @@
 <script lang="ts">
 	import Dropzone from "svelte-file-dropzone"
 	import Markdown from "$lib/Markdown.svelte"
-	import { supabase } from "$lib/supabase"
-	import { uploadScript, type ScriptData } from "$lib/supabaseStorage"
-	import { categories, subcategories, loadData, type Script } from "$lib/stores/stores"
+	import { uploadScript, type Script } from "$lib/supabaseStorage"
+	import { categories, subcategories, loadData } from "$lib/stores/stores"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
 
 	let script: Script = {
 		title: "",
 		description: "",
 		content: "",
+		revision: 1,
 		categories: [],
 		subcategories: []
 	}
-
-	let categoriesValue: { name: string; emoji: string }[] = []
-	let subcategoriesValue: { name: string; emoji: string }[] = []
 
 	let file: File
 
@@ -26,27 +23,10 @@
 			file = acceptedFiles[acceptedFiles.length - 1]
 		}
 	}
+	const handleSubmit = async () => uploadScript(script, file)
 
 	loadData("categories", categories)
 	loadData("subcategories", subcategories)
-
-	const handleSubmit = async () => {
-		if (!file) return console.log("No file added!")
-
-		const { data, error } = await supabase.from("scripts_test").insert({
-			title: script.title,
-			description: script.description,
-			content: script.content,
-			categories: categoriesValue,
-			subcategories: subcategoriesValue
-		})
-
-		if (error) {
-			return console.error(error)
-		}
-
-		uploadScript(data[0] as ScriptData, file)
-	}
 </script>
 
 <div class="container mx-auto my-6 max-w-3xl flex-grow">
@@ -65,6 +45,7 @@
 	</header>
 
 	<form class="form my-6" on:submit|preventDefault={handleSubmit}>
+		<!-- Preview -->
 		<div class="flex flex-col text-sm mb-2">
 			<details>
 				<summary>Preview</summary>
@@ -102,22 +83,24 @@
 		</div>
 
 		<!-- Categories -->
-		<div class="flex flex-col text-sm mb-2">
-			<label for="categories" class="font-bold mb-2"> Categories: </label>
-			<MultiSelect id="cats" bind:value={categoriesValue}>
-				{#each $categories as cat}
-					<option value={cat.name}>{cat.emoji}{cat.name}</option>
-				{/each}
-			</MultiSelect>
-		</div>
-		<div class="flex flex-col text-sm mb-2">
-			<label for="categories" class="font-bold mb-2"> Subcategories: </label>
-			<MultiSelect id="subcats" bind:value={subcategoriesValue}>
-				{#each $subcategories as subcat}
-					<option value={subcat.name}>{subcat.emoji}{subcat.name}</option>
-				{/each}
-			</MultiSelect>
-		</div>
+		{#if $categories.length > 0 && $subcategories.length > 0}
+			<div class="flex flex-col text-sm mb-2">
+				<label for="categories" class="font-bold mb-2"> Categories: </label>
+				<MultiSelect id="cats" bind:value={script.categories}>
+					{#each $categories as cat}
+						<option value={cat.name}>{cat.emoji}{cat.name}</option>
+					{/each}
+				</MultiSelect>
+			</div>
+			<div class="flex flex-col text-sm mb-2">
+				<label for="categories" class="font-bold mb-2"> Subcategories: </label>
+				<MultiSelect id="subcats" bind:value={script.subcategories}>
+					{#each $subcategories as subcat}
+						<option value={subcat.name}>{subcat.emoji}{subcat.name}</option>
+					{/each}
+				</MultiSelect>
+			</div>
+		{/if}
 
 		<!-- Content -->
 		<div class="flex flex-col text-sm mb-2">
@@ -141,6 +124,7 @@
 			</ol>
 		</div>
 
+		<!-- Buttons -->
 		<div class="flex justify-between">
 			<a href="/scripts">
 				<button

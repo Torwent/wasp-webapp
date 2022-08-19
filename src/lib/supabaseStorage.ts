@@ -1,4 +1,19 @@
 import { supabase } from "$lib/supabase"
+import { pad } from "./utils"
+
+export interface Script {
+	id?: string
+	title: string
+	description: string
+	content: string
+	revision: number
+	categories: string[]
+	subcategories: string[]
+	author?: string
+	user_id?: string
+	assets_path?: string
+	assets_alt?: string
+}
 
 export const loadPublicFiles = async (bucket: string, folder: string) => {
 	const { data, error } = await supabase.storage.from(bucket).list(folder, {
@@ -40,25 +55,12 @@ const getFilePath = async (bucket: string, path: string) => {
 }
 
 export const getSignedURL = async (bucket: string, path: string, file: string) => {
-	let data = await getFilePath(bucket, path)
-
-	if (!data) return console.error("Path doesn't exist")
-
-	path += data[data.length - 1].name + "/" + file
+	path += "/" + file
 
 	const { signedURL, error } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
 
-	if (error) {
-		return console.error(error)
-	}
-
+	if (error) return console.error(error)
 	return signedURL
-}
-
-export interface ScriptData {
-	id: string
-	title: string
-	revision: number
 }
 
 export const uploadFile = async (bucket: string, path: string, file: File) => {
@@ -69,35 +71,59 @@ export const uploadFile = async (bucket: string, path: string, file: File) => {
 	}
 }
 
-export const uploadScript = async (scriptData: ScriptData, file: File) => {
-	const pad = (n: number, size: number) => {
-		var s = n + ""
-		while (s.length < size) s = "0" + s
-		return s
-	}
-
+const updateScriptRevision = async (file: File, revision: number) => {
 	let fileString = await file.text()
 	let regex = /{\$UNDEF SCRIPT_REVISION}{\$DEFINE SCRIPT_REVISION := '(\d*?)'}/
+
 	let replaceStr =
-		"{$UNDEF SCRIPT_REVISION}{$DEFINE SCRIPT_REVISION := '" + scriptData.revision.toString() + "'}"
+		"{$UNDEF SCRIPT_REVISION}{$DEFINE SCRIPT_REVISION := '" + revision.toString() + "'}"
 
 	if (fileString.match(regex)) {
-		console.log("here0")
 		fileString = fileString.replace(regex, replaceStr)
 	} else {
-		console.log("here1")
 		fileString = replaceStr.concat("\n").concat(fileString)
 	}
-	console.log(fileString)
 
-	file = new File([fileString], scriptData.id + ".simba", { type: "text/plain" })
+	return new File([fileString], file.name, { type: "text/plain" })
+}
+
+export const uploadScript = async (script: Script, file: File) => {
+	if (!file) return console.log("No file added!")
+
+	const { data, error } = await supabase.from("scripts_test").insert(script)
+
+	if (error) return console.error(error)
+
+	script = data[0]
+
+	file = await updateScriptRevision(file, script.revision)
 
 	let path =
-		scriptData.id +
+		script.id +
 		"/" +
-		pad(scriptData.revision, 9) +
+		pad(script.revision, 9) +
 		"/" +
-		scriptData.title.toLowerCase().replace(/\s/g, "_") +
+		script.title.toLowerCase().replace(/\s/g, "_") +
+		".simba"
+
+	uploadFile("scripts", path, file)
+}
+
+export const updateScript = async (script: Script, file: File) => {
+	if (file) script.revision += 1
+	const { error } = await supabase.from("scripts").update(script).match({ id: script.id })
+
+	if (error) return console.error(error)
+
+	if (!file) return
+
+	file = await updateScriptRevision(file, script.revision)
+	let path =
+		script.id +
+		"/" +
+		pad(script.revision, 9) +
+		"/" +
+		script.title.toLowerCase().replace(/\s/g, "_") +
 		".simba"
 
 	uploadFile("scripts", path, file)

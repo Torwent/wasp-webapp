@@ -1,25 +1,12 @@
 <script lang="ts">
 	import { profile } from "$lib/stores/authStore"
-	import { fade, fly } from "svelte/transition"
-	import {
-		scripts,
-		categories,
-		subcategories,
-		loadData,
-		search,
-		type Script
-	} from "$lib/stores/stores"
+	import { fly } from "svelte/transition"
+	import { scripts, categories, subcategories, loadData, search } from "$lib/stores/stores"
 	import Card from "$lib/components/ScriptCard.svelte"
 	import LinkButton from "$lib/components/LinkButton.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
+	import type { Script } from "$lib/supabaseStorage"
 
-	loadData("scripts", scripts)
-	loadData("categories", categories)
-	loadData("subcategories", subcategories)
-
-	let searchQuery = ""
-	let filteredScripts: Script[] = []
-	let placeholderText = "Search posts..."
 	interface CheckboxType {
 		id: number
 		name: string
@@ -27,8 +14,17 @@
 		main: boolean
 		checked: boolean
 	}
-	let checkboxes: CheckboxType[] = []
 
+	loadData("scripts", scripts)
+	loadData("categories", categories)
+	loadData("subcategories", subcategories)
+
+	let searchQuery = "",
+		placeholderText = "Search posts...",
+		filteredScripts: Script[] = [],
+		checkboxes: CheckboxType[] = []
+
+	//handles the search field
 	const handleSearch = () => {
 		filteredScripts = $scripts
 		placeholderText = "Search scripts..."
@@ -41,6 +37,7 @@
 		}
 	}
 
+	//handles checkbox filters
 	const handleFilters = () => {
 		searchQuery = ""
 		filteredScripts = []
@@ -58,9 +55,14 @@
 		})
 	}
 
-	$: {
+	//sets up checkboxes to what's available from the database
+	const loadCheckboxes = () => {
+		if (checkboxes.length > 0) return
+
 		let id = 0
+
 		checkboxes = []
+
 		for (let category of $categories) {
 			checkboxes.push({
 				id: id++,
@@ -82,8 +84,13 @@
 				}
 			}
 		}
-		checkboxes = checkboxes
 	}
+
+	// make sure categories and subcategories are both loaded to run loadCheckboxes()
+	$: if ($categories.length > 0 && $subcategories.length > 0) loadCheckboxes()
+
+	//this is a svelte hack. since checkboxes.push() in loadCheckboxes() don't trigger checkboxes update we reset it to be equals to itself to force an update
+	$: checkboxes = checkboxes
 </script>
 
 <svelte:head>

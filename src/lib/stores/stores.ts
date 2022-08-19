@@ -1,14 +1,6 @@
 import { supabase } from "$lib/supabase"
 import { writable } from "svelte/store"
 
-export interface Script {
-	title: string
-	description: string
-	content: string
-	categories: string[]
-	subcategories: string[]
-}
-
 export interface Post {
 	title: string
 	description: string

@@ -10,7 +10,7 @@
 	import { page } from "$app/stores"
 
 	let tabs = [0, 1, 2, 3, 4, 5]
-	let selectedTab
+	let selectedTab: number
 
 	switch ($page.url.pathname) {
 		case "/":
@@ -58,7 +58,7 @@
 							class:text-orange-500={selectedTab === 0}
 							class:dark:text-orange-400={selectedTab === 0}
 						>
-							<Logo {selectedTab} />
+							<Logo />
 						</a>
 					{:else}
 						<span
@@ -67,7 +67,7 @@
 							class:text-orange-500={selectedTab === 0}
 							class:dark:text-orange-400={selectedTab === 0}
 						>
-							<Logo {selectedTab} />
+							<Logo />
 						</span>
 					{/if}
 				</MediaQuery>

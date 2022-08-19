@@ -5,32 +5,17 @@
 
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import ScriptDownloadButton from "$lib/components/ScriptDownloadButton.svelte"
+	import AdvancedButton from "$lib/components/AdvancedDownloadButton.svelte"
+	import SimpleButton from "$lib/components/SimpleDownloadButton.svelte"
 	import Carousel from "$lib/components/Carousel.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { getServiceSupabase } from "$lib/supabase"
 	import { fade } from "svelte/transition"
 	import { profile, loadProfile } from "$lib/stores/authStore"
+	import type { Script } from "$lib/supabaseStorage"
 	let tempDismiss = $profile.dismissed_warning
 
-	export let script: {
-		id: string
-		title: string
-		description: string
-		categories: string[]
-		subcategories?: string[]
-		content: string
-		assets_path: string
-		assets_alt: string
-	}
-	let premium: boolean
-
-	if (script.categories.includes("Premium")) {
-		premium = true
-	} else {
-		premium = false
-	}
-	let script_name = script.title.toLowerCase().replace(" ", "_") + ".simba"
+	export let script: Script
 
 	const fullDismiss = async () => {
 		const ssb = getServiceSupabase()
@@ -49,6 +34,9 @@
 
 		tempDismiss = true
 	}
+
+	let assets_path =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" + script.id
 </script>
 
 <svelte:head>
@@ -109,11 +97,11 @@
 	<div class="group w-full absolute left-0 top-16">
 		<img
 			class="inset-0 z-0 object-none h-96 w-full"
-			src={script.assets_path + "cover.png"}
+			src={assets_path + "/banner.jpg"}
 			alt={script.assets_alt}
 		/>
 
-		<header class="text-center w-full h-32 absolute inset-0 z-10 top-64 text-amber-500">
+		<header class="text-center w-full h-32 absolute inset-0 z-10 top-64 text-amber-500 text-shadow">
 			<h1 class="mb-4 font-bold text-4xl">{script.title}</h1>
 			<h2 class="font-semibold leading-normal mb-4">{script.description}</h2>
 		</header>
@@ -137,38 +125,46 @@
 
 		<div class="text-center py-12">
 			{#if script.categories.includes("Free")}
-				<ScriptDownloadButton {premium} {script_name} text={`Download ${script.title}`} />
-				<h3 class="py-6">
-					This is a free script, if you want to learn how to install and easily manage all
-					FreeWaspScripts check this
-					<a
-						href="/blog/Simba%20packages"
-						class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
-					>
-						guide</a
-					>.
-				</h3>
+				<AdvancedButton {script} />
+
+				{#if script.categories.includes("Official")}
+					<h3 class="py-6">
+						This is a free wasp script, you can add it to Simba's package manager with the following
+						link:
+					</h3>
+					<h4>
+						<a
+							href="https://github.com/Torwent/wasp-free"
+							class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
+							>https://github.com/Torwent/wasp-free</a
+						>
+					</h4>
+					<h5 class="py-4">
+						For more information check this
+						<a
+							href="/blog/Simba%20packages"
+							class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
+						>
+							guide</a
+						>.
+					</h5>
+				{/if}
 			{:else if script.categories.includes("Premium")}
 				{#if !$profile.id}
 					<h3 class="py-6">Please login to be able to download this script.</h3>
-				{:else if $profile.premium || $profile.vip || $profile.tester}
-					<ScriptDownloadButton {premium} {script_name} text={`Download ${script.title}`} />
-					<h4 class="py-6">
-						This is a premium script, you need to manually move it to <b
-							>Simba/Scripts/wasp-premium</b
-						>.
+				{:else if $profile.premium || $profile.vip || $profile.tester || $profile.id === script.user_id}
+					<AdvancedButton {script} />
+					<h4 class="pt-6">
+						This is a premium script, you need to move it to
+						<b class="text-amber-500 dark:text-amber-200"> Simba/Scripts/wasp-premium </b>
 					</h4>
 
-					<h4 class="py-6">
-						If you prefer to download all premium scripts in a zip you can download them here:
-					</h4>
-					<ScriptDownloadButton
-						{premium}
-						script_name="wasp-premium.zip"
-						text="Download wasp-premium.zip"
-					/>
+					{#if script.categories.includes("Official")}
+						<h4 class="py-6">To download all official premium scripts a zip click here:</h4>
+						<SimpleButton />
+					{/if}
 				{:else}
-					<h3 class="py-6">This is a premium script and you are not premium.</h3>
+					<h3 class="py-2">This is a premium script and you are not premium.</h3>
 					<h4>
 						To be able to download this script join
 						<a
@@ -182,14 +178,14 @@
 			{/if}
 		</div>
 
-		{#if $profile.id === script.id || $profile.id === "4dbcf43d-cc8a-48e3-aead-2c55a3f302ee"}
+		{#if $profile.id === script.user_id || $profile.id === "4dbcf43d-cc8a-48e3-aead-2c55a3f302ee"}
 			<div class="grid place-items-center">
-				<a href="/scripts/{encodeURI(script.title)}/edit">
+				<a href="/scripts/{encodeURI(script.title) + '&' + script.id}/edit">
 					<button
 						data-mdb-ripple="true"
 						data-mdb-ripple-color="light"
-						class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center justify-between 
-			bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
+						class=" text-white text-xs font-semibold leading-tight px-6 py-2.5 uppercase rounded transition duration-300 ease-in-out flex justify-start shadow-md hover:shadow-lg
+				 			 bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 outline-orange-300 active:outline"
 					>
 						Edit
 					</button>
