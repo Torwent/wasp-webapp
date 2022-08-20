@@ -1,13 +1,12 @@
-<script>
-	import { supabase } from "$lib/supabase.js"
-	import Discord from "$lib/components/Discord.svelte"
+<script lang="ts">
+	import { supabase } from "$lib/supabase"
 
-	let loading = false
+	let loading: boolean = false
 
 	const handleLogin = async () => {
 		try {
 			loading = true
-			let { error } = await supabase.auth.signIn(
+			await supabase.auth.signIn(
 				{ provider: "discord" },
 				{
 					redirectTo: window.location.origin

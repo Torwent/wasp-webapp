@@ -1,6 +1,6 @@
-<script>
+<script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import { supabase } from "$lib/supabase.js"
+	import { supabase } from "$lib/supabase"
 	import { user } from "$lib/stores/authStore"
 	let post = { title: "", description: "", content: "", level: 0 }
 

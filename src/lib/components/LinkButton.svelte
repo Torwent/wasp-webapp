@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	export let url
 	export let text
 	export let arrow = true

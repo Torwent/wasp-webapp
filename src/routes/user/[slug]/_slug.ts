@@ -1,9 +1,9 @@
-import { supabase } from "$lib/supabase.js"
+import { supabase } from "$lib/supabase"
 
 /**
  * @type {import('@sveltejs/kit').Load}
  */
-export async function load({ params }) {
+export async function load({ params }: { params: { slug: string } }) {
 	const { slug } = params
 
 	const { data: users, error } = await supabase.from("profile").select("*").eq("id", slug)

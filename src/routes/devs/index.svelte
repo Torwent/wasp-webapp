@@ -1,6 +1,7 @@
-<script>
+<script lang="ts">
 	import { fade } from "svelte/transition"
-	import { devs, loadData } from "$lib/stores/stores.js"
+	import { devs, loadData } from "$lib/stores/stores"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 	import DevCard from "$lib/components/DevCard.svelte"
 	loadData("devs", devs)
 
@@ -32,10 +33,10 @@
 </script>
 
 <svelte:head>
-	<title>Developers - Waspscripts</title>
-	<meta
-		name="description"
-		content="List of developers that are behind the project directly and/or indirerectly."
+	<MetaTags
+		title="Developers"
+		description="List of developers that are behind the project directly and/or indirerectly."
+		url="/devs"
 	/>
 </svelte:head>
 

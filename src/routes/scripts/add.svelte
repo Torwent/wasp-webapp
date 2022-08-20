@@ -1,62 +1,41 @@
-<script>
+<script lang="ts">
 	import Dropzone from "svelte-file-dropzone"
 	import Markdown from "$lib/Markdown.svelte"
-	import { supabase } from "$lib/supabase.js"
-	import { categories, subcategories, loadData } from "$lib/stores/stores.js"
+	import { uploadScript, type Script } from "$lib/supabaseStorage"
+	import { categories, subcategories, loadData } from "$lib/stores/stores"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
 
-	let script = { title: "", description: "", content: "", categoires: [], subcategories: [] }
+	let script: Script = {
+		title: "",
+		description: "",
+		content: "",
+		revision: 1,
+		categories: [],
+		subcategories: []
+	}
 
-	let categoriesValue = []
-	let subcategoriesValue = []
+	let file: File
 
-	let file
-
-	function handleFilesSelect(e) {
-		console.log(e.detail)
+	function handleFilesSelect(e: { detail: { acceptedFiles: File[] } }) {
 		const { acceptedFiles } = e.detail
 
 		if (acceptedFiles.length > 0) {
 			file = acceptedFiles[acceptedFiles.length - 1]
 		}
 	}
+	const handleSubmit = async () => uploadScript(script, file)
 
 	loadData("categories", categories)
 	loadData("subcategories", subcategories)
-
-	const handleSubmit = async () => {
-		/*const { error } = await supabase.from("scripts_test").insert({
-			title: script.title,
-			description: script.description,
-			content: script.content,
-			categories: categoriesValue,
-			subcategories: subcategoriesValue
-		})
-
-		if (error) {
-			return console.error(error)
-		}
-		*/
-		console.log("This is a placeholder and serves no purpose right now!")
-	}
 </script>
 
 <div class="container mx-auto my-6 max-w-3xl flex-grow">
 	<header>
-		<h1 class="text-center text-orange-400">
-			THIS IS A PLACEHOLDER AND SERVES NO PURPOSE RIGHT NOW!
-		</h1>
-		<h2 class="text-center">THIS IS A PLACEHOLDER AND SERVES NO PURPOSE RIGHT NOW!</h2>
-		<h3 class="text-center text-orange-400">
-			THIS IS A PLACEHOLDER AND SERVES NO PURPOSE RIGHT NOW!
-		</h3>
-		<h2 class="text-center">THIS IS A PLACEHOLDER AND SERVES NO PURPOSE RIGHT NOW!</h2>
-		<h1 class="text-center text-orange-400">
-			THIS IS A PLACEHOLDER AND SERVES NO PURPOSE RIGHT NOW!
-		</h1>
+		<h1 class="text-center text-orange-400">NEW SCRIPT</h1>
 	</header>
 
 	<form class="form my-6" on:submit|preventDefault={handleSubmit}>
+		<!-- Preview -->
 		<div class="flex flex-col text-sm mb-2">
 			<details>
 				<summary>Preview</summary>
@@ -94,22 +73,24 @@
 		</div>
 
 		<!-- Categories -->
-		<div class="flex flex-col text-sm mb-2">
-			<label for="categories" class="font-bold mb-2"> Categories: </label>
-			<MultiSelect id="cats" bind:value={categoriesValue}>
-				{#each $categories as cat}
-					<option value={cat.name}>{cat.emoji}{cat.name}</option>
-				{/each}
-			</MultiSelect>
-		</div>
-		<div class="flex flex-col text-sm mb-2">
-			<label for="categories" class="font-bold mb-2"> Subcategories: </label>
-			<MultiSelect id="subcats" bind:value={subcategoriesValue}>
-				{#each $subcategories as subcat}
-					<option value={subcat.name}>{subcat.emoji}{subcat.name}</option>
-				{/each}
-			</MultiSelect>
-		</div>
+		{#if $categories.length > 0 && $subcategories.length > 0}
+			<div class="flex flex-col text-sm mb-2">
+				<label for="categories" class="font-bold mb-2"> Categories: </label>
+				<MultiSelect id="cats" bind:value={script.categories}>
+					{#each $categories as cat}
+						<option value={cat.name}>{cat.emoji}{cat.name}</option>
+					{/each}
+				</MultiSelect>
+			</div>
+			<div class="flex flex-col text-sm mb-2">
+				<label for="categories" class="font-bold mb-2"> Subcategories: </label>
+				<MultiSelect id="subcats" bind:value={script.subcategories}>
+					{#each $subcategories as subcat}
+						<option value={subcat.name}>{subcat.emoji}{subcat.name}</option>
+					{/each}
+				</MultiSelect>
+			</div>
+		{/if}
 
 		<!-- Content -->
 		<div class="flex flex-col text-sm mb-2">
@@ -133,6 +114,7 @@
 			</ol>
 		</div>
 
+		<!-- Buttons -->
 		<div class="flex justify-between">
 			<a href="/scripts">
 				<button

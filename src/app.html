@@ -2,14 +2,19 @@
 <html id="wasp-webapp" lang="en" class="dark">
 	<head>
 		<meta charset="utf-8" />
-		<meta name="description" content="" />
-		<link rel="icon" href="%svelte.assets%/favicon.svg" />
-		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		%svelte.head%
+		<link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+		<meta name="viewport" content="width=device-width" />
+
+		<!-- Social media tags -->
+		<meta property="og:site_name" content="WaspScripts" />
+		<meta name="twitter:site" content="WaspScripts" />
+
+		<!-- Dynamic head -->
+		%sveltekit.head%
 	</head>
 	<body
 		class="antialiased overflow-y-scroll text-stone-500 dark:text-stone-400 bg-white dark:bg-stone-900"
 	>
-		<div id="svelte" class="flex flex-col">%svelte.body%</div>
+		%sveltekit.body%
 	</body>
 </html>

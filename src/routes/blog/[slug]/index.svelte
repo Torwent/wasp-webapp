@@ -3,16 +3,20 @@
 	export { load }
 </script>
 
-<script>
+<script lang="ts">
 	import { profile } from "$lib/stores/authStore"
 	import Markdown from "$lib/Markdown.svelte"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { fade } from "svelte/transition"
-	export let post
+	export let post: { title: string; description: string; content: string }
 </script>
 
 <svelte:head>
-	<title>{post.title} - Waspscripts</title>
-	<meta name="description" content={post.description} />
+	<MetaTags
+		title={post.title}
+		description={post.description}
+		url={"/blog/" + encodeURI(post.title)}
+	/>
 </svelte:head>
 
 <div

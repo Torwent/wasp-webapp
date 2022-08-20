@@ -1,5 +1,5 @@
-<script>
-	import { user, avatar, reloadAvatar, profile } from "$lib/stores/authStore.js"
+<script lang="ts">
+	import { user, avatar, reloadAvatar, profile } from "$lib/stores/authStore"
 	reloadAvatar()
 </script>
 

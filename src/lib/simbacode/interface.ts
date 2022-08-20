@@ -1,45 +1,51 @@
-const drawChatbox = (canvas, context) => {
+const strokeRect = (ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number) => {
+	x = Math.round(x) + 0.5
+	y = Math.round(y) + 0.5
+	ctx.strokeRect(x, y, w, h)
+}
+
+const drawChatbox = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
 	let chatY1 = canvas.height - 165
-	context.sRect(0, chatY1, 518, 141)
+	strokeRect(context, 0, chatY1, 518, 141)
 
 	for (let i = 0; i < 8; i++) {
-		context.sRect(10, chatY1 + 14 * i + 8, 483, 13)
+		strokeRect(context, 10, chatY1 + 14 * i + 8, 483, 13)
 	}
 
-	context.sRect(10, chatY1 + 120, 508, 15)
+	strokeRect(context, 10, chatY1 + 120, 508, 15)
 
-	context.sRect(498, chatY1 + 8, 16, 112)
+	strokeRect(context, 498, chatY1 + 8, 16, 112)
 }
 
-const drawChatButtons = (canvas, context) => {
+const drawChatButtons = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
 	let buttonsY1 = canvas.height - 23
-	context.sRect(0, buttonsY1, 518, 22)
+	strokeRect(context, 0, buttonsY1, 518, 22)
 
 	for (let i = 0; i < 7; i++) {
-		context.sRect(3 + i * 62, buttonsY1, 58, 21)
+		strokeRect(context, 3 + i * 62, buttonsY1, 58, 21)
 	}
 
-	context.sRect(436, buttonsY1, 79, 21)
+	strokeRect(context, 436, buttonsY1, 79, 21)
 }
 
-const drawGametabs = (canvas, context) => {
+const drawGametabs = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
 	let tabsX1 = canvas.width - 241
 	let tabsY1 = canvas.height - 335
-	context.sRect(tabsX1, tabsY1, 240, 334)
+	strokeRect(context, tabsX1, tabsY1, 240, 334)
 
 	for (let i = 0; i < 7; i++) {
-		context.sRect(tabsX1 + 6 + i * 33, tabsY1 + 1, 30, 33)
+		strokeRect(context, tabsX1 + 6 + i * 33, tabsY1 + 1, 30, 33)
 	}
 
 	for (let i = 0; i < 7; i++) {
-		context.sRect(tabsX1 + 6 + i * 33, tabsY1 + 298, 30, 33)
+		strokeRect(context, tabsX1 + 6 + i * 33, tabsY1 + 298, 30, 33)
 	}
 }
 
-const drawMinimap = (canvas, context) => {
+const drawMinimap = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
 	let mmX1 = canvas.width - 158
 	let mmY1 = 8
-	//context.sRect(mmX1, mmY1, 151, 151)
+	//strokeRect(context, mmX1, mmY1, 151, 151)
 
 	let coords = [
 		[0, -76],
@@ -116,39 +122,18 @@ const drawMinimap = (canvas, context) => {
 	context.stroke()
 }
 
-const drawXPBarnUpText = (canvas, context) => {
-	context.sRect(canvas.width - 359 - 15, 0, 118, 28)
+const drawXPBarnUpText = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
+	strokeRect(context, canvas.width - 359 - 15, 0, 118, 28)
 	let w
 	if (canvas.width > 900) w = 497
 	else w = canvas.width - 359 - 20
 
-	context.sRect(3, 3, w, 18)
+	strokeRect(context, 3, 3, w, 18)
 }
 
-export const drawInterface = (canvas, context, mediaquery) => {
-	context.sRect = function (x, y, w, h) {
-		x = parseInt(x) + 0.5
-		y = parseInt(y) + 0.5
-		this.strokeRect(x, y, w, h)
-	}
-
+export const drawInterface = (canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) => {
 	context.strokeStyle = "rgb(249 115 22)"
 	context.fillStyle = "rgb(249 115 22)"
 
-	if (mediaquery) {
-		context.sRect(0, 0, canvas.width - 1, canvas.height - 1)
-
-		drawChatbox(canvas, context)
-		drawChatButtons(canvas, context)
-		drawXPBarnUpText(canvas, context)
-	}
 	drawGametabs(canvas, context)
-	drawMinimap(canvas, context)
-
-	if (mediaquery) {
-		context.font = "20px sans-serif"
-		let textString = "The click pattern generated is in relation to your mouse position.",
-			textWidth = context.measureText(textString).width
-		context.fillText(textString, canvas.width / 2 - textWidth / 2, 230)
-	}
 }

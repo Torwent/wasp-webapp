@@ -1,26 +1,28 @@
 <!-- Based on https://svelte.dev/repl/c7094fb1004b440482d2a88f4d1d7ef5?version=3.14.0 -->
-<script>
+<script lang="ts">
 	import { onMount } from "svelte"
 	import { fly } from "svelte/transition"
 	import { profile } from "$lib/stores/authStore"
 	export let id = ""
-	export let value = []
+	export let value: string[] = []
 	export let placeholder = ""
 
-	let input,
-		inputValue,
-		options = [],
-		activeOption,
+	let input: HTMLInputElement,
+		inputValue: string,
+		options: any[] = [],
+		activeOption: { value: string } | undefined,
 		showOptions = false,
-		selected = {},
+		selected: any = {},
 		first = true,
-		slot
+		slot: HTMLSelectElement,
+		selectedOptions: any[]
+
 	const iconClearPath =
 		"M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
 
 	let isOfficial = $profile.id === "4dbcf43d-cc8a-48e3-aead-2c55a3f302ee"
 
-	if (id === "cats") {
+	if (id === "cats" && value.length === 0) {
 		first = false
 		if (isOfficial) {
 			selected = [{ value: "Official", name: "🏷️Official" }]
@@ -47,7 +49,7 @@
 		first = false
 	})
 
-	$: if (!first) value = Object.values(selected).map((o) => o.value)
+	$: if (!first) value = Object.values(selected).map((o: any) => o.value)
 
 	$: filtered = options.filter((o) =>
 		inputValue ? o.name.toLowerCase().includes(inputValue.toLowerCase()) : o
@@ -55,7 +57,7 @@
 	$: if ((activeOption && !filtered.includes(activeOption)) || (!activeOption && inputValue))
 		activeOption = filtered[0]
 
-	const add = (token) => {
+	const add = (token: { value: string }) => {
 		if (
 			id === "cats" &&
 			((isOfficial && token.value === "Community") ||
@@ -67,7 +69,7 @@
 		selected[token.value] = token
 	}
 
-	const remove = (value) => {
+	const remove = (value: string) => {
 		if (
 			id === "cats" &&
 			((isOfficial && value === "Official") ||
@@ -80,7 +82,7 @@
 		selected = rest
 	}
 
-	const optionsVisibility = (show) => {
+	const optionsVisibility = (show: boolean) => {
 		if (typeof show === "boolean") {
 			showOptions = show
 			show && input.focus()
@@ -92,16 +94,18 @@
 		}
 	}
 
-	const handleKeyup = (e) => {
-		if (e.keyCode === 13) {
+	const handleKeyup = (e: KeyboardEvent) => {
+		if (e.code === "Enter") {
+			if (activeOption == null) return
+
 			Object.keys(selected).includes(activeOption.value)
 				? remove(activeOption.value)
 				: add(activeOption)
 			inputValue = ""
 		}
-		if ([38, 40].includes(e.keyCode)) {
+		if (e.code === "ArrowUp" || e.code === "ArrowDown") {
 			// up and down arrows
-			const increment = e.keyCode === 38 ? -1 : 1
+			const increment = e.code === "ArrowUp" ? -1 : 1
 			const calcIndex = filtered.indexOf(activeOption) + increment
 			activeOption =
 				calcIndex < 0
@@ -112,11 +116,11 @@
 		}
 	}
 
-	const handleBlur = (e) => {
+	const handleBlur = () => {
 		optionsVisibility(false)
 	}
 
-	const handleTokenClick = (e) => {
+	const handleTokenClick = (e: any) => {
 		if (e.target.closest(".token-remove")) {
 			e.stopPropagation()
 			remove(e.target.closest(".token").dataset.id)
@@ -138,7 +142,7 @@
 		}
 	}
 
-	const handleOptionMousedown = (e) => {
+	const handleOptionMousedown = (e: any) => {
 		const value = e.target.dataset.value
 		if (selected[value]) {
 			remove(value)
@@ -147,6 +151,8 @@
 			input.focus()
 		}
 	}
+
+	$: selectedOptions = Object.values(selected)
 </script>
 
 <div
@@ -159,7 +165,7 @@
 		class:showOptions
 		on:click={handleTokenClick}
 	>
-		{#each Object.values(selected) as s}
+		{#each selectedOptions as s}
 			<div
 				class="token text-black items-center border-r-2 flex m-1 max-h-6 p-1 pb-2 rounded-xl whitespace-nowrap bg-orange-200 hover:bg-orange-400"
 				data-id={s.value}

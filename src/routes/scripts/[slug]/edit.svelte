@@ -3,38 +3,37 @@
 	export { load }
 </script>
 
-<script>
+<script lang="ts">
+	import Dropzone from "svelte-file-dropzone"
 	import Markdown from "$lib/Markdown.svelte"
-	import { supabase } from "$lib/supabase.js"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
-	import { categories, subcategories, loadData } from "$lib/stores/stores.js"
+	import { categories, subcategories, loadData } from "$lib/stores/stores"
+	import { updateScript, type Script } from "$lib/supabaseStorage"
 
-	export let script
+	export let script: Script
 
-	let categoriesValue = []
-	let subcategoriesValue = []
+	let file: File
 
-	loadData("categories", categories)
-	loadData("subcategories", subcategories)
+	function handleFilesSelect(e: { detail: { acceptedFiles: File[] } }) {
+		const { acceptedFiles } = e.detail
+
+		if (acceptedFiles.length > 0) {
+			file = acceptedFiles[acceptedFiles.length - 1]
+		}
+	}
 
 	const handleSubmit = async () => {
-		const { error } = await supabase
-			.from("scripts")
-			.update({ title: script.title, description: script.description, content: script.content })
-			.match({ id: script.id })
-
-		if (error) {
-			return console.error(error)
-		}
-
+		await updateScript(script, file)
 		location.reload()
 	}
 
-	$: categories, subcategories
+	loadData("categories", categories)
+	loadData("subcategories", subcategories)
 </script>
 
 <div class="container mx-auto my-6 max-w-2xl flex-grow">
 	<form class="form my-6" on:submit|preventDefault={handleSubmit}>
+		<!-- Preview -->
 		<div class="flex flex-col text-sm mb-2">
 			<details>
 				<summary>Preview</summary>
@@ -48,7 +47,8 @@
 			</details>
 		</div>
 
-		<div class="flex flex-col text-sm mb-2">
+		<!-- Title n Description -->
+		<div class="pt-4 flex flex-col text-sm mb-2">
 			<label for="title" class="font-bold mb-2"> Title: </label>
 			<input
 				type="text"
@@ -70,24 +70,28 @@
 			/>
 		</div>
 
-		<div class="flex flex-col text-sm mb-2">
-			<label for="categories" class="font-bold mb-2"> Categories: </label>
-			<MultiSelect id="cats" bind:value={categoriesValue}>
-				{#each $categories as cat}
-					<option value={cat.name}>{cat.emoji}{cat.name}</option>
-				{/each}
-			</MultiSelect>
-		</div>
+		<!-- Categories -->
+		{#if $categories.length > 0 && $subcategories.length > 0}
+			<div class="flex flex-col text-sm mb-2">
+				<label for="categories" class="font-bold mb-2"> Categories: </label>
 
-		<div class="flex flex-col text-sm mb-2">
-			<label for="categories" class="font-bold mb-2"> Subcategories: </label>
-			<MultiSelect id="subcats" bind:value={subcategoriesValue}>
-				{#each $subcategories as subcat}
-					<option value={subcat.name}>{subcat.emoji}{subcat.name}</option>
-				{/each}
-			</MultiSelect>
-		</div>
+				<MultiSelect id="cats" bind:value={script.categories}>
+					{#each $categories as cat}
+						<option value={cat.name}>{cat.emoji}{cat.name}</option>
+					{/each}
+				</MultiSelect>
+			</div>
+			<div class="flex flex-col text-sm mb-2">
+				<label for="categories" class="font-bold mb-2"> Subcategories: </label>
+				<MultiSelect id="subcats" bind:value={script.subcategories}>
+					{#each $subcategories as subcat}
+						<option value={subcat.name}>{subcat.emoji}{subcat.name}</option>
+					{/each}
+				</MultiSelect>
+			</div>
+		{/if}
 
+		<!-- Content -->
 		<div class="flex flex-col text-sm mb-2">
 			<label for="content" class="font-bold mb-2"> Content: </label>
 			<textarea
@@ -99,8 +103,20 @@
 			/>
 		</div>
 
+		<!-- File -->
+		<div class="flex flex-col text-sm mt-4 mb-2">
+			<span class="font-bold mb-2">Script revision: {script.revision}</span>
+			<Dropzone accept={".simba"} on:drop={handleFilesSelect} />
+			<ol>
+				{#if file}
+					<li>{file.name}</li>
+				{/if}
+			</ol>
+		</div>
+
+		<!-- Buttons -->
 		<div class="flex justify-between">
-			<a href="/scripts/{encodeURI(script.title)}">
+			<a href="./">
 				<button
 					type="button"
 					class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
@@ -115,7 +131,13 @@
 				class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
 		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
 			>
-				<span class="px-2">Update</span>
+				<span class="px-2">
+					{#if file}
+						Add revision
+					{:else}
+						Update
+					{/if}
+				</span>
 			</button>
 		</div>
 	</form>

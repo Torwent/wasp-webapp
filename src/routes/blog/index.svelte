@@ -1,33 +1,24 @@
-<script>
+<script lang="ts">
 	import { fade } from "svelte/transition"
 	import { profile } from "$lib/stores/authStore"
-	import { posts, loadData } from "$lib/stores/stores.js"
+	import { posts, loadData, type Post, search } from "$lib/stores/stores"
 	import PostCard from "$lib/components/PostCard.svelte"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 	loadData("posts", posts)
 
 	let searchQuery = ""
-	let filteredPosts = []
+	let filteredPosts: Post[] = []
 	let placeholderText = "Search posts..."
 	let basicEnabled = false
 	let intermediateEnabled = false
 	let advancedEnabled = false
-
-	String.prototype.fuzzy = function (s) {
-		var hay = this.toLowerCase(),
-			i = 0,
-			n = -1,
-			l
-		s = s.toLowerCase()
-		for (; (l = s[i++]); ) if (!~(n = hay.indexOf(l, n + 1))) return false
-		return true
-	}
 
 	const handleSearch = () => {
 		filteredPosts = $posts
 		placeholderText = "Search posts..."
 		if (searchQuery === "") return
 
-		filteredPosts = $posts.filter((post) => post.title.fuzzy(searchQuery))
+		filteredPosts = $posts.filter((post: Post) => search(post.title, searchQuery))
 		if (filteredPosts.length === 0) {
 			placeholderText = "Not found!"
 			searchQuery = ""
@@ -39,7 +30,7 @@
 		if (!basicEnabled && !intermediateEnabled && !advancedEnabled) return
 
 		filteredPosts = $posts.filter(
-			(post) =>
+			(post: { level: number }) =>
 				(basicEnabled && post.level === 0) ||
 				(intermediateEnabled && post.level === 1) ||
 				(advancedEnabled && post.level === 2)
@@ -48,10 +39,10 @@
 </script>
 
 <svelte:head>
-	<title>Dev Blog - Waspscripts</title>
-	<meta
-		name="description"
-		content="Guides and tutorials to bot and develop scripts for OldSchool RuneScape. Find the large collection of Simba tutorials available and unleach the power of Simba and max on osrs."
+	<MetaTags
+		title="Dev Blog"
+		description="Guides and tutorials to bot and develop scripts for OldSchool RuneScape. Find the large collection of Simba tutorials available and unleach the power of Simba and max on osrs."
+		url="/blog"
 	/>
 </svelte:head>
 
@@ -73,7 +64,6 @@
 					class="w-full my-2 md:w-auto text-xs py-1 px-8 font-bold rounded-full bg-sky-400 dark:bg-sky-500 border-sky-600 dark:border-sky-300 text-white"
 					class:border-r-8={basicEnabled}
 					class:pr-6={basicEnabled}
-					bind={basicEnabled}
 					on:click={() => (basicEnabled = !basicEnabled)}
 				>
 					Basic tutorial
@@ -83,7 +73,6 @@
 					class="w-full my-2 md:w-auto text-xs py-1 px-8 font-bold rounded-full bg-orange-400 dark:bg-orange-500 border-orange-600 dark:border-orange-300 text-white"
 					class:border-r-8={intermediateEnabled}
 					class:pr-6={intermediateEnabled}
-					bind={intermediateEnabled}
 					on:click={() => (intermediateEnabled = !intermediateEnabled)}
 				>
 					Intermidiate tutorial
@@ -93,7 +82,6 @@
 					class="w-full my-2 md:w-auto text-xs py-1 px-8 font-bold rounded-full bg-red-400 dark:bg-red-500 border-red-600 dark:border-red-300 text-white"
 					class:border-r-8={advancedEnabled}
 					class:pr-6={advancedEnabled}
-					bind={advancedEnabled}
 					on:click={() => (advancedEnabled = !advancedEnabled)}
 				>
 					Advanced tutorial

@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
 	import { slide } from "svelte/transition"
 

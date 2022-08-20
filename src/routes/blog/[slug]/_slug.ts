@@ -1,4 +1,4 @@
-import { supabase } from "$lib/supabase.js"
+import { supabase } from "$lib/supabase"
 
 /**
  * @type {import('@sveltejs/kit').Load}
@@ -7,17 +7,17 @@ export async function load({ params }) {
 	const { slug } = params
 
 	const { data: posts, error } = await supabase
-		.from("scripts")
+		.from("posts")
 		.select("*")
 		.eq("title", decodeURI(slug))
 
 	if (!error) {
-		const script = posts[0]
+		const post = posts[0]
 
-		if (script) {
+		if (post) {
 			return {
 				props: {
-					script
+					post
 				}
 			}
 		}
@@ -25,6 +25,6 @@ export async function load({ params }) {
 
 	return {
 		status: 404,
-		error: new Error(`scripts/${slug} not found.`)
+		error: new Error(`blog/${slug} not found.`)
 	}
 }

@@ -1,14 +1,14 @@
-<script>
+<script lang="ts">
 	import { slide } from "svelte/transition"
 	import DropDownEntry from "./DropDownEntry.svelte"
-	export let title
+	export let title: string
 	export let entries
 
 	let show = false
 
-	let searchQuery = ""
-	let filteredEntries = []
-	let placeholderText = "Search..."
+	let searchQuery = "",
+		filteredEntries = [],
+		placeholderText = "Search..."
 
 	String.prototype.fuzzy = function (s) {
 		var hay = this.toLowerCase(),

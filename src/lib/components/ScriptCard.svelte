@@ -1,12 +1,17 @@
-<script>
+<script lang="ts">
 	import { fade } from "svelte/transition"
-	import { categories, subcategories } from "$lib/stores/stores.js"
+	import { categories, subcategories } from "$lib/stores/stores"
 	import EmojiTooltip from "$lib/components/EmojiTooltip.svelte"
-	export let script
+	import type { Script } from "$lib/supabaseStorage"
+	export let script: Script
 
 	let allCategories = [...$categories, ...$subcategories]
+	let description =
+		script.description.length > 80
+			? script.description.substring(0, 80) + "..."
+			: script.description
 
-	const loadEmojis = (cats) => {
+	const loadEmojis = (cats: string[]) => {
 		let result = []
 		for (let c of cats) {
 			for (let c2 of allCategories) {
@@ -19,15 +24,18 @@
 		return result
 	}
 
+	let assets_path =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" + script.id
+
 	$: emojis = loadEmojis([...script.categories, ...script.subcategories])
 </script>
 
 <!-- Product Card -->
-<a href="/scripts/{encodeURI(script.title)}">
+<a href="/scripts/{encodeURI(script.title) + '&' + script.id}">
 	<div
 		in:fade={{ duration: 300, delay: 300 }}
 		out:fade={{ duration: 300 }}
-		class="flex flex-col shadow-md cursor-pointer hover:-translate-y-1 duration-300 w-72"
+		class="flex flex-col shadow-md hover:shadow-xl hover:shadow-black/20 cursor-pointer hover:-translate-y-2  duration-300 w-72 rounded-md"
 	>
 		<!-- Preview -->
 		<div class="inline relative group h-48">
@@ -35,7 +43,7 @@
 
 			<img
 				class="absolute rounded-t object-cover h-full w-full"
-				src={script.assets_path + "cover0.png"}
+				src={assets_path + "/cover.jpg"}
 				alt={script.assets_alt}
 			/>
 
@@ -49,7 +57,7 @@
 			/>
 		</div>
 		<!-- Body -->
-		<div class="flex flex-col bg-stone-100 dark:bg-stone-800 rounded-b p-3">
+		<div class="flex flex-col bg-stone-100 dark:bg-stone-800 rounded-b p-3 h-[11.5rem]">
 			<!-- Title -->
 			<div class="text-md font-semibold text-amber-500 hover:underline truncate">
 				{script.title}
@@ -60,17 +68,17 @@
 				by
 
 				<!-- Author -->
-				<a href="/user/{script.user_id}" class="font-semibold hover:underline">
+				<a href="/user/{script.author}" class="font-semibold hover:underline">
 					{script.author}
 				</a>
 			</div>
 
 			<!-- content -->
-			<div class="text-sm text-stone-500 my-2 h-16">
-				{script.description}
+			<div class="text-sm text-stone-500 my-2 h-16 break-words overflow-clip">
+				{description}
 			</div>
 
-			<div class="grid grid-cols-12">
+			<div class="grid grid-cols-12 mt-auto">
 				{#each emojis as emoji}
 					<EmojiTooltip {emoji} />
 				{/each}

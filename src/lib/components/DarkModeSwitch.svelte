@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 	export let checked = true
 	const toggle = () => {
 		checked = !checked

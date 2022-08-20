@@ -1,15 +1,16 @@
-<script>
+<script lang="ts">
+	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { fade } from "svelte/transition"
 	import { profile } from "$lib/stores/authStore"
 
-	let show = false
+	let show: boolean = false
 </script>
 
 <svelte:head>
-	<title>Premium - Waspscripts</title>
-	<meta
-		name="description"
-		content="Get Waspscripts premium role and gain access to exclusive scripts. With premium you have scripts for nearly all skills in OSRS."
+	<MetaTags
+		title="Premium"
+		description="Get WaspScripts premium role and gain access to exclusive scripts. With premium you have scripts for nearly all skills in OSRS."
+		url="/premium"
 	/>
 </svelte:head>
 
@@ -60,8 +61,14 @@
 	</button>
 
 	<p class="py-4">
-		If you are having issues with your roles not appearing, go to that last page and click to
-		"reprocess". If after that they are still missing, you can contact me at <a
+		If you are having issues with your roles not appearing:
+		<br />
+		- Go to that last page and click to "reprocess".
+		<br />
+		- Hover your profile on the top right corner and make sure the roles are not there.
+		<br /><br />
+		If after that they are still missing, you can contact me at
+		<a
 			href="mailto: torwent@waspscripts.com"
 			class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
 			>torwent@waspscripts.com</a

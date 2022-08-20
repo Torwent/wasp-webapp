@@ -1,110 +1,120 @@
-<script>
-	import { writable } from "svelte/store"
+<script lang="ts">
 	import { profile } from "$lib/stores/authStore"
-	import { fade, fly } from "svelte/transition"
-	import { scripts, categories, subcategories, loadData } from "$lib/stores/stores.js"
+	import { fly } from "svelte/transition"
+	import { scripts, categories, subcategories, loadData, search } from "$lib/stores/stores"
 	import Card from "$lib/components/ScriptCard.svelte"
 	import LinkButton from "$lib/components/LinkButton.svelte"
+	import MetaTags from "$lib/components/MetaTags.svelte"
+	import type { Script } from "$lib/supabaseStorage"
+
+	interface CheckboxType {
+		id: number
+		name: string
+		emoji: string
+		main: boolean
+		checked: boolean
+	}
 
 	loadData("scripts", scripts)
 	loadData("categories", categories)
 	loadData("subcategories", subcategories)
 
-	let searchQuery = ""
-	let filteredScripts = []
-	let placeholderText = "Search posts..."
-	const checkboxes = writable([])
+	let searchQuery = "",
+		placeholderText = "Search posts...",
+		filteredScripts: Script[] = [],
+		checkboxes: CheckboxType[] = []
 
-	String.prototype.fuzzy = function (s) {
-		var hay = this.toLowerCase(),
-			i = 0,
-			n = -1,
-			l
-		s = s.toLowerCase()
-		for (; (l = s[i++]); ) if (!~(n = hay.indexOf(l, n + 1))) return false
-		return true
-	}
-
+	//handles the search field
 	const handleSearch = () => {
 		filteredScripts = $scripts
 		placeholderText = "Search scripts..."
 		if (searchQuery === "") return
 
-		filteredScripts = $scripts.filter((script) => script.title.fuzzy(searchQuery))
+		filteredScripts = $scripts.filter((script: Script) => search(script.title, searchQuery))
 		if (filteredScripts.length === 0) {
 			placeholderText = "Not found!"
 			searchQuery = ""
 		}
 	}
 
+	//handles checkbox filters
 	const handleFilters = () => {
 		searchQuery = ""
 		filteredScripts = []
 		filteredScripts = $scripts
-		let checked = $checkboxes
-			.filter((checkbox) => checkbox.checked)
-			.map((checkbox) => checkbox.name)
+		let checked = checkboxes
+			.filter((checkbox: CheckboxType) => checkbox.checked)
+			.map((checkbox: CheckboxType) => checkbox.name)
 
 		if (checked.length === 0) return
 
-		filteredScripts = $scripts.filter((script) => {
+		filteredScripts = $scripts.filter((script: Script) => {
 			let allCat = [...script.categories, ...script.subcategories]
 
 			return allCat.some((c) => checked.includes(c))
 		})
 	}
 
-	$: {
-		checkboxes.update(() => [])
+	//sets up checkboxes to what's available from the database
+	const loadCheckboxes = () => {
+		if (checkboxes.length > 0) return
+
 		let id = 0
+
+		checkboxes = []
+
 		for (let category of $categories) {
-			id++
-			checkboxes.update((value) => [
-				...value,
-				{ id: id, name: category.name, emoji: category.emoji, main: true, checked: false }
-			])
+			checkboxes.push({
+				id: id++,
+				name: category.name,
+				emoji: category.emoji,
+				main: true,
+				checked: false
+			})
 
 			for (let subcategory of $subcategories) {
 				if (category.name === subcategory.category) {
-					id++
-					checkboxes.update((value) => [
-						...value,
-						{
-							id: id,
-							name: subcategory.name,
-							emoji: subcategory.emoji,
-							main: false,
-							checked: false
-						}
-					])
+					checkboxes.push({
+						id: id++,
+						name: subcategory.name,
+						emoji: subcategory.emoji,
+						main: false,
+						checked: false
+					})
 				}
 			}
 		}
 	}
+
+	// make sure categories and subcategories are both loaded to run loadCheckboxes()
+	$: if ($categories.length > 0 && $subcategories.length > 0) loadCheckboxes()
+
+	//this is a svelte hack. since checkboxes.push() in loadCheckboxes() don't trigger checkboxes update we reset it to be equals to itself to force an update
+	$: checkboxes = checkboxes
 </script>
 
 <svelte:head>
-	<title>OSRS bot scripts - Waspscripts</title>
 	<meta
 		name="description"
 		content="Large script collection to bot OldSchool RuneScape with Simba, SRL and WaspLib. Get that 99 on osrs today!"
 	/>
+	<MetaTags
+		title="Scripts"
+		description="Large script collection to bot OldSchool RuneScape with Simba, SRL and WaspLib. Get that 99 on osrs today!"
+		url="/scripts"
+	/>
 </svelte:head>
 
-<div
-	class="flex max-h-screen absolute left-0"
-	in:fade={{ duration: 300, delay: 300 }}
-	out:fade={{ duration: 300 }}
->
+<div class="flex absolute min-h-screen inset-0 overflow-x-hidden">
 	<div
-		class="w-64 border-r dark:border-stone-800 sticky bottom-0 min-h-full overflow-y-scroll no-scrollbar"
+		class="w-64 border-r dark:border-stone-800 sticky bottom-0 min-h-full overflow-y-scroll no-scrollbar pt-16"
 		in:fly={{ duration: 600, delay: 600, x: -100 }}
 		out:fly={{ duration: 300, x: -100 }}
 	>
-		<h4 class="text-center py-6">Categories</h4>
+		<h4 class="text-center py-4">Categories</h4>
 		<div class="flex justify-center font-semibold text-sm">
 			<div>
-				{#each $checkboxes as checkbox}
+				{#each checkboxes as checkbox}
 					<div class="flex py-0.5">
 						{#if !checkbox.main}
 							<div class="w-4 h-2 " />
@@ -129,7 +139,7 @@
 							</label>
 						</div>
 					</div>
-					{#if checkbox.id === 4}
+					{#if checkbox.id === 3}
 						<br />
 					{/if}
 				{/each}
@@ -137,7 +147,11 @@
 		</div>
 	</div>
 
-	<div class="overflow-y-scroll no-scrollbar max-h-full">
+	<div
+		class="overflow-y-scroll no-scrollbar max-h-full pt-16"
+		in:fly={{ duration: 600, delay: 600, x: 100 }}
+		out:fly={{ duration: 300, x: 100 }}
+	>
 		{#if $profile.dev}
 			<LinkButton text="Add Script" url="/scripts/add" arrow={false} />
 		{/if}
@@ -168,6 +182,6 @@
 				Loading scripts...
 			{/if}
 		</div>
-		<div class="h-24 w-72" />
+		<div class="h-24 w-full" />
 	</div>
 </div>

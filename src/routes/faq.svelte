@@ -1,6 +1,7 @@
-<script>
+<script lang="ts">
 	import { fade } from "svelte/transition"
-	import { questions, commonErrors, loadData } from "$lib/stores/stores.js"
+	import { questions, commonErrors, loadData } from "$lib/stores/stores"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 	import DropDown from "$lib/components/DropDown.svelte"
 	import Discord from "$lib/components/Discord.svelte"
 
@@ -9,10 +10,10 @@
 </script>
 
 <svelte:head>
-	<title>FAQ and Errors - Waspscripts</title>
-	<meta
-		name="description"
-		content="Need help botting osrs? See if what you are looking for is in this list."
+	<MetaTags
+		title="FAQ and Errors"
+		description="Need help botting osrs? See if what you are looking for is in this list."
+		url="/faq"
 	/>
 </svelte:head>
 

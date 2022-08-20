@@ -1,13 +1,14 @@
-<script>
+<script lang="ts">
 	import { onMount } from "svelte"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 	import Discord from "$lib/components/Discord.svelte"
 	import { fade } from "svelte/transition"
-	import { Rowp } from "$lib/simbacode/srl.js"
-	import { drawInterface } from "$lib/simbacode/interface.js"
+	import { Rowp, type TBox, type TPoint, type TRectangle } from "$lib/simbacode/srl"
+	import { drawInterface } from "$lib/simbacode/interface"
 
-	let canvasData
+	let canvasData: ImageData
 
-	const clearPixel = (context, i) => {
+	const clearPixel = (context: CanvasRenderingContext2D, i: number) => {
 		if (canvasData.data[i + 0] == 0 && canvasData.data[i + 1] == 0) {
 			canvasData.data[i + 3] = 0
 		} else if (canvasData.data[i + 0] == 0 && canvasData.data[i + 1] > 0) {
@@ -32,8 +33,8 @@
 		context.putImageData(canvasData, 0, 0)
 	}
 
-	const drawPixel = (context, canvas, x, y) => {
-		const setPixel = (i) => {
+	const drawPixel = (context: CanvasRenderingContext2D, canvas: HTMLCanvasElement, p: TPoint) => {
+		const setPixel = (i: number) => {
 			if (
 				canvasData.data[i + 0] == 0 &&
 				canvasData.data[i + 1] >= 0 &&
@@ -60,48 +61,50 @@
 			setTimeout(clearPixel, 40000, context, i)
 		}
 
-		setPixel((x + y * canvas.width) * 4)
+		setPixel((p.x + p.y * canvas.width) * 4)
 	}
 
-	const drawInvTabHits = (canvas, context, MouseX, MouseY) => {
+	const drawInvTabHits = (
+		canvas: HTMLCanvasElement,
+		context: CanvasRenderingContext2D,
+		Mouse: TPoint
+	) => {
 		context.strokeStyle = "rgba(255, 0, 0, 1)"
 		canvasData = context.getImageData(0, 0, canvas.width, canvas.height)
 
-		let BX1 = canvas.width - 240 + 6 + 3 * 33
-		let BY1 = canvas.height - 333
-		let BX2 = BX1 + 30
-		let BY2 = BY1 + 33
+		let Box: TBox = {
+			x1: canvas.width - 240 + 6 + 3 * 33,
+			y1: canvas.height - 333,
+			x2: canvas.width - 240 + 6 + 3 * 33 + 30,
+			y2: canvas.height - 333 + 33
+		}
 
-		let rect = { Top: {}, Right: {}, Btm: {}, Left: {} }
-		rect.Top.x = BX1
-		rect.Top.y = BY1
-		rect.Right.x = BX2
-		rect.Right.y = BY1
-		rect.Btm.x = BX2
-		rect.Btm.y = BY2
-		rect.Left.x = BX1
-		rect.Left.y = BY2
+		let rect: TRectangle = {
+			Top: { x: Box.x1, y: Box.y1 },
+			Right: { x: Box.x2, y: Box.y1 },
+			Btm: { x: Box.x2, y: Box.y2 },
+			Left: { x: Box.x1, y: Box.y2 }
+		}
 
-		let p = Rowp({ x: MouseX, y: MouseY }, rect)
-		drawPixel(context, canvas, p.x, p.y)
+		let p: TPoint = Rowp({ x: Mouse.x, y: Mouse.y }, rect)
+		drawPixel(context, canvas, p)
 	}
 
 	onMount(() => {
-		let canvas = document.getElementById("canvas"),
+		let canvas: any = document.getElementById("canvas"),
 			context = canvas.getContext("2d")
 
-		let x
-		let y
+		let Mouse: TPoint = { x: 0, y: 0 }
 
 		window.addEventListener("resize", resizeCanvas, false)
 		window.onmousemove = (e) => {
-			x = e.pageX
-			y = e.pageY - document.documentElement.scrollTop
+			Mouse.x = e.pageX
+			Mouse.y = e.pageY - document.documentElement.scrollTop
 		}
 
 		function drawHitBox() {
 			for (let i = 0; i < 5; i++) {
-				drawInvTabHits(canvas, context, x, y)
+				drawInvTabHits(canvas, context, Mouse)
 			}
 			requestAnimationFrame(drawHitBox)
 		}
@@ -109,22 +112,20 @@
 		drawHitBox()
 
 		function resizeCanvas() {
-			canvas.width = canvas.parentElement.clientWidth
-			canvas.height = window.innerHeight - 100
-			if (canvas.height < 600) canvas.height = 600
+			canvas.width = 241
+			canvas.height = 335
 
 			// Redraw everything after resizing the window
-			drawInterface(canvas, context, window.matchMedia("(min-width: 768px)").matches)
+			drawInterface(canvas, context)
 		}
 		resizeCanvas()
 	})
 </script>
 
 <svelte:head>
-	<title>Wasp Scripts</title>
-	<meta
-		name="description"
-		content="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
+	<MetaTags
+		title=""
+		description="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
 	/>
 </svelte:head>
 
@@ -138,7 +139,9 @@
 			<h1 class="text-2xl font-bold text-center md:text-3xl py-12">
 				<div class="py-4">WaspScripts</div>
 				<div>
-					100% <span class="bg-clip-border animate-character pl-1">color</span>, 100% open source.
+					100% <span class="bg-clip-text animate-character text-transparent pl-1 inline-block"
+						>color</span
+					>, 100% open source.
 				</div>
 			</h1>
 		</header>
@@ -164,7 +167,7 @@
 			</h2>
 		</header>
 
-		<canvas id="canvas" />
+		<canvas id="canvas" class="m-auto" />
 	</div>
 </div>
 
@@ -185,10 +188,7 @@
 			rgba(255, 0, 0, 1) 100%
 		);
 		background-size: 200% auto;
-		-webkit-background-clip: text;
-		-webkit-text-fill-color: transparent;
 		animation: textclip 10s linear infinite;
-		display: inline-block;
 	}
 
 	@keyframes textclip {
