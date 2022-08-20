@@ -31,17 +31,7 @@
 
 <div class="container mx-auto my-6 max-w-3xl flex-grow">
 	<header>
-		<h1 class="text-center text-orange-400">
-			THIS IS A PLACEHOLDER AND SERVES NO PURPOSE RIGHT NOW!
-		</h1>
-		<h2 class="text-center">THIS IS A PLACEHOLDER AND SERVES NO PURPOSE RIGHT NOW!</h2>
-		<h3 class="text-center text-orange-400">
-			THIS IS A PLACEHOLDER AND SERVES NO PURPOSE RIGHT NOW!
-		</h3>
-		<h2 class="text-center">THIS IS A PLACEHOLDER AND SERVES NO PURPOSE RIGHT NOW!</h2>
-		<h1 class="text-center text-orange-400">
-			THIS IS A PLACEHOLDER AND SERVES NO PURPOSE RIGHT NOW!
-		</h1>
+		<h1 class="text-center text-orange-400">NEW SCRIPT</h1>
 	</header>
 
 	<form class="form my-6" on:submit|preventDefault={handleSubmit}>

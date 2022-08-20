@@ -2,7 +2,7 @@
 	import { getSignedURL, type Script } from "$lib/supabaseStorage"
 
 	const download = () => {
-		getSignedURL("scripts", "premium", "wasp-premium.zip").then((url) => {
+		getSignedURL("scripts", "", "wasp-premium.zip").then((url) => {
 			if (url == null) return
 
 			fetch(url)
