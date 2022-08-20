@@ -48,7 +48,7 @@
 		</div>
 
 		<!-- Title n Description -->
-		<div class="flex flex-col text-sm mb-2">
+		<div class="pt-4 flex flex-col text-sm mb-2">
 			<label for="title" class="font-bold mb-2"> Title: </label>
 			<input
 				type="text"
@@ -105,6 +105,7 @@
 
 		<!-- File -->
 		<div class="flex flex-col text-sm mt-4 mb-2">
+			<span class="font-bold mb-2">Script revision: {script.revision}</span>
 			<Dropzone accept={".simba"} on:drop={handleFilesSelect} />
 			<ol>
 				{#if file}

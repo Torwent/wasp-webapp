@@ -40,6 +40,15 @@
 
 <div class="px-4 py-2">
 	<div class="my-4 justify-end">
+		<a href="/user/{$profile.id}">
+			<button
+				class="w-full shadow-sm rounded py-2 px-4 my-4 text-white
+				     bg-orange-500 hover:bg-orange-400 dark:bg-orange-400 dark:hover:bg-amber-300"
+			>
+				Profile
+			</button>
+		</a>
+
 		<h3 class="text-center py-2">Roles</h3>
 		<div class="flex justify-center pt-2 pb-8">
 			{#if $profile}
