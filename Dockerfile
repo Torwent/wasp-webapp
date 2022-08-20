@@ -1,8 +1,8 @@
 ### Build Step
-FROM node:16.2.0-alpine3.13 AS builder
+FROM node:16 AS builder
 WORKDIR /usr/src/app
 COPY . .
-RUN npm install -g pnpm && pnpm install -P && pnpm run build
+RUN npm install -g pnpm && pnpm install && pnpm run build
 
 ### Serve Step
 FROM node:16.2.0-alpine3.13
