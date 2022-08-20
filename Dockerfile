@@ -1,16 +1,38 @@
-### Build Step
+# Install dependencies only when needed
+FROM node:16-alpine AS deps
+# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
+RUN apk add --no-cache libc6-compat
+# install dependencies
+WORKDIR /usr/src/app
+COPY package.json pnpm-lock.yaml ./
+RUN npx pnpm i --frozen-lockfile
+
+# Rebuild the source code only when needed
 FROM node:16 AS builder
 WORKDIR /usr/src/app
 COPY . .
-RUN npm install -g pnpm && pnpm install && pnpm run build
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+RUN npx pnpm run build
 
-### Serve Step
-FROM node:16.2.0-alpine3.13
-WORKDIR /app
-# copy files from previous step
-COPY --from=builder /usr/src/app/build .
-COPY --from=builder /usr/src/app/package.json .
+# Production image, copy all the files and run next
+FROM node:16-alpine AS runner
+WORKDIR /usr/src/app
+
+ENV NODE_ENV production
+
+RUN adduser -S torwent -D -u 10000 -s /bin/nologin
+
+# COPY --from=builder /app/*.cjs ./
+# COPY --from=builder /app/*.config.js ./
+# COPY --from=builder /app/tsconfig.json ./
+# COPY --from=builder /app/static ./static
+# COPY --from=builder --chown=sveltekit:nodejs /app/.svelte-kit ./.svelte-kit
+COPY --from=builder --chown=sveltekit:nodejs /usr/src/app/build ./build
 COPY --from=builder /usr/src/app/node_modules ./node_modules
-# our app is running on port 3000 within the container, so need to expose it
+COPY --from=builder /usr/src/app/package.json ./package.json
+
+USER 10000
+
 EXPOSE 3000
-CMD ["node", "index.js"]
+
+CMD ["node", "./build"]
