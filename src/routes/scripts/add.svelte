@@ -99,6 +99,7 @@
 		await uploadScript(script, file, coverFile, bannerFile)
 
 		location.replace(location.origin + "scripts")
+		location.reload()
 	}
 
 	loadData("categories", categories)

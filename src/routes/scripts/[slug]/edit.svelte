@@ -101,7 +101,7 @@
 
 	const handleSubmit = async () => {
 		await updateScript(script, file, coverFile, bannerFile)
-		//location.reload()
+		location.reload()
 	}
 
 	loadData("categories", categories)
