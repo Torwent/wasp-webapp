@@ -33,7 +33,9 @@
 	}
 
 	let assets_path =
-		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" + script.id
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" +
+		script.id +
+		"/banner.jpg"
 </script>
 
 <svelte:head>
@@ -91,28 +93,24 @@
 		</div>
 	{/if}
 
-	<div class="group w-full absolute left-0 top-16">
+	<div class="inset-0 group container w-screen h-[44rem] mx-auto flex flex-col">
 		<img
-			class="inset-0 z-0 object-none h-96 w-full"
-			src={assets_path + "/banner.jpg"}
+			class="inset-0 z-0 absolute object-cover h-fit w-full"
+			src={assets_path}
 			alt={script.assets_alt}
 		/>
-
-		<header class="text-center w-full h-32 absolute inset-0 z-10 top-64 text-amber-500 text-shadow">
+		<header class="mt-auto z-10 text-center h-32 text-amber-500 text-shadow bg-none">
+			<div
+				class="absolute left-0 h-30 w-screen opacity-100
+					   bg-gradient-to-t from-white/20 via-white-800/20 dark:from-black/60 dark:via-gray-800/20 to-transparent"
+			/>
 			<h1 class="mb-4 font-bold text-4xl">{script.title}</h1>
 			<h2 class="font-semibold leading-normal mb-4">{script.description}</h2>
 		</header>
-		<!-- Hover Effect -->
-		<div
-			class="absolute top-80
-                    h-16 w-full px-3 space-x-2
-                    bg-none opacity-0 group-hover:opacity-100
-                    group-hover:bg-gradient-to-t from-white/20 via-white-800/20 dark:from-black/20 dark:via-gray-800/20 to-transparent 
-                    transition-all ease-in-out duration-200 delay-100"
-		/>
+		<!-- Title and Description Hover Effect -->
 	</div>
 
-	<div class="container mx-auto mt-96 mb-6 max-w-2xl flex-grow">
+	<div class="container mx-auto mb-6 max-w-2xl flex-grow">
 		<div class="container w-full mx-auto my-3">
 			<Carousel
 				bucket="imgs"
