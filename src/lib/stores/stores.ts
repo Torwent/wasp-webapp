@@ -9,22 +9,6 @@ export interface Post {
 	author: string
 }
 
-//this is included here because it's only used to search scripts and posts
-export const search = (content: string, search: string) => {
-	content = content.toLowerCase()
-	search = search.toLowerCase()
-	let i = 0,
-		n = -1,
-		l: string
-
-	for (; (l = search[i++]); ) {
-		if (!~(n = content.indexOf(l, n + 1))) {
-			return false
-		}
-	}
-	return true
-}
-
 export const posts: any = writable([])
 
 export const devs: any = writable([])

@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { profile } from "$lib/stores/authStore"
 	import { fly } from "svelte/transition"
-	import { scripts, categories, subcategories, loadData, search } from "$lib/stores/stores"
+	import { scripts, categories, subcategories, loadData } from "$lib/stores/stores"
 	import Card from "$lib/components/ScriptCard.svelte"
 	import LinkButton from "$lib/components/LinkButton.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import type { Script } from "$lib/supabaseStorage"
+	import { search } from "$lib/utils"
 
 	interface CheckboxType {
 		id: number

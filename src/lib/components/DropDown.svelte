@@ -1,31 +1,27 @@
 <script lang="ts">
 	import { slide } from "svelte/transition"
 	import DropDownEntry from "./DropDownEntry.svelte"
+	import { search } from "$lib/utils"
 	export let title: string
+	interface Entry {
+		title: string
+		content: string
+	}
+
 	export let entries
 
 	let show = false
 
 	let searchQuery = "",
-		filteredEntries = [],
+		filteredEntries: any = [],
 		placeholderText = "Search..."
-
-	String.prototype.fuzzy = function (s) {
-		var hay = this.toLowerCase(),
-			i = 0,
-			n = -1,
-			l
-		s = s.toLowerCase()
-		for (; (l = s[i++]); ) if (!~(n = hay.indexOf(l, n + 1))) return false
-		return true
-	}
 
 	const handleSearch = () => {
 		filteredEntries = $entries
 		placeholderText = "Search..."
-		if (searchQuery === "") return
+		if (searchQuery === "" || $entries == null) return
 
-		filteredEntries = $entries.filter((e) => e.title.fuzzy(searchQuery))
+		filteredEntries = $entries.filter((entry: Entry) => search(entry.title, searchQuery))
 		if (filteredEntries.length === 0) {
 			placeholderText = "Not found!"
 			searchQuery = ""

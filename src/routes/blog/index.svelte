@@ -1,9 +1,10 @@
 <script lang="ts">
 	import { fade } from "svelte/transition"
 	import { profile } from "$lib/stores/authStore"
-	import { posts, loadData, type Post, search } from "$lib/stores/stores"
+	import { posts, loadData, type Post } from "$lib/stores/stores"
 	import PostCard from "$lib/components/PostCard.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
+	import { search } from "$lib/utils"
 	loadData("posts", posts)
 
 	let searchQuery = ""
