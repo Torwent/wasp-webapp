@@ -1,5 +1,5 @@
 <script lang="ts">
-	export let emoji
+	export let emoji: { tooltip: string; icon: string }
 
 	let show = false
 </script>
