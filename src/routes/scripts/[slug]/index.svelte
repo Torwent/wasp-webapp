@@ -99,9 +99,9 @@
 			src={assets_path}
 			alt={script.assets_alt}
 		/>
-		<header class="mt-auto z-10 text-center h-32 text-amber-500 text-shadow bg-none">
+		<header class="mt-auto z-10 text-center h-32 text-amber-500 text-shadow">
 			<div
-				class="absolute left-0 h-30 w-screen opacity-100
+				class="absolute mx-0 left-0 h-32 w-full opacity-100
 					   bg-gradient-to-t from-white/20 via-white-800/20 dark:from-black/60 dark:via-gray-800/20 to-transparent"
 			/>
 			<h1 class="mb-4 font-bold text-4xl">{script.title}</h1>
