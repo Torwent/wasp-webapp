@@ -1,22 +1,12 @@
 <script lang="ts">
 	import { supabase } from "$lib/supabase"
-
-	let loading: boolean = false
+	const redirect = location.origin + (location.pathname !== "/" ? location.pathname + "/" : "")
 
 	const handleLogin = async () => {
-		try {
-			loading = true
-			await supabase.auth.signIn(
-				{ provider: "discord" },
-				{
-					redirectTo: window.location.origin
-				}
-			)
-		} catch (error) {
-			console.error(error)
-		} finally {
-			loading = false
-		}
+		const { error } = await supabase.auth.signIn({ provider: "discord" }, { redirectTo: redirect })
+
+		if (error) return
+		console.error(error)
 	}
 </script>
 

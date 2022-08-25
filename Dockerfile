@@ -17,22 +17,11 @@ RUN npx pnpm run build
 # Production image, copy all the files and run next
 FROM node:16-alpine AS runner
 WORKDIR /usr/src/app
-
 ENV NODE_ENV production
-
 RUN adduser -S torwent -D -u 10000 -s /bin/nologin
-
-# COPY --from=builder /app/*.cjs ./
-# COPY --from=builder /app/*.config.js ./
-# COPY --from=builder /app/tsconfig.json ./
-# COPY --from=builder /app/static ./static
-# COPY --from=builder --chown=sveltekit:nodejs /app/.svelte-kit ./.svelte-kit
 COPY --from=builder --chown=sveltekit:nodejs /usr/src/app/build ./build
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/package.json ./package.json
-
 USER 10000
-
 EXPOSE 3000
-
 CMD ["node", "./build"]
