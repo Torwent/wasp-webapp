@@ -53,21 +53,14 @@
 					{#if matches}
 						<a
 							href="/"
-							class="flex items-center py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
+							class="flex items-center py-4 px-2"
 							on:click={() => (selectedTab = tabs[0])}
-							class:text-orange-500={selectedTab === 0}
-							class:dark:text-orange-400={selectedTab === 0}
 						>
-							<Logo />
+							<Logo selected={selectedTab === 0} />
 						</a>
 					{:else}
-						<span
-							class="flex items-center py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
-							on:click={() => (showMenu = !showMenu)}
-							class:text-orange-500={selectedTab === 0}
-							class:dark:text-orange-400={selectedTab === 0}
-						>
-							<Logo />
+						<span class="flex items-center py-4 px-2" on:click={() => (showMenu = !showMenu)}>
+							<Logo selected={selectedTab === 0} />
 						</span>
 					{/if}
 				</MediaQuery>
