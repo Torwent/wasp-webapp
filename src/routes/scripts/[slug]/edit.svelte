@@ -9,43 +9,156 @@
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
 	import { categories, subcategories, loadData } from "$lib/stores/stores"
 	import { updateScript, type Script } from "$lib/supabaseStorage"
+	import Card from "$lib/components/Card.svelte"
 
 	export let script: Script
 
-	let file: File
-
-	function handleFilesSelect(e: { detail: { acceptedFiles: File[] } }) {
+	let cover: string =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" +
+		script.id +
+		"/cover.jpg"
+	let coverFile: File | undefined
+	const handleCoverSelect = (e: { detail: { acceptedFiles: File[] } }) => {
 		const { acceptedFiles } = e.detail
 
-		if (acceptedFiles.length > 0) {
-			file = acceptedFiles[acceptedFiles.length - 1]
+		if (acceptedFiles.length === 0) return
+
+		coverFile = acceptedFiles[acceptedFiles.length - 1]
+
+		if (coverFile.size > 250000) {
+			coverFile = undefined
+			return alert("This file is too large.")
+		}
+
+		let reader = new FileReader()
+		reader.readAsDataURL(coverFile)
+		reader.onload = (e) => {
+			if (e.target == null || e.target.result == null) return
+			cover = e.target.result as string
+
+			let img = new Image()
+
+			img.onload = function () {
+				if (img.width !== 300 || img.height !== 200) {
+					coverFile = undefined
+					return alert("The cover image has to be 300x200")
+				}
+			}
+
+			img.src = cover
+		}
+	}
+
+	let banner: string =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" +
+		script.id +
+		"/banner.jpg"
+	let bannerFile: File | undefined
+	const handleBannerSelect = (e: { detail: { acceptedFiles: File[] } }) => {
+		const { acceptedFiles } = e.detail
+
+		if (acceptedFiles.length === 0) return
+
+		bannerFile = acceptedFiles[acceptedFiles.length - 1]
+
+		if (bannerFile.size > 625000) {
+			bannerFile = undefined
+			return alert("This file is too large.")
+		}
+
+		let reader = new FileReader()
+		reader.readAsDataURL(bannerFile)
+		reader.onload = (e) => {
+			if (e.target == null || e.target.result == null) return
+			banner = e.target.result as string
+
+			let img = new Image()
+
+			img.onload = function () {
+				if (img.width !== 1920 || img.height !== 768) {
+					bannerFile = undefined
+					return alert("The banner image has to be 1920x768")
+				}
+			}
+
+			img.src = banner
+		}
+	}
+
+	let file: File | undefined
+	const handleFileSelect = (e: { detail: { acceptedFiles: File[] } }) => {
+		const { acceptedFiles } = e.detail
+
+		if (acceptedFiles.length === 0) return
+
+		file = acceptedFiles[acceptedFiles.length - 1]
+
+		if (file.size > 125000) {
+			file = undefined
+			return alert("This simba file is abnormally large.")
 		}
 	}
 
 	const handleSubmit = async () => {
-		await updateScript(script, file)
-		location.reload()
+		await updateScript(script, file, coverFile, bannerFile)
+		//location.reload()
 	}
 
 	loadData("categories", categories)
 	loadData("subcategories", subcategories)
 </script>
 
-<div class="container mx-auto my-6 max-w-2xl flex-grow">
-	<form class="form my-6" on:submit|preventDefault={handleSubmit}>
-		<!-- Preview -->
-		<div class="flex flex-col text-sm mb-2">
-			<details>
-				<summary>Preview</summary>
-				<h1 class="mb-4 font-bold text-3xl">{script.title}</h1>
+<div class="container mx-auto my-6 max-w-3xl flex-grow">
+	<!-- Preview -->
+	<div>
+		<div class="group w-full absolute left-0 top-16">
+			<img class="inset-0 z-0 object-none h-96 w-full" src={banner} alt="Missing banner" />
+
+			<header
+				class="text-center w-full h-32 absolute inset-0 z-10 top-64 text-amber-500 text-shadow"
+			>
+				<h1 class="mb-4 font-bold text-4xl">{script.title}</h1>
 				<h2 class="font-semibold leading-normal mb-4">{script.description}</h2>
-				<article
-					class="prose dark:prose-invert py-6 border-t-2 border-stone-300 dark:border-stone-800"
-				>
+			</header>
+			<!-- Hover Effect -->
+			<div
+				class="absolute top-80
+                    h-16 w-full px-3 space-x-2
+                    bg-none opacity-0 group-hover:opacity-100
+                    group-hover:bg-gradient-to-t from-white/20 via-white-800/20 dark:from-black/20 dark:via-gray-800/20 to-transparent 
+                    transition-all ease-in-out duration-200 delay-100"
+			/>
+		</div>
+
+		<details class="container mx-auto mt-96 mb-6 max-w-2xl flex-grow">
+			<summary>Preview script page</summary>
+			<div class="container mx-auto max-w-2xl flex-grow">
+				<h2 class="text-amber-500 dark:text-amber-200 text-center py-6">Description:</h2>
+				<article class="prose dark:prose-invert py-6">
 					<Markdown src={script.content} />
 				</article>
-			</details>
+			</div>
+		</details>
+	</div>
+
+	<form class="form my-6" on:submit|preventDefault={handleSubmit}>
+		<!-- Card Preview -->
+		<div class="2xl:absolute left-20">
+			<Card
+				img={cover}
+				title={script.title}
+				author={script.author ? script.author : ""}
+				description={script.description}
+				exportedCategories={script.categories}
+				exportedSubcategories={script.subcategories}
+			/>
 		</div>
+
+		<!-- Images -->
+		<h4>Cover image:</h4>
+		<Dropzone accept={".jpg"} on:drop={handleCoverSelect} />
+		<h4>Banner image:</h4>
+		<Dropzone accept={".jpg"} on:drop={handleBannerSelect} />
 
 		<!-- Title n Description -->
 		<div class="pt-4 flex flex-col text-sm mb-2">
@@ -106,7 +219,7 @@
 		<!-- File -->
 		<div class="flex flex-col text-sm mt-4 mb-2">
 			<span class="font-bold mb-2">Script revision: {script.revision}</span>
-			<Dropzone accept={".simba"} on:drop={handleFilesSelect} />
+			<Dropzone accept={".simba"} on:drop={handleFileSelect} />
 			<ol>
 				{#if file}
 					<li>{file.name}</li>
