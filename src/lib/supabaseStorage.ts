@@ -15,6 +15,14 @@ export interface Script {
 	assets_alt?: string
 }
 
+export const getScripts = async (table: string) => {
+	const { data, error } = await supabase.from(table).select()
+
+	if (error) return console.error(error)
+
+	return data
+}
+
 export const loadPublicFiles = async (bucket: string, folder: string) => {
 	const { data, error } = await supabase.storage.from(bucket).list(folder, {
 		limit: 20,
@@ -71,6 +79,22 @@ export const uploadFile = async (bucket: string, path: string, file: File) => {
 	}
 }
 
+export const updateImg = async (bucket: string, path: string, fileName: string, file: File) => {
+	let paths = (await getFilePath(bucket, path)) as { name: string }[]
+
+	paths.forEach(async (p) => {
+		if (p.name === fileName.replace("/", "")) {
+			const { error } = await supabase.storage.from(bucket).update(path + fileName, file)
+			if (error) return console.error(error)
+			return
+		}
+	})
+
+	const { error } = await supabase.storage.from(bucket).update(path + fileName, file)
+
+	if (error) return console.error(error)
+}
+
 const updateScriptRevision = async (file: File, revision: number) => {
 	let fileString = await file.text()
 	let regex = /{\$UNDEF SCRIPT_REVISION}{\$DEFINE SCRIPT_REVISION := '(\d*?)'}/
@@ -87,10 +111,15 @@ const updateScriptRevision = async (file: File, revision: number) => {
 	return new File([fileString], file.name, { type: "text/plain" })
 }
 
-export const uploadScript = async (script: Script, file: File) => {
-	if (!file) return console.log("No file added!")
+export const uploadScript = async (
+	script: Script,
+	file: File | undefined,
+	coverFile: File | undefined,
+	bannerFile: File | undefined
+) => {
+	if (!file) return console.error("No file added!")
 
-	const { data, error } = await supabase.from("scripts_test").insert(script)
+	const { data, error } = await supabase.from("scripts").insert(script)
 
 	if (error) return console.error(error)
 
@@ -107,24 +136,45 @@ export const uploadScript = async (script: Script, file: File) => {
 		".simba"
 
 	uploadFile("scripts", path, file)
+
+	if (coverFile) {
+		uploadFile("imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
+	}
+
+	if (bannerFile) {
+		uploadFile("imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+	}
 }
 
-export const updateScript = async (script: Script, file: File) => {
+export const updateScript = async (
+	script: Script,
+	file: File | undefined,
+	coverFile: File | undefined,
+	bannerFile: File | undefined
+) => {
 	if (file) script.revision += 1
 	const { error } = await supabase.from("scripts").update(script).match({ id: script.id })
 
 	if (error) return console.error(error)
 
-	if (!file) return
+	if (file) {
+		file = await updateScriptRevision(file, script.revision)
+		let path =
+			script.id +
+			"/" +
+			pad(script.revision, 9) +
+			"/" +
+			script.title.toLowerCase().replace(/\s/g, "_") +
+			".simba"
 
-	file = await updateScriptRevision(file, script.revision)
-	let path =
-		script.id +
-		"/" +
-		pad(script.revision, 9) +
-		"/" +
-		script.title.toLowerCase().replace(/\s/g, "_") +
-		".simba"
+		uploadFile("scripts", path, file)
+	}
 
-	uploadFile("scripts", path, file)
+	if (coverFile) {
+		updateImg("imgs", "scripts/" + script.id, "/cover.jpg", coverFile)
+	}
+
+	if (bannerFile) {
+		updateImg("imgs", "scripts/" + script.id, "/banner.jpg", bannerFile)
+	}
 }
