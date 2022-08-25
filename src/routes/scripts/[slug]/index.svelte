@@ -18,6 +18,7 @@
 	export let script: Script
 
 	const fullDismiss = async () => {
+		tempDismiss = true
 		const ssb = getServiceSupabase()
 		ssb.auth.signOut()
 
@@ -26,13 +27,9 @@
 			.update({ dismissed_warning: true })
 			.match({ id: $profile.id })
 
-		if (error) {
-			return console.error(error)
-		}
+		if (error) return console.error(error)
 
 		loadProfile($profile.id)
-
-		tempDismiss = true
 	}
 
 	let assets_path =
