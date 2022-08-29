@@ -1,12 +1,11 @@
 <script lang="ts">
 	import { profile } from "$lib/stores/authStore"
 	import { fly } from "svelte/transition"
-	import { scripts, categories, subcategories, loadData } from "$lib/stores/stores"
 	import Card from "$lib/components/ScriptCard.svelte"
 	import LinkButton from "$lib/components/LinkButton.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
-	import type { Script } from "$lib/supabaseStorage"
 	import { search } from "$lib/utils"
+	import { getData, type Category, type Script, type SubCategory } from "$lib/supabase"
 
 	interface CheckboxType {
 		id: number
@@ -16,9 +15,7 @@
 		checked: boolean
 	}
 
-	loadData("scripts", scripts)
-	loadData("categories", categories)
-	loadData("subcategories", subcategories)
+	let scripts: Script[] = getData("scripts") as unknown as Script[]
 
 	let searchQuery = "",
 		placeholderText = "Search posts...",
@@ -27,11 +24,11 @@
 
 	//handles the search field
 	const handleSearch = () => {
-		filteredScripts = $scripts
+		filteredScripts = scripts
 		placeholderText = "Search scripts..."
 		if (searchQuery === "") return
 
-		filteredScripts = $scripts.filter((script: Script) => search(script.title, searchQuery))
+		filteredScripts = scripts.filter((script: Script) => search(script.title, searchQuery))
 		if (filteredScripts.length === 0) {
 			placeholderText = "Not found!"
 			searchQuery = ""
@@ -39,32 +36,31 @@
 	}
 
 	//handles checkbox filters
-	const handleFilters = () => {
+	const handleFilters = async () => {
 		searchQuery = ""
-		filteredScripts = []
-		filteredScripts = $scripts
+		filteredScripts = (await getData("scripts")) as unknown as Script[]
 		let checked = checkboxes
 			.filter((checkbox: CheckboxType) => checkbox.checked)
 			.map((checkbox: CheckboxType) => checkbox.name)
 
 		if (checked.length === 0) return
 
-		filteredScripts = $scripts.filter((script: Script) => {
+		filteredScripts = filteredScripts.filter((script: Script) => {
 			let allCat = [...script.categories, ...script.subcategories]
-
 			return allCat.some((c) => checked.includes(c))
 		})
 	}
 
 	//sets up checkboxes to what's available from the database
-	const loadCheckboxes = () => {
-		if (checkboxes.length > 0) return
+	const loadCheckboxes = async () => {
+		const categories: Category[] = (await getData("categories")) as unknown as Category[]
+		const subcategories: SubCategory[] = (await getData(
+			"subcategories"
+		)) as unknown as SubCategory[]
 
 		let id = 0
 
-		checkboxes = []
-
-		for (let category of $categories) {
+		for (let category of categories) {
 			checkboxes.push({
 				id: id++,
 				name: category.name,
@@ -73,7 +69,7 @@
 				checked: false
 			})
 
-			for (let subcategory of $subcategories) {
+			for (let subcategory of subcategories) {
 				if (category.name === subcategory.category) {
 					checkboxes.push({
 						id: id++,
@@ -86,12 +82,6 @@
 			}
 		}
 	}
-
-	// make sure categories and subcategories are both loaded to run loadCheckboxes()
-	$: if ($categories.length > 0 && $subcategories.length > 0) loadCheckboxes()
-
-	//this is a svelte hack. since checkboxes.push() in loadCheckboxes() don't trigger checkboxes update we reset it to be equals to itself to force an update
-	$: checkboxes = checkboxes
 </script>
 
 <svelte:head>
@@ -113,39 +103,41 @@
 		out:fly={{ duration: 300, x: -100 }}
 	>
 		<h4 class="text-center py-4">Categories</h4>
-		<div class="flex justify-center font-semibold text-sm">
-			<div>
-				{#each checkboxes as checkbox}
-					<div class="flex py-0.5">
-						{#if !checkbox.main}
-							<div class="w-4 h-2 " />
-						{/if}
-						<div
-							id={"checkboxdiv" + checkbox.id}
-							class:font-thin={!checkbox.main}
-							on:change={() => handleFilters()}
-						>
-							<input
-								class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-amber-500"
-								type="checkbox"
-								id={"checkbox" + checkbox.id}
-								bind:checked={checkbox.checked}
-							/>
-							<label
-								class="form-check-label inline-block cursor-pointer dark:hover:text-amber-100 hover:text-orange-400"
-								for={"checkbox" + checkbox.id}
-								class:text-amber-500={checkbox.checked}
+		{#await loadCheckboxes() then}
+			<div class="flex justify-center font-semibold text-sm">
+				<div>
+					{#each checkboxes as checkbox}
+						<div class="flex py-0.5">
+							{#if !checkbox.main}
+								<div class="w-4 h-2 " />
+							{/if}
+							<div
+								id={"checkboxdiv" + checkbox.id}
+								class:font-thin={!checkbox.main}
+								on:change={() => handleFilters()}
 							>
-								{checkbox.name + checkbox.emoji}
-							</label>
+								<input
+									class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-amber-500"
+									type="checkbox"
+									id={"checkbox" + checkbox.id}
+									bind:checked={checkbox.checked}
+								/>
+								<label
+									class="form-check-label inline-block cursor-pointer dark:hover:text-amber-100 hover:text-orange-400"
+									for={"checkbox" + checkbox.id}
+									class:text-amber-500={checkbox.checked}
+								>
+									{checkbox.name + checkbox.emoji}
+								</label>
+							</div>
 						</div>
-					</div>
-					{#if checkbox.id === 3}
-						<br />
-					{/if}
-				{/each}
+						{#if checkbox.id === 3}
+							<br />
+						{/if}
+					{/each}
+				</div>
 			</div>
-		</div>
+		{/await}
 	</div>
 
 	<div
@@ -171,17 +163,19 @@
 		<div
 			class="grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:px-20 container gap-6 mx-auto xl:max-w-full lg:max-w-6xl md:max-w-4xl sm:max-w-xl content-start pt-10 xl:px-12"
 		>
-			{#if filteredScripts.length !== 0}
-				{#each filteredScripts as script}
-					<Card {script} />
-				{/each}
-			{:else if $scripts}
-				{#each $scripts as script}
-					<Card {script} />
-				{/each}
-			{:else}
+			{#await scripts}
 				Loading scripts...
-			{/if}
+			{:then scripts}
+				{#if filteredScripts.length !== 0}
+					{#each filteredScripts as script}
+						<Card {script} />
+					{/each}
+				{:else if scripts}
+					{#each scripts as script}
+						<Card {script} />
+					{/each}
+				{/if}
+			{/await}
 		</div>
 		<div class="h-24 w-full" />
 	</div>

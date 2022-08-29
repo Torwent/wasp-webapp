@@ -1,19 +1,5 @@
-import { supabase } from "$lib/supabase"
+import { supabase, type Script } from "$lib/supabase"
 import { pad } from "./utils"
-
-export interface Script {
-	id?: string
-	title: string
-	description: string
-	content: string
-	revision: number
-	categories: string[]
-	subcategories: string[]
-	author?: string
-	user_id?: string
-	assets_path?: string
-	assets_alt?: string
-}
 
 export const getScripts = async (table: string) => {
 	const { data, error } = await supabase.from(table).select()
@@ -127,13 +113,8 @@ export const uploadScript = async (
 
 	file = await updateScriptRevision(file, script.revision)
 
-	let path =
-		script.id +
-		"/" +
-		pad(script.revision, 9) +
-		"/" +
-		script.title.toLowerCase().replace(/\s/g, "_") +
-		".simba"
+	//rename all scripts to script so we can always fetch them later regardless of name changes.
+	let path = script.id + "/" + pad(script.revision, 9) + "/" + "script.simba"
 
 	uploadFile("scripts", path, file)
 

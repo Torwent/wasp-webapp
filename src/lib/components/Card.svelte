@@ -1,10 +1,7 @@
 <script lang="ts">
 	import { fade } from "svelte/transition"
 	import EmojiTooltip from "$lib/components/EmojiTooltip.svelte"
-	import { categories, subcategories, loadData } from "$lib/stores/stores"
-
-	loadData("categories", categories)
-	loadData("subcategories", subcategories)
+	import { getData, type Category, type SubCategory } from "$lib/supabase"
 
 	export let img: string
 	export let altImg: string = "Asset missing"
@@ -23,27 +20,24 @@
 		description.substring(0, 80) + "..." //crop description at 80 characters.
 	}
 
-	let allCategories = [...$categories, ...$subcategories]
-	let tooltips: EmojiTooltip[] = []
+	const loadEmojis = async () => {
+		let result: EmojiTooltip[] = []
+		const exportedAllCategories = [...exportedCategories, ...exportedSubcategories]
+		const categories = (await getData("categories")) as unknown as Category[]
+		const subcategories = (await getData("subcategories")) as unknown as SubCategory[]
 
-	const loadEmojis = (cats: string[]) => {
-		tooltips = []
-		for (let c of cats) {
+		let allCategories = [...categories, ...subcategories]
+
+		for (let c of exportedAllCategories) {
 			for (let c2 of allCategories) {
-				if (c === c2.name) tooltips.push({ tooltip: c2.name, icon: c2.emoji })
+				if (c === c2.name) result.push({ tooltip: c2.name, icon: c2.emoji })
 			}
 		}
+
+		return result
 	}
 
-	$: if (
-		$categories.length > 0 &&
-		$subcategories.length > 0 &&
-		exportedCategories.length > 0 &&
-		exportedSubcategories.length > 0
-	)
-		loadEmojis([...exportedCategories, ...exportedSubcategories])
-
-	$: tooltips = tooltips
+	const tooltips = loadEmojis()
 </script>
 
 <div
@@ -89,9 +83,11 @@
 		</div>
 
 		<div class="grid grid-cols-12 mt-auto">
-			{#each tooltips as emoji}
-				<EmojiTooltip {emoji} />
-			{/each}
+			{#await tooltips then tooltips}
+				{#each tooltips as emoji}
+					<EmojiTooltip {emoji} />
+				{/each}
+			{/await}
 		</div>
 	</div>
 </div>

@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { slide } from "svelte/transition"
-	import { getSignedURL, type Script } from "$lib/supabaseStorage"
+	import { getSignedURL } from "$lib/supabaseStorage"
 	import { pad } from "$lib/utils"
+	import type { Script } from "$lib/supabase"
 
 	export let script: Script
 
 	export let rev = script.revision != null ? script.revision : 1
-
-	let scriptName = script.title.toLowerCase().replace(/\s/g, "_") + ".simba"
 
 	let menu: boolean = false,
 		revisions: number[] = []
@@ -18,7 +17,7 @@
 
 	const download = () => {
 		menu = false
-		getSignedURL("scripts", script.id + "/" + pad(rev, 9), scriptName).then((url) => {
+		getSignedURL("scripts", script.id + "/" + pad(rev, 9), "script.simba").then((url) => {
 			if (url == null) return
 
 			fetch(url)
@@ -28,7 +27,7 @@
 					const anchor = document.createElement("a")
 					anchor.style.display = "none"
 					anchor.href = blob
-					anchor.download = scriptName
+					anchor.download = script.title.toLowerCase().replace(/\s/g, "_") + ".simba"
 					document.body.appendChild(anchor)
 					anchor.click()
 					window.URL.revokeObjectURL(blob)

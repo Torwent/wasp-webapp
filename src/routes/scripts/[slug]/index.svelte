@@ -9,10 +9,9 @@
 	import SimpleButton from "$lib/components/SimpleDownloadButton.svelte"
 	import Carousel from "$lib/components/Carousel.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
-	import { getServiceSupabase } from "$lib/supabase"
+	import { getServiceSupabase, type Script } from "$lib/supabase"
 	import { fade } from "svelte/transition"
 	import { profile, loadProfile } from "$lib/stores/authStore"
-	import type { Script } from "$lib/supabaseStorage"
 	let tempDismiss = $profile.dismissed_warning
 
 	export let script: Script

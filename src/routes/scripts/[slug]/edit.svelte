@@ -7,9 +7,9 @@
 	import Dropzone from "svelte-file-dropzone"
 	import Markdown from "$lib/Markdown.svelte"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
-	import { categories, subcategories, loadData } from "$lib/stores/stores"
-	import { updateScript, type Script } from "$lib/supabaseStorage"
+	import { updateScript } from "$lib/supabaseStorage"
 	import Card from "$lib/components/Card.svelte"
+	import { getData, type Category, type Script, type SubCategory } from "$lib/supabase"
 
 	export let script: Script
 
@@ -104,8 +104,8 @@
 		location.reload()
 	}
 
-	loadData("categories", categories)
-	loadData("subcategories", subcategories)
+	const categories = getData("categories") as unknown as Category[]
+	const subcategories = getData("subcategories") as unknown as SubCategory[]
 </script>
 
 <div class="container mx-auto my-6 max-w-3xl flex-grow">
@@ -184,25 +184,30 @@
 		</div>
 
 		<!-- Categories -->
-		{#if $categories.length > 0 && $subcategories.length > 0}
-			<div class="flex flex-col text-sm mb-2">
-				<label for="categories" class="font-bold mb-2"> Categories: </label>
-
+		<div class="flex flex-col text-sm mb-2">
+			<label for="categories" class="font-bold mb-2"> Categories: </label>
+			{#await categories}
+				<MultiSelect id="cats" bind:value={script.categories} />
+			{:then categories}
 				<MultiSelect id="cats" bind:value={script.categories}>
-					{#each $categories as cat}
+					{#each categories as cat}
 						<option value={cat.name}>{cat.emoji}{cat.name}</option>
 					{/each}
 				</MultiSelect>
-			</div>
-			<div class="flex flex-col text-sm mb-2">
-				<label for="categories" class="font-bold mb-2"> Subcategories: </label>
+			{/await}
+		</div>
+		<div class="flex flex-col text-sm mb-2">
+			<label for="categories" class="font-bold mb-2"> Subcategories: </label>
+			{#await subcategories}
+				<MultiSelect id="subcats" bind:value={script.subcategories} />
+			{:then subcategories}
 				<MultiSelect id="subcats" bind:value={script.subcategories}>
-					{#each $subcategories as subcat}
+					{#each subcategories as subcat}
 						<option value={subcat.name}>{subcat.emoji}{subcat.name}</option>
 					{/each}
 				</MultiSelect>
-			</div>
-		{/if}
+			{/await}
+		</div>
 
 		<!-- Content -->
 		<div class="flex flex-col text-sm mb-2">

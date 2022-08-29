@@ -1,14 +1,6 @@
 import { supabase } from "$lib/supabase"
 import { writable } from "svelte/store"
 
-export interface Post {
-	title: string
-	description: string
-	content: string
-	level: number
-	author: string
-}
-
 export const posts: any = writable([])
 
 export const devs: any = writable([])

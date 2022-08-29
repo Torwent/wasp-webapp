@@ -14,9 +14,7 @@
 			}
 		])
 
-		if (error) {
-			return console.error(error)
-		}
+		if (error) return console.error(error)
 
 		location.reload()
 	}
