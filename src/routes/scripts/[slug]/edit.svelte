@@ -187,7 +187,7 @@
 		<div class="flex flex-col text-sm mb-2">
 			<label for="categories" class="font-bold mb-2"> Categories: </label>
 			{#await categories}
-				<MultiSelect id="cats" bind:value={script.categories} />
+				<MultiSelect id="cats" />
 			{:then categories}
 				<MultiSelect id="cats" bind:value={script.categories}>
 					{#each categories as cat}
@@ -199,7 +199,7 @@
 		<div class="flex flex-col text-sm mb-2">
 			<label for="categories" class="font-bold mb-2"> Subcategories: </label>
 			{#await subcategories}
-				<MultiSelect id="subcats" bind:value={script.subcategories} />
+				<MultiSelect id="subcats" />
 			{:then subcategories}
 				<MultiSelect id="subcats" bind:value={script.subcategories}>
 					{#each subcategories as subcat}

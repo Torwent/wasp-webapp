@@ -114,7 +114,7 @@ export const uploadScript = async (
 	file = await updateScriptRevision(file, script.revision)
 
 	//rename all scripts to script so we can always fetch them later regardless of name changes.
-	let path = script.id + "/" + pad(script.revision, 9) + "/" + "script.simba"
+	let path = script.id + "/" + pad(script.revision, 9) + "/script.simba"
 
 	uploadFile("scripts", path, file)
 
@@ -140,13 +140,7 @@ export const updateScript = async (
 
 	if (file) {
 		file = await updateScriptRevision(file, script.revision)
-		let path =
-			script.id +
-			"/" +
-			pad(script.revision, 9) +
-			"/" +
-			script.title.toLowerCase().replace(/\s/g, "_") +
-			".simba"
+		let path = script.id + "/" + pad(script.revision, 9) + "/script.simba"
 
 		uploadFile("scripts", path, file)
 	}
