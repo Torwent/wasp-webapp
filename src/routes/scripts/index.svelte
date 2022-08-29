@@ -23,27 +23,25 @@
 		checkboxes: CheckboxType[] = []
 
 	//handles the search field
-	const handleSearch = () => {
-		filteredScripts = scripts
+	const handleSearch = async () => {
+		filteredScripts = (await getData("scripts")) as unknown as Script[]
 		placeholderText = "Search scripts..."
-		if (searchQuery === "") return
 
-		filteredScripts = scripts.filter((script: Script) => search(script.title, searchQuery))
+		filteredScripts = filteredScripts.filter((script: Script) => search(script.title, searchQuery))
 		if (filteredScripts.length === 0) {
 			placeholderText = "Not found!"
-			searchQuery = ""
 		}
+		searchQuery = ""
 	}
 
 	//handles checkbox filters
 	const handleFilters = async () => {
-		searchQuery = ""
 		filteredScripts = (await getData("scripts")) as unknown as Script[]
+		searchQuery = ""
+
 		let checked = checkboxes
 			.filter((checkbox: CheckboxType) => checkbox.checked)
 			.map((checkbox: CheckboxType) => checkbox.name)
-
-		if (checked.length === 0) return
 
 		filteredScripts = filteredScripts.filter((script: Script) => {
 			let allCat = [...script.categories, ...script.subcategories]
@@ -166,7 +164,7 @@
 			{#await scripts}
 				Loading scripts...
 			{:then scripts}
-				{#if filteredScripts.length !== 0}
+				{#if filteredScripts.length !== 0 || searchQuery !== ""}
 					{#each filteredScripts as script}
 						<Card {script} />
 					{/each}
