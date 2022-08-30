@@ -2,6 +2,7 @@
 	import { fade } from "svelte/transition"
 	import EmojiTooltip from "$lib/components/EmojiTooltip.svelte"
 	import { getData, type Category, type SubCategory } from "$lib/supabase"
+	import Loading from "$lib/components/Loading.svelte"
 
 	export let img: string
 	export let altImg: string = "Asset missing"
@@ -83,7 +84,9 @@
 		</div>
 
 		<div class="grid grid-cols-12 mt-auto">
-			{#await tooltips then tooltips}
+			{#await tooltips}
+				<Loading />
+			{:then tooltips}
 				{#each tooltips as emoji}
 					<EmojiTooltip {emoji} />
 				{/each}
