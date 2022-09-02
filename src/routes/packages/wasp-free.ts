@@ -1,5 +1,5 @@
 import { getPackage } from "$lib/packages"
 
-export const get = async () => {
+export const GET = async () => {
 	return getPackage("free")
 }

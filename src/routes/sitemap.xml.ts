@@ -1,5 +1,60 @@
+import { supabase } from "$lib/supabase"
+
 const website = "https://waspscripts.com"
-export const get = async () => {
+
+const loadScripts = async () => {
+	const { data, error } = await supabase.from("scripts").select("title, id")
+
+	if (error) return console.error(error)
+
+	let result: string[] = []
+	data.forEach((entry) => {
+		result.push(encodeURI(entry.title) + "&amp;" + entry.id)
+	})
+
+	return result
+}
+
+const loadBlog = async () => {
+	const { data, error } = await supabase.from("posts").select("title")
+
+	if (error) return console.error(error)
+
+	let result: string[] = []
+	data.forEach((entry) => {
+		result.push(encodeURI(entry.title))
+	})
+
+	return result
+}
+
+const buildLoc = async (loc: string) => {
+	let data: string[] = []
+	if (loc === "scripts") {
+		data = (await loadScripts()) as string[]
+	} else {
+		data = (await loadBlog()) as string[]
+	}
+
+	let result: string = ""
+
+	data.forEach((el) => {
+		result += `
+      <url>
+        <loc>${website}/${loc}/${el}</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+      </url>
+`
+	})
+
+	return result
+}
+
+export const GET = async () => {
+	const scripts = await buildLoc("scripts")
+	const blog = await buildLoc("blog")
+
 	const headers = {
 		"Cache-Control": "max-age=0, s-maxage=3600",
 		"Content-Type": "application/xml"
@@ -21,22 +76,7 @@ export const get = async () => {
         <priority>0.7</priority>
       </url>
       <url>
-        <loc>${website}/blog</loc>
-        <changefreq>daily</changefreq>
-        <priority>0.7</priority>
-      </url>
-      <url>
-        <loc>${website}/devs</loc>
-        <changefreq>daily</changefreq>
-        <priority>0.7</priority>
-      </url>
-      <url>
-        <loc>${website}/faq</loc>
-        <changefreq>daily</changefreq>
-        <priority>0.7</priority>
-      </url>
-      <url>
-        <loc>${website}/premium</loc>
+        <loc>${website}/setup</loc>
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
       </url>
@@ -45,8 +85,25 @@ export const get = async () => {
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
       </url>
+      ${scripts}
       <url>
-        <loc>${website}/setup</loc>
+        <loc>${website}/premium</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+      </url>      
+      <url>
+        <loc>${website}/faq</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+      </url>     
+      <url>
+        <loc>${website}/blog</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+      </url>
+      ${blog}
+      <url>
+        <loc>${website}/devs</loc>
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
       </url>
