@@ -146,7 +146,7 @@
 		{#if $profile.dev}
 			<LinkButton text="Add Script" url="/scripts/add" arrow={false} />
 		{/if}
-		<form class="form my-6 place-items-center" on:submit|preventDefault={handleSearch}>
+		<form class="my-6 place-items-center" on:submit|preventDefault={handleSearch}>
 			<div class="flex flex-col text-sm mb-2 max-w-2xl m-auto">
 				<input
 					type="text"
@@ -162,7 +162,7 @@
 			class="grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:px-20 container gap-6 mx-auto xl:max-w-full lg:max-w-6xl md:max-w-4xl sm:max-w-xl content-start pt-10 xl:px-12"
 		>
 			{#await scripts}
-				Loading scripts...
+				<h3>Loading scripts...</h3>
 			{:then scripts}
 				{#if filteredScripts.length !== 0 || searchQuery !== ""}
 					{#each filteredScripts as script}
@@ -175,6 +175,6 @@
 				{/if}
 			{/await}
 		</div>
-		<div class="h-24 w-full" />
+		<div class="h-24 w-full place-items-center" />
 	</div>
 </div>
