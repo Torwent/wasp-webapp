@@ -1,4 +1,5 @@
 import { supabase, type Script } from "$lib/supabase"
+import Promise from "bluebird"
 import { pad } from "./utils"
 
 export const getScripts = async (table: string) => {
@@ -148,4 +149,18 @@ export const updateScript = async (
 	if (bannerFile) {
 		updateImg("imgs", "scripts/" + script.id, "/banner.jpg", bannerFile)
 	}
+}
+
+const download = (url: string) => {
+	return fetch(url).then((resp) => resp.blob())
+}
+
+const downloadByGroup = (urls: string[], files_per_group = 5) => {
+	return Promise.map(
+		urls,
+		async (url) => {
+			return await download(url)
+		},
+		{ concurrency: files_per_group }
+	)
 }
