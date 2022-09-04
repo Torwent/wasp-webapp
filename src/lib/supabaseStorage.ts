@@ -16,9 +16,7 @@ export const loadPublicFiles = async (bucket: string, folder: string) => {
 		sortBy: { column: "name", order: "asc" }
 	})
 
-	if (error) {
-		return console.error(error)
-	}
+	if (error) return console.error(error)
 
 	let imgURLs = []
 
@@ -60,9 +58,7 @@ export const getSignedURL = async (bucket: string, path: string, file: string) =
 export const uploadFile = async (bucket: string, path: string, file: File) => {
 	const { error } = await supabase.storage.from(bucket).upload(path, file)
 
-	if (error) {
-		return console.error(error)
-	}
+	if (error) return console.error(error)
 }
 
 export const updateImg = async (bucket: string, path: string, fileName: string, file: File) => {
