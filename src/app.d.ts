@@ -12,3 +12,5 @@ declare namespace App {
 
 declare module "svelte-file-dropzone"
 declare module "markdown-it"
+declare module "bluebird"
+declare module "file-saver"
