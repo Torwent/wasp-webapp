@@ -10,7 +10,7 @@ export const GET = async ({ params }: { params: { slug: string } }) => {
 	if (error)
 		return {
 			status: 404,
-			error: new Error(`packages/${slug} not found.`)
+			error: new Error(slug + " not found.")
 		}
 
 	const pkg = data[0]

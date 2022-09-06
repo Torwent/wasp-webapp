@@ -13,6 +13,13 @@ const headers = {
 	"Content-Type": "application/json"
 }
 
+const error = (pkg: string) => {
+	return {
+		status: 404,
+		error: new Error(pkg + " not found.")
+	}
+}
+
 const getData = async (pkg: string) => {
 	const { data, error } = await supabase.from("packages").select().eq("name", pkg)
 
@@ -22,35 +29,22 @@ const getData = async (pkg: string) => {
 }
 
 export const getPackage = async (pkg: string) => {
-	console.log(pkg)
 	let data = await getData(pkg)
-	if (data == null)
-		return {
-			status: 404,
-			error: new Error(`Page not found.`)
-		}
+	if (data == null) return error(pkg)
 
 	return { headers, body: JSON.stringify(data.body, null, 2) }
 }
 
 export const getVersions = async (pkg: string) => {
 	let data = await getData(pkg)
-	if (data == null)
-		return {
-			status: 404,
-			error: new Error(`Page not found.`)
-		}
+	if (data == null) return error(pkg)
 
 	return { headers, body: JSON.stringify(data.versions, null, 2) }
 }
 
 export const getPkgFile = async (pkg: string) => {
 	let data = await getData(pkg)
-	if (data == null)
-		return {
-			status: 404,
-			error: new Error(`Page not found.`)
-		}
+	if (data == null) return error(pkg)
 
 	return { headers, body: data.pkg_file }
 }
