@@ -1,45 +1,56 @@
 import { supabase } from "$lib/supabase"
-import { getSignedURL } from "$lib/supabaseStorage"
+
+interface simbaPackage {
+	id: string
+	name: string
+	body: string
+	versions: string
+	pkg_file: string
+}
 
 const headers = {
 	"Cache-Control": "max-age=0, s-maxage=3600",
 	"Content-Type": "application/json"
 }
 
-export const getPackage = async (pkg) => {
-	return {
-		headers,
-		body: `  {
-    "name" : "wasp-${pkg}",
-    "full_name" : "Torwent/wasp-${pkg}",
-    "description" : "WaspScripts ${pkg} scripts.",
-    "homepage_url" : "https://waspscripts.com/wasp-${pkg}-versions.json"
-  }`
-	}
+const getData = async (pkg: string) => {
+	const { data, error } = await supabase.from("packages").select().eq("name", pkg)
+
+	if (error) return console.error(error)
+
+	return data[0] as simbaPackage
 }
 
-export const getVersions = async () => {
-	const headers = {
-		"Cache-Control": "max-age=0, s-maxage=3600",
-		"Content-Type": "application/json"
-	}
-	return {
-		headers,
-		body: `  [
-    {
-      "download_url" : "www.test.com/files.zip",
-      "options_url" : "www.test.com/.simbapackage",
-      "notes" : "notes about this version",
-      "time" : "unixtimestamp",
-      "name" : "versionname"
-    },
-    {
-      "download_url" : "www.test.com/files.zip",
-      "options_url" : "www.test.com/.simbapackage",
-      "notes" : "notes about this version",
-      "time" : "unixtimestamp",
-      "name" : "versionname"
-    }
-  ]`
-	}
+export const getPackage = async (pkg: string) => {
+	console.log(pkg)
+	let data = await getData(pkg)
+	if (data == null)
+		return {
+			status: 404,
+			error: new Error(`Page not found.`)
+		}
+
+	return { headers, body: JSON.stringify(data.body, null, 2) }
+}
+
+export const getVersions = async (pkg: string) => {
+	let data = await getData(pkg)
+	if (data == null)
+		return {
+			status: 404,
+			error: new Error(`Page not found.`)
+		}
+
+	return { headers, body: JSON.stringify(data.versions, null, 2) }
+}
+
+export const getPkgFile = async (pkg: string) => {
+	let data = await getData(pkg)
+	if (data == null)
+		return {
+			status: 404,
+			error: new Error(`Page not found.`)
+		}
+
+	return { headers, body: data.pkg_file }
 }
