@@ -1,21 +1,17 @@
-<script context="module">
-	import { load } from "./_slug"
-	export { load }
-</script>
-
 <script lang="ts">
+	import type { Category, Script, SubCategory } from "$lib/database/types"
+	import { getData } from "$lib/database/supabase"
+	export let data: Script //data fetched from ../+page.ts
+
 	import Dropzone from "svelte-file-dropzone"
 	import Markdown from "$lib/Markdown.svelte"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
-	import { updateScript } from "$lib/supabaseStorage"
+	import { updateScript } from "$lib/database/storage"
 	import Card from "$lib/components/Card.svelte"
-	import { getData, type Category, type Script, type SubCategory } from "$lib/supabase"
-
-	export let script: Script
 
 	let cover: string =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" +
-		script.id +
+		data.id +
 		"/cover.jpg"
 	let coverFile: File | undefined
 	const handleCoverSelect = (e: { detail: { acceptedFiles: File[] } }) => {
@@ -51,7 +47,7 @@
 
 	let banner: string =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" +
-		script.id +
+		data.id +
 		"/banner.jpg"
 	let bannerFile: File | undefined
 	const handleBannerSelect = (e: { detail: { acceptedFiles: File[] } }) => {
@@ -100,7 +96,7 @@
 	}
 
 	const handleSubmit = async () => {
-		await updateScript(script, file, coverFile, bannerFile)
+		await updateScript(data, file, coverFile, bannerFile)
 		location.reload()
 	}
 
@@ -117,8 +113,8 @@
 			<header
 				class="text-center w-full h-32 absolute inset-0 z-10 top-64 text-amber-500 text-shadow"
 			>
-				<h1 class="mb-4 font-bold text-4xl">{script.title}</h1>
-				<h2 class="font-semibold leading-normal mb-4">{script.description}</h2>
+				<h1 class="mb-4 font-bold text-4xl">{data.title}</h1>
+				<h2 class="font-semibold leading-normal mb-4">{data.description}</h2>
 			</header>
 			<!-- Hover Effect -->
 			<div
@@ -135,22 +131,23 @@
 			<div class="container mx-auto max-w-2xl flex-grow">
 				<h2 class="text-amber-500 dark:text-amber-200 text-center py-6">Description:</h2>
 				<article class="prose dark:prose-invert py-6">
-					<Markdown src={script.content} />
+					<Markdown src={data.content} />
 				</article>
 			</div>
 		</details>
 	</div>
 
+	<!-- Form -->
 	<form class="form my-6" on:submit|preventDefault={handleSubmit}>
 		<!-- Card Preview -->
 		<div class="2xl:absolute left-20">
 			<Card
 				img={cover}
-				title={script.title}
-				author={script.author ? script.author : ""}
-				description={script.description}
-				exportedCategories={script.categories}
-				exportedSubcategories={script.subcategories}
+				title={data.title}
+				author={data.author ? data.author : ""}
+				description={data.description}
+				exportedCategories={data.categories}
+				exportedSubcategories={data.subcategories}
 			/>
 		</div>
 
@@ -168,7 +165,7 @@
 				name="title"
 				class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
                 border-orange-200 focus:border-orange-600 text-black"
-				bind:value={script.title}
+				bind:value={data.title}
 			/>
 		</div>
 		<div class="flex flex-col text-sm mb-2">
@@ -179,7 +176,7 @@
 				name="description"
 				class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
                 border-orange-200 focus:border-orange-600 text-black"
-				bind:value={script.description}
+				bind:value={data.description}
 			/>
 		</div>
 
@@ -189,7 +186,7 @@
 			{#await categories}
 				<MultiSelect id="cats" />
 			{:then categories}
-				<MultiSelect id="cats" bind:value={script.categories}>
+				<MultiSelect id="cats" bind:value={data.categories}>
 					{#each categories as cat}
 						<option value={cat.name}>{cat.emoji}{cat.name}</option>
 					{/each}
@@ -201,7 +198,7 @@
 			{#await subcategories}
 				<MultiSelect id="subcats" />
 			{:then subcategories}
-				<MultiSelect id="subcats" bind:value={script.subcategories}>
+				<MultiSelect id="subcats" bind:value={data.subcategories}>
 					{#each subcategories as subcat}
 						<option value={subcat.name}>{subcat.emoji}{subcat.name}</option>
 					{/each}
@@ -217,13 +214,13 @@
 				name="content"
 				class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
                 border-orange-200 focus:border-orange-600 text-black h-64"
-				bind:value={script.content}
+				bind:value={data.content}
 			/>
 		</div>
 
 		<!-- File -->
 		<div class="flex flex-col text-sm mt-4 mb-2">
-			<span class="font-bold mb-2">Script revision: {script.revision}</span>
+			<span class="font-bold mb-2">Script revision: {data.revision}</span>
 			<Dropzone accept={".simba"} on:drop={handleFileSelect} />
 			<ol>
 				{#if file}

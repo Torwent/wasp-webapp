@@ -1,34 +1,27 @@
-<script context="module">
-	import { load } from "./_slug"
-	export { load }
-</script>
-
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import { supabase } from "$lib/supabase"
+	import { supabase } from "$lib/database/supabase"
 	import { user } from "$lib/stores/authStore"
-	export let post: {
-		id: string
-		title: string
-		description: string
-		level: number
-		content: string
+	import type { Post } from "$lib/database/types"
+	let post: Post = {
+		title: "",
+		description: "",
+		content: "",
+		level: 0,
+		author: ""
 	}
 
 	const handleSubmit = async () => {
-		const { error } = await supabase
-			.from("posts")
-			.update({
+		const { error } = await supabase.from("posts").insert([
+			{
 				title: post.title,
 				description: post.description,
-				level: post.level,
-				content: post.content
-			})
-			.match({ id: post.id })
+				content: post.content,
+				level: post.level
+			}
+		])
 
-		if (error) {
-			return console.error(error)
-		}
+		if (error) return console.error(error)
 
 		location.reload()
 	}
@@ -95,7 +88,7 @@
 			</div>
 
 			<div class="flex justify-between">
-				<a href="/blog/{encodeURI(post.title)}">
+				<a href="/blog">
 					<button
 						type="button"
 						class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
@@ -110,7 +103,7 @@
 					class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
 		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
 				>
-					<span class="px-2">Update</span>
+					<span class="px-2">Add</span>
 				</button>
 			</div>
 		</form>

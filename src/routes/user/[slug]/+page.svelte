@@ -1,12 +1,9 @@
-<script context="module">
-	import { load } from "./_slug"
-	export { load }
-</script>
-
 <script lang="ts">
 	import { fade } from "svelte/transition"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
-	import { supabase } from "$lib/supabase"
+	import { supabase } from "$lib/database/supabase"
+	import type { Profile } from "$lib/database/types"
+	import { validEmail } from "$lib/utils"
 
 	let email: string = ""
 	let password: string = ""
@@ -20,21 +17,7 @@
 		email = supabaseUser.email
 	}
 
-	export let user: {
-		username: string
-		id: string
-		avatar: string
-		dev: boolean
-		premium: boolean
-		vip: boolean
-		tester: boolean
-	}
-
-	const validEmail = (input: string) => {
-		let validRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
-		if (input.match(validRegex)) return true
-		return false
-	}
+	export let data: Profile
 
 	const updateAccount = async () => {
 		let obj: { email?: string; password?: string } = {}
@@ -54,16 +37,16 @@
 	}
 </script>
 
-{#if supabaseUser && user.id === supabaseUser.id}
+{#if supabaseUser && data.id === supabaseUser.id}
 	<div
 		class="container mx-auto my-6 max-w-2xl flex-grow"
 		in:fade={{ duration: 300, delay: 300 }}
 		out:fade={{ duration: 300 }}
 	>
-		<h1 class="mb-4 font-bold text-3xl">Username: {user.username}</h1>
-		<h2 class="font-semibold leading-normal mb-4">ID: {user.id}</h2>
+		<h1 class="mb-4 font-bold text-3xl">Username: {data.username}</h1>
+		<h2 class="font-semibold leading-normal mb-4">ID: {data.id}</h2>
 
-		<RoleBadges profile={user} />
+		<RoleBadges profile={data} />
 
 		<h3 class="py-8">
 			<p class="text-orange-400">THIS IS NOT IN USE YET BUT WILL BE SOON!</p>

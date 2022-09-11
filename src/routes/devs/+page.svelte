@@ -3,28 +3,20 @@
 	import { devs, loadData } from "$lib/stores/stores"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import DevCard from "$lib/components/DevCard.svelte"
+	import type { Developer } from "$lib/database/types"
+	import { search } from "$lib/utils"
 	loadData("devs", devs)
 
 	let searchQuery = ""
-	let filteredDevs = []
+	let filteredDevs: Developer[] = []
 	let placeholderText = "Search devs..."
-
-	String.prototype.fuzzy = function (s) {
-		var hay = this.toLowerCase(),
-			i = 0,
-			n = -1,
-			l
-		s = s.toLowerCase()
-		for (; (l = s[i++]); ) if (!~(n = hay.indexOf(l, n + 1))) return false
-		return true
-	}
 
 	const handleSearch = () => {
 		filteredDevs = $devs
 		placeholderText = "Search devs..."
 		if (searchQuery === "") return
 
-		filteredDevs = $devs.filter((post) => post.title.fuzzy(searchQuery))
+		filteredDevs = $devs.filter((dev: Developer) => search(dev.username, searchQuery))
 		if (filteredDevs.length === 0) {
 			placeholderText = "Not found!"
 			searchQuery = ""

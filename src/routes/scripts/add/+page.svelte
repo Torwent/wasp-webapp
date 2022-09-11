@@ -5,8 +5,8 @@
 	import { profile } from "$lib/stores/authStore"
 
 	import Markdown from "$lib/Markdown.svelte"
-	import { uploadScript } from "$lib/supabaseStorage"
-	import { getData, type Category, type Script, type SubCategory } from "$lib/supabase"
+	import { uploadScript } from "$lib/database/storage"
+	import { getData, type Category, type Script, type SubCategory } from "$lib/database/supabase"
 
 	let script: Script = {
 		title: "New Script",

@@ -1,5 +1,6 @@
-import { supabase, type Script } from "$lib/supabase"
-import { pad } from "./utils"
+import { supabase } from "$lib/database/supabase"
+import { pad } from "$lib/utils"
+import type { Script } from "$lib/database/types"
 
 export const getScripts = async () => {
 	const { data, error } = await supabase.from("scripts").select()

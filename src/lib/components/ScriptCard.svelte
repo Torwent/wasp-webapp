@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Card from "$lib/components/Card.svelte"
-	import type { Script } from "$lib/supabase"
+	import type { Script } from "$lib/database/types"
 
 	export let script: Script
 

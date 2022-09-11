@@ -1,4 +1,12 @@
-import { supabase } from "$lib/supabase"
+import { supabase } from "$lib/database/supabase"
+
+interface VersionJSON {
+	name: string
+	time: string
+	download_url: string
+	options_url: string
+	notes: string
+}
 
 interface simbaPackage {
 	id: string
@@ -6,11 +14,6 @@ interface simbaPackage {
 	body: string
 	versions: string
 	pkg_file: string
-}
-
-const headers = {
-	"Cache-Control": "max-age=0, s-maxage=3600",
-	"Content-Type": "application/json"
 }
 
 const error = (pkg: string) => {
@@ -32,19 +35,19 @@ export const getPackage = async (pkg: string) => {
 	let data = await getData(pkg)
 	if (data == null) return error(pkg)
 
-	return { headers, body: JSON.stringify(data.body, null, 2) }
+	return data.body
 }
 
 export const getVersions = async (pkg: string) => {
 	let data = await getData(pkg)
 	if (data == null) return error(pkg)
 
-	return { headers, body: JSON.stringify(data.versions, null, 2) }
+	return data.versions
 }
 
 export const getPkgFile = async (pkg: string) => {
 	let data = await getData(pkg)
 	if (data == null) return error(pkg)
 
-	return { headers, body: data.pkg_file }
+	return data.pkg_file
 }

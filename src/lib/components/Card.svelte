@@ -1,7 +1,8 @@
 <script lang="ts">
+	import type { Category, SubCategory } from "$lib/database/types"
 	import { fade } from "svelte/transition"
 	import EmojiTooltip from "$lib/components/EmojiTooltip.svelte"
-	import { getData, type Category, type SubCategory } from "$lib/supabase"
+	import { getData } from "$lib/database/supabase"
 	import Loading from "$lib/components/Loading.svelte"
 
 	export let img: string

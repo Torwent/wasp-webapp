@@ -17,40 +17,6 @@ export const getServiceSupabase = () =>
 		import.meta.env.VITE_PUBLIC_SUPABASE_SERVICE_KEY
 	)
 
-export interface Script {
-	id?: string
-	title: string
-	description: string
-	content: string
-	revision: number
-	categories: string[]
-	subcategories: string[]
-	author?: string
-	user_id?: string
-	assets_path?: string
-	assets_alt?: string
-}
-
-export interface Post {
-	user_id?: string
-	title: string
-	description: string
-	content: string
-	level: number
-	author: string
-}
-
-export interface Category {
-	name: string
-	emoji: string
-}
-
-export interface SubCategory {
-	category: string
-	name: string
-	emoji: string
-}
-
 export const getData = async (table: string, id: string = "") => {
 	const { data, error } =
 		id === ""

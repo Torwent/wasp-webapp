@@ -1,20 +1,18 @@
-<script context="module">
-	import { load } from "./_slug"
-	export { load }
-</script>
-
 <script lang="ts">
+	import type { Script } from "$lib/database/types"
+	export let data: Script //data fetched from ./+page.ts
+
 	import Markdown from "$lib/Markdown.svelte"
+	import { getServiceSupabase } from "$lib/database/supabase"
 	import AdvancedButton from "$lib/components/AdvancedDownloadButton.svelte"
 	import SimpleButton from "$lib/components/SimpleDownloadButton.svelte"
 	import Carousel from "$lib/components/Carousel.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
-	import { getServiceSupabase, type Script } from "$lib/supabase"
+
 	import { fade } from "svelte/transition"
 	import { profile, loadProfile } from "$lib/stores/authStore"
-	let tempDismiss = $profile.dismissed_warning
 
-	export let script: Script
+	let tempDismiss = $profile.dismissed_warning
 
 	const fullDismiss = async () => {
 		tempDismiss = true
@@ -33,20 +31,20 @@
 
 	let assets_path =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" +
-		script.id +
+		data.id +
 		"/banner.jpg"
 </script>
 
 <svelte:head>
 	<MetaTags
-		title={script.title}
-		description={script.description}
-		url={"/scripts/" + encodeURI(script.title)}
+		title={data.title}
+		description={data.description}
+		url={"/scripts/" + encodeURI(data.title)}
 	/>
 </svelte:head>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
-	{#if script.categories.includes("Community") && !tempDismiss}
+	{#if data.categories.includes("Community") && !tempDismiss}
 		<div
 			class="fixed inset-0 bg-stone-900 bg-opacity-50 overflow-y-auto h-full w-full backdrop-blur transition-colors z-40"
 			in:fade={{ duration: 300, delay: 300 }}
@@ -96,15 +94,15 @@
 		<img
 			class="inset-0 z-0 absolute object-cover h-fit w-full"
 			src={assets_path}
-			alt={script.assets_alt}
+			alt={data.assets_alt}
 		/>
 		<header class="mt-auto z-10 text-center h-32 text-amber-500 text-shadow">
 			<div
 				class="absolute mx-0 left-0 h-32 w-full opacity-100
 					   bg-gradient-to-t from-white/20 via-white-800/20 dark:from-black/60 dark:via-gray-800/20 to-transparent"
 			/>
-			<h1 class="mb-4 font-bold text-4xl">{script.title}</h1>
-			<h2 class="font-semibold leading-normal mb-4">{script.description}</h2>
+			<h1 class="mb-4 font-bold text-4xl">{data.title}</h1>
+			<h2 class="font-semibold leading-normal mb-4">{data.description}</h2>
 		</header>
 		<!-- Title and Description Hover Effect -->
 	</div>
@@ -113,15 +111,15 @@
 		<div class="container w-full mx-auto my-3">
 			<Carousel
 				bucket="imgs"
-				folder={"scripts/" + script.title.toLowerCase().replace(" ", "_") + "/assets"}
+				folder={"scripts/" + data.title.toLowerCase().replace(" ", "_") + "/assets"}
 			/>
 		</div>
 
 		<div class="text-center py-12">
-			{#if script.categories.includes("Free")}
-				<AdvancedButton {script} />
+			{#if data.categories.includes("Free")}
+				<AdvancedButton script={data} />
 
-				{#if script.categories.includes("Official")}
+				{#if data.categories.includes("Official")}
 					<h3 class="py-6">
 						This is a free wasp script, you can add it to Simba's package manager with the following
 						link:
@@ -143,17 +141,17 @@
 						>.
 					</h5>
 				{/if}
-			{:else if script.categories.includes("Premium")}
+			{:else if data.categories.includes("Premium")}
 				{#if !$profile.id}
 					<h3 class="py-6">Please login to be able to download this script.</h3>
-				{:else if $profile.premium || $profile.vip || $profile.tester || $profile.id === script.user_id}
-					<AdvancedButton {script} />
+				{:else if $profile.premium || $profile.vip || $profile.tester || $profile.id === data.user_id}
+					<AdvancedButton script={data} />
 					<h4 class="pt-6">
 						This is a premium script, you need to move it to
 						<b class="text-amber-500 dark:text-amber-200"> Simba/Scripts/wasp-premium </b>
 					</h4>
 
-					{#if script.categories.includes("Official")}
+					{#if data.categories.includes("Official")}
 						<h4 class="py-6">To download all official premium scripts a zip click here:</h4>
 						<SimpleButton />
 					{/if}
@@ -172,9 +170,9 @@
 			{/if}
 		</div>
 
-		{#if $profile.id === script.user_id || $profile.id === "4dbcf43d-cc8a-48e3-aead-2c55a3f302ee"}
+		{#if $profile.id === data.user_id || $profile.id === "4dbcf43d-cc8a-48e3-aead-2c55a3f302ee"}
 			<div class="grid place-items-center">
-				<a href="/scripts/{encodeURI(script.title) + '&' + script.id}/edit">
+				<a href="/scripts/{encodeURI(data.title) + '&' + data.id}/edit">
 					<button
 						data-mdb-ripple="true"
 						data-mdb-ripple-color="light"
@@ -189,7 +187,7 @@
 
 		<h2 class="text-amber-500 dark:text-amber-200 text-center py-6">Description:</h2>
 		<article class="prose dark:prose-invert py-6">
-			<Markdown src={script.content} />
+			<Markdown src={data.content} />
 		</article>
 	</div>
 </div>

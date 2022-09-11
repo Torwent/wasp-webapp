@@ -1,4 +1,4 @@
-import { supabase } from "$lib/supabase"
+import { supabase } from "$lib/database/supabase"
 
 const website = "https://waspscripts.com"
 
@@ -59,9 +59,8 @@ export const GET = async () => {
 		"Cache-Control": "max-age=0, s-maxage=3600",
 		"Content-Type": "application/xml"
 	}
-	return {
-		headers,
-		body: `<?xml version="1.0" encoding="UTF-8" ?>
+	return new Response(
+		`<?xml version="1.0" encoding="UTF-8" ?>
     <urlset
       xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
       xmlns:news="https://www.google.com/schemas/sitemap-news/0.9"
@@ -107,6 +106,7 @@ export const GET = async () => {
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
       </url>
-    </urlset>`
-	}
+    </urlset>`,
+		{ headers: headers }
+	)
 }

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Post } from "$lib/supabase"
+	import type { Post } from "$lib/database/types"
 	import { fly } from "svelte/transition"
 	export let post: Post
 </script>

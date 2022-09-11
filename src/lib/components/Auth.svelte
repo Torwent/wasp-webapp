@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { supabase } from "$lib/supabase"
+	import { supabase } from "$lib/database/supabase"
 	const redirect = location.origin + (location.pathname !== "/" ? location.pathname + "/" : "")
 
 	const handleLogin = async () => {

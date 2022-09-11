@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { getScripts, getSignedURL } from "$lib/supabaseStorage"
+	import { getScripts, getSignedURL } from "$lib/database/storage"
 	import Promise from "bluebird"
 	import JsZip from "jszip"
 	import FileSaver from "file-saver"
-	import type { Script } from "$lib/supabase"
+	import type { Script } from "$lib/database/types"
 	import { pad } from "$lib/utils"
 	let progress: number = -1
 

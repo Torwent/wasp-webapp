@@ -5,7 +5,7 @@
 	import LinkButton from "$lib/components/LinkButton.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { search } from "$lib/utils"
-	import { getData, type Category, type Script, type SubCategory } from "$lib/supabase"
+	import { getData, type Category, type Script, type SubCategory } from "$lib/database/supabase"
 
 	interface CheckboxType {
 		id: number

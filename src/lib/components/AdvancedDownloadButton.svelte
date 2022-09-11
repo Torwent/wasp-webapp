@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { slide } from "svelte/transition"
-	import { getSignedURL } from "$lib/supabaseStorage"
+	import { getSignedURL } from "$lib/database/storage"
 	import { pad } from "$lib/utils"
-	import type { Script } from "$lib/supabase"
+	import type { Script } from "$lib/database/types"
 
 	export let script: Script
 

@@ -1,3 +1,11 @@
+export const loadError = (page: string = "") => {
+	if (page == null) page = "page"
+	return {
+		status: 404,
+		error: new Error(page + " not found.")
+	}
+}
+
 export const pad = (n: number, size: number) => {
 	let s = n + ""
 	while (s.length < size) s = "0" + s
@@ -17,4 +25,8 @@ export const search = (content: string, search: string) => {
 		}
 	}
 	return true
+}
+
+export const validEmail = (input: string) => {
+	return input.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)
 }
