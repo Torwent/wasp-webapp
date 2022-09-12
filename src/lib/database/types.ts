@@ -6,6 +6,7 @@ export interface Profile {
 	premium: boolean
 	vip: boolean
 	tester: boolean
+	unlocked_ips: number
 }
 
 export interface Developer {
