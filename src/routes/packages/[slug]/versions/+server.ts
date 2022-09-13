@@ -4,7 +4,7 @@ import { supabase } from "$lib/database/supabase"
 import { json } from "@sveltejs/kit"
 
 export const GET: RequestHandler = async ({ params, getClientAddress }) => {
-	console.log(getClientAddress())
+	//console.log(getClientAddress())
 	const { slug } = params
 
 	const { data, error } = await supabase.from("packages").select("*").eq("name", slug)

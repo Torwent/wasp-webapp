@@ -3,7 +3,7 @@
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
 	import { supabase } from "$lib/database/supabase"
 	import type { Profile } from "$lib/database/types"
-	import { validEmail } from "$lib/utils"
+	import { validateEmail, validateIp } from "$lib/utils"
 	export let data: { data: Profile; clientAddress: string }
 
 	let email: string = ""
@@ -22,24 +22,7 @@
 	const updateAccount = async () => {
 		let obj: { email?: string; password?: string } = {}
 
-		if (validEmail(email)) {
-			emailUpdated =
-				supabaseUser != null && supabaseUser.email != null && email !== supabaseUser.email
-			obj.email = email
-		}
-
-		if (password != null && password.length > 6) {
-			obj.password = password
-			passUpdated = true
-		}
-		const { error } = await supabase.auth.update(obj)
-		if (error) return console.error(error)
-	}
-
-	const updateIpList = async () => {
-		let obj: { email?: string; password?: string } = {}
-
-		if (validEmail(email)) {
+		if (validateEmail(email)) {
 			emailUpdated =
 				supabaseUser != null && supabaseUser.email != null && email !== supabaseUser.email
 			obj.email = email
@@ -54,16 +37,47 @@
 	}
 
 	const loadIpList = async (user: string) => {
-		const { data, error } = await supabase
-		.from('ip_whitelist')
-		.select('ip')
-		.eq('user', user)
+		const { data, error } = await supabase.from("ip_whitelist").select("ip").eq("user", user)
 
 		if (error) return console.error(error)
-		return data
+
+		let result: string[] = []
+		data.forEach((ip) => result.push(ip.ip))
+
+		return result
 	}
 
-	const ipList = loadIpList(data.data.id) as unknown as { ip: string }
+	const ipList = loadIpList(data.data.id) as unknown as string[]
+
+	const insertAddress = async () => {
+		if (ipList.length === 0) return
+		if (data.data.unlocked_ips >= ipList.length) return
+		if (!validateIp(clientAddress)) return
+
+		const { error } = await supabase
+			.from("ip_whitelist")
+			.insert({ user: data.data.id, ip: clientAddress })
+
+		if (error) return console.error(error)
+		location.reload()
+	}
+
+	const updateAddress = async (i: number) => {
+		if (ipList.length === 0) return
+		if (!validateIp(clientAddress)) return
+
+		const { error } = await supabase
+			.from("ip_whitelist")
+			.update({ ip: clientAddress })
+			.match({ user: data.data.id, ip: ipList[i] })
+
+		if (error) return console.error(error)
+		location.reload()
+	}
+
+	const deleteAddress = async (i: number) => {
+		console.log(i, " ip deleted")
+	}
 </script>
 
 {#if supabaseUser && data.data.id === supabaseUser.id}
@@ -125,61 +139,86 @@
 			Your password was updated.
 		{/if}
 
-		
-		<form class="form my-6 w-full" on:submit|preventDefault={updateIpList}>
+		<div class="form my-6 w-full">
 			<h3>IP Addresses:</h3>
 
 			{#await ipList}
 				Loading...
 			{:then ipList}
-			<p>Your account has {ipList.length}/{data.data.unlocked_ips} ip addresses.</p>
-			{/await}
+				<p class="py-4">Your account has {ipList.length}/{data.data.unlocked_ips} ip addresses.</p>
 
-			<div class="flex flex-col text-sm my-6">
-				<label for="clientAddress" class="font-bold mb-2">
-					Add IP Address
-					{#if clientAddress === data.clientAddress}
-						(Current IP)
-					{/if}
-					:
-				</label>
-				<input type="text" name="clientAddress"
-					class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
-						 border-orange-200 focus:border-orange-600 text-black"
-					bind:value={clientAddress}
+				<div
+					class="w-full bg-white rounded-lg shadow-lg appearance-none border-2 border-orange-200"
 				>
-			</div>
-						
-			{#await ipList}
-				Loading...
-			{:then ipList}
-				<div class="w-full bg-white rounded-lg shadow-lg appearance-none border-2 border-orange-200">
-					<ul class="divide-y-2 rounded-lg divide-orange-100">
-						{#each ipList as ipEntry}
-						<li class="flex justify-between p-3 hover:bg-orange-500 hover:text-orange-100 group">
-							{ipEntry.ip}
-							<svg class="hidden group-hover:block" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-								viewBox="0 0 443 443" width="22" height="22" xml:space="preserve">
-									<path d="M321.785,38h-83.384V0H125.169v38H41.785v60h280V38z M155.169,30h53.232v8h-53.232V30z"/>
-									<path d="M295.142,214.31l5.66-86.31H62.769l19.016,290h114.172c-14.861-21.067-23.602-46.746-23.602-74.43
-										C172.355,274.43,226.849,217.779,295.142,214.31z"/>
-									<path d="M301.785,244.141c-54.826,0-99.43,44.604-99.43,99.429S246.959,443,301.785,443s99.43-44.604,99.43-99.43
-										S356.611,244.141,301.785,244.141z M355.961,376.533l-21.213,21.213l-32.963-32.963l-32.963,32.963l-21.213-21.213l32.963-32.963
-										l-32.963-32.963l21.213-21.213l32.963,32.963l32.963-32.963l21.213,21.213l-32.963,32.963L355.961,376.533z"/>
-							</svg>
-						</li>
-						{/each}					
+					<ul class="divide-y-2 rounded-lg divide-orange-100 overflow-y-auto h-52">
+						{#if !ipList.includes(clientAddress)}
+							<li
+								class="h-10 flex w-full justify-around rounded-md shadow-sm border-2 focus-within:outline-none border-orange-200 focus-within:border-orange-600 text-stone-500 bg-white"
+							>
+								<input
+									type="text"
+									name="clientAddress"
+									class="mx-4 w-full appearance-none border-0 outline-none"
+									value={clientAddress}
+								/>
+
+								<button
+									class="mx-2 w-28 text-stone-500 hover:text-orange-400 bg-white text-xs font-semibold leading-tight transition duration-150 ease-in-out flex items-center justify-between"
+									on:click={async () => await insertAddress()}
+								>
+									Add Current IP
+								</button>
+							</li>
+						{/if}
+						{#each Array(data.data.unlocked_ips) as _, i}
+							{#if ipList[i] != null}
+								<li
+									class="h-10 flex w-full justify-around rounded-md shadow-sm border-2 focus-within:outline-none border-orange-200 focus-within:border-orange-600 text-stone-500 bg-white"
+								>
+									<input
+										type="text"
+										name="clientAddress"
+										class="mx-4 w-full appearance-none border-0 outline-none"
+										class:text-orange-400={ipList[i] === clientAddress}
+										value={ipList[i]}
+									/>
+
+									<button
+										class="mx-2 text-stone-500 hover:text-orange-400 bg-white text-xs font-semibold leading-tight transition duration-150 ease-in-out flex items-center justify-between"
+										on:click={async () => await deleteAddress(i)}
+									>
+										Delete
+									</button>
+									<button
+										class="mx-2 text-stone-500 hover:text-orange-400 bg-white text-xs font-semibold leading-tight transition duration-150 ease-in-out flex items-center justify-between"
+										on:click={async () => await updateAddress(i)}
+									>
+										Update
+									</button>
+								</li>
+							{:else}
+								<li
+									class="h-10 flex w-full justify-around rounded-md shadow-sm border-2 focus-within:outline-none border-orange-200 focus-within:border-orange-600 text-stone-500 bg-white"
+								>
+									<input
+										type="text"
+										name="clientAddress"
+										class="mx-4 w-full appearance-none border-0 outline-none"
+										value=""
+									/>
+
+									<button
+										class="mx-2 text-stone-500 hover:text-orange-400 bg-white text-xs font-semibold leading-tight transition duration-150 ease-in-out flex items-center justify-between"
+										on:click={async () => await insertAddress()}
+									>
+										Add
+									</button>
+								</li>
+							{/if}
+						{/each}
 					</ul>
 				</div>
 			{/await}
-			<button
-				type="submit"
-				class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
-					justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
-			>
-				<span class="px-2">Update</span>
-			</button>
-		</form>
-		
+		</div>
 	</div>
 {/if}
