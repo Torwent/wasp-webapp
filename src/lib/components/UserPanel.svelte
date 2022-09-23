@@ -1,41 +1,13 @@
 <script lang="ts">
 	import { onMount } from "svelte"
-	import { profile, logout, updateRoles } from "$lib/stores/authStore"
+	import { profile, logout } from "$lib/stores/authStore"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
-
-	let ws
-	onMount(() => {
-		let protocol = "ws://"
-		if (window.location.protocol === "https:") {
-			protocol = "wss://"
-		}
-
-		let wsUri = protocol + "waspscripts.com/wss"
-
-		ws = new WebSocket(wsUri)
-		ws.addEventListener("open", () => {
-			console.log("Connection open to wasp-discord!")
-			let id = $profile.discord_id
-
-			if (id !== "") ws.send(id)
-		})
-
-		ws.addEventListener("message", async ({ data }) => {
-			console.log("Received a reply from wasp-discord!", data)
-			let hasDev = data.includes("864744526894333963")
-			let hasPremium = data.includes("820985772140134440")
-			let hasVip = data.includes("931167526681972746")
-			let hasTester = data.includes("907209408860291113")
-
-			updateRoles($profile.id, hasDev, hasTester, hasPremium, hasVip)
-			console.log("Closing the connection to wasp-discord...")
-			ws.close()
-		})
-
-		ws.addEventListener("close", () => {
-			console.log("Connection to wasp-discord closed!")
-		})
-	})
+	onMount(async () => {
+        const response = await fetch(location.origin + "/updateuser/" + $profile.id,
+            { method: 'GET' }
+        )
+        await response.json();
+    });
 </script>
 
 <div class="px-4 py-2">
