@@ -2,7 +2,6 @@ import { supabase, getServiceSupabase } from "$lib/database/supabase"
 import { writable } from "svelte/store"
 import { createAvatar } from "@dicebear/avatars"
 import * as style from "@dicebear/avatars-bottts-sprites"
-import { browser } from "$app/environment"
 
 export const user: any = writable(false)
 export const profile: any = writable([])
@@ -16,8 +15,6 @@ export const loadProfile = async (id: string) => {
 }
 
 export const updateRoles = async (id: string, d: boolean, t: boolean, p: boolean, v: boolean) => {
-	if (browser) return
-
 	const ssb = getServiceSupabase()
 	ssb.auth.signOut()
 
