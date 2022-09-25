@@ -7,8 +7,8 @@ services:
       context: .
     restart: unless-stopped
     networks:
-      - wasp-server_proxy
+      - wasp-proxy
 
 networks:
-  wasp-server_proxy:
+  wasp-proxy:
     external: true
