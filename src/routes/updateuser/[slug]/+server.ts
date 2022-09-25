@@ -4,7 +4,7 @@ import { updateRoles } from "$lib/stores/authStore"
 import WebSocket from "ws"
 import { getData } from "$lib/database/supabase"
 
-const ws = new WebSocket("ws://wasp-discord:4100")
+const ws = new WebSocket("ws://wasp-discord:4100", { headers: { Host: "wasp-discord:4100" } })
 
 export const GET: RequestHandler = async ({ params }) => {
 	const { slug } = params
