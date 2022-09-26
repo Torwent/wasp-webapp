@@ -4,7 +4,7 @@ import { updateRoles } from "$lib/stores/authStore"
 import WebSocket from "ws"
 import { getData } from "$lib/database/supabase"
 
-export const GET: RequestHandler = async ({ params }) => {
+export const POST: RequestHandler = async ({ params }) => {
 	const { slug } = params
 	if (slug == null) return json("Missing id")
 
@@ -20,7 +20,7 @@ export const GET: RequestHandler = async ({ params }) => {
 		if (profile.discord_id !== "") ws.send(profile.discord_id)
 	})
 
-	ws.addEventListener("message", async ({ data }) => {
+	ws.addEventListener("message", async ({ data }: any) => {
 		console.log("Received a reply from wasp-discord!")
 
 		let hasDev = data.includes("864744526894333963")

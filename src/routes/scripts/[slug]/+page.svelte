@@ -16,16 +16,7 @@
 
 	const fullDismiss = async () => {
 		tempDismiss = true
-		const ssb = getServiceSupabase()
-		ssb.auth.signOut()
-
-		const { error } = await ssb
-			.from("profile")
-			.update({ dismissed_warning: true })
-			.match({ id: $profile.id })
-
-		if (error) return console.error(error)
-
+		await fetch(location.origin + "/api/dismiss/" + $profile.id, { method: 'POST' })
 		loadProfile($profile.id)
 	}
 
