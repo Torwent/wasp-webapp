@@ -4,14 +4,14 @@ import { updateRoles } from "$lib/stores/authStore"
 import WebSocket from "ws"
 import { getData } from "$lib/database/supabase"
 
-const ws = new WebSocket("ws://wasp-discord:4100", { headers: { Host: "wasp-discord:4100" } })
-
 export const GET: RequestHandler = async ({ params }) => {
 	const { slug } = params
 	if (slug == null) return json("Missing id")
 
 	const data = await getData("profile", slug)
 	if (data == null) return json("Profile doesn't exist")
+
+	const ws = new WebSocket("ws://wasp-discord:4100")
 
 	const profile = data[0]
 
