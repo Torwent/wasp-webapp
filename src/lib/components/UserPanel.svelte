@@ -3,10 +3,8 @@
 	import { profile, logout } from "$lib/stores/authStore"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
 	onMount(async () => {
-        await fetch(location.origin + "/api/updateuser/" + $profile.id,
-            { method: 'POST' }
-        )
-    })
+		await fetch(location.origin + "/api/user/update/" + $profile.id, { method: "POST" })
+	})
 </script>
 
 <div class="px-4 py-2">

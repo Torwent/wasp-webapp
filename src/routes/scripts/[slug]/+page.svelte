@@ -16,7 +16,7 @@
 
 	const fullDismiss = async () => {
 		tempDismiss = true
-		await fetch(location.origin + "/api/dismiss/" + $profile.id, { method: 'POST' })
+		await fetch(location.origin + "/api/user/dismiss/" + $profile.id, { method: "POST" })
 		loadProfile($profile.id)
 	}
 
