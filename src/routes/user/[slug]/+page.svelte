@@ -2,6 +2,7 @@
 	import { fade } from "svelte/transition"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
 	import { supabase } from "$lib/database/supabase"
+	import { user } from "$lib/stores/authStore"
 	import type { Profile } from "$lib/database/types"
 	import { validateEmail, validateIp } from "$lib/utils"
 	export let data: { data: Profile; clientAddress: string }
@@ -13,11 +14,9 @@
 		passUpdated = false,
 		clientAddress = data.clientAddress
 
-	const supabaseUser = supabase.auth.user()
+	const supabaseUser = $user
 
-	if (supabaseUser != null && supabaseUser.email != null) {
-		email = supabaseUser.email
-	}
+	if (supabaseUser != null && supabaseUser.email != null) email = supabaseUser.email
 
 	const updateAccount = async () => {
 		let obj: { email?: string; password?: string } = {}

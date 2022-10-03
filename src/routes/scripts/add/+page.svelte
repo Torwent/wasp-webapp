@@ -6,7 +6,9 @@
 
 	import Markdown from "$lib/Markdown.svelte"
 	import { uploadScript } from "$lib/database/storage"
-	import { getData, type Category, type Script, type SubCategory } from "$lib/database/supabase"
+	import { getData } from "$lib/database/supabase"
+
+	import type { Category, Script, SubCategory } from "$lib/database/types"
 
 	let script: Script = {
 		title: "New Script",
@@ -98,8 +100,7 @@
 	const handleSubmit = async () => {
 		await uploadScript(script, file, coverFile, bannerFile)
 
-		location.replace(location.origin + "scripts")
-		location.reload()
+		location.replace(location.origin + "/scripts")
 	}
 
 	const categories = getData("categories") as unknown as Category[]
@@ -153,9 +154,9 @@
 		</div>
 
 		<!-- Images -->
-		<h4>Cover image:</h4>
+		<h4>Cover image (300x200 .jpg):</h4>
 		<Dropzone accept={".jpg"} on:drop={handleCoverSelect} />
-		<h4>Banner image:</h4>
+		<h4>Banner image (1920x768 .jpg):</h4>
 		<Dropzone accept={".jpg"} on:drop={handleBannerSelect} />
 
 		<!-- Title n Description -->

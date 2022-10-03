@@ -102,16 +102,24 @@ export const uploadScript = async (
 ) => {
 	if (!file) return console.error("No file added!")
 
-	const { data, error } = await supabase.from("scripts").insert(script)
+	const publicData = {
+		title: script.title,
+		description: script.description,
+		content: script.content,
+		categories: script.categories,
+		subcategories: script.subcategories
+	}
+
+	const { data, error } = await supabase.from("scripts_public").insert(publicData)
 
 	if (error) return console.error(error)
 
 	script = data[0]
 
-	file = await updateScriptRevision(file, script.revision)
+	file = await updateScriptRevision(file, 1)
 
 	//rename all scripts to script so we can always fetch them later regardless of name changes.
-	let path = script.id + "/" + pad(script.revision, 9) + "/script.simba"
+	let path = script.id + "/" + pad(1, 9) + "/script.simba"
 
 	uploadFile("scripts", path, file)
 
@@ -131,7 +139,20 @@ export const updateScript = async (
 	bannerFile: File | undefined
 ) => {
 	if (file) script.revision += 1
-	const { error } = await supabase.from("scripts").update(script).match({ id: script.id })
+
+	const publicData = {
+		id: script.id,
+		title: script.title,
+		description: script.description,
+		content: script.content,
+		categories: script.categories,
+		subcategories: script.subcategories
+	}
+
+	const { error } = await supabase
+		.from("scripts_public")
+		.update(publicData)
+		.match({ id: publicData.id })
 
 	if (error) return console.error(error)
 

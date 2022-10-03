@@ -1,55 +1,73 @@
-import { supabase, getServiceSupabase } from "$lib/database/supabase"
+import { supabase } from "$lib/database/supabase"
 import { writable } from "svelte/store"
+import type { Profile } from "$lib/database/types"
 import { createAvatar } from "@dicebear/avatars"
 import * as style from "@dicebear/avatars-bottts-sprites"
-import { browser } from "$app/environment"
 
 export const user: any = writable(false)
 export const profile: any = writable([])
 
-export const loadProfile = async (id: string) => {
-	const { data, error } = await supabase.from("profile").select().eq("id", id)
+export const getProfile = async () => {
+	if (supabase.auth.user()?.id == null) return
 
-	if (error) return console.error(error)
+	const { data: profilePublic, error: errorPublic } = await supabase
+		.from("profiles_public")
+		.select()
+		.eq("id", supabase.auth.user()?.id)
 
-	profile.set(data[0])
-}
+	if (errorPublic) return console.error(errorPublic)
 
-export const updateRoles = async (id: string, d: boolean, t: boolean, p: boolean, v: boolean) => {
-	if (browser) return
+	const { data: profileProtected, error: errorProtected } = await supabase
+		.from("profiles_protected")
+		.select()
+		.eq("id", supabase.auth.user()?.id)
 
-	const ssb = getServiceSupabase()
-	ssb.auth.signOut()
+	if (errorProtected) return console.error(errorProtected)
+	if (profileProtected.length === 0)
+		return console.log("Can't read protected data from that profile.")
 
-	const { error } = await ssb
-		.from("profile")
-		.update({ dev: d, tester: t, premium: p, vip: v })
-		.eq("id", id)
+	const { data: profilePrivate, error: errorPrivate } = await supabase
+		.from("profiles_private")
+		.select()
+		.eq("id", supabase.auth.user()?.id)
 
-	if (error) console.log(error)
+	if (errorPrivate) return console.error(errorPrivate)
+	if (profilePrivate.length === 0) return console.log("Can't read private data from that profile.")
 
-	loadProfile(id)
-}
-
-supabase.auth.onAuthStateChange((_, session) => {
-	user.set(session?.user)
-	if (session && session?.user) {
-		loadProfile(session?.user.id)
-		return
+	const data: Profile = {
+		id: profilePublic[0].id,
+		username: profilePublic[0].username,
+		discord_id: profilePublic[0].discord_id,
+		avatar_url: profilePublic[0].avatar_url,
+		developer: profileProtected[0].developer,
+		premium: profileProtected[0].premium,
+		vip: profileProtected[0].vip,
+		tester: profileProtected[0].tester,
+		moderator: profileProtected[0].moderator,
+		administrator: profileProtected[0].administrator,
+		unlocked_ips: profileProtected[0].unlocked_ips,
+		dismissed_warning: profilePrivate[0].dismissed_warning
 	}
-	profile.set(false)
+
+	profile.set(data)
+	return data
+}
+
+supabase.auth.onAuthStateChange((_: any, session: any) => {
+	user.set(session?.user)
+	profile.set([])
+	getProfile()
 })
 
 export const logout = () => supabase.auth.signOut()
 
 export var getSeed = () => {
-	if (!supabase.auth.currentUser) {
-		return String(Math.floor(Math.random() * 100000000))
-	}
-	return supabase.auth.currentUser.id
+	if (!supabase.auth.user()) return String(Math.floor(Math.random() * 100000000))
+
+	return supabase.auth.user()?.id
 }
 
-export var avatar: string
+export let avatar: string
 
 export var reloadAvatar = () => {
 	avatar = createAvatar(style, {
@@ -62,7 +80,5 @@ export var reloadAvatar = () => {
 export const updateUsername = async (id: string, username: string) => {
 	const { error } = await supabase.from("profile").update({ username: username }).eq("id", id)
 
-	if (error) {
-		console.log(error.message)
-	}
+	if (error) console.error(error)
 }

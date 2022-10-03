@@ -100,8 +100,8 @@
 		location.reload()
 	}
 
-	const categories = getData("categories") as unknown as Category[]
-	const subcategories = getData("subcategories") as unknown as SubCategory[]
+	const categories = getData("scripts_categories") as unknown as Category[]
+	const subcategories = getData("scripts_subcategories") as unknown as SubCategory[]
 </script>
 
 <div class="container mx-auto my-6 max-w-3xl flex-grow">

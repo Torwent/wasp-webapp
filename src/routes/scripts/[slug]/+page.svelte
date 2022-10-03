@@ -1,29 +1,39 @@
 <script lang="ts">
 	import type { Script } from "$lib/database/types"
 	export let data: Script //data fetched from ./+page.ts
-
 	import Markdown from "$lib/Markdown.svelte"
-	import { getServiceSupabase } from "$lib/database/supabase"
 	import AdvancedButton from "$lib/components/AdvancedDownloadButton.svelte"
 	import SimpleButton from "$lib/components/SimpleDownloadButton.svelte"
 	import Carousel from "$lib/components/Carousel.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 
 	import { fade } from "svelte/transition"
-	import { profile, loadProfile } from "$lib/stores/authStore"
+	import { profile, getProfile } from "$lib/stores/authStore"
+	import { supabase } from "$lib/database/supabase"
+	import { onMount } from "svelte"
 
-	let tempDismiss = $profile.dismissed_warning
+	let tempDismiss: Boolean
 
 	const fullDismiss = async () => {
 		tempDismiss = true
-		await fetch(location.origin + "/api/user/dismiss/" + $profile.id, { method: "POST" })
-		loadProfile($profile.id)
+		const { error } = await supabase
+			.from("profiles_private")
+			.update({ dismissed_warning: true })
+			.eq("id", supabase.auth.user()?.id)
+
+		if (error) console.error(error)
+		getProfile()
 	}
 
 	let assets_path =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" +
 		data.id +
 		"/banner.jpg"
+
+	onMount(async () => {
+		await getProfile()
+		tempDismiss = $profile.dismissed_warning
+	})
 </script>
 
 <svelte:head>
@@ -135,7 +145,7 @@
 			{:else if data.categories.includes("Premium")}
 				{#if !$profile.id}
 					<h3 class="py-6">Please login to be able to download this script.</h3>
-				{:else if $profile.premium || $profile.vip || $profile.tester || $profile.id === data.user_id}
+				{:else if $profile.premium || $profile.vip || $profile.tester || $profile.id === data.author_id}
 					<AdvancedButton script={data} />
 					<h4 class="pt-6">
 						This is a premium script, you need to move it to
@@ -161,7 +171,7 @@
 			{/if}
 		</div>
 
-		{#if $profile.id === data.user_id || $profile.id === "4dbcf43d-cc8a-48e3-aead-2c55a3f302ee"}
+		{#if $profile.id === data.author_id || $profile.administrator}
 			<div class="grid place-items-center">
 				<a href="/scripts/{encodeURI(data.title) + '&' + data.id}/edit">
 					<button

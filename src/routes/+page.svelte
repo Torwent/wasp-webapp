@@ -58,7 +58,7 @@
 			canvasData.data[i + 2] = 0
 			canvasData.data[i + 3] = 255
 			context.putImageData(canvasData, 0, 0)
-			setTimeout(clearPixel, 40000, context, i)
+			setTimeout(clearPixel, 20000, context, i)
 		}
 
 		setPixel((p.x + p.y * canvas.width) * 4)
@@ -90,9 +90,9 @@
 		drawPixel(context, canvas, p)
 	}
 
-	onMount(() => {
-		let canvas: any = document.getElementById("canvas"),
-			context = canvas.getContext("2d")
+	onMount(async () => {
+		let canvas: any = document.getElementById("canvas")
+		const context = canvas.getContext("2d", { willReadFrequently: true })
 
 		let Mouse: TPoint = { x: 0, y: 0 }
 

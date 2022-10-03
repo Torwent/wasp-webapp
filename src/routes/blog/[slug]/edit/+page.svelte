@@ -8,7 +8,7 @@
 
 	const handleSubmit = async () => {
 		const { error } = await supabase
-			.from("posts")
+			.from("blog")
 			.update({
 				title: data.title,
 				description: data.description,

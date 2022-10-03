@@ -5,7 +5,8 @@
 	import LinkButton from "$lib/components/LinkButton.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { search } from "$lib/utils"
-	import { getData, type Category, type Script, type SubCategory } from "$lib/database/supabase"
+	import { getData, getScripts } from "$lib/database/supabase"
+	import type { Category, Script, SubCategory } from "$lib/database/types"
 
 	interface CheckboxType {
 		id: number
@@ -15,7 +16,7 @@
 		checked: boolean
 	}
 
-	let scripts: Script[] = getData("scripts") as unknown as Script[]
+	const scripts: Script[] = getScripts() as unknown as Script[]
 
 	let searchQuery = "",
 		placeholderText = "Search posts...",
@@ -24,7 +25,7 @@
 
 	//handles the search field
 	const handleSearch = async () => {
-		filteredScripts = (await getData("scripts")) as unknown as Script[]
+		filteredScripts = await scripts
 		placeholderText = "Search scripts..."
 
 		filteredScripts = filteredScripts.filter((script: Script) => search(script.title, searchQuery))
@@ -36,7 +37,7 @@
 
 	//handles checkbox filters
 	const handleFilters = async () => {
-		filteredScripts = (await getData("scripts")) as unknown as Script[]
+		filteredScripts = await scripts
 		searchQuery = ""
 
 		let checked = checkboxes
@@ -51,9 +52,9 @@
 
 	//sets up checkboxes to what's available from the database
 	const loadCheckboxes = async () => {
-		const categories: Category[] = (await getData("categories")) as unknown as Category[]
+		const categories: Category[] = (await getData("scripts_categories")) as unknown as Category[]
 		const subcategories: SubCategory[] = (await getData(
-			"subcategories"
+			"scripts_subcategories"
 		)) as unknown as SubCategory[]
 
 		let id = 0
@@ -143,7 +144,7 @@
 		in:fly={{ duration: 600, delay: 600, x: 100 }}
 		out:fly={{ duration: 300, x: 100 }}
 	>
-		{#if $profile.dev}
+		{#if $profile.developer}
 			<LinkButton text="Add Script" url="/scripts/add" arrow={false} />
 		{/if}
 		<form class="my-6 place-items-center" on:submit|preventDefault={handleSearch}>

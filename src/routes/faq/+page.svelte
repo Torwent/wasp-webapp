@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { fade } from "svelte/transition"
-	import { questions, commonErrors, loadData } from "$lib/stores/stores"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import DropDown from "$lib/components/DropDown.svelte"
 	import Discord from "$lib/components/Discord.svelte"
+	import { getData } from "$lib/database/supabase"
+	import type { FAQEntry } from "$lib/database/types"
 
-	loadData("faq", questions)
-	loadData("common_errors", commonErrors)
+	const faqData = getData("faq_questions") as unknown as FAQEntry[]
+	const faqErrors = getData("faq_errors") as unknown as FAQEntry[]
 </script>
 
 <svelte:head>
@@ -26,8 +27,13 @@
 		<h2>Welcome to the Frequently Asked Questions and Common Errors section.</h2>
 	</header>
 
-	<DropDown title="FAQ" entries={questions} />
-	<DropDown title="Common Errors" entries={commonErrors} />
+	{#await faqData then faq}
+		<DropDown title="FAQ" entries={faq} />
+	{/await}
+
+	{#await faqErrors then errors}
+		<DropDown title="Common Errors" entries={errors} />
+	{/await}
 
 	<header class="py-12 text-center">
 		<p class="py-6">

@@ -1,16 +1,16 @@
 import type { Load } from "@sveltejs/kit"
-import { supabase } from "$lib/database/supabase"
+import { getScripts } from "$lib/database/supabase"
 import { loadError } from "$lib/utils"
+import type { Script } from "$lib/database/types"
 
 export const load: Load = async ({ params }) => {
 	const { slug } = params
 	if (slug == null) return loadError()
 
 	let id = slug.substring(slug.indexOf("&") + 1)
-	const { data, error } = await supabase.from("scripts").select("*").eq("id", id)
+	const script = (await getScripts(id)) as unknown as Script[]
 
-	if (error) return loadError("scripts/" + slug)
+	if (script.length === 0) return loadError("scripts/" + slug)
 
-	const script = data[0]
-	if (script) return script
+	if (script) return script[0]
 }

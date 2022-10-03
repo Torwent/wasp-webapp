@@ -6,7 +6,7 @@ export const load: Load = async ({ params }) => {
 	const { slug } = params
 	if (slug == null) return loadError()
 
-	const { data, error } = await supabase.from("posts").select("*").eq("title", decodeURI(slug))
+	const { data, error } = await supabase.from("blog").select("*").eq("title", decodeURI(slug))
 	if (error) return loadError("blog/" + slug)
 
 	return data[0]

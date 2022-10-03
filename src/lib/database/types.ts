@@ -1,12 +1,16 @@
 export interface Profile {
-	username: string
 	id: string
-	avatar: string
-	dev: boolean
+	username: string
+	discord_id: string
+	avatar_url: string
+	developer: boolean
 	premium: boolean
 	vip: boolean
 	tester: boolean
+	moderator: boolean
+	administrator: boolean
 	unlocked_ips: number
+	dismissed_warning: boolean
 }
 
 export interface Developer {
@@ -28,7 +32,7 @@ export interface Script {
 	categories: string[]
 	subcategories: string[]
 	author?: string
-	user_id?: string
+	author_id?: string
 	assets_path?: string
 	assets_alt?: string
 }
@@ -52,4 +56,9 @@ export interface SubCategory {
 	category: string
 	name: string
 	emoji: string
+}
+
+export interface FAQEntry {
+	title: string
+	content: string
 }

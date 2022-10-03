@@ -4,9 +4,7 @@
 
 	const handleLogin = async () => {
 		const { error } = await supabase.auth.signIn({ provider: "discord" }, { redirectTo: redirect })
-
-		if (error) return
-		console.error(error)
+		if (error) return console.error(error)
 	}
 </script>
 

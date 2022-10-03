@@ -1,7 +1,10 @@
 <script lang="ts">
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { fade } from "svelte/transition"
-	import { profile } from "$lib/stores/authStore"
+	import { getProfile } from "$lib/stores/authStore"
+	import type { Profile } from "$lib/database/types"
+
+	const profilePromise = getProfile() as unknown as Profile
 
 	let show: boolean = false
 </script>
@@ -19,24 +22,26 @@
 	in:fade={{ duration: 300, delay: 300 }}
 	out:fade={{ duration: 300 }}
 >
-	{#if $profile.vip || $profile.premium || $profile.tester}
-		<header class="py-8">
-			<h2>
-				Thank you for having joined
-				{#if $profile.vip}
-					<span class="text-red-600 dark:text-red-500">VIP</span>
-				{:else if $profile.premium}
-					<span class="text-orange-500 dark:text-orange-400">Premium</span>
-				{:else if $profile.tester}
-					<span class="text-green-500 dark:text-green-400">Tester</span>
-					you already have access to every script and you don't need to buy
-					<span class="text-orange-500 dark:text-orange-400">Premium</span>.
-					<br />
-					But of course, I appreciate it if you do!
-				{/if}
-			</h2>
-		</header>
-	{/if}
+	{#await profilePromise then profile}
+		{#if profile != null && (profile.vip || profile.premium || profile.tester)}
+			<header class="py-8">
+				<h2>
+					Thank you for having joined
+					{#if profile.vip}
+						<span class="text-red-600 dark:text-red-500">VIP</span>
+					{:else if profile.premium}
+						<span class="text-orange-500 dark:text-orange-400">Premium</span>
+					{:else if profile.tester}
+						<span class="text-green-500 dark:text-green-400">Tester</span>
+						you already have access to every script and you don't need to buy
+						<span class="text-orange-500 dark:text-orange-400">Premium</span>.
+						<br />
+						But of course, I appreciate it if you do!
+					{/if}
+				</h2>
+			</header>
+		{/if}
+	{/await}
 	<p class="py-4">
 		The shop is handled by <a
 			href="https://upgrade.chat/waspscripts"

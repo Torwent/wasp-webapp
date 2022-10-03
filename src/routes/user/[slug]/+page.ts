@@ -1,15 +1,13 @@
+import { getProfile } from "$lib/stores/authStore"
 import type { Load } from "@sveltejs/kit"
 import { loadError } from "$lib/utils"
-import { supabase } from "$lib/database/supabase"
 
 export const load: Load = async ({ params, data }) => {
 	const { slug } = params
-
-	const { data: users, error } = await supabase.from("profile").select("*").eq("id", slug)
-
-	if (error) return loadError("user/" + slug)
+	const user = await getProfile()
+	if (user == null) return loadError("user/" + slug)
 
 	const clientAddress = data != null && data.address != null ? data.address : ""
 
-	return { data: users[0], clientAddress: clientAddress }
+	return { data: user, clientAddress: clientAddress }
 }

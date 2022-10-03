@@ -1,9 +1,11 @@
 <script lang="ts">
-	export let profile: { dev: boolean; premium: boolean; vip: boolean; tester: boolean }
+	import type { Profile } from "$lib/database/types"
+
+	export let profile: Profile
 </script>
 
-<div>
-	{#if profile.dev}
+<div class="w-full">
+	{#if profile.developer}
 		<span
 			class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-sky-500 dark:bg-sky-400 text-white rounded-full"
 		>
@@ -18,7 +20,7 @@
 	{/if}
 	{#if profile.premium}
 		<span
-			class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-orange-500 dark:bg-orange-400 text-white rounded-full"
+			class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-yellow-500 dark:bg-yellow-400 text-white rounded-full"
 		>
 			Premium
 		</span>
@@ -35,6 +37,20 @@
 			class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-green-500 dark:bg-green-400 text-white rounded-full"
 		>
 			Tester
+		</span>
+	{/if}
+	{#if profile.moderator}
+		<span
+			class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-purple-500 dark:bg-purple-400 text-white rounded-full"
+		>
+			Mod
+		</span>
+	{/if}
+	{#if profile.administrator}
+		<span
+			class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-orange-500 dark:bg-orange-400 text-white rounded-full"
+		>
+			Admin
 		</span>
 	{/if}
 </div>

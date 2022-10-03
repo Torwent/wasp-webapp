@@ -2,26 +2,23 @@
 	import { slide } from "svelte/transition"
 	import DropDownEntry from "./DropDownEntry.svelte"
 	import { search } from "$lib/utils"
+	import type { FAQEntry } from "$lib/database/types"
 	export let title: string
-	interface Entry {
-		title: string
-		content: string
-	}
 
-	export let entries
+	export let entries: FAQEntry[]
 
 	let show = false
 
 	let searchQuery = "",
-		filteredEntries: any = [],
+		filteredEntries: FAQEntry[] = [],
 		placeholderText = "Search..."
 
 	const handleSearch = () => {
-		filteredEntries = $entries
+		filteredEntries = entries
 		placeholderText = "Search..."
-		if (searchQuery === "" || $entries == null) return
+		if (searchQuery === "" || entries == null) return
 
-		filteredEntries = $entries.filter((entry: Entry) => search(entry.title, searchQuery))
+		filteredEntries = entries.filter((entry: FAQEntry) => search(entry.title, searchQuery))
 		if (filteredEntries.length === 0) {
 			placeholderText = "Not found!"
 			searchQuery = ""
@@ -99,7 +96,7 @@
 					<DropDownEntry {entry} />
 				{/each}
 			{:else}
-				{#each $entries as entry}
+				{#each entries as entry}
 					<DropDownEntry {entry} />
 				{/each}
 			{/if}

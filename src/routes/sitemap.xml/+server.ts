@@ -3,7 +3,7 @@ import { supabase } from "$lib/database/supabase"
 const website = "https://waspscripts.com"
 
 const loadScripts = async () => {
-	const { data, error } = await supabase.from("scripts").select("title, id")
+	const { data, error } = await supabase.from("scripts_public").select("title, id")
 
 	if (error) return console.error(error)
 
@@ -16,7 +16,7 @@ const loadScripts = async () => {
 }
 
 const loadBlog = async () => {
-	const { data, error } = await supabase.from("posts").select("title")
+	const { data, error } = await supabase.from("blog").select("title")
 
 	if (error) return console.error(error)
 
