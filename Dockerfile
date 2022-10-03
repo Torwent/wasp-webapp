@@ -22,7 +22,6 @@ RUN adduser -S torwent -D -u 10000 -s /bin/nologin
 COPY --from=builder --chown=sveltekit:nodejs /usr/src/app/build ./build
 COPY --from=builder /usr/src/app/node_modules ./node_modules
 COPY --from=builder /usr/src/app/package.json ./package.json
-COPY --from=builder /usr/src/app/.env ./.env.production
 USER 10000
 EXPOSE 3000
 CMD ["node", "./build"]

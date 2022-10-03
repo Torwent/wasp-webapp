@@ -1,4 +1,4 @@
-import { env } from "$env/dynamic/private"
+import { SERVICE_USER, SERVICE_PASS } from "$env/static/private"
 import { json } from "@sveltejs/kit"
 import type { RequestHandler } from "@sveltejs/kit"
 import WebSocket from "ws"
@@ -15,8 +15,8 @@ export const updateRoles = async (
 ) => {
 	if (supabase.auth.user() == null)
 		await supabase.auth.signIn({
-			email: env.SERVICE_USER,
-			password: env.SERVICE_PASS
+			email: SERVICE_USER,
+			password: SERVICE_PASS
 		})
 
 	const { error } = await supabase
