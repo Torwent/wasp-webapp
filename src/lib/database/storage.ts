@@ -1,13 +1,35 @@
 import { supabase } from "$lib/database/supabase"
 import { pad } from "$lib/utils"
-import type { Script } from "$lib/database/types"
+import type { Script, DownloadScript } from "$lib/database/types"
 
 export const getScripts = async () => {
-	const { data, error } = await supabase.from("scripts").select()
+	const { data: scriptsPublic, error: errorPublic } = await supabase
+		.from("scripts_public")
+		.select("id, title, categories")
+	if (errorPublic) return console.error(errorPublic)
 
-	if (error) return console.error(error)
+	const { data: scriptsProtected, error: errorProtected } = await supabase
+		.from("scripts_protected")
+		.select("revision")
+	if (errorProtected) return console.error(errorProtected)
 
-	return data as Script[]
+	if (scriptsPublic.length !== scriptsProtected.length)
+		return console.error("Scripts public and protected data length does not match.")
+
+	let scripts: DownloadScript[] = []
+
+	for (let i = 0; i < scriptsPublic.length; i++) {
+		let script: DownloadScript = {
+			id: scriptsPublic[i].id,
+			title: scriptsPublic[i].title,
+			revision: scriptsProtected[i].revision,
+			categories: scriptsPublic[i].categories
+		}
+
+		scripts.push(script)
+	}
+
+	return scripts
 }
 
 export const loadPublicFiles = async (bucket: string, folder: string) => {

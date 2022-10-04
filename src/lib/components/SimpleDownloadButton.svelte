@@ -3,7 +3,7 @@
 	import Promise from "bluebird"
 	import JsZip from "jszip"
 	import FileSaver from "file-saver"
-	import type { Script } from "$lib/database/types"
+	import type { DownloadScript } from "$lib/database/types"
 	import { pad } from "$lib/utils"
 	let progress: number = -1
 
@@ -12,7 +12,7 @@
 		return await resp.blob()
 	}
 
-	const downloadByGroup = (urls: string[], files_per_group = 5) => {
+	const downloadByGroup = async (urls: string[], files_per_group = 5) => {
 		return Promise.map(
 			urls,
 			async (url: string) => {
@@ -22,7 +22,7 @@
 		)
 	}
 
-	const exportZip = (blobs: Blob[], scripts: Script[]) => {
+	const exportZip = async (blobs: Blob[], scripts: DownloadScript[]) => {
 		const zip = JsZip()
 		blobs.forEach((blob, i) => {
 			zip.file(scripts[i].title.toLowerCase().replaceAll(" ", "_") + ".simba", blob)
@@ -37,8 +37,8 @@
 		})
 	}
 
-	export const downloadAndZip = async () => {
-		let scripts: Script[] | void = await getScripts()
+	const downloadAndZip = async () => {
+		let scripts: DownloadScript[] | void = await getScripts()
 
 		if (scripts == null) return
 
@@ -58,12 +58,12 @@
 		}
 
 		const blobs = await downloadByGroup(urls, 5)
-		return exportZip(blobs, scripts)
+		return await exportZip(blobs, scripts)
 	}
 
-	const download = () => {
+	const download = async () => {
 		progress = 0
-		downloadAndZip()
+		await downloadAndZip()
 	}
 </script>
 

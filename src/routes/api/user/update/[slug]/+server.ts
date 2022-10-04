@@ -41,11 +41,14 @@ export const POST: RequestHandler = async ({ params }: any) => {
 
 	ws.addEventListener("open", async () => {
 		console.log("Connection open to wasp-discord!")
-		if (profile.discord_id !== "") ws.send(profile.discord_id)
+		if (profile.discord_id !== "") {
+			console.log("Requesting information of ", profile.discord_id, " from wasp-discord.")
+			ws.send(profile.discord_id)
+		}
 	})
 
 	ws.addEventListener("message", async ({ data }: any) => {
-		console.log("Received a reply from wasp-discord!")
+		console.log("Received a information of ", profile.discord_id, " from wasp-discord.")
 
 		const d = data.includes("864744526894333963")
 		const t = data.includes("907209408860291113")
@@ -55,7 +58,6 @@ export const POST: RequestHandler = async ({ params }: any) => {
 		const a = data.includes("816271648118013953")
 
 		await updateRoles(profile.id, d, t, p, v, m, a)
-		ws.close()
 	})
 
 	ws.addEventListener("close", async () => {

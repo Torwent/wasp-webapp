@@ -37,6 +37,13 @@ export interface Script {
 	assets_alt?: string
 }
 
+export interface DownloadScript {
+	id: string
+	title: string
+	revision: number
+	categories: string[]
+}
+
 export interface Post {
 	id?: number
 	user_id?: string
