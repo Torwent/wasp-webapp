@@ -6,11 +6,13 @@ export const getScripts = async () => {
 	const { data: scriptsPublic, error: errorPublic } = await supabase
 		.from("scripts_public")
 		.select("id, title, categories")
+		.order("id", { ascending: true })
 	if (errorPublic) return console.error(errorPublic)
 
 	const { data: scriptsProtected, error: errorProtected } = await supabase
 		.from("scripts_protected")
-		.select("revision")
+		.select("id, revision")
+		.order("id", { ascending: true })
 	if (errorProtected) return console.error(errorProtected)
 
 	if (scriptsPublic.length !== scriptsProtected.length)
@@ -19,6 +21,15 @@ export const getScripts = async () => {
 	let scripts: DownloadScript[] = []
 
 	for (let i = 0; i < scriptsPublic.length; i++) {
+		if (scriptsPublic[i].id !== scriptsProtected[i].id) {
+			console.error(
+				"storage getScripts() id mismatch:",
+				scriptsPublic[i].id,
+				" and ",
+				scriptsProtected[i].id
+			)
+			continue
+		}
 		let script: DownloadScript = {
 			id: scriptsPublic[i].id,
 			title: scriptsPublic[i].title,

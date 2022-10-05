@@ -28,7 +28,7 @@ export const getData = async (table: string, id: string = "") => {
 export const getScripts = async (id: string = "") => {
 	const { data: dataPublic, error: errorPublic } =
 		id === ""
-			? await supabase.from("scripts_public").select()
+			? await supabase.from("scripts_public").select().order("title", { ascending: true })
 			: await supabase.from("scripts_public").select().eq("id", id)
 
 	if (errorPublic) return console.error(errorPublic)

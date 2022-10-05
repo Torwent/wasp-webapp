@@ -3,7 +3,7 @@
 	export let data: Script //data fetched from ./+page.ts
 	import Markdown from "$lib/Markdown.svelte"
 	import AdvancedButton from "$lib/components/AdvancedDownloadButton.svelte"
-	import SimpleButton from "$lib/components/SimpleDownloadButton.svelte"
+	import ZipDownload from "$lib/components/ZIPDownloadButton.svelte"
 	import Carousel from "$lib/components/Carousel.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 
@@ -154,7 +154,7 @@
 
 					{#if data.categories.includes("Official")}
 						<h4 class="py-6">To download all official premium scripts a zip click here:</h4>
-						<SimpleButton />
+						<ZipDownload />
 					{/if}
 				{:else}
 					<h3 class="py-2">This is a premium script and you are not premium.</h3>

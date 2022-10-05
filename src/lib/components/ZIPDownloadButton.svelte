@@ -40,9 +40,11 @@
 	const downloadAndZip = async () => {
 		let scripts: DownloadScript[] | void = await getScripts()
 
-		if (scripts == null) return
+		if (scripts == null) return console.error("Can't read scripts from the database.")
 
-		scripts = scripts.filter((script) => script.categories.includes("Premium"))
+		scripts = scripts.filter((script) => {
+			return script.categories.includes("Official") && script.categories.includes("Premium")
+		})
 
 		let urls: string[] = []
 
