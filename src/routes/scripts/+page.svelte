@@ -140,7 +140,7 @@
 	</div>
 
 	<div
-		class="overflow-y-scroll no-scrollbar max-h-full pt-16"
+		class="w-full overflow-y-scroll no-scrollbar max-h-full pt-16"
 		in:fly={{ duration: 600, delay: 600, x: 100 }}
 		out:fly={{ duration: 300, x: 100 }}
 	>

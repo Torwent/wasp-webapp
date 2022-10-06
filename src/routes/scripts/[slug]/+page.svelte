@@ -91,23 +91,20 @@
 		</div>
 	{/if}
 
-	<div class="inset-0 group container w-screen h-[44rem] mx-auto flex flex-col">
-		<img
-			class="inset-0 z-0 absolute object-cover h-fit w-full"
-			src={assets_path}
-			alt={data.assets_alt}
-		/>
-		<header class="mt-auto z-10 text-center h-32 text-amber-500 text-shadow">
+	<div class="absolute inset-0 container min-w-full h-96 mx-0 flex flex-col">
+		<img class="z-0 absolute object-cover h-full w-full" src={assets_path} alt={data.assets_alt} />
+		<header class="left-0 mt-auto z-10 text-center h-32 text-amber-500 text-shadow">
 			<div
-				class="absolute mx-0 left-0 h-32 w-full opacity-100
+				class="absolute mx-0 h-32 w-full opacity-100
 					   bg-gradient-to-t from-white/20 via-white-800/20 dark:from-black/60 dark:via-gray-800/20 to-transparent"
 			/>
-			<h1 class="mb-4 font-bold text-4xl">{data.title}</h1>
+			<h1 class="mx-8 mb-4 font-bold text-4xl">{data.title}</h1>
 			<h2 class="font-semibold leading-normal mb-4">{data.description}</h2>
 		</header>
 		<!-- Title and Description Hover Effect -->
 	</div>
 
+	<div class="h-96 w-fill" />
 	<div class="container mx-auto mb-6 max-w-2xl flex-grow">
 		<div class="container w-full mx-auto my-3">
 			<Carousel

@@ -47,7 +47,7 @@
 	bg-white/60 supports-backdrop-blur:bg-white/95 dark:border-stone-50/[0.06] dark:bg-stone-900/60"
 >
 	<div class="max-w-7xl mx-auto px-4">
-		<div class="grid md:flex justify-center md:justify-between">
+		<div class="text-center grid md:flex justify-center md:justify-between">
 			<div class="grid md:flex space-x-7">
 				<MediaQuery query="(min-width: 768px)" let:matches>
 					{#if matches}
@@ -59,7 +59,7 @@
 							<Logo selected={selectedTab === 0} />
 						</a>
 					{:else}
-						<span class="flex items-center py-4 px-2" on:click={() => (showMenu = !showMenu)}>
+						<span class="flex justify-center py-4 px-2" on:click={() => (showMenu = !showMenu)}>
 							<Logo selected={selectedTab === 0} />
 						</span>
 					{/if}

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade } from "svelte/transition"
 	import MetaTags from "$lib/components/MetaTags.svelte"
-	import DropDown from "$lib/components/DropDown.svelte"
+	import DropDown from "./DropDown.svelte"
 	import Discord from "$lib/components/Discord.svelte"
 	import { getData } from "$lib/database/supabase"
 	import type { FAQEntry } from "$lib/database/types"
