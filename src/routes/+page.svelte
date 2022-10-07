@@ -8,7 +8,7 @@
 
 	let canvasData: ImageData
 
-	const clearPixel = (context: CanvasRenderingContext2D, i: number) => {
+	const clearPixel = async (context: CanvasRenderingContext2D, i: number) => {
 		if (canvasData.data[i + 0] == 0 && canvasData.data[i + 1] == 0) {
 			canvasData.data[i + 3] = 0
 		} else if (canvasData.data[i + 0] == 0 && canvasData.data[i + 1] > 0) {
@@ -33,8 +33,12 @@
 		context.putImageData(canvasData, 0, 0)
 	}
 
-	const drawPixel = (context: CanvasRenderingContext2D, canvas: HTMLCanvasElement, p: TPoint) => {
-		const setPixel = (i: number) => {
+	const drawPixel = async (
+		context: CanvasRenderingContext2D,
+		canvas: HTMLCanvasElement,
+		p: TPoint
+	) => {
+		const setPixel = async (i: number) => {
 			if (
 				canvasData.data[i + 0] == 0 &&
 				canvasData.data[i + 1] >= 0 &&
@@ -64,7 +68,7 @@
 		setPixel((p.x + p.y * canvas.width) * 4)
 	}
 
-	const drawInvTabHits = (
+	const drawInvTabHits = async (
 		canvas: HTMLCanvasElement,
 		context: CanvasRenderingContext2D,
 		Mouse: TPoint
@@ -97,12 +101,12 @@
 		let Mouse: TPoint = { x: 0, y: 0 }
 
 		window.addEventListener("resize", resizeCanvas, false)
-		window.onmousemove = (e) => {
+		window.onmousemove = async (e) => {
 			Mouse.x = e.pageX
 			Mouse.y = e.pageY - document.documentElement.scrollTop
 		}
 
-		function drawHitBox() {
+		const drawHitBox = async () => {
 			for (let i = 0; i < 5; i++) {
 				drawInvTabHits(canvas, context, Mouse)
 			}

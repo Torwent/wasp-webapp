@@ -1,13 +1,13 @@
 <script lang="ts">
-	import MediaQuery from "svelte-media-query"
-	import { user } from "$lib/stores/authStore"
 	import { scale } from "svelte/transition"
-	import Logo from "$lib/components/Logo.svelte"
-	import UserPanel from "$lib/components/UserPanel.svelte"
-	import Auth from "$lib/components/Auth.svelte"
-	import Avatar from "$lib/components/Avatar.svelte"
-	import DarkModeSwitch from "$lib/components/DarkModeSwitch.svelte"
+	import MediaQuery from "svelte-media-query"
 	import { page } from "$app/stores"
+	import { user } from "$lib/stores/authStore"
+	import Avatar from "./Avatar.svelte"
+	import Logo from "./Logo.svelte"
+	import UserPanel from "./UserPanel.svelte"
+	import Auth from "./Auth.svelte"
+	import DarkModeSwitch from "./DarkModeSwitch.svelte"
 
 	let tabs = [0, 1, 2, 3, 4, 5]
 	let selectedTab: number

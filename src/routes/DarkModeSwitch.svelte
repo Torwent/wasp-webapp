@@ -1,8 +1,10 @@
 <script lang="ts">
 	export let checked = true
-	const toggle = () => {
+	const toggle = async () => {
 		checked = !checked
-		window.document.getElementById("wasp-webapp").classList.toggle("dark")
+		const element = window.document.getElementById("wasp-webapp")
+
+		if (element) element.classList.toggle("dark")
 	}
 </script>
 
