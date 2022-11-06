@@ -12,7 +12,7 @@
 
 		finalProfile = profile
 
-		await fetch(location.origin + "/api/user/update/" + profile.id, { method: "POST" })
+		await fetch(location.origin + "/api/user/update/" + profile.id, { method: "GET" })
 		setTimeout(async () => {
 			finalProfile = (await getProfile()) as unknown as Profile
 		}, 1000)

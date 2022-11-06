@@ -1,7 +1,7 @@
 import { SERVICE_USER, SERVICE_PASS } from "$env/static/private"
 import { json } from "@sveltejs/kit"
 import type { RequestHandler } from "@sveltejs/kit"
-import WebSocket from "ws"
+import { WebSocket, type MessageEvent } from "ws"
 import { getData, supabase } from "$lib/database/supabase"
 
 export const updateRoles = async (
@@ -27,12 +27,12 @@ export const updateRoles = async (
 	if (error) console.log(error)
 }
 
-export const POST: RequestHandler = async ({ params }: any) => {
+export const GET: RequestHandler = async ({ params }: any) => {
 	const { slug } = params
-	if (slug == null) return json("Missing id")
+	if (slug == null) return json("Missing id!")
 
 	const data = await getData("profiles_public", slug)
-	if (data == null) return json("Profile doesn't exist")
+	if (data == null) return json("Profile doesn't exist!")
 
 	const url = import.meta.env.VITE_DEV ? "wss://waspscripts.com/wss" : "ws://wasp-discord:4100"
 	const ws = new WebSocket(url)
@@ -40,22 +40,22 @@ export const POST: RequestHandler = async ({ params }: any) => {
 	const profile = data[0]
 
 	ws.addEventListener("open", async () => {
-		console.log("Connection open to wasp-discord!")
+		console.log("Connection to wasp-discord established!")
 		if (profile.discord_id !== "") {
 			console.log("Requesting information of ", profile.discord_id, " from wasp-discord.")
 			ws.send(profile.discord_id)
 		}
 	})
 
-	ws.addEventListener("message", async ({ data }: any) => {
-		console.log("Received a information of ", profile.discord_id, " from wasp-discord.")
+	ws.addEventListener("message", async ({ data }: MessageEvent) => {
+		console.log("Received information of ", profile.discord_id, " from wasp-discord.")
 
-		const d = data.includes("864744526894333963")
-		const t = data.includes("907209408860291113")
-		const p = data.includes("820985772140134440")
-		const v = data.includes("931167526681972746")
-		const m = data.includes("1018906735123124315")
-		const a = data.includes("816271648118013953")
+		const d = data.toString().includes("864744526894333963")
+		const t = data.toString().includes("907209408860291113")
+		const p = data.toString().includes("820985772140134440")
+		const v = data.toString().includes("931167526681972746")
+		const m = data.toString().includes("1018906735123124315")
+		const a = data.toString().includes("816271648118013953")
 
 		await updateRoles(profile.id, d, t, p, v, m, a)
 	})
