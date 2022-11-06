@@ -40,7 +40,7 @@
 	<MetaTags
 		title={data.title}
 		description={data.description}
-		url={"/scripts/" + encodeURI(data.title)}
+		url={"/scripts/" + encodeURI(data.title) + "&" + data.id}
 	/>
 </svelte:head>
 

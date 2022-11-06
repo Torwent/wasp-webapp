@@ -106,7 +106,7 @@ export const updateImg = async (bucket: string, path: string, fileName: string, 
 		}
 	})
 
-	const { error } = await supabase.storage.from(bucket).update(path + fileName, file)
+	const { error } = await supabase.storage.from(bucket).upload(path + fileName, file)
 
 	if (error) return console.error(error)
 }
