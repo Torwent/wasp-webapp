@@ -65,11 +65,6 @@
 				<h2 class="mb-6 text-sm font-semibold uppercase text-white">Special thanks:</h2>
 				<ul>
 					<li>
-						<a href="/devs/Brandon" class="hover:text-amber-500 dark:hover:text-amber-400"
-							>Brandon</a
-						>
-					</li>
-					<li>
 						<a href="/devs/Slacky" class="hover:text-amber-500 dark:hover:text-amber-400"
 							>Jarl Holta</a
 						>

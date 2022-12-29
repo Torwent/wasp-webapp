@@ -1,31 +1,27 @@
 <script lang="ts">
-	import { onMount } from "svelte"
+	import markdownIt from "markdown-it"
 	import hljs from "highlight.js"
-	import "highlight.js/styles/github-dark.css"
+	//import "highlight.js/styles/github-dark.css"
 
 	export let src: string
-	let html: string
-	let md: any
 
-	onMount(async () => {
-		const MarkdownIt = (await import("markdown-it")).default
-
-		md = new MarkdownIt("commonmark", {
-			highlight: function (code: string, lang: string, callback: void) {
-				if (lang && hljs.getLanguage(lang)) {
-					try {
-						return hljs.highlight(code, { language: lang }).value
-					} catch (error) {
-						console.error(error)
-					}
+	const md = new markdownIt("commonmark", {
+		langPrefix: true,
+		highlight: function (code: string, lang: string, callback: void) {
+			if (lang && hljs.getLanguage(lang)) {
+				try {
+					console.log(hljs.highlight(code, { language: lang }))
+					return hljs.highlight(code, { language: lang }).value
+				} catch (error) {
+					console.error(error)
 				}
-
-				return "" // use external default escaping
 			}
-		})
+
+			return "" // use external default escaping
+		}
 	})
 
-	$: if (md) html = md.render(src)
+	const html = md.render(src)
 </script>
 
 {@html html}

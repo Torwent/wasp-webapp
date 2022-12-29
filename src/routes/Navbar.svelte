@@ -25,16 +25,20 @@
 			selectedTab = tabs[2]
 			break
 
-		case "/premium":
+		case "/stats":
 			selectedTab = tabs[3]
 			break
 
-		case "/faq":
+		case "/premium":
 			selectedTab = tabs[4]
 			break
 
-		case "/blog":
+		case "/faq":
 			selectedTab = tabs[5]
+			break
+
+		case "/blog":
+			selectedTab = tabs[6]
 			break
 	}
 
@@ -59,6 +63,7 @@
 							<Logo selected={selectedTab === 0} />
 						</a>
 					{:else}
+						<!-- svelte-ignore a11y-click-events-have-key-events -->
 						<span class="flex justify-center py-4 px-2" on:click={() => (showMenu = !showMenu)}>
 							<Logo selected={selectedTab === 0} />
 						</span>
@@ -103,22 +108,32 @@
 								Scripts
 							</a>
 							<a
-								href="/premium"
+								href="/stats"
 								class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
 								on:click={() => (selectedTab = tabs[3])}
 								on:click={() => (showMenu = false)}
 								class:text-orange-500={selectedTab === 3}
 								class:dark:text-orange-400={selectedTab === 3}
 							>
-								Premium
+								Stats
 							</a>
 							<a
-								href="/faq"
+								href="/premium"
 								class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
 								on:click={() => (selectedTab = tabs[4])}
 								on:click={() => (showMenu = false)}
 								class:text-orange-500={selectedTab === 4}
 								class:dark:text-orange-400={selectedTab === 4}
+							>
+								Premium
+							</a>
+							<a
+								href="/faq"
+								class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
+								on:click={() => (selectedTab = tabs[5])}
+								on:click={() => (showMenu = false)}
+								class:text-orange-500={selectedTab === 5}
+								class:dark:text-orange-400={selectedTab === 5}
 							>
 								FAQ
 							</a>
@@ -126,10 +141,10 @@
 							<a
 								href="/blog"
 								class="font-semibold py-4 px-2 transition duration-300 dark:hover:text-amber-100 hover:text-orange-400"
-								on:click={() => (selectedTab = tabs[5])}
+								on:click={() => (selectedTab = tabs[6])}
 								on:click={() => (showMenu = false)}
-								class:text-orange-500={selectedTab === 5}
-								class:dark:text-orange-400={selectedTab === 5}
+								class:text-orange-500={selectedTab === 6}
+								class:dark:text-orange-400={selectedTab === 6}
 							>
 								Blog
 							</a>

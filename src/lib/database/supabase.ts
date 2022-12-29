@@ -12,9 +12,6 @@ export const supabase = createClient(
 	options
 )
 
-export const getServiceSupabase = () =>
-	createClient(import.meta.env.VITE_SB_URL, import.meta.env.SB_SERVICE_KEY)
-
 export const getData = async (table: string, id: string = "") => {
 	const { data, error } =
 		id === ""

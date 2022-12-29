@@ -24,7 +24,7 @@ export interface Developer {
 }
 
 export interface Script {
-	id?: string
+	id: string
 	title: string
 	description: string
 	content: string

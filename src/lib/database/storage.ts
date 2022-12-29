@@ -2,7 +2,7 @@ import { supabase } from "$lib/database/supabase"
 import { pad } from "$lib/utils"
 import type { Script, DownloadScript } from "$lib/database/types"
 
-export const getScripts = async () => {
+export async function getScripts() {
 	const { data: scriptsPublic, error: errorPublic } = await supabase
 		.from("scripts_public")
 		.select("id, title, categories")
@@ -43,7 +43,7 @@ export const getScripts = async () => {
 	return scripts
 }
 
-export const loadPublicFiles = async (bucket: string, folder: string) => {
+export async function loadPublicFiles(bucket: string, folder: string) {
 	const { data, error } = await supabase.storage.from(bucket).list(folder, {
 		limit: 20,
 		offset: 0,
@@ -71,7 +71,7 @@ export const loadPublicFiles = async (bucket: string, folder: string) => {
 	return imgURLs
 }
 
-const getFilePath = async (bucket: string, path: string) => {
+async function getFilePath(bucket: string, path: string) {
 	const { data, error } = await supabase.storage.from(bucket).list(path)
 
 	if (data === null || error) return console.error(error)
@@ -80,7 +80,7 @@ const getFilePath = async (bucket: string, path: string) => {
 	return data
 }
 
-export const getSignedURL = async (bucket: string, path: string, file: string) => {
+export async function getSignedURL(bucket: string, path: string, file: string) {
 	path += "/" + file
 
 	const { signedURL, error } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
@@ -89,13 +89,13 @@ export const getSignedURL = async (bucket: string, path: string, file: string) =
 	return signedURL
 }
 
-export const uploadFile = async (bucket: string, path: string, file: File) => {
+export async function uploadFile(bucket: string, path: string, file: File) {
 	const { error } = await supabase.storage.from(bucket).upload(path, file)
 
-	if (error) return console.error(error)
+	if (error) console.error(error)
 }
 
-export const updateImg = async (bucket: string, path: string, fileName: string, file: File) => {
+export async function updateImg(bucket: string, path: string, fileName: string, file: File) {
 	let paths = (await getFilePath(bucket, path)) as { name: string }[]
 
 	paths.forEach(async (p) => {
@@ -111,28 +111,50 @@ export const updateImg = async (bucket: string, path: string, fileName: string, 
 	if (error) return console.error(error)
 }
 
-const updateScriptRevision = async (file: File, revision: number) => {
-	let fileString = await file.text()
-	let regex = /{\$UNDEF SCRIPT_REVISION}{\$DEFINE SCRIPT_REVISION := '(\d*?)'}/
+async function updateScriptInfo(file: File, id: string, revision: number) {
+	function updateID(str: string, id: string) {
+		let regex =
+			/{\$UNDEF SCRIPT_ID}{\$DEFINE SCRIPT_ID := '[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}'}/
 
-	let replaceStr =
-		"{$UNDEF SCRIPT_REVISION}{$DEFINE SCRIPT_REVISION := '" + revision.toString() + "'}"
+		let replaceStr = "{$UNDEF SCRIPT_ID}{$DEFINE SCRIPT_ID := '" + id + "'}"
 
-	if (fileString.match(regex)) {
-		fileString = fileString.replace(regex, replaceStr)
-	} else {
-		fileString = replaceStr.concat("\n").concat(fileString)
+		if (str.match(regex)) {
+			str = str.replace(regex, replaceStr)
+		} else {
+			str = replaceStr.concat("\n").concat(str)
+		}
+
+		return str
 	}
+
+	function updateRevision(str: string, revision: number) {
+		let regex = /{\$UNDEF SCRIPT_REVISION}{\$DEFINE SCRIPT_REVISION := '(\d*?)'}/
+
+		let replaceStr =
+			"{$UNDEF SCRIPT_REVISION}{$DEFINE SCRIPT_REVISION := '" + revision.toString() + "'}"
+
+		if (str.match(regex)) {
+			str = str.replace(regex, replaceStr)
+		} else {
+			str = replaceStr.concat("\n").concat(str)
+		}
+
+		return str
+	}
+
+	let fileString = await file.text()
+
+	fileString = updateID(updateRevision(fileString, revision), id)
 
 	return new File([fileString], file.name, { type: "text/plain" })
 }
 
-export const uploadScript = async (
+export async function uploadScript(
 	script: Script,
 	file: File | undefined,
 	coverFile: File | undefined,
 	bannerFile: File | undefined
-) => {
+) {
 	if (!file) return console.error("No file added!")
 
 	const publicData = {
@@ -149,28 +171,28 @@ export const uploadScript = async (
 
 	script = data[0]
 
-	file = await updateScriptRevision(file, 1)
+	file = await updateScriptInfo(file, script.id, 1)
 
 	//rename all scripts to script so we can always fetch them later regardless of name changes.
 	let path = script.id + "/" + pad(1, 9) + "/script.simba"
 
-	uploadFile("scripts", path, file)
+	await uploadFile("scripts", path, file)
 
 	if (coverFile) {
-		uploadFile("imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
+		await uploadFile("imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
 	}
 
 	if (bannerFile) {
-		uploadFile("imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+		await uploadFile("imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
 	}
 }
 
-export const updateScript = async (
+export async function updateScript(
 	script: Script,
 	file: File | undefined,
 	coverFile: File | undefined,
 	bannerFile: File | undefined
-) => {
+) {
 	if (file) script.revision += 1
 
 	const publicData = {
@@ -190,10 +212,10 @@ export const updateScript = async (
 	if (error) return console.error(error)
 
 	if (file) {
-		file = await updateScriptRevision(file, script.revision)
+		file = await updateScriptInfo(file, script.id, script.revision)
 		let path = script.id + "/" + pad(script.revision, 9) + "/script.simba"
 
-		uploadFile("scripts", path, file)
+		await uploadFile("scripts", path, file)
 	}
 
 	if (coverFile) {
