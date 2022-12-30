@@ -1,5 +1,40 @@
 <script lang="ts">
 	export let data: any
+
+	async function convertTime(t: number): Promise<string> {
+		let days, hours, minutes, seconds, total_hours, total_minutes, total_seconds: number
+		let result: string = ""
+
+		total_seconds = Math.floor(t / 1000)
+		total_minutes = Math.floor(total_seconds / 60)
+		total_hours = Math.floor(total_minutes / 60)
+		days = Math.floor(total_hours / 24)
+
+		seconds = total_seconds % 60
+		minutes = total_minutes % 60
+		hours = total_hours % 24
+
+		if (days > 0) result += days.toString() + "d "
+		if (hours > 0) result += hours.toString() + "h "
+		if (minutes > 0) result += minutes.toString() + "m "
+
+		if ((days = 0 && seconds > 0)) result += seconds.toString() + "s"
+
+		return result
+	}
+
+	async function formatRSNumber(n: number): Promise<string> {
+		let i: number = 0
+		let f: number = n
+		let arr: string[] = ["", "K", "M", "B", "T"]
+
+		while (Math.abs(f) >= 1000) {
+			i++
+			f = f / 1000
+		}
+
+		return parseFloat(f.toFixed(2)).toString() + " " + arr[i]
+	}
 </script>
 
 <p class="my-4">
@@ -38,10 +73,22 @@
 					>
 						{entry.username}
 					</th>
-					<td class="py-4 px-6"> {entry.experience} </td>
-					<td class="py-4 px-6"> {entry.gold} </td>
+					{#await formatRSNumber(entry.experience)}
+						<td class="py-4 px-6"> ... </td>
+					{:then value}
+						<td class="py-4 px-6"> {value} </td>
+					{/await}
+					{#await formatRSNumber(entry.gold)}
+						<td class="py-4 px-6"> ... </td>
+					{:then value}
+						<td class="py-4 px-6"> {value} </td>
+					{/await}
 					<td class="py-4 px-6"> {entry.levels} </td>
-					<td class="py-4 px-6"> {entry.runtime} </td>
+					{#await convertTime(entry.runtime)}
+						<td class="py-4 px-6"> ... </td>
+					{:then value}
+						<td class="py-4 px-6"> {value} </td>
+					{/await}
 				</tr>
 			{/each}
 		</tbody>
