@@ -3,11 +3,12 @@
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import DropDown from "./DropDown.svelte"
 	import Discord from "$lib/components/Discord.svelte"
-	import { getData } from "$lib/database/supabase"
 	import type { FAQEntry } from "$lib/database/types"
 
-	const faqData = getData("faq_questions") as unknown as FAQEntry[]
-	const faqErrors = getData("faq_errors") as unknown as FAQEntry[]
+	export let data: { questions: FAQEntry[]; errors: FAQEntry[] }
+
+	const faqData = data.questions
+	const faqErrors = data.errors
 </script>
 
 <svelte:head>

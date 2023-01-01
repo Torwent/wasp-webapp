@@ -34,7 +34,7 @@
 		</header>
 
 		<div class="flex justify-evenly w-64">
-			<a href="https://github.com/slackydev" class="hover:text-amber-500 dark:hover:text-amber-400">
+			<a href={data.github} class="hover:text-amber-500 dark:hover:text-amber-400">
 				<svg class="w-10 h-10" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 					<path
 						fill-rule="evenodd"
