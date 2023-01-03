@@ -1,3 +1,12 @@
+# [0.3.0](https://github.com/Torwent/wasp-webapp/compare/v0.2.0...v0.3.0) (2023-01-03)
+
+
+### Features
+
+* proper blog searching and more, read notes. ([ec1c7c8](https://github.com/Torwent/wasp-webapp/commit/ec1c7c89acd9aa7abe806592a2737360a483bffb))
+
+
+
 # [0.2.0](https://github.com/Torwent/wasp-webapp/compare/v0.1.0...v0.2.0) (2023-01-03)
 
 
