@@ -4,44 +4,56 @@
 	import { getProfile } from "$lib/stores/authStore"
 	import PostCard from "$lib/components/PostCard.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
-	import { search } from "$lib/utils"
 	import type { PageData } from "./$types"
+	import { createSearchStore, searchHandler } from "$lib/stores/search"
+	import { onDestroy } from "svelte"
 
 	export let data: PageData
-	let blog = data.posts
 
 	const profilePromise = getProfile() as unknown as Profile
 
-	let searchQuery = ""
-	let filteredBlog: Post[] = []
-	let placeholderText = "Search posts..."
 	let basicEnabled = false
 	let intermediateEnabled = false
 	let advancedEnabled = false
 
-	const handleSearch = () => {
-		filteredBlog = blog
-		placeholderText = "Search posts..."
-		if (searchQuery === "") return
+	const searchStats: Post[] = data.posts.map((post: Post) => ({
+		...post,
+		searchTerms: `${post.title} ${post.description} ${post.content} ${post.author}`,
+		filters: `${post.level}`
+	}))
 
-		filteredBlog = blog.filter((post: Post) => search(post.title, searchQuery))
-		if (filteredBlog.length === 0) {
-			placeholderText = "Not found!"
-			searchQuery = ""
-		}
+	const searchStore = createSearchStore(searchStats)
+
+	let filters: number[] = []
+
+	function handleFilters() {
+		if (basicEnabled) {
+			if (filters.indexOf(0) === -1) filters.push(0)
+		} else
+			filters = filters.filter((item) => {
+				return item !== 0
+			})
+
+		if (intermediateEnabled) {
+			if (filters.indexOf(1) === -1) filters.push(1)
+		} else
+			filters = filters.filter((item) => {
+				return item !== 1
+			})
+
+		if (advancedEnabled) {
+			if (filters.indexOf(2) === -1) filters.push(2)
+		} else
+			filters = filters.filter((item) => {
+				return item !== 2
+			})
+
+		$searchStore.filters = filters
 	}
 
-	const handleFilters = () => {
-		filteredBlog = blog
-		if (!basicEnabled && !intermediateEnabled && !advancedEnabled) return
+	const unsubscribe = searchStore.subscribe((model) => searchHandler(model))
 
-		filteredBlog = blog.filter(
-			(post: { level: number }) =>
-				(basicEnabled && post.level === 0) ||
-				(intermediateEnabled && post.level === 1) ||
-				(advancedEnabled && post.level === 2)
-		)
-	}
+	onDestroy(() => unsubscribe())
 </script>
 
 <svelte:head>
@@ -95,17 +107,14 @@
 			</div>
 		</form>
 
-		<form class="form my-6" on:submit|preventDefault={handleSearch}>
-			<div class="flex flex-col text-sm mb-2">
-				<input
-					type="text"
-					bind:value={searchQuery}
-					name="search"
-					placeholder={placeholderText}
-					class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
-				/>
-			</div>
-		</form>
+		<div class="flex flex-col text-sm mb-2">
+			<input
+				type="search"
+				placeholder="Search biohash or username..."
+				class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
+				bind:value={$searchStore.search}
+			/>
+		</div>
 	</div>
 
 	{#await profilePromise then profile}
@@ -126,16 +135,8 @@
 	{/await}
 
 	<div class="overflow-hidden">
-		{#if blog != null}
-			{#if filteredBlog.length !== 0}
-				{#each filteredBlog as p}
-					<PostCard post={p} />
-				{/each}
-			{:else}
-				{#each blog as p}
-					<PostCard post={p} />
-				{/each}
-			{/if}
-		{/if}
+		{#each $searchStore.filtered as post}
+			<PostCard {post} />
+		{/each}
 	</div>
 </div>

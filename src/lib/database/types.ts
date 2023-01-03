@@ -69,3 +69,13 @@ export interface FAQEntry {
 	title: string
 	content: string
 }
+
+export interface Stat {
+	biohash: string
+	username: string
+	experience: number
+	gold: number
+	levels: number
+	runtime: number
+	banned: boolean
+}

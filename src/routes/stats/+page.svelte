@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { Stat } from "$lib/database/types"
 	import { createSearchStore, searchHandler } from "$lib/stores/search"
 	import { onDestroy } from "svelte"
 
@@ -41,19 +42,10 @@
 
 	export let data: PageData
 
-	type Stat = {
-		biohash: string
-		username: string
-		experience: number
-		gold: number
-		levels: number
-		runtime: number
-		banned: boolean
-	}
-
 	const searchStats: Stat[] = data.stats.map((stat: Stat) => ({
 		...stat,
-		searchTerms: `${stat.biohash} ${stat.username}`
+		searchTerms: `${stat.biohash} ${stat.username}`,
+		filters: ""
 	}))
 
 	const searchStore = createSearchStore(searchStats)
@@ -68,6 +60,31 @@
 	can be found <a href="https://api.waspscripts.com/docs" class="text-amber-400">here</a>.
 </p>
 <div class="overflow-x-auto relative shadow-md sm:rounded-lg my-4">
+	<header class="">
+		<h3 class="py-4 px-6 font-bold whitespace-nowrap text-center">
+			Total experience:
+			{#await formatRSNumber(data.total.experience)}
+				<span class="py-4 pr-6"> ... </span>
+			{:then value}
+				<span class="py-4 pr-6"> {value} </span>
+			{/await}
+			Total gold:
+			{#await formatRSNumber(data.total.gold)}
+				<span class="py-4 pr-6"> ... </span>
+			{:then value}
+				<span class="py-4 pr-6"> {value} </span>
+			{/await}
+			Total levels:
+			<span class="py-4 pr-6"> {data.total.levels} </span>
+			Total runtime:
+			{#await convertTime(data.total.runtime)}
+				<span class="py-4 pr-6"> ... </span>
+			{:then value}
+				<span class="py-4 pr-6"> {value} </span>
+			{/await}
+		</h3>
+	</header>
+
 	<div class="flex flex-col text-sm mb-2">
 		<input
 			type="search"
