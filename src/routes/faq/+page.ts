@@ -1,13 +1,28 @@
-import type { Load } from "@sveltejs/kit"
 import { supabase } from "$lib/database/supabase"
-import { loadError } from "$lib/utils"
+import type { PageLoad } from "./$types"
 
-export const load: Load = async () => {
+export const load: PageLoad = async () => {
 	const { data: dataQ, error: errorQ } = await supabase.from("faq_questions").select("*")
-	if (errorQ) return loadError(errorQ.toString())
+	if (errorQ)
+		return {
+			questions: [],
+			errors: [],
+			status: 500,
+			error: new Error(
+				`Server failed to fetch from faq_questions. Error message:\n\n${errorQ.message}`
+			)
+		}
 
 	const { data: dataE, error: errorE } = await supabase.from("faq_errors").select("*")
-	if (errorE) return loadError(errorE.toString())
+	if (errorE)
+		return {
+			questions: [],
+			errors: [],
+			status: 500,
+			error: new Error(
+				`Server failed to fetch from faq_errors. Error message:\n\n${errorE.message}`
+			)
+		}
 
 	return { questions: dataQ, errors: dataE }
 }

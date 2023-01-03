@@ -4,7 +4,7 @@ import type { RequestHandler } from "@sveltejs/kit"
 import { WebSocket, type MessageEvent } from "ws"
 import { getData, supabase } from "$lib/database/supabase"
 
-export const updateRoles = async (
+const updateRoles = async (
 	id: string,
 	d: boolean,
 	t: boolean,

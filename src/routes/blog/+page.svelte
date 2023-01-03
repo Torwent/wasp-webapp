@@ -1,14 +1,14 @@
 <script lang="ts">
 	import type { Post, Profile } from "$lib/database/types"
-	import { getData } from "$lib/database/supabase"
 	import { fade } from "svelte/transition"
 	import { getProfile } from "$lib/stores/authStore"
 	import PostCard from "$lib/components/PostCard.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { search } from "$lib/utils"
+	import type { PageData } from "./$types"
 
-	let blog: Post[]
-	getData("blog").then((b) => (blog = b as unknown as Post[]))
+	export let data: PageData
+	let blog = data.posts
 
 	const profilePromise = getProfile() as unknown as Profile
 

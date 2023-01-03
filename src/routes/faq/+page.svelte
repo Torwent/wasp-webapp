@@ -3,9 +3,9 @@
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import DropDown from "./DropDown.svelte"
 	import Discord from "$lib/components/Discord.svelte"
-	import type { FAQEntry } from "$lib/database/types"
+	import type { PageData } from "./$types"
 
-	export let data: { questions: FAQEntry[]; errors: FAQEntry[] }
+	export let data: PageData
 
 	const faqData = data.questions
 	const faqErrors = data.errors

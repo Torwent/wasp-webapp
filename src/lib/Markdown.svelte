@@ -10,7 +10,6 @@
 		highlight: function (code: string, lang: string, callback: void) {
 			if (lang && hljs.getLanguage(lang)) {
 				try {
-					console.log(hljs.highlight(code, { language: lang }))
 					return hljs.highlight(code, { language: lang }).value
 				} catch (error) {
 					console.error(error)

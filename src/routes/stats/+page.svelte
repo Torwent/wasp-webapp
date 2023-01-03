@@ -1,5 +1,8 @@
 <script lang="ts">
-	export let data: any
+	import { createSearchStore, searchHandler } from "$lib/stores/search"
+	import { onDestroy } from "svelte"
+
+	import type { PageData } from "./$types"
 
 	async function convertTime(t: number): Promise<string> {
 		let days, hours, minutes, seconds, total_hours, total_minutes, total_seconds: number
@@ -35,6 +38,28 @@
 
 		return parseFloat(f.toFixed(2)).toString() + " " + arr[i]
 	}
+
+	export let data: PageData
+
+	type Stat = {
+		biohash: string
+		username: string
+		experience: number
+		gold: number
+		levels: number
+		runtime: number
+		banned: boolean
+	}
+
+	const searchStats: Stat[] = data.stats.map((stat: Stat) => ({
+		...stat,
+		searchTerms: `${stat.biohash} ${stat.username}`
+	}))
+
+	const searchStore = createSearchStore(searchStats)
+	const unsubscribe = searchStore.subscribe((model) => searchHandler(model))
+
+	onDestroy(() => unsubscribe())
 </script>
 
 <p class="my-4">
@@ -43,6 +68,15 @@
 	can be found <a href="https://api.waspscripts.com/docs" class="text-amber-400">here</a>.
 </p>
 <div class="overflow-x-auto relative shadow-md sm:rounded-lg my-4">
+	<div class="flex flex-col text-sm mb-2">
+		<input
+			type="search"
+			placeholder="Search biohash or username..."
+			class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
+			bind:value={$searchStore.search}
+		/>
+	</div>
+
 	<table class="w-full text-sm text-left text-stone-500 dark:text-stone-400">
 		<thead
 			class="text-xs text-stone-700 uppercase bg-stone-50 dark:bg-stone-700 dark:text-stone-400"
@@ -57,7 +91,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each data.data as entry}
+			{#each $searchStore.filtered as entry}
 				<tr
 					class="bg-white border-b dark:bg-stone-800 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-600"
 				>
