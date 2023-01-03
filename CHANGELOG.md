@@ -1,4 +1,13 @@
-# 0.1.0 (2023-01-01)
+# [0.2.0](https://github.com/Torwent/wasp-webapp/compare/v0.1.0...v0.2.0) (2023-01-03)
+
+
+### Features
+
+* Added proper search method. ([903a445](https://github.com/Torwent/wasp-webapp/commit/903a4452289f2a6e2060ae6bad9cdcf6749bd5d9))
+
+
+
+# [0.1.0](https://github.com/Torwent/wasp-webapp/compare/ea1da425b2819341d3e96835c86d80f10fef8aa9...v0.1.0) (2023-01-01)
 
 
 ### Bug Fixes
