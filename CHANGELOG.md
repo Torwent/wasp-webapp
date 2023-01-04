@@ -1,3 +1,12 @@
+# [0.4.0](https://github.com/Torwent/wasp-webapp/compare/v0.3.0...v0.4.0) (2023-01-04)
+
+
+### Features
+
+* scripts page refactor, read notes. ([976e697](https://github.com/Torwent/wasp-webapp/commit/976e6973887781a53512c5a3026add8532209f2e))
+
+
+
 # [0.3.0](https://github.com/Torwent/wasp-webapp/compare/v0.2.0...v0.3.0) (2023-01-03)
 
 
