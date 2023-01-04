@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { profile } from "$lib/stores/authStore"
 	import { fly } from "svelte/transition"
-	import Card from "$lib/components/ScriptCard.svelte"
+	import Card from "./ScriptCard.svelte"
 	import LinkButton from "$lib/components/LinkButton.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
-	import { search } from "$lib/utils"
-	import { getData, getScripts } from "$lib/database/supabase"
 	import type { Category, Script, SubCategory } from "$lib/database/types"
+	import type { PageData } from "./$types"
+	import { createSearchStore, searchHandler } from "$lib/stores/search"
+	import { onDestroy } from "svelte"
+
+	export let data: PageData
 
 	interface CheckboxType {
 		id: number
@@ -16,46 +19,11 @@
 		checked: boolean
 	}
 
-	const scripts: Script[] = getScripts() as unknown as Script[]
-
-	let searchQuery = "",
-		placeholderText = "Search posts...",
-		filteredScripts: Script[] = [],
-		checkboxes: CheckboxType[] = []
-
-	//handles the search field
-	const handleSearch = async () => {
-		filteredScripts = await scripts
-		placeholderText = "Search scripts..."
-
-		filteredScripts = filteredScripts.filter((script: Script) => search(script.title, searchQuery))
-		if (filteredScripts.length === 0) {
-			placeholderText = "Not found!"
-		}
-		searchQuery = ""
-	}
-
-	//handles checkbox filters
-	const handleFilters = async () => {
-		filteredScripts = await scripts
-		searchQuery = ""
-
-		let checked = checkboxes
-			.filter((checkbox: CheckboxType) => checkbox.checked)
-			.map((checkbox: CheckboxType) => checkbox.name)
-
-		filteredScripts = filteredScripts.filter((script: Script) => {
-			let allCat = [...script.categories, ...script.subcategories]
-			return allCat.some((c) => checked.includes(c))
-		})
-	}
-
 	//sets up checkboxes to what's available from the database
+	let checkboxes: CheckboxType[] = []
 	const loadCheckboxes = async () => {
-		const categories: Category[] = (await getData("scripts_categories")) as unknown as Category[]
-		const subcategories: SubCategory[] = (await getData(
-			"scripts_subcategories"
-		)) as unknown as SubCategory[]
+		const categories: Category[] = data.categories
+		const subcategories: SubCategory[] = data.subcategories
 
 		let id = 0
 
@@ -81,6 +49,25 @@
 			}
 		}
 	}
+
+	function handleFilters() {
+		let filters = checkboxes
+			.filter((checkbox: CheckboxType) => checkbox.checked)
+			.map((checkbox: CheckboxType) => checkbox.name)
+
+		$searchStore.filters = filters
+	}
+
+	const searchStats: Script[] = data.scripts.map((script: Script) => ({
+		...script,
+		searchTerms: `${script.title} ${script.description} ${script.categories} ${script.subcategories} ${script.author}`,
+		filters: `${script.categories} ${script.subcategories}`
+	}))
+
+	const searchStore = createSearchStore(searchStats)
+	const unsubscribe = searchStore.subscribe((model) => searchHandler(model))
+
+	onDestroy(() => unsubscribe())
 </script>
 
 <svelte:head>
@@ -102,7 +89,9 @@
 		out:fly={{ duration: 300, x: -100 }}
 	>
 		<h4 class="text-center py-4">Categories</h4>
-		{#await loadCheckboxes() then}
+		{#await loadCheckboxes()}
+			<span class="px-4">Loading...</span>
+		{:then}
 			<div class="flex justify-center font-semibold text-sm">
 				<div>
 					{#each checkboxes as checkbox}
@@ -147,34 +136,22 @@
 		{#if $profile.developer}
 			<LinkButton text="Add Script" url="/scripts/add" arrow={false} />
 		{/if}
-		<form class="my-6 place-items-center" on:submit|preventDefault={handleSearch}>
-			<div class="flex flex-col text-sm mb-2 max-w-2xl m-auto">
-				<input
-					type="text"
-					bind:value={searchQuery}
-					name="search"
-					placeholder={placeholderText}
-					class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
-				/>
-			</div>
-		</form>
+
+		<div class="flex flex-col text-sm mb-2 max-w-2xl m-auto">
+			<input
+				type="search"
+				placeholder="Search script, categories, author,..."
+				class="appearance-none shadow-sm border border-amber-200 p-2 focus:outline-none focus:border-amber-500 rounded-lg"
+				bind:value={$searchStore.search}
+			/>
+		</div>
 
 		<div
 			class="grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:px-20 container gap-6 mx-auto xl:max-w-full lg:max-w-6xl md:max-w-4xl sm:max-w-xl content-start pt-10 xl:px-12"
 		>
-			{#await scripts}
-				<h3>Loading scripts...</h3>
-			{:then scripts}
-				{#if filteredScripts.length !== 0 || searchQuery !== ""}
-					{#each filteredScripts as script}
-						<Card {script} />
-					{/each}
-				{:else if scripts}
-					{#each scripts as script}
-						<Card {script} />
-					{/each}
-				{/if}
-			{/await}
+			{#each $searchStore.filtered as script}
+				<Card {script} />
+			{/each}
 		</div>
 		<div class="h-24 w-full place-items-center" />
 	</div>

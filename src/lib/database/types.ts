@@ -24,7 +24,7 @@ export interface Developer {
 }
 
 export interface Script {
-	id: string
+	id?: string
 	title: string
 	description: string
 	content: string
@@ -33,7 +33,7 @@ export interface Script {
 	subcategories: string[]
 	author?: string
 	author_id?: string
-	assets_path?: string
+	assets_path: string
 	assets_alt?: string
 }
 

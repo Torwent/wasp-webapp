@@ -72,7 +72,6 @@
 				<div class="flex flex-col text-sm mb-2">
 					<label for="level" class="font-bold mb-2"> Level (0-2): </label>
 					<textarea
-						type="text"
 						name="level"
 						class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
                 border-orange-200 focus:border-orange-600 text-black"
@@ -83,7 +82,6 @@
 				<div class="flex flex-col text-sm mb-2">
 					<label for="content" class="font-bold mb-2"> Content: </label>
 					<textarea
-						type="text"
 						name="content"
 						class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
                 border-orange-200 focus:border-orange-600 text-black h-64"

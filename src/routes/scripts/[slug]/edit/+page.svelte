@@ -7,7 +7,7 @@
 	import Markdown from "$lib/Markdown.svelte"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
 	import { updateScript } from "$lib/database/storage"
-	import Card from "$lib/components/Card.svelte"
+	import Card from "../../Card.svelte"
 
 	let cover: string =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" +
@@ -210,7 +210,6 @@
 		<div class="flex flex-col text-sm mb-2">
 			<label for="content" class="font-bold mb-2"> Content: </label>
 			<textarea
-				type="text"
 				name="content"
 				class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
                 border-orange-200 focus:border-orange-600 text-black h-64"

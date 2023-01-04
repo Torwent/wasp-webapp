@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Dropzone from "svelte-file-dropzone"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
-	import Card from "$lib/components/Card.svelte"
 	import { profile } from "$lib/stores/authStore"
 
 	import Markdown from "$lib/Markdown.svelte"
@@ -9,6 +8,10 @@
 	import { getData } from "$lib/database/supabase"
 
 	import type { Category, Script, SubCategory } from "$lib/database/types"
+	import Card from "../Card.svelte"
+	import type { PageLoad } from "./$types"
+
+	export let data: PageLoad
 
 	let script: Script = {
 		title: "New Script",
@@ -16,7 +19,8 @@
 		content: "Add info about your script! You can user MarkDown!",
 		revision: 1,
 		categories: [],
-		subcategories: []
+		subcategories: [],
+		assets_path: ""
 	}
 
 	let cover: string, coverFile: File | undefined
@@ -212,7 +216,6 @@
 		<div class="flex flex-col text-sm mb-2">
 			<label for="content" class="font-bold mb-2"> Content (Markdown): </label>
 			<textarea
-				type="text"
 				name="content"
 				class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
                 border-orange-200 focus:border-orange-600 text-black h-64"

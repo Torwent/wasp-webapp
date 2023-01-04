@@ -27,12 +27,15 @@ export const searchHandler = <T extends Record<PropertyKey, any>>(store: SearchS
 	let enabledFilters: string[] | number[] = []
 	if (store.filters != null) enabledFilters = store.filters
 
-	if (enabledFilters.length > 0)
+	if (enabledFilters.length > 0) {
+		let isStr = typeof enabledFilters[0] === "string"
 		store.filtered = store.data.filter((item) => {
 			for (let i = 0; i < enabledFilters.length; i++) {
+				if (isStr) enabledFilters[i] = enabledFilters[i].toString().toLowerCase()
 				if (item.filters.toLowerCase().includes(enabledFilters[i])) return true
 			}
 		})
+	}
 
 	if (enabledFilters.length > 0) {
 		store.filtered = store.filtered.filter((item) => {

@@ -2,7 +2,7 @@
 	import type { Post, Profile } from "$lib/database/types"
 	import { fade } from "svelte/transition"
 	import { getProfile } from "$lib/stores/authStore"
-	import PostCard from "$lib/components/PostCard.svelte"
+	import PostCard from "./PostCard.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import type { PageData } from "./$types"
 	import { createSearchStore, searchHandler } from "$lib/stores/search"
@@ -110,7 +110,7 @@
 		<div class="flex flex-col text-sm mb-2">
 			<input
 				type="search"
-				placeholder="Search biohash or username..."
+				placeholder="Search..."
 				class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
 				bind:value={$searchStore.search}
 			/>

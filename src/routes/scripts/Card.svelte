@@ -40,6 +40,11 @@
 	}
 
 	const tooltips = loadEmojis()
+
+	let fallback =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/default/cover.jpg"
+
+	const handleError = (ev: { target: { src: string } }) => (ev.target.src = fallback)
 </script>
 
 <div
@@ -51,7 +56,12 @@
 	<!-- Preview -->
 	<div class="inline relative group h-48">
 		<!-- Thumbnail -->
-		<img class="absolute rounded-t object-cover h-full w-full" src={img} alt={altImg} />
+		<img
+			class="absolute rounded-t object-cover h-full w-full"
+			src={img}
+			alt={altImg}
+			on:error={handleError}
+		/>
 
 		<!-- Hover Effect -->
 		<div

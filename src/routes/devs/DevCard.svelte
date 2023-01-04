@@ -1,6 +1,7 @@
 <script lang="ts">
+	import type { Developer } from "$lib/database/types"
 	import { fly } from "svelte/transition"
-	export let dev
+	export let dev: Developer
 </script>
 
 <div
