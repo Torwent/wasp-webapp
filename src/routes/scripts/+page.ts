@@ -1,40 +1,60 @@
 import { supabase } from "$lib/database/supabase"
-import type { Category, Script, SubCategory } from "$lib/database/types"
+import type { Category, EmojiTooltip, ScriptCard, SubCategory } from "$lib/database/types"
 import type { PageLoad } from "./$types"
 
 export const load: PageLoad = async () => {
-	async function fetchCategories() {
-		const { data, error } = await supabase.from("scripts_categories").select("name, emoji")
+	const { data: dataC, error: errorC } = await supabase
+		.from("scripts_categories")
+		.select("name, emoji")
 
-		if (error) return []
-		return data as Category[]
+	if (errorC)
+		return {
+			categories: [],
+			subcategories: [],
+			scripts: []
+		}
+
+	const { data: dataS, error: errorS } = await supabase
+		.from("scripts_subcategories")
+		.select("category, name, emoji")
+
+	if (errorS)
+		return {
+			categories: [],
+			subcategories: [],
+			scripts: []
+		}
+
+	const allCategories = [...dataC, ...dataS]
+
+	function loadEmojis(categories: Category[], subcategories: SubCategory[]) {
+		let result: EmojiTooltip[] = []
+		const scriptCategories = [...categories, ...subcategories]
+
+		for (let c of scriptCategories) {
+			for (let c2 of allCategories) {
+				if (c === c2.name) result.push({ tooltip: c2.name, icon: c2.emoji })
+			}
+		}
+
+		return result
 	}
 
-	async function fetchSubCategories() {
-		const { data, error } = await supabase
-			.from("scripts_subcategories")
-			.select("category, name, emoji")
-
-		if (error) return []
-		return data as SubCategory[]
-	}
-
-	async function fetchScripts(id: string = "") {
-		let scripts: Script[] = []
-		const { data: dataPublic, error: errorPublic } =
-			id === ""
-				? await supabase.from("scripts_public").select().order("title", { ascending: true })
-				: await supabase.from("scripts_public").select().eq("id", id)
+	async function fetchScripts() {
+		let scripts: ScriptCard[] = []
+		const { data: dataPublic, error: errorPublic } = await supabase
+			.from("scripts_public")
+			.select()
+			.order("title", { ascending: true })
 
 		if (errorPublic) {
 			console.error(errorPublic)
 			return scripts
 		}
 
-		const { data: dataProtected, error: errorProtected } =
-			id === ""
-				? await supabase.from("scripts_protected").select()
-				: await supabase.from("scripts_protected").select().eq("id", id)
+		const { data: dataProtected, error: errorProtected } = await supabase
+			.from("scripts_protected")
+			.select()
 
 		if (errorProtected) {
 			console.error(errorProtected)
@@ -49,7 +69,7 @@ export const load: PageLoad = async () => {
 		dataPublic.forEach((publicD) => {
 			const protectedD = dataProtected.find((entry) => entry.id === publicD.id)
 
-			let script: Script = {
+			let script: ScriptCard = {
 				id: publicD.id,
 				title: publicD.title,
 				description: publicD.description,
@@ -63,7 +83,8 @@ export const load: PageLoad = async () => {
 					"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" +
 					publicD.id +
 					"/cover.jpg",
-				assets_alt: protectedD.assets_alt
+				assets_alt: protectedD.assets_alt,
+				emojiTooltip: loadEmojis(publicD.categories, publicD.subcategories)
 			}
 
 			scripts.push(script)
@@ -73,8 +94,8 @@ export const load: PageLoad = async () => {
 	}
 
 	return {
-		categories: fetchCategories(),
-		subcategories: fetchSubCategories(),
+		categories: dataC as Category[],
+		subcategories: dataS as SubCategory[],
 		scripts: fetchScripts()
 	}
 }

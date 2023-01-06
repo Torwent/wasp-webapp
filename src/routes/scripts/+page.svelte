@@ -4,7 +4,7 @@
 	import Card from "./ScriptCard.svelte"
 	import LinkButton from "$lib/components/LinkButton.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
-	import type { Category, Script, SubCategory } from "$lib/database/types"
+	import type { Category, ScriptCard, SubCategory } from "$lib/database/types"
 	import type { PageData } from "./$types"
 	import { createSearchStore, searchHandler } from "$lib/stores/search"
 	import { onDestroy } from "svelte"
@@ -58,7 +58,7 @@
 		$searchStore.filters = filters
 	}
 
-	const searchStats: Script[] = data.scripts.map((script: Script) => ({
+	const searchStats: ScriptCard[] = data.scripts.map((script: ScriptCard) => ({
 		...script,
 		searchTerms: `${script.title} ${script.description} ${script.categories} ${script.subcategories} ${script.author}`,
 		filters: `${script.categories} ${script.subcategories}`

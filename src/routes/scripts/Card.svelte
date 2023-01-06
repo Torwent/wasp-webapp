@@ -1,50 +1,27 @@
 <script lang="ts">
-	import type { Category, SubCategory } from "$lib/database/types"
+	import type { EmojiTooltip } from "$lib/database/types"
 	import { fade } from "svelte/transition"
-	import EmojiTooltip from "$lib/components/EmojiTooltip.svelte"
-	import { getData } from "$lib/database/supabase"
-	import Loading from "$lib/components/Loading.svelte"
+	import EmojiTooltipComponent from "$lib/components/EmojiTooltip.svelte"
 
 	export let img: string
 	export let altImg: string = "Asset missing"
 	export let title: string
-	export let author: string
+	export let author: string | undefined
 	export let description: string
-	export let exportedCategories: string[]
-	export let exportedSubcategories: string[]
+	export let tooltips: EmojiTooltip[]
 
-	interface EmojiTooltip {
-		tooltip: string
-		icon: string
-	}
+	if (author == null) author = ""
 
 	if (description.length > 80) {
 		description.substring(0, 80) + "..." //crop description at 80 characters.
 	}
 
-	const loadEmojis = async () => {
-		let result: EmojiTooltip[] = []
-		const exportedAllCategories = [...exportedCategories, ...exportedSubcategories]
-		const categories = (await getData("categories")) as unknown as Category[]
-		const subcategories = (await getData("subcategories")) as unknown as SubCategory[]
-
-		let allCategories = [...categories, ...subcategories]
-
-		for (let c of exportedAllCategories) {
-			for (let c2 of allCategories) {
-				if (c === c2.name) result.push({ tooltip: c2.name, icon: c2.emoji })
-			}
-		}
-
-		return result
-	}
-
-	const tooltips = loadEmojis()
-
 	let fallback =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/default/cover.jpg"
 
-	const handleError = (ev: { target: { src: string } }) => (ev.target.src = fallback)
+	const handleError = (ev: Event) => {
+		/*ev.target.src = fallback)*/
+	}
 </script>
 
 <div
@@ -95,13 +72,9 @@
 		</div>
 
 		<div class="grid grid-cols-12 mt-auto">
-			{#await tooltips}
-				<Loading />
-			{:then tooltips}
-				{#each tooltips as emoji}
-					<EmojiTooltip {emoji} />
-				{/each}
-			{/await}
+			{#each tooltips as emoji}
+				<EmojiTooltipComponent {emoji} />
+			{/each}
 		</div>
 	</div>
 </div>

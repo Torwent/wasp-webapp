@@ -23,6 +23,11 @@ export interface Developer {
 	paypal_id: string
 }
 
+export interface EmojiTooltip {
+	tooltip: string
+	icon: string
+}
+
 export interface Script {
 	id?: string
 	title: string
@@ -35,6 +40,22 @@ export interface Script {
 	author_id?: string
 	assets_path: string
 	assets_alt?: string
+	emojiTooltip?: EmojiTooltip[]
+}
+
+export interface ScriptCard {
+	id?: string
+	title: string
+	description: string
+	content: string
+	revision: number
+	categories: string[]
+	subcategories: string[]
+	author?: string
+	author_id?: string
+	assets_path: string
+	assets_alt?: string
+	emojiTooltip: EmojiTooltip[]
 }
 
 export interface DownloadScript {
