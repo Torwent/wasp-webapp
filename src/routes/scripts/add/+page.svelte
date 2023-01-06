@@ -152,8 +152,7 @@
 				title={script.title}
 				author={$profile.username}
 				description={script.description}
-				exportedCategories={script.categories}
-				exportedSubcategories={script.subcategories}
+				tooltips={[]}
 			/>
 		</div>
 

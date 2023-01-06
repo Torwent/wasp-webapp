@@ -144,10 +144,9 @@
 			<Card
 				img={cover}
 				title={data.title}
-				author={data.author ? data.author : ""}
+				author={data.author}
 				description={data.description}
-				exportedCategories={data.categories}
-				exportedSubcategories={data.subcategories}
+				tooltips={[]}
 			/>
 		</div>
 
