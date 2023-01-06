@@ -1,3 +1,12 @@
+## [0.4.1](https://github.com/Torwent/wasp-webapp/compare/v0.4.0...v0.4.1) (2023-01-06)
+
+
+### Bug Fixes
+
+* scripts page is now fully reactive. No more left over artifacts of previous components ([535ea45](https://github.com/Torwent/wasp-webapp/commit/535ea45f3099e4e0961f2ac90609676ee4bde5d8))
+
+
+
 # [0.4.0](https://github.com/Torwent/wasp-webapp/compare/v0.3.0...v0.4.0) (2023-01-04)
 
 
