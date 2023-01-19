@@ -1,3 +1,12 @@
+## [0.4.3](https://github.com/Torwent/wasp-webapp/compare/v0.4.2...v0.4.3) (2023-01-19)
+
+
+### Bug Fixes
+
+* BioHashes were removed and are not accessible anymore to anyone ([f4aad6a](https://github.com/Torwent/wasp-webapp/commit/f4aad6aa089bf729b04308d07c1b18a1a8ec9ff0))
+
+
+
 ## [0.4.2](https://github.com/Torwent/wasp-webapp/compare/v0.4.1...v0.4.2) (2023-01-06)
 
 
@@ -31,15 +40,6 @@
 ### Features
 
 * proper blog searching and more, read notes. ([ec1c7c8](https://github.com/Torwent/wasp-webapp/commit/ec1c7c89acd9aa7abe806592a2737360a483bffb))
-
-
-
-# [0.2.0](https://github.com/Torwent/wasp-webapp/compare/v0.1.0...v0.2.0) (2023-01-03)
-
-
-### Features
-
-* Added proper search method. ([903a445](https://github.com/Torwent/wasp-webapp/commit/903a4452289f2a6e2060ae6bad9cdcf6749bd5d9))
 
 
 
