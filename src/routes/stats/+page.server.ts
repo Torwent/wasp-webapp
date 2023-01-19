@@ -5,7 +5,6 @@ import type { PageServerLoad } from "./$types"
 
 export const load: PageServerLoad = async () => {
 	let total: Stat = {
-		biohash: "Total",
 		username: "Total",
 		experience: 0,
 		gold: 0,
@@ -34,7 +33,7 @@ export const load: PageServerLoad = async () => {
 
 	const { data, error } = await supabase
 		.from("stats_protected")
-		.select("biohash, username, experience, gold, levels, runtime, banned")
+		.select("username, experience, gold, levels, runtime, banned")
 	if (error) {
 		const response = {
 			total: total,

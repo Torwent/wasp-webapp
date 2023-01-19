@@ -44,7 +44,7 @@
 
 	const searchStats: Stat[] = data.stats.map((stat: Stat) => ({
 		...stat,
-		searchTerms: `${stat.biohash} ${stat.username}`,
+		searchTerms: `${stat.username}`,
 		filters: ""
 	}))
 
@@ -99,7 +99,6 @@
 			class="text-xs text-stone-700 uppercase bg-stone-50 dark:bg-stone-700 dark:text-stone-400"
 		>
 			<tr>
-				<th scope="col" class="py-3 px-6"> BioHash </th>
 				<th scope="col" class="py-3 px-6"> Username </th>
 				<th scope="col" class="py-3 px-6"> Experience </th>
 				<th scope="col" class="py-3 px-6"> Gold </th>
@@ -116,13 +115,11 @@
 						scope="row"
 						class="py-4 px-6 font-medium text-stone-900 whitespace-nowrap dark:text-white"
 					>
-						{entry.biohash}
-					</th>
-					<th
-						scope="row"
-						class="py-4 px-6 font-medium text-stone-900 whitespace-nowrap dark:text-white"
-					>
-						{entry.username}
+						{#if entry.username}
+							{entry.username}
+						{:else}
+							Anonymous
+						{/if}
 					</th>
 					{#await formatRSNumber(entry.experience)}
 						<td class="py-4 px-6"> ... </td>

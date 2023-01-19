@@ -92,7 +92,6 @@ export interface FAQEntry {
 }
 
 export interface Stat {
-	biohash: string
 	username: string
 	experience: number
 	gold: number
