@@ -1,3 +1,12 @@
+## [0.4.5](https://github.com/Torwent/wasp-webapp/compare/v0.4.4...v0.4.5) (2023-03-02)
+
+
+### Bug Fixes
+
+* typo ([8ffc9ae](https://github.com/Torwent/wasp-webapp/commit/8ffc9ae6989429d22e2ad90fec96830030c9e5ab))
+
+
+
 ## [0.4.4](https://github.com/Torwent/wasp-webapp/compare/v0.4.3...v0.4.4) (2023-03-02)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * scripts page is now fully reactive. No more left over artifacts of previous components ([535ea45](https://github.com/Torwent/wasp-webapp/commit/535ea45f3099e4e0961f2ac90609676ee4bde5d8))
-
-
-
-# [0.4.0](https://github.com/Torwent/wasp-webapp/compare/v0.3.0...v0.4.0) (2023-01-04)
-
-
-### Features
-
-* scripts page refactor, read notes. ([976e697](https://github.com/Torwent/wasp-webapp/commit/976e6973887781a53512c5a3026add8532209f2e))
 
 
 
