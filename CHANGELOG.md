@@ -1,3 +1,12 @@
+## [0.4.4](https://github.com/Torwent/wasp-webapp/compare/v0.4.3...v0.4.4) (2023-03-02)
+
+
+### Bug Fixes
+
+* stats compatibility update ([fc86110](https://github.com/Torwent/wasp-webapp/commit/fc86110a572b2ec566ad91a9dbc804b95d36da36))
+
+
+
 ## [0.4.3](https://github.com/Torwent/wasp-webapp/compare/v0.4.2...v0.4.3) (2023-01-19)
 
 
@@ -31,15 +40,6 @@
 ### Features
 
 * scripts page refactor, read notes. ([976e697](https://github.com/Torwent/wasp-webapp/commit/976e6973887781a53512c5a3026add8532209f2e))
-
-
-
-# [0.3.0](https://github.com/Torwent/wasp-webapp/compare/v0.2.0...v0.3.0) (2023-01-03)
-
-
-### Features
-
-* proper blog searching and more, read notes. ([ec1c7c8](https://github.com/Torwent/wasp-webapp/commit/ec1c7c89acd9aa7abe806592a2737360a483bffb))
 
 
 
