@@ -130,7 +130,7 @@
 				{/await}
 			{/if}
 			{#if data.runtime}
-				{#await formatRSNumber(data.runtime)}
+				{#await convertTime(data.runtime)}
 					<h2>Total Runtime: ...</h2>
 				{:then value}
 					<h2>Total Runtime: {value}</h2>
