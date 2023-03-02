@@ -11,6 +11,7 @@
 	import { profile, getProfile } from "$lib/stores/authStore"
 	import { supabase } from "$lib/database/supabase"
 	import { onMount } from "svelte"
+	import { convertTime, formatRSNumber } from "$lib/utils"
 
 	let tempDismiss: Boolean
 
@@ -112,6 +113,30 @@
 				folder={"scripts/" + data.title.toLowerCase().replace(" ", "_") + "/assets"}
 			/>
 		</div>
+
+		<header class="text-center">
+			{#if data.experience}
+				{#await formatRSNumber(data.experience)}
+					<h2>Total Experience Gained: ...</h2>
+				{:then value}
+					<h2>Total Experience Gained: {value}</h2>
+				{/await}
+			{/if}
+			{#if data.gold}
+				{#await formatRSNumber(data.gold)}
+					<h2>Total Gold Gained: ...</h2>
+				{:then value}
+					<h2>Total Gold Gained: {value}</h2>
+				{/await}
+			{/if}
+			{#if data.runtime}
+				{#await formatRSNumber(data.runtime)}
+					<h2>Total Runtime: ...</h2>
+				{:then value}
+					<h2>Total Runtime: {value}</h2>
+				{/await}
+			{/if}
+		</header>
 
 		<div class="text-center py-12">
 			{#if data.categories.includes("Free")}

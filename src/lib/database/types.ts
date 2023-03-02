@@ -41,6 +41,9 @@ export interface Script {
 	assets_path: string
 	assets_alt?: string
 	emojiTooltip?: EmojiTooltip[]
+	experience?: number
+	gold?: number
+	runtime?: number
 }
 
 export interface ScriptCard {

@@ -171,20 +171,19 @@ export async function uploadScript(
 
 	script = data[0]
 
-	file = await updateScriptInfo(file, script.id, 1)
+	file = await updateScriptInfo(file, script.id as string, 1)
 
 	//rename all scripts to script so we can always fetch them later regardless of name changes.
 	let path = script.id + "/" + pad(1, 9) + "/script.simba"
 
-	await uploadFile("scripts", path, file)
+	let promises = [uploadFile("scripts", path, file)]
 
-	if (coverFile) {
-		await uploadFile("imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
-	}
+	if (coverFile) promises.push(uploadFile("imgs", "scripts/" + script.id + "/cover.jpg", coverFile))
 
-	if (bannerFile) {
-		await uploadFile("imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
-	}
+	if (bannerFile)
+		promises.push(uploadFile("imgs", "scripts/" + script.id + "/banner.jpg", bannerFile))
+
+	await Promise.all(promises)
 }
 
 export async function updateScript(
@@ -211,18 +210,19 @@ export async function updateScript(
 
 	if (error) return console.error(error)
 
+	let promises = []
+
 	if (file) {
-		file = await updateScriptInfo(file, script.id, script.revision)
+		file = await updateScriptInfo(file, script.id as string, script.revision)
 		let path = script.id + "/" + pad(script.revision, 9) + "/script.simba"
 
-		await uploadFile("scripts", path, file)
+		promises.push(uploadFile("scripts", path, file))
 	}
 
-	if (coverFile) {
-		updateImg("imgs", "scripts/" + script.id, "/cover.jpg", coverFile)
-	}
+	if (coverFile) promises.push(updateImg("imgs", "scripts/" + script.id, "/cover.jpg", coverFile))
 
-	if (bannerFile) {
-		updateImg("imgs", "scripts/" + script.id, "/banner.jpg", bannerFile)
-	}
+	if (bannerFile)
+		promises.push(updateImg("imgs", "scripts/" + script.id, "/banner.jpg", bannerFile))
+
+	await Promise.all(promises)
 }

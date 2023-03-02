@@ -32,8 +32,8 @@ export const load: PageServerLoad = async () => {
 	}
 
 	const { data, error } = await supabase
-		.from("stats_protected")
-		.select("username, experience, gold, levels, runtime, banned")
+		.from("stats")
+		.select("username, experience, gold, levels, runtime")
 	if (error) {
 		const response = {
 			total: total,
