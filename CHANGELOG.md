@@ -1,3 +1,13 @@
+## [0.4.9](https://github.com/Torwent/wasp-webapp/compare/v0.4.8...v0.4.9) (2023-03-03)
+
+
+### Bug Fixes
+
+* add .env to gitignore again ([f517f2a](https://github.com/Torwent/wasp-webapp/commit/f517f2a2f79281df2af18aa3301e26adc48dc579))
+* add blank .env file ([59556cd](https://github.com/Torwent/wasp-webapp/commit/59556cd4962ffefa3a6a3f2dadba8343a78b4b46))
+
+
+
 ## [0.4.8](https://github.com/Torwent/wasp-webapp/compare/v0.4.7...v0.4.8) (2023-03-03)
 
 
@@ -31,15 +41,6 @@
 ### Bug Fixes
 
 * typo ([8ffc9ae](https://github.com/Torwent/wasp-webapp/commit/8ffc9ae6989429d22e2ad90fec96830030c9e5ab))
-
-
-
-## [0.4.4](https://github.com/Torwent/wasp-webapp/compare/v0.4.3...v0.4.4) (2023-03-02)
-
-
-### Bug Fixes
-
-* stats compatibility update ([fc86110](https://github.com/Torwent/wasp-webapp/commit/fc86110a572b2ec566ad91a9dbc804b95d36da36))
 
 
 
