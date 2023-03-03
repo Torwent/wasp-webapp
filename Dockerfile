@@ -10,13 +10,6 @@ RUN npx pnpm i --frozen-lockfile
 # Rebuild the source code only when needed
 FROM node:16 AS builder
 WORKDIR /usr/src/app
-COPY . .
-COPY --from=deps /usr/src/app/node_modules ./node_modules
-RUN npx pnpm run build
-
-# Production image, copy all the files and run next
-FROM node:16-alpine AS runner
-WORKDIR /usr/src/app
 
 ARG VITE_SB_URL
 ARG VITE_SB_ANON_KEY
@@ -31,6 +24,13 @@ ENV SERVICE_USER $SERVICE_USER
 ENV SERVICE_PASS $SERVICE_PASS
 ENV VITE_DEV $VITE_DEV
 
+COPY . .
+COPY --from=deps /usr/src/app/node_modules ./node_modules
+RUN npx pnpm run build
+
+# Production image, copy all the files and run next
+FROM node:16-alpine AS runner
+WORKDIR /usr/src/app
 RUN adduser -S torwent -D -u 10000 -s /bin/nologin
 COPY --from=builder --chown=sveltekit:nodejs /usr/src/app/build ./build
 COPY --from=builder /usr/src/app/node_modules ./node_modules
