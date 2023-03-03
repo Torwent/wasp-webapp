@@ -32,6 +32,8 @@
 			return 0
 		})
 	}
+
+	$: sortedStore = $searchStore.filtered
 </script>
 
 <svelte:head>
