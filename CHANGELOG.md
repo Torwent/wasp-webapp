@@ -1,3 +1,12 @@
+## [0.4.11](https://github.com/Torwent/wasp-webapp/compare/v0.4.10...v0.4.11) (2023-03-03)
+
+
+### Bug Fixes
+
+* **stats:** fix the searchbar. oops! ([b5b2909](https://github.com/Torwent/wasp-webapp/commit/b5b2909b059c1fcfa861e4cec0ce9c3c48340207))
+
+
+
 ## [0.4.10](https://github.com/Torwent/wasp-webapp/compare/v0.4.9...v0.4.10) (2023-03-03)
 
 
@@ -32,15 +41,6 @@
 ### Bug Fixes
 
 * **stats:** can now sort the columns ([fbaec4e](https://github.com/Torwent/wasp-webapp/commit/fbaec4e473cc645f000bf1ebb31e2e4a58609d72))
-
-
-
-## [0.4.6](https://github.com/Torwent/wasp-webapp/compare/v0.4.5...v0.4.6) (2023-03-03)
-
-
-### Bug Fixes
-
-* several fixes, read notes ([1467cd6](https://github.com/Torwent/wasp-webapp/commit/1467cd6950a80b354f827d312f54a238c9c92b0c))
 
 
 
