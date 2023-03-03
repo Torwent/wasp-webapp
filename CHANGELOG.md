@@ -1,3 +1,12 @@
+## [0.4.8](https://github.com/Torwent/wasp-webapp/compare/v0.4.7...v0.4.8) (2023-03-03)
+
+
+### Bug Fixes
+
+* changes to docker configs ([6384f4b](https://github.com/Torwent/wasp-webapp/commit/6384f4b216d469e06567d6c90a90aee129d94041))
+
+
+
 ## [0.4.7](https://github.com/Torwent/wasp-webapp/compare/v0.4.6...v0.4.7) (2023-03-03)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * stats compatibility update ([fc86110](https://github.com/Torwent/wasp-webapp/commit/fc86110a572b2ec566ad91a9dbc804b95d36da36))
-
-
-
-## [0.4.3](https://github.com/Torwent/wasp-webapp/compare/v0.4.2...v0.4.3) (2023-01-19)
-
-
-### Bug Fixes
-
-* BioHashes were removed and are not accessible anymore to anyone ([f4aad6a](https://github.com/Torwent/wasp-webapp/commit/f4aad6aa089bf729b04308d07c1b18a1a8ec9ff0))
 
 
 
