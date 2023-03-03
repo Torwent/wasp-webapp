@@ -216,6 +216,55 @@
 			/>
 		</div>
 
+		<!-- Stats -->
+		<div class="flex flex-col text-sm mb-2">
+			<h3 class="text-center">Stats limits (every 5 minutes)</h3>
+			<div class="flex justify-evenly py-3">
+				<div class="grid">
+					<label for="min_xp" class="font-bold mb-2"> Minimum Experience: </label>
+					<input
+						type="number"
+						name="min_xp"
+						class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
+						bind:value={data.min_xp}
+					/>
+				</div>
+				<div class="grid">
+					<label for="max_xp" class="font-bold mb-2"> Maximum Experience: </label>
+					<input
+						type="number"
+						name="max_xp"
+						class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
+						bind:value={data.max_xp}
+					/>
+				</div>
+			</div>
+			<div class="flex justify-evenly py-3">
+				<div class="grid">
+					<label for="min_gp" class="font-bold mb-2"> Minimum Gold: </label>
+					<input
+						type="number"
+						name="min_gp"
+						class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
+						bind:value={data.min_gp}
+					/>
+				</div>
+				<div class="grid">
+					<label for="max_gp" class="font-bold mb-2"> Maximum Gold: </label>
+					<input
+						type="number"
+						name="max_gp"
+						class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
+						bind:value={data.max_gp}
+					/>
+				</div>
+			</div>
+		</div>
+
 		<!-- File -->
 		<div class="flex flex-col text-sm mt-4 mb-2">
 			<span class="font-bold mb-2">Script revision: {data.revision}</span>

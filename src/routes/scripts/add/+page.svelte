@@ -9,9 +9,6 @@
 
 	import type { Category, Script, SubCategory } from "$lib/database/types"
 	import Card from "../Card.svelte"
-	import type { PageLoad } from "./$types"
-
-	export let data: PageLoad
 
 	let script: Script = {
 		title: "New Script",
@@ -20,7 +17,11 @@
 		revision: 1,
 		categories: [],
 		subcategories: [],
-		assets_path: ""
+		assets_path: "",
+		min_xp: 0,
+		max_xp: 15000,
+		min_gp: 0,
+		max_gp: 250000
 	}
 
 	let cover: string, coverFile: File | undefined
@@ -220,6 +221,55 @@
                 border-orange-200 focus:border-orange-600 text-black h-64"
 				bind:value={script.content}
 			/>
+		</div>
+
+		<!-- Stats -->
+		<div class="flex flex-col text-sm mb-2">
+			<h3 class="text-center">Stats limits (every 5 minutes)</h3>
+			<div class="flex justify-evenly py-3">
+				<div class="grid">
+					<label for="min_xp" class="font-bold mb-2"> Minimum Experience: </label>
+					<input
+						type="number"
+						name="min_xp"
+						class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
+						bind:value={script.min_xp}
+					/>
+				</div>
+				<div class="grid">
+					<label for="max_xp" class="font-bold mb-2"> Maximum Experience: </label>
+					<input
+						type="number"
+						name="max_xp"
+						class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
+						bind:value={script.max_xp}
+					/>
+				</div>
+			</div>
+			<div class="flex justify-evenly py-3">
+				<div class="grid">
+					<label for="min_gp" class="font-bold mb-2"> Minimum Gold: </label>
+					<input
+						type="number"
+						name="min_gp"
+						class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
+						bind:value={script.min_gp}
+					/>
+				</div>
+				<div class="grid">
+					<label for="max_gp" class="font-bold mb-2"> Maximum Gold: </label>
+					<input
+						type="number"
+						name="max_gp"
+						class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
+                border-orange-200 focus:border-orange-600 text-black"
+						bind:value={script.max_gp}
+					/>
+				</div>
+			</div>
 		</div>
 
 		<!-- File -->

@@ -6,7 +6,7 @@ import type { Script } from "$lib/database/types"
 async function getScript(id: string = "") {
 	const publicData = supabase.from("scripts_public").select().eq("id", id)
 	const protectedData = supabase.from("scripts_protected").select().eq("id", id)
-	const statsData = supabase.from("stats_scripts").select().eq("scriptID", id)
+	const statsData = supabase.from("stats_scripts").select().eq("script_id", id)
 
 	const promises = await Promise.all([publicData, protectedData, statsData])
 
@@ -36,6 +36,7 @@ async function getScript(id: string = "") {
 		assets_alt: protectedD.assets_alt,
 		experience: statsD.experience,
 		gold: statsD.gold,
+		levels: statsD.levels,
 		runtime: statsD.runtime
 	}
 

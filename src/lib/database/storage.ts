@@ -165,18 +165,28 @@ export async function uploadScript(
 		subcategories: script.subcategories
 	}
 
-	const { data, error } = await supabase.from("scripts_public").insert(publicData)
+	const { data, error: pError } = await supabase.from("scripts_public").insert(publicData)
+	if (pError) return console.error(pError)
 
-	if (error) return console.error(error)
+	const statsData = {
+		min_xp: script.min_xp,
+		max_xp: script.max_xp,
+		min_gp: script.min_gp,
+		max_gp: script.max_gp
+	}
 
 	script = data[0]
+
+	let promises = []
+
+	promises.push(supabase.from("stats_scripts").update(statsData).match({ script_id: script.id }))
 
 	file = await updateScriptInfo(file, script.id as string, 1)
 
 	//rename all scripts to script so we can always fetch them later regardless of name changes.
 	let path = script.id + "/" + pad(1, 9) + "/script.simba"
 
-	let promises = [uploadFile("scripts", path, file)]
+	promises.push(uploadFile("scripts", path, file))
 
 	if (coverFile) promises.push(uploadFile("imgs", "scripts/" + script.id + "/cover.jpg", coverFile))
 
@@ -203,14 +213,17 @@ export async function updateScript(
 		subcategories: script.subcategories
 	}
 
-	const { error } = await supabase
-		.from("scripts_public")
-		.update(publicData)
-		.match({ id: publicData.id })
-
-	if (error) return console.error(error)
+	const statsData = {
+		min_xp: script.min_xp,
+		max_xp: script.max_xp,
+		min_gp: script.min_gp,
+		max_gp: script.max_gp
+	}
 
 	let promises = []
+
+	promises.push(supabase.from("scripts_public").update(publicData).match({ id: script.id }))
+	promises.push(supabase.from("stats_scripts").update(statsData).match({ script_id: script.id }))
 
 	if (file) {
 		file = await updateScriptInfo(file, script.id as string, script.revision)

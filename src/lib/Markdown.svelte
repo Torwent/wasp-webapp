@@ -20,7 +20,7 @@
 		}
 	})
 
-	const html = md.render(src)
+	$: html = md.render(src)
 </script>
 
 {@html html}

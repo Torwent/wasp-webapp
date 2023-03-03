@@ -43,7 +43,12 @@ export interface Script {
 	emojiTooltip?: EmojiTooltip[]
 	experience?: number
 	gold?: number
+	levels?: number
 	runtime?: number
+	min_xp?: number
+	max_xp?: number
+	min_gp?: number
+	max_gp?: number
 }
 
 export interface ScriptCard {
