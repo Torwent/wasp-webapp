@@ -1,3 +1,12 @@
+## [0.4.10](https://github.com/Torwent/wasp-webapp/compare/v0.4.9...v0.4.10) (2023-03-03)
+
+
+### Bug Fixes
+
+* dockerfile changes ([5525cc4](https://github.com/Torwent/wasp-webapp/commit/5525cc4eb19f558556366c6a79a94811c5226643))
+
+
+
 ## [0.4.9](https://github.com/Torwent/wasp-webapp/compare/v0.4.8...v0.4.9) (2023-03-03)
 
 
@@ -32,15 +41,6 @@
 ### Bug Fixes
 
 * several fixes, read notes ([1467cd6](https://github.com/Torwent/wasp-webapp/commit/1467cd6950a80b354f827d312f54a238c9c92b0c))
-
-
-
-## [0.4.5](https://github.com/Torwent/wasp-webapp/compare/v0.4.4...v0.4.5) (2023-03-02)
-
-
-### Bug Fixes
-
-* typo ([8ffc9ae](https://github.com/Torwent/wasp-webapp/commit/8ffc9ae6989429d22e2ad90fec96830030c9e5ab))
 
 
 
