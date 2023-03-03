@@ -19,6 +19,19 @@
 	const unsubscribe = searchStore.subscribe((model) => searchHandler(model))
 
 	onDestroy(() => unsubscribe())
+
+	let sortedStore = $searchStore.filtered
+
+	function sortByNumber(header: keyof Stat) {
+		sortedStore = $searchStore.filtered
+		sortedStore = sortedStore.sort((obj1, obj2) => {
+			if (header != "username") return obj2[header] - obj1[header]
+
+			if (obj1[header] < obj2[header]) return -1
+			if (obj1[header] > obj2[header]) return 1
+			return 0
+		})
+	}
 </script>
 
 <svelte:head>
@@ -26,11 +39,6 @@
 	<MetaTags title="Stats" description="Wasp Scripts usage stats!" url="/stats" />
 </svelte:head>
 
-<p class="my-4">
-	<span class="text-red-500">Disclaimer:</span>
-	wasp-stats is a work in progress. Stats will be reset a couple of times during development! documentation
-	can be found <a href="https://api.waspscripts.com/docs" class="text-amber-400">here</a>.
-</p>
 <div class="overflow-x-auto relative shadow-md sm:rounded-lg my-4">
 	<header class="">
 		<h3 class="py-4 px-6 font-bold whitespace-nowrap text-center">
@@ -71,15 +79,21 @@
 			class="text-xs text-stone-700 uppercase bg-stone-50 dark:bg-stone-700 dark:text-stone-400"
 		>
 			<tr>
-				<th scope="col" class="py-3 px-6"> Username </th>
-				<th scope="col" class="py-3 px-6"> Experience </th>
-				<th scope="col" class="py-3 px-6"> Gold </th>
-				<th scope="col" class="py-3 px-6"> Levels </th>
-				<th scope="col" class="py-3 px-6"> Runtime </th>
+				<th scope="col" class="py-3 px-6" on:click={() => sortByNumber("username")}> Username </th>
+				<th scope="col" class="py-3 px-6" on:click={() => sortByNumber("experience")}>
+					Experience
+				</th>
+				<th scope="col" class="py-3 px-6" on:click={() => sortByNumber("gold")}> Gold </th>
+				<th scope="col" class="py-3 px-6" on:click={() => sortByNumber("levels")}>
+					<a href="/blog/WaspStats%20virtual%20levels" class="hover:text-amber-400">
+						Virtual levels
+					</a></th
+				>
+				<th scope="col" class="py-3 px-6" on:click={() => sortByNumber("runtime")}> Runtime </th>
 			</tr>
 		</thead>
 		<tbody>
-			{#each $searchStore.filtered as entry}
+			{#each sortedStore as entry}
 				<tr
 					class="bg-white border-b dark:bg-stone-800 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-600"
 				>

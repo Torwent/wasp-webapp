@@ -9,8 +9,7 @@ export const load: PageServerLoad = async () => {
 		experience: 0,
 		gold: 0,
 		levels: 0,
-		runtime: 0,
-		banned: false
+		runtime: 0
 	}
 
 	if (supabase.auth.user() == null) {
@@ -34,6 +33,8 @@ export const load: PageServerLoad = async () => {
 	const { data, error } = await supabase
 		.from("stats")
 		.select("username, experience, gold, levels, runtime")
+		.or("experience.gt.0,gold.gt.0")
+		.order("experience", { ascending: false })
 	if (error) {
 		const response = {
 			total: total,

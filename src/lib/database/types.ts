@@ -105,5 +105,4 @@ export interface Stat {
 	gold: number
 	levels: number
 	runtime: number
-	banned: boolean
 }
