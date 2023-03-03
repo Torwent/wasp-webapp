@@ -5,9 +5,17 @@ services:
     container_name: "wasp-webapp"
     build:
       context: .
+      args:
+        VITE_SB_URL: $VITE_SB_URL
+        VITE_SB_ANON_KEY: $VITE_SB_ANON_KEY
+        SERVICE_USER: $SERVICE_USER
+        SERVICE_PASS: $SERVICE_PASS
+        VITE_DEV: $VITE_DEV
     restart: unless-stopped
     networks:
       - wasp-proxy
+    env_file:
+      - .env
 
 networks:
   wasp-proxy:
