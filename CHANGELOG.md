@@ -1,3 +1,12 @@
+## [0.4.12](https://github.com/Torwent/wasp-webapp/compare/v0.4.11...v0.4.12) (2023-03-04)
+
+
+### Bug Fixes
+
+* **stats:** added ascending and descending sorting ([70b4a6e](https://github.com/Torwent/wasp-webapp/commit/70b4a6e7d84bbd05386da7a63f5af96bce6da2a3))
+
+
+
 ## [0.4.11](https://github.com/Torwent/wasp-webapp/compare/v0.4.10...v0.4.11) (2023-03-03)
 
 
@@ -32,15 +41,6 @@
 ### Bug Fixes
 
 * changes to docker configs ([6384f4b](https://github.com/Torwent/wasp-webapp/commit/6384f4b216d469e06567d6c90a90aee129d94041))
-
-
-
-## [0.4.7](https://github.com/Torwent/wasp-webapp/compare/v0.4.6...v0.4.7) (2023-03-03)
-
-
-### Bug Fixes
-
-* **stats:** can now sort the columns ([fbaec4e](https://github.com/Torwent/wasp-webapp/commit/fbaec4e473cc645f000bf1ebb31e2e4a58609d72))
 
 
 
