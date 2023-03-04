@@ -20,15 +20,24 @@
 
 	onDestroy(() => unsubscribe())
 
+	let ascending = false
+	let headers: (keyof Stat)[] = ["username", "experience", "gold", "levels", "runtime"]
+	let selectedHeader: keyof Stat = "experience"
 	let sortedStore = $searchStore.filtered
 
 	function sortByNumber(header: keyof Stat) {
+		selectedHeader = header
+		ascending = !ascending
 		sortedStore = $searchStore.filtered
 		sortedStore = sortedStore.sort((obj1, obj2) => {
-			if (header != "username") return obj2[header] - obj1[header]
+			if (header != "username") {
+				return ascending ? obj2[header] - obj1[header] : obj1[header] - obj2[header]
+			}
 
-			if (obj1[header] < obj2[header]) return -1
-			if (obj1[header] > obj2[header]) return 1
+			if (obj1[header].toLocaleLowerCase() < obj2[header].toLocaleLowerCase())
+				return ascending ? -1 : 1
+			if (obj1[header].toLocaleLowerCase() > obj2[header].toLocaleLowerCase())
+				return ascending ? 1 : -1
 			return 0
 		})
 	}
@@ -81,17 +90,23 @@
 			class="text-xs text-stone-700 uppercase bg-stone-50 dark:bg-stone-700 dark:text-stone-400"
 		>
 			<tr>
-				<th scope="col" class="py-3 px-6" on:click={() => sortByNumber("username")}> Username </th>
-				<th scope="col" class="py-3 px-6" on:click={() => sortByNumber("experience")}>
-					Experience
-				</th>
-				<th scope="col" class="py-3 px-6" on:click={() => sortByNumber("gold")}> Gold </th>
-				<th scope="col" class="py-3 px-6" on:click={() => sortByNumber("levels")}>
-					<a href="/blog/WaspStats%20virtual%20levels" class="hover:text-amber-400">
-						Virtual levels
-					</a></th
-				>
-				<th scope="col" class="py-3 px-6" on:click={() => sortByNumber("runtime")}> Runtime </th>
+				{#each headers as header}
+					<th scope="col" class="py-3 px-6" on:click={() => sortByNumber(header)}>
+						<div class="flex justify-between text-sm">
+							<span>
+								{header}
+								{#if header === "levels"}
+									<a href="/blog/WaspStats%20virtual%20levels" class="hover:text-amber-400"> * </a>
+								{/if}
+							</span>
+							{#if selectedHeader === header}
+								<span class="text-amber-400">
+									{@html ascending ? "&#8638;" : "&#8643;"}
+								</span>
+							{/if}
+						</div>
+					</th>
+				{/each}
 			</tr>
 		</thead>
 		<tbody>
