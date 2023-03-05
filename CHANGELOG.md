@@ -1,3 +1,12 @@
+## [0.4.13](https://github.com/Torwent/wasp-webapp/compare/v0.4.12...v0.4.13) (2023-03-05)
+
+
+### Reverts
+
+* Revert "add .env.example" ([9839ede](https://github.com/Torwent/wasp-webapp/commit/9839edef50aeae0210e2086dd4d2292bc70e4da2))
+
+
+
 ## [0.4.12](https://github.com/Torwent/wasp-webapp/compare/v0.4.11...v0.4.12) (2023-03-04)
 
 
@@ -32,15 +41,6 @@
 
 * add .env to gitignore again ([f517f2a](https://github.com/Torwent/wasp-webapp/commit/f517f2a2f79281df2af18aa3301e26adc48dc579))
 * add blank .env file ([59556cd](https://github.com/Torwent/wasp-webapp/commit/59556cd4962ffefa3a6a3f2dadba8343a78b4b46))
-
-
-
-## [0.4.8](https://github.com/Torwent/wasp-webapp/compare/v0.4.7...v0.4.8) (2023-03-03)
-
-
-### Bug Fixes
-
-* changes to docker configs ([6384f4b](https://github.com/Torwent/wasp-webapp/commit/6384f4b216d469e06567d6c90a90aee129d94041))
 
 
 
