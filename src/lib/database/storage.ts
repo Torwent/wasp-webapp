@@ -162,24 +162,19 @@ export async function uploadScript(
 		description: script.description,
 		content: script.content,
 		categories: script.categories,
-		subcategories: script.subcategories
-	}
-
-	const { data, error: pError } = await supabase.from("scripts_public").insert(publicData)
-	if (pError) return console.error(pError)
-
-	const statsData = {
+		subcategories: script.subcategories,
 		min_xp: script.min_xp,
 		max_xp: script.max_xp,
 		min_gp: script.min_gp,
 		max_gp: script.max_gp
 	}
 
+	const { data, error: pError } = await supabase.from("scripts_public").insert(publicData)
+	if (pError) return console.error(pError)
+
 	script = data[0]
 
 	let promises = []
-
-	promises.push(supabase.from("stats_scripts").update(statsData).match({ script_id: script.id }))
 
 	file = await updateScriptInfo(file, script.id as string, 1)
 
@@ -210,10 +205,7 @@ export async function updateScript(
 		description: script.description,
 		content: script.content,
 		categories: script.categories,
-		subcategories: script.subcategories
-	}
-
-	const statsData = {
+		subcategories: script.subcategories,
 		min_xp: script.min_xp,
 		max_xp: script.max_xp,
 		min_gp: script.min_gp,
@@ -223,7 +215,6 @@ export async function updateScript(
 	let promises = []
 
 	promises.push(supabase.from("scripts_public").update(publicData).match({ id: script.id }))
-	promises.push(supabase.from("stats_scripts").update(statsData).match({ script_id: script.id }))
 
 	if (file) {
 		file = await updateScriptInfo(file, script.id as string, script.revision)

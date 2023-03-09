@@ -30,29 +30,52 @@ export const load: PageServerLoad = async () => {
 		}
 	}
 
-	const { data, error } = await supabase
-		.from("stats")
-		.select("username, experience, gold, levels, runtime")
-		.or("experience.gt.0,gold.gt.0")
-		.order("experience", { ascending: false })
+	let promises = []
+	promises.push(
+		supabase
+			.from("stats")
+			.select("username, experience, gold, levels, runtime")
+			.or("experience.gt.0,gold.gt.0")
+			.order("experience", { ascending: false })
+	)
+
+	promises.push(supabase.rpc("get_stats_total"))
+
+	promises = await Promise.all(promises)
+
+	const { data, error } = promises[0]
+	const { data: tData, error: tError } = promises[1]
+
 	if (error) {
 		const response = {
 			total: total,
 			stats: [],
 			status: 500,
 			error: new Error(
-				`The server failed to data from the database. This is not an issue on your side! Error message:\n\n${error.message}`
+				`The server failed to fetch data from the database. This is not an issue on your side! Error message:\n\n${error.message}`
 			)
 		}
 		return response
 	}
 
-	data.forEach((entry) => {
-		total.experience += entry.experience
-		total.gold += entry.gold
-		total.levels += entry.levels
-		total.runtime += entry.runtime
-	})
+	if (tError) {
+		const response = {
+			total: total,
+			stats: [],
+			status: 500,
+			error: new Error(
+				`The server failed to fetch total data from the database. This is not an issue on your side! Error message:\n\n${tError.message}`
+			)
+		}
+		return response
+	}
+
+	const totalData = tData[0] as Stat
+
+	total.experience += totalData.experience
+	total.gold += totalData.gold
+	total.levels += totalData.levels
+	total.runtime += totalData.runtime
 
 	return { total: total, stats: data }
 }
