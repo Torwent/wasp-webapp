@@ -1,3 +1,12 @@
+## [0.4.14](https://github.com/Torwent/wasp-webapp/compare/v0.4.13...v0.4.14) (2023-03-09)
+
+
+### Bug Fixes
+
+* improved data loading, changed data structure ([0afce91](https://github.com/Torwent/wasp-webapp/commit/0afce9178eb30762bf8748ccb831da12cba41170))
+
+
+
 ## [0.4.13](https://github.com/Torwent/wasp-webapp/compare/v0.4.12...v0.4.13) (2023-03-05)
 
 
@@ -31,16 +40,6 @@
 ### Bug Fixes
 
 * dockerfile changes ([5525cc4](https://github.com/Torwent/wasp-webapp/commit/5525cc4eb19f558556366c6a79a94811c5226643))
-
-
-
-## [0.4.9](https://github.com/Torwent/wasp-webapp/compare/v0.4.8...v0.4.9) (2023-03-03)
-
-
-### Bug Fixes
-
-* add .env to gitignore again ([f517f2a](https://github.com/Torwent/wasp-webapp/commit/f517f2a2f79281df2af18aa3301e26adc48dc579))
-* add blank .env file ([59556cd](https://github.com/Torwent/wasp-webapp/commit/59556cd4962ffefa3a6a3f2dadba8343a78b4b46))
 
 
 
