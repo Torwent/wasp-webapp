@@ -1,3 +1,12 @@
+# [0.5.0](https://github.com/Torwent/wasp-webapp/compare/v0.4.14...v0.5.0) (2023-03-12)
+
+
+### Features
+
+* stats now refresh every 5 seconds ([2b41e30](https://github.com/Torwent/wasp-webapp/commit/2b41e30227709be0f5276fb518373dabd2c434a3))
+
+
+
 ## [0.4.14](https://github.com/Torwent/wasp-webapp/compare/v0.4.13...v0.4.14) (2023-03-09)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * **stats:** fix the searchbar. oops! ([b5b2909](https://github.com/Torwent/wasp-webapp/commit/b5b2909b059c1fcfa861e4cec0ce9c3c48340207))
-
-
-
-## [0.4.10](https://github.com/Torwent/wasp-webapp/compare/v0.4.9...v0.4.10) (2023-03-03)
-
-
-### Bug Fixes
-
-* dockerfile changes ([5525cc4](https://github.com/Torwent/wasp-webapp/commit/5525cc4eb19f558556366c6a79a94811c5226643))
 
 
 
