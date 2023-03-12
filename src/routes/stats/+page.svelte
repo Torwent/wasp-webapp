@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { browser } from "$app/environment"
+	import { invalidateAll } from "$app/navigation"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import type { Stat } from "$lib/database/types"
 	import { createSearchStore, searchHandler } from "$lib/stores/search"
@@ -41,6 +43,14 @@
 			return 0
 		})
 	}
+
+	function rerunLoad() {
+		if (browser) invalidateAll()
+		setTimeout( rerunLoad, 5000 );
+	}
+	
+	rerunLoad()
+	$: data
 
 	$: sortedStore = $searchStore.filtered
 </script>

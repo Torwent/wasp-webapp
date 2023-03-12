@@ -5,6 +5,11 @@
 	import { fade } from "svelte/transition"
 	import { Rowp, type TBox, type TPoint, type TRectangle } from "$lib/simbacode/srl"
 	import { drawInterface } from "$lib/simbacode/interface"
+	import type { PageData } from "./$types"
+	import { convertTime, formatRSNumber } from "$lib/utils"
+	import { invalidateAll } from "$app/navigation"
+	import { browser } from "$app/environment"
+	export let data: PageData
 
 	let canvasData: ImageData
 
@@ -124,6 +129,14 @@
 		}
 		resizeCanvas()
 	})
+	
+	function rerunLoad() {
+		if (browser) invalidateAll()
+		setTimeout( rerunLoad, 5000 );
+	}
+	
+	rerunLoad()
+	$: data.total
 </script>
 
 <svelte:head>
@@ -149,6 +162,37 @@
 				</div>
 			</h1>
 		</header>
+
+	<header>
+		<h2 class="pt-6 px-6 font-bold whitespace-nowrap text-center">
+			Total Experience Earned:
+			{#await formatRSNumber(data.total.experience)}
+				<span class="py-4 pr-6"> ... </span>
+			{:then value}
+				<span class="py-4 pr-6"> {value} </span>
+			{/await}
+		</h2>
+		<h2 class="px-6 font-bold whitespace-nowrap text-center">
+			Total Gold Earned:
+			{#await formatRSNumber(data.total.gold)}
+				<span class="py-4 pr-6"> ... </span>
+			{:then value}
+				<span class="py-4 pr-6"> {value} </span>
+			{/await}
+		</h2>
+		<h2 class="px-6 font-bold whitespace-nowrap text-center">
+			Total Levels Earned:
+			<span class="py-4 pr-6"> {data.total.levels} </span>
+		</h2>
+		<h2 class="pb-4 px-6 font-bold whitespace-nowrap text-center">
+			Total Runtime:
+			{#await convertTime(data.total.runtime)}
+				<span class="py-4 pr-6"> ... </span>
+			{:then value}
+				<span class="py-4 pr-6"> {value} </span>
+			{/await}
+		</h2>
+	</header>
 
 		<p class="py-12 text-center">
 			WaspScripts is a collection of open source color scripts written for Simba on top of SRL and
