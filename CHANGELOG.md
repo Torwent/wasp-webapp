@@ -1,3 +1,12 @@
+## [0.5.1](https://github.com/Torwent/wasp-webapp/compare/v0.5.0...v0.5.1) (2023-03-20)
+
+
+### Bug Fixes
+
+* missed a tiny refactor ([477e242](https://github.com/Torwent/wasp-webapp/commit/477e2427fa0af445229dfbaa8172a878f10f4903))
+
+
+
 # [0.5.0](https://github.com/Torwent/wasp-webapp/compare/v0.4.14...v0.5.0) (2023-03-12)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * **stats:** added ascending and descending sorting ([70b4a6e](https://github.com/Torwent/wasp-webapp/commit/70b4a6e7d84bbd05386da7a63f5af96bce6da2a3))
-
-
-
-## [0.4.11](https://github.com/Torwent/wasp-webapp/compare/v0.4.10...v0.4.11) (2023-03-03)
-
-
-### Bug Fixes
-
-* **stats:** fix the searchbar. oops! ([b5b2909](https://github.com/Torwent/wasp-webapp/commit/b5b2909b059c1fcfa861e4cec0ce9c3c48340207))
 
 
 
