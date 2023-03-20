@@ -1,10 +1,10 @@
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
 	import { supabase } from "$lib/database/supabase"
-	import { getProfile } from "$lib/stores/authStore"
-	import type { Post, Profile } from "$lib/database/types"
+	import { profile, updateProfile } from "$lib/stores/authStore"
+	import type { Post } from "$lib/database/types"
 
-	const profilePromise = getProfile() as unknown as Profile
+	updateProfile()
 
 	let post: Post = {
 		title: "",
@@ -31,8 +31,7 @@
 </script>
 
 <div class="container mx-auto my-6 max-w-2xl flex-grow">
-	{#await profilePromise then profile}
-		{#if profile != null && profile.administrator}
+		{#if $profile && $profile.administrator}
 			<form class="form my-6" on:submit|preventDefault={handleSubmit}>
 				<div class="flex flex-col text-sm mb-2">
 					<details>
@@ -112,5 +111,4 @@
 		{:else}
 			You don't have permission to edit this post.
 		{/if}
-	{/await}
 </div>
