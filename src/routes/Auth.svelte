@@ -3,7 +3,7 @@
 	const redirect = location.origin + (location.pathname !== "/" ? location.pathname + "/" : "")
 
 	const handleLogin = async () => {
-		const { error } = await supabase.auth.signIn({ provider: "discord" }, { redirectTo: redirect })
+		const { error } = await supabase.auth.signIn({ provider: "discord" }, { redirectTo: redirect, scopes: "identify email guilds guilds.members.read"})
 		if (error) return console.error(error)
 	}
 </script>

@@ -1,12 +1,12 @@
 <script lang="ts">
 	import type { Post, Profile } from "$lib/database/types"
 	export let data: Post
-	import { getProfile } from "$lib/stores/authStore"
+	import { profile, updateProfile } from "$lib/stores/authStore"
 	import Markdown from "$lib/Markdown.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { fade } from "svelte/transition"
 
-	const profilePromise = getProfile() as unknown as Profile
+	updateProfile()
 </script>
 
 <svelte:head>
@@ -25,8 +25,7 @@
 	<h1 class="mb-4 font-bold text-3xl">{data.title}</h1>
 	<h2 class="font-semibold leading-normal mb-4">{data.description}</h2>
 
-	{#await profilePromise then profile}
-		{#if profile != null && profile.administrator}
+		{#if $profile && $profile.administrator}
 			<div class="grid place-items-center">
 				<a href="/blog/{encodeURI(data.title)}/edit">
 					<button
@@ -40,7 +39,6 @@
 				</a>
 			</div>
 		{/if}
-	{/await}
 
 	<article class="prose dark:prose-invert py-6 border-t-2 border-stone-300 dark:border-stone-800">
 		<Markdown src={data.content} />

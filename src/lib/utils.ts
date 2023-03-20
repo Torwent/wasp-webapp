@@ -1,3 +1,5 @@
+export const API_URL = "https:/api.waspscripts.com"
+
 export const loadError = (page: string = "") => {
 	if (page == null) page = "page"
 	return {

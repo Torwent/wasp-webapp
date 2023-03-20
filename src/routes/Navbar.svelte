@@ -163,12 +163,7 @@
 							class="grid place-items-center h-full"
 						>
 							<button class="menu focus:outline-none focus:shadow-solid">
-								<!-- Maybe this is silly but it's the only way I found to refresh the avatar on user login/logout lol-->
-								{#if $user}
-									<Avatar />
-								{:else}
-									<Avatar />
-								{/if}
+								<Avatar />							
 							</button>
 
 							{#if showUserPanel}
@@ -196,12 +191,7 @@
 							class="grid place-items-center h-full"
 						>
 							<button class="menu focus:outline-none focus:shadow-solid">
-								<!-- Maybe this is silly but it's the only way I found to refresh the avatar on user login/logout lol-->
-								{#if $user}
-									<Avatar />
-								{:else}
-									<Avatar />
-								{/if}
+								<Avatar />	
 							</button>
 
 							{#if showUserPanel}

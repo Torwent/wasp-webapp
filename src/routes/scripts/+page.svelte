@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { profile } from "$lib/stores/authStore"
+	import { profile, updateProfile } from "$lib/stores/authStore"
 	import { fly } from "svelte/transition"
 	import Card from "./ScriptCard.svelte"
 	import LinkButton from "$lib/components/LinkButton.svelte"
@@ -10,6 +10,8 @@
 	import { onDestroy } from "svelte"
 
 	export let data: PageData
+
+	updateProfile()
 
 	interface CheckboxType {
 		id: number
@@ -127,16 +129,14 @@
 			</div>
 		{/await}
 	</div>
-
 	<div
 		class="w-full overflow-y-scroll no-scrollbar max-h-full pt-16"
 		in:fly={{ duration: 600, delay: 600, x: 100 }}
 		out:fly={{ duration: 300, x: 100 }}
 	>
-		{#if $profile.developer}
+		{#if $profile && $profile.developer}
 			<LinkButton text="Add Script" url="/scripts/add" arrow={false} />
 		{/if}
-
 		<div class="flex flex-col text-sm mb-2 max-w-2xl m-auto">
 			<input
 				type="search"

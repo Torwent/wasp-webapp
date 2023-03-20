@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { Post, Profile } from "$lib/database/types"
+	import type { Post } from "$lib/database/types"
 	import { fade } from "svelte/transition"
-	import { getProfile } from "$lib/stores/authStore"
+	import { profile, updateProfile } from "$lib/stores/authStore"
 	import PostCard from "./PostCard.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import type { PageData } from "./$types"
@@ -10,7 +10,7 @@
 
 	export let data: PageData
 
-	const profilePromise = getProfile() as unknown as Profile
+	updateProfile()
 
 	let basicEnabled = false
 	let intermediateEnabled = false
@@ -116,24 +116,20 @@
 			/>
 		</div>
 	</div>
-
-	{#await profilePromise then profile}
-		{#if profile != null && profile.administrator}
-			<div class="grid place-items-center">
-				<a href="/blog/add">
-					<button
-						data-mdb-ripple="true"
-						data-mdb-ripple-color="light"
-						class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center justify-between 
-			bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
-					>
-						Add
-					</button>
-				</a>
-			</div>
-		{/if}
-	{/await}
-
+	{#if $profile && $profile.administrator}
+		<div class="grid place-items-center">
+			<a href="/blog/add">
+				<button
+					data-mdb-ripple="true"
+					data-mdb-ripple-color="light"
+					class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center justify-between 
+		bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
+				>
+					Add
+				</button>
+			</a>
+		</div>
+	{/if}
 	<div class="overflow-hidden">
 		{#each $searchStore.filtered as post}
 			<PostCard {post} />

@@ -169,7 +169,6 @@
 				<div class="flex flex-col text-sm mb-2">
 					<label for="description" class="font-bold mb-2"> Short description: </label>
 					<textarea
-						type="text"
 						name="description"
 						class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
                 border-orange-200 focus:border-orange-600 text-black"
@@ -180,7 +179,6 @@
 				<div class="flex flex-col text-sm mb-2">
 					<label for="content" class="font-bold mb-2"> Information: </label>
 					<textarea
-						type="text"
 						name="content"
 						class="h-64 p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
                 border-orange-200 focus:border-orange-600 text-black"

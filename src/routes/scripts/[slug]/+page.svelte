@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Script } from "$lib/database/types"
-	export let data: Script //data fetched from ./+page.ts
+	export let data: Script
 	import Markdown from "$lib/Markdown.svelte"
 	import AdvancedButton from "$lib/components/AdvancedDownloadButton.svelte"
 	import ZipDownload from "$lib/components/ZIPDownloadButton.svelte"
@@ -8,12 +8,13 @@
 	import MetaTags from "$lib/components/MetaTags.svelte"
 
 	import { fade } from "svelte/transition"
-	import { profile, getProfile } from "$lib/stores/authStore"
+	import { profile, updateProfile } from "$lib/stores/authStore"
 	import { supabase } from "$lib/database/supabase"
-	import { onMount } from "svelte"
 	import { convertTime, formatRSNumber } from "$lib/utils"
 
 	let tempDismiss: Boolean
+
+	updateProfile()
 
 	const fullDismiss = async () => {
 		tempDismiss = true
@@ -23,7 +24,8 @@
 			.eq("id", supabase.auth.user()?.id)
 
 		if (error) console.error(error)
-		getProfile()
+		profile.set(false)
+		updateProfile()
 	}
 
 	let assets_path =
@@ -31,10 +33,7 @@
 		data.id +
 		"/banner.jpg"
 
-	onMount(async () => {
-		await getProfile()
-		tempDismiss = $profile.dismissed_warning
-	})
+	tempDismiss = $profile.dismissed_warning
 </script>
 
 <svelte:head>
