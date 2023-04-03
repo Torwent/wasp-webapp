@@ -1,3 +1,12 @@
+## [0.5.3](https://github.com/Torwent/wasp-webapp/compare/v0.5.2...v0.5.3) (2023-04-03)
+
+
+### Bug Fixes
+
+* site theme is now persistent via cookies 🍪 ([265458a](https://github.com/Torwent/wasp-webapp/commit/265458ae1f51d805433c5441a7b7018b5fe4618e))
+
+
+
 ## [0.5.2](https://github.com/Torwent/wasp-webapp/compare/v0.5.1...v0.5.2) (2023-03-20)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * improved data loading, changed data structure ([0afce91](https://github.com/Torwent/wasp-webapp/commit/0afce9178eb30762bf8748ccb831da12cba41170))
-
-
-
-## [0.4.13](https://github.com/Torwent/wasp-webapp/compare/v0.4.12...v0.4.13) (2023-03-05)
-
-
-### Reverts
-
-* Revert "add .env.example" ([9839ede](https://github.com/Torwent/wasp-webapp/commit/9839edef50aeae0210e2086dd4d2292bc70e4da2))
 
 
 
