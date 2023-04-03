@@ -1,14 +1,20 @@
 <script lang="ts">
-	export let checked = true
+	let checked = true
 	const toggle = async () => {
 		checked = !checked
-		const element = window.document.getElementById("wasp-webapp")
 
-		if (element) element.classList.toggle("dark")
+		if (checked){
+			document.documentElement.classList.replace("light", "dark")
+			document.cookie = `siteTheme=dark;max-age=31536000;path="/"`
+		}
+		else {
+			document.documentElement.classList.replace("dark", "light")
+			document.cookie = `siteTheme=light;max-age=31536000;path="/"`
+		}	
 	}
 </script>
 
-<div class="w-6" on:click={toggle}>
+<button class="w-6" on:click={toggle}>
 	{#if checked}
 		<svg
 			version="1.1"
@@ -154,4 +160,4 @@
 			</g>
 		</svg>
 	{/if}
-</div>
+</button>

@@ -5,7 +5,7 @@ RUN apk add --no-cache libc6-compat
 # install dependencies
 WORKDIR /usr/src/app
 COPY package.json pnpm-lock.yaml ./
-RUN npx pnpm i --frozen-lockfile
+RUN npx pnpm i --no-frozen-lockfile
 
 # Rebuild the source code only when needed
 FROM node:16 AS builder

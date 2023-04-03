@@ -23,9 +23,11 @@
 			.update({ dismissed_warning: true })
 			.eq("id", supabase.auth.user()?.id)
 
-		if (error) console.error(error)
+		if (error) return console.error(error)
 		profile.set(false)
 		updateProfile()
+
+		document.cookie = `warningDismissed=true;max-age=31536000;path="/"`
 	}
 
 	let assets_path =

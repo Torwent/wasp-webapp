@@ -186,7 +186,7 @@
 					</div>
 				{:else if showMenu}
 					<div class="flex">
-						<div
+						<button
 							on:click={() => (showUserPanel = !showUserPanel)}
 							class="grid place-items-center h-full"
 						>
@@ -207,7 +207,7 @@
 									{/if}
 								</div>
 							{/if}
-						</div>
+						</button>
 						<div class="grid place-items-center h-full px-8">
 							<DarkModeSwitch />
 						</div>
