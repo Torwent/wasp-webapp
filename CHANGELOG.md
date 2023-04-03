@@ -1,3 +1,12 @@
+## [0.5.4](https://github.com/Torwent/wasp-webapp/compare/v0.5.3...v0.5.4) (2023-04-03)
+
+
+### Bug Fixes
+
+* several tiny things read notes ([7c8f96a](https://github.com/Torwent/wasp-webapp/commit/7c8f96aab079c89775179a662e525bb592c4c2c7))
+
+
+
 ## [0.5.3](https://github.com/Torwent/wasp-webapp/compare/v0.5.2...v0.5.3) (2023-04-03)
 
 
@@ -31,15 +40,6 @@
 ### Features
 
 * stats now refresh every 5 seconds ([2b41e30](https://github.com/Torwent/wasp-webapp/commit/2b41e30227709be0f5276fb518373dabd2c434a3))
-
-
-
-## [0.4.14](https://github.com/Torwent/wasp-webapp/compare/v0.4.13...v0.4.14) (2023-03-09)
-
-
-### Bug Fixes
-
-* improved data loading, changed data structure ([0afce91](https://github.com/Torwent/wasp-webapp/commit/0afce9178eb30762bf8748ccb831da12cba41170))
 
 
 
