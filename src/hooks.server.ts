@@ -7,6 +7,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 	let warning = event.cookies.get("warningDismissed")
 	if (warning == null) warning = "false"
 
+	event.locals.warningDismissed = warning === "true"
+
 	const response = await resolve(event, {
 		transformPageChunk: ({ html }) => html.replace('class=""', `class="${theme}"`)
 	})

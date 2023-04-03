@@ -113,8 +113,7 @@ export async function updateImg(bucket: string, path: string, fileName: string, 
 
 async function updateScriptInfo(file: File, id: string, revision: number) {
 	function updateID(str: string, id: string) {
-		let regex =
-			/{\$UNDEF SCRIPT_ID}{\$DEFINE SCRIPT_ID := '[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12}'}/
+		let regex = /{\$UNDEF SCRIPT_ID}{\$DEFINE SCRIPT_ID := '(.*?)'}/
 
 		let replaceStr = "{$UNDEF SCRIPT_ID}{$DEFINE SCRIPT_ID := '" + id + "'}"
 
@@ -128,7 +127,7 @@ async function updateScriptInfo(file: File, id: string, revision: number) {
 	}
 
 	function updateRevision(str: string, revision: number) {
-		let regex = /{\$UNDEF SCRIPT_REVISION}{\$DEFINE SCRIPT_REVISION := '(\d*?)'}/
+		let regex = /{\$UNDEF SCRIPT_REVISION}{\$DEFINE SCRIPT_REVISION := '(.*?)'}/
 
 		let replaceStr =
 			"{$UNDEF SCRIPT_REVISION}{$DEFINE SCRIPT_REVISION := '" + revision.toString() + "'}"

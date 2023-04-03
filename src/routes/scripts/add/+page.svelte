@@ -102,9 +102,8 @@
 		}
 	}
 
-	const handleSubmit = async () => {
+	async function handleSubmit() {
 		await uploadScript(script, file, coverFile, bannerFile)
-
 		location.replace(location.origin + "/scripts")
 	}
 
@@ -145,7 +144,7 @@
 		</details>
 	</div>
 
-	<form class="form my-6 static" on:submit|preventDefault={handleSubmit}>
+	<form class="form my-6 static" on:submit|preventDefault|once={handleSubmit}>
 		<!-- Card Preview -->
 		<div class="2xl:absolute left-20">
 			<Card

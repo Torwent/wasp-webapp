@@ -49,12 +49,14 @@ async function getScript(id: string = "") {
 	return script
 }
 
-export const load: Load = async ({ params }) => {
+export const load: Load = async ({ params, data }) => {
 	const { slug } = params
 	if (slug == null) return loadError()
 
 	let id = slug.substring(slug.indexOf("&") + 1)
 	const script = getScript(id)
 
-	return script
+	const warningDismissed = data != null ? data.warningDismissed : false
+
+	return { script: script, warningDismissed: warningDismissed }
 }

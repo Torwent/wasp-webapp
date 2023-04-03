@@ -138,7 +138,7 @@
 	</div>
 
 	<!-- Form -->
-	<form class="form my-6" on:submit|preventDefault={handleSubmit}>
+	<form class="form my-6" on:submit|preventDefault|once={handleSubmit}>
 		<!-- Card Preview -->
 		<div class="2xl:absolute left-20">
 			<Card

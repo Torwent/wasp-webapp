@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type { Script } from "$lib/database/types"
-	export let data: Script
+	export let data
 	import Markdown from "$lib/Markdown.svelte"
 	import AdvancedButton from "$lib/components/AdvancedDownloadButton.svelte"
 	import ZipDownload from "$lib/components/ZIPDownloadButton.svelte"
@@ -12,12 +12,13 @@
 	import { supabase } from "$lib/database/supabase"
 	import { convertTime, formatRSNumber } from "$lib/utils"
 
-	let tempDismiss: Boolean
+	const script: Script = data.script as Script
+	let dismissed: Boolean = data.warningDismissed as Boolean
 
 	updateProfile()
 
 	const fullDismiss = async () => {
-		tempDismiss = true
+		dismissed = true
 		const { error } = await supabase
 			.from("profiles_private")
 			.update({ dismissed_warning: true })
@@ -25,29 +26,31 @@
 
 		if (error) return console.error(error)
 		profile.set(false)
-		updateProfile()
-
+		updateProfile()	
 		document.cookie = `warningDismissed=true;max-age=31536000;path="/"`
 	}
 
 	let assets_path =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" +
-		data.id +
+		script.id +
 		"/banner.jpg"
 
-	tempDismiss = $profile.dismissed_warning
+	$: if ($profile && $profile.dismissed_warning) {
+		dismissed = true
+		document.cookie = `warningDismissed=true;max-age=31536000;path="/"`
+		}
 </script>
 
 <svelte:head>
 	<MetaTags
-		title={data.title}
-		description={data.description}
-		url={"/scripts/" + encodeURI(data.title) + "&" + data.id}
+		title={script.title}
+		description={script.description}
+		url={"/scripts/" + encodeURI(script.title) + "&" + script.id}
 	/>
 </svelte:head>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
-	{#if data.categories.includes("Community") && !tempDismiss}
+	{#if script.categories.includes("Community") && !dismissed}
 		<div
 			class="fixed inset-0 bg-stone-900 bg-opacity-50 overflow-y-auto h-full w-full backdrop-blur transition-colors z-40"
 			in:fade={{ duration: 300, delay: 300 }}
@@ -74,7 +77,7 @@
 							type="button"
 							class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
 		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
-							on:click={() => (tempDismiss = true)}
+							on:click={() => (dismissed = true)}
 						>
 							<span class="px-2">I understand!</span>
 						</button>
@@ -94,14 +97,14 @@
 	{/if}
 
 	<div class="absolute inset-0 container min-w-full h-96 mx-0 flex flex-col">
-		<img class="z-0 absolute object-cover h-full w-full" src={assets_path} alt={data.assets_alt} />
+		<img class="z-0 absolute object-cover h-full w-full" src={assets_path} alt={script.assets_alt} />
 		<header class="left-0 mt-auto z-10 text-center h-32 text-amber-500 text-shadow">
 			<div
 				class="absolute mx-0 h-32 w-full opacity-100
 					   bg-gradient-to-t from-white/20 via-white-800/20 dark:from-black/60 dark:via-gray-800/20 to-transparent"
 			/>
-			<h1 class="mx-8 mb-4 font-bold text-4xl">{data.title}</h1>
-			<h2 class="font-semibold leading-normal mb-4">{data.description}</h2>
+			<h1 class="mx-8 mb-4 font-bold text-4xl">{script.title}</h1>
+			<h2 class="font-semibold leading-normal mb-4">{script.description}</h2>
 		</header>
 		<!-- Title and Description Hover Effect -->
 	</div>
@@ -111,27 +114,27 @@
 		<div class="container w-full mx-auto my-3">
 			<Carousel
 				bucket="imgs"
-				folder={"scripts/" + data.title.toLowerCase().replace(" ", "_") + "/assets"}
+				folder={"scripts/" + script.title.toLowerCase().replace(" ", "_") + "/assets"}
 			/>
 		</div>
 
 		<header class="text-center">
-			{#if data.experience}
-				{#await formatRSNumber(data.experience)}
+			{#if script.experience}
+				{#await formatRSNumber(script.experience)}
 					<h2>Total Experience Gained: ...</h2>
 				{:then value}
 					<h2>Total Experience Gained: {value}</h2>
 				{/await}
 			{/if}
-			{#if data.gold}
-				{#await formatRSNumber(data.gold)}
+			{#if script.gold}
+				{#await formatRSNumber(script.gold)}
 					<h2>Total Gold Gained: ...</h2>
 				{:then value}
 					<h2>Total Gold Gained: {value}</h2>
 				{/await}
 			{/if}
-			{#if data.runtime}
-				{#await convertTime(data.runtime)}
+			{#if script.runtime}
+				{#await convertTime(script.runtime)}
 					<h2>Total Runtime: ...</h2>
 				{:then value}
 					<h2>Total Runtime: {value}</h2>
@@ -140,10 +143,10 @@
 		</header>
 
 		<div class="text-center py-12">
-			{#if data.categories.includes("Free")}
-				<AdvancedButton script={data} />
+			{#if script.categories.includes("Free")}
+				<AdvancedButton script={script} />
 
-				{#if data.categories.includes("Official")}
+				{#if script.categories.includes("Official")}
 					<h3 class="py-6">
 						This is a free wasp script, you can add it to Simba's package manager with the following
 						link:
@@ -165,17 +168,17 @@
 						>.
 					</h5>
 				{/if}
-			{:else if data.categories.includes("Premium")}
+			{:else if script.categories.includes("Premium")}
 				{#if !$profile.id}
 					<h3 class="py-6">Please login to be able to download this script.</h3>
-				{:else if $profile.premium || $profile.vip || $profile.tester || $profile.id === data.author_id}
-					<AdvancedButton script={data} />
+				{:else if $profile.premium || $profile.vip || $profile.tester || $profile.id === script.author_id}
+					<AdvancedButton script={script} />
 					<h4 class="pt-6">
 						This is a premium script, you need to move it to
 						<b class="text-amber-500 dark:text-amber-200"> Simba/Scripts/wasp-premium </b>
 					</h4>
 
-					{#if data.categories.includes("Official")}
+					{#if script.categories.includes("Official")}
 						<h4 class="py-6">To download all official premium scripts a zip click here:</h4>
 						<ZipDownload />
 					{/if}
@@ -194,9 +197,9 @@
 			{/if}
 		</div>
 
-		{#if $profile.id === data.author_id || $profile.administrator}
+		{#if $profile.id === script.author_id || $profile.administrator}
 			<div class="grid place-items-center">
-				<a href="/scripts/{encodeURI(data.title) + '&' + data.id}/edit">
+				<a href="/scripts/{encodeURI(script.title) + '&' + script.id}/edit">
 					<button
 						data-mdb-ripple="true"
 						data-mdb-ripple-color="light"
@@ -211,7 +214,7 @@
 
 		<h2 class="text-amber-500 dark:text-amber-200 text-center py-6">Description:</h2>
 		<article class="prose dark:prose-invert py-6">
-			<Markdown src={data.content} />
+			<Markdown src={script.content} />
 		</article>
 	</div>
 </div>
