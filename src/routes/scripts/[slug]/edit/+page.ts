@@ -10,13 +10,12 @@ async function getScript(id: string = "") {
 			"title, description, content, categories, subcategories, min_xp, max_xp, min_gp, max_gp"
 		)
 		.eq("id", id)
-	const protectedData = supabase.from("scripts_protected").select().eq("id", id)
-	const statsData = supabase
-		.from("stats_scripts")
+	const protectedData = supabase
+		.from("scripts_protected")
 		.select("revision, author, author_id, assets_path, assets_alt")
-		.eq("script_id", id)
+		.eq("id", id)
 
-	const promises = await Promise.all([publicData, protectedData, statsData])
+	const promises = await Promise.all([publicData, protectedData])
 
 	const { data: dataPublic, error: errorPublic } = promises[0]
 	const { data: dataProtected, error: errorProtected } = promises[1]

@@ -1,8 +1,7 @@
 <script lang="ts">
 	import type { Category, Script, SubCategory } from "$lib/database/types"
 	import { getData } from "$lib/database/supabase"
-	export let data: Script //data fetched from ../+page.ts
-
+	export let data: Script
 	import Dropzone from "svelte-file-dropzone"
 	import Markdown from "$lib/Markdown.svelte"
 	import MultiSelect from "$lib/components/MultiSelect.svelte"
