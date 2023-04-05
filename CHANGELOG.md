@@ -1,3 +1,12 @@
+## [0.5.6](https://github.com/Torwent/wasp-webapp/compare/v0.5.5...v0.5.6) (2023-04-05)
+
+
+### Bug Fixes
+
+* data refresh fixed ([646b6f7](https://github.com/Torwent/wasp-webapp/commit/646b6f7ffcd68180561838dd63b59e03f3230039))
+
+
+
 ## [0.5.5](https://github.com/Torwent/wasp-webapp/compare/v0.5.4...v0.5.5) (2023-04-05)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * typo ([a66a508](https://github.com/Torwent/wasp-webapp/commit/a66a508a3d7830db2c608589e5ec161d2fa49be2))
-
-
-
-## [0.5.1](https://github.com/Torwent/wasp-webapp/compare/v0.5.0...v0.5.1) (2023-03-20)
-
-
-### Bug Fixes
-
-* missed a tiny refactor ([477e242](https://github.com/Torwent/wasp-webapp/commit/477e2427fa0af445229dfbaa8172a878f10f4903))
 
 
 
