@@ -7,7 +7,7 @@
 	import { drawInterface } from "$lib/simbacode/interface"
 	import type { PageData } from "./$types"
 	import { convertTime, formatRSNumber } from "$lib/utils"
-	import { invalidateAll } from "$app/navigation"
+	import { invalidate } from "$app/navigation"
 	import { browser } from "$app/environment"
 	export let data: PageData
 
@@ -131,7 +131,7 @@
 	})
 	
 	function rerunLoad() {
-		if (browser) invalidateAll()
+		if (browser) invalidate("stats:total")
 		setTimeout( rerunLoad, 5000 );
 	}
 	

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { browser } from "$app/environment"
-	import { invalidateAll } from "$app/navigation"
+	import { invalidate } from "$app/navigation"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import type { Stat } from "$lib/database/types"
 	import { createSearchStore, searchHandler } from "$lib/stores/search"
@@ -45,7 +45,7 @@
 	}
 
 	function rerunLoad() {
-		if (browser) invalidateAll()
+		if (browser) invalidate("stats:total")
 		setTimeout( rerunLoad, 5000 );
 	}
 	

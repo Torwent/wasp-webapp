@@ -43,23 +43,35 @@ export const validateIp = (input: string) => {
 }
 
 export async function convertTime(t: number): Promise<string> {
-	let days, hours, minutes, seconds, total_hours, total_minutes, total_seconds: number
+	let years,
+		days,
+		hours,
+		minutes,
+		seconds,
+		total_days,
+		total_hours,
+		total_minutes,
+		total_seconds: number
 	let result: string = ""
 
 	total_seconds = Math.floor(t / 1000)
 	total_minutes = Math.floor(total_seconds / 60)
 	total_hours = Math.floor(total_minutes / 60)
-	days = Math.floor(total_hours / 24)
+	total_days = Math.floor(total_hours / 24)
+
+	years = Math.floor(total_days / 365)
 
 	seconds = total_seconds % 60
 	minutes = total_minutes % 60
 	hours = total_hours % 24
+	days = total_days % 365
 
+	if (years > 0) result += years.toString() + "y "
 	if (days > 0) result += days.toString() + "d "
 	if (hours > 0) result += hours.toString() + "h "
-	if (minutes > 0) result += minutes.toString() + "m "
+	if (minutes > 0) result += minutes.toString() + "m"
 
-	if ((days = 0 && seconds > 0)) result += seconds.toString() + "s"
+	if ((days = 0 && seconds > 0)) result += " " + seconds.toString() + "s"
 
 	return result
 }

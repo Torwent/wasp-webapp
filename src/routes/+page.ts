@@ -2,7 +2,8 @@ import { supabase } from "$lib/database/supabase"
 import type { Stat } from "$lib/database/types"
 import type { PageLoad } from "./$types"
 
-export const load: PageLoad = async () => {
+export const load: PageLoad = async ({ depends }) => {
+	depends("stats:total")
 	let total: Stat = {
 		username: "Total",
 		experience: 0,
