@@ -1,3 +1,12 @@
+## [0.5.5](https://github.com/Torwent/wasp-webapp/compare/v0.5.4...v0.5.5) (2023-04-05)
+
+
+### Bug Fixes
+
+* forgot to remove old data fetch that was making script data auto-refresh. ([edd0169](https://github.com/Torwent/wasp-webapp/commit/edd016963913859987d62f3bbd365484cf312acc))
+
+
+
 ## [0.5.4](https://github.com/Torwent/wasp-webapp/compare/v0.5.3...v0.5.4) (2023-04-03)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * missed a tiny refactor ([477e242](https://github.com/Torwent/wasp-webapp/commit/477e2427fa0af445229dfbaa8172a878f10f4903))
-
-
-
-# [0.5.0](https://github.com/Torwent/wasp-webapp/compare/v0.4.14...v0.5.0) (2023-03-12)
-
-
-### Features
-
-* stats now refresh every 5 seconds ([2b41e30](https://github.com/Torwent/wasp-webapp/commit/2b41e30227709be0f5276fb518373dabd2c434a3))
 
 
 
