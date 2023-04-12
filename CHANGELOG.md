@@ -1,3 +1,12 @@
+## [0.5.7](https://github.com/Torwent/wasp-webapp/compare/v0.5.6...v0.5.7) (2023-04-12)
+
+
+### Bug Fixes
+
+* ensure the warning cookie reading is only done in the browser and never in the server ([ce54f90](https://github.com/Torwent/wasp-webapp/commit/ce54f90bc10c680fd1a27c51a8b5345334f81955))
+
+
+
 ## [0.5.6](https://github.com/Torwent/wasp-webapp/compare/v0.5.5...v0.5.6) (2023-04-05)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * site theme is now persistent via cookies 🍪 ([265458a](https://github.com/Torwent/wasp-webapp/commit/265458ae1f51d805433c5441a7b7018b5fe4618e))
-
-
-
-## [0.5.2](https://github.com/Torwent/wasp-webapp/compare/v0.5.1...v0.5.2) (2023-03-20)
-
-
-### Bug Fixes
-
-* typo ([a66a508](https://github.com/Torwent/wasp-webapp/commit/a66a508a3d7830db2c608589e5ec161d2fa49be2))
 
 
 
