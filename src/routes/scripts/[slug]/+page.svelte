@@ -11,6 +11,7 @@
 	import { profile, updateProfile } from "$lib/stores/authStore"
 	import { supabase } from "$lib/database/supabase"
 	import { convertTime, formatRSNumber } from "$lib/utils"
+	import { browser } from "$app/environment"
 
 	const script: Script = data.script as Script
 	let dismissed: Boolean = data.warningDismissed as Boolean
@@ -27,7 +28,7 @@
 		if (error) return console.error(error)
 		profile.set(false)
 		updateProfile()	
-		document.cookie = `warningDismissed=true;max-age=31536000;path="/"`
+		if (browser) document.cookie = `warningDismissed=true;max-age=31536000;path="/"`
 	}
 
 	let assets_path =
@@ -37,7 +38,7 @@
 
 	$: if ($profile && $profile.dismissed_warning) {
 		dismissed = true
-		document.cookie = `warningDismissed=true;max-age=31536000;path="/"`
+		if (browser) document.cookie = `warningDismissed=true;max-age=31536000;path="/"`
 		}
 </script>
 
