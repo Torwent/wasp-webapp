@@ -16,9 +16,9 @@
 		description.substring(0, 80) + "..." //crop description at 80 characters.
 	}
 
-	let link =
-		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/default/cover.jpg"
-
+	function handleError(ev: any) {
+		ev.target.src = "https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/default/cover.jpg"
+	}
 </script>
 
 <div
@@ -31,8 +31,7 @@
 	<!-- Preview -->
 	<div class="inline relative group h-48">
 		<!-- Thumbnail -->
-    		<img src={link} srcset={img + " 2x"} alt={altImg} class="absolute rounded-t object-cover h-full w-full">
-
+    	<img src={img} alt={altImg} class="absolute rounded-t object-cover h-full w-full" on:error={handleError}>
 		<!-- Hover Effect -->
 		<div
 			class="flex flex-row absolute justify-end
