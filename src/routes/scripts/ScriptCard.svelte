@@ -6,13 +6,15 @@
 </script>
 
 <!-- Product Card -->
-<a href="/scripts/{encodeURI(script.title) + '&' + script.id}">
-	<Card
-		bind:img={script.assets_path}
-		altImg={script.assets_alt}
-		title={script.title}
-		author={script.author}
-		description={script.description}
-		tooltips={script.emojiTooltip}
-	/>
-</a>
+<div class="flex items-center justify-center">
+	<a href="/scripts/{encodeURI(script.title) + '&' + script.id}" class="contents">
+		<Card
+			bind:img={script.assets_path}
+			altImg={script.assets_alt}
+			title={script.title}
+			author={script.author}
+			description={script.description}
+			tooltips={script.emojiTooltip}
+		/>
+	</a>
+</div>

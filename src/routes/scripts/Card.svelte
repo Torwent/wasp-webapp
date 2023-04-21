@@ -9,19 +9,16 @@
 	export let author: string | undefined
 	export let description: string
 	export let tooltips: EmojiTooltip[]
-
+	
 	if (author == null) author = ""
 
 	if (description.length > 80) {
 		description.substring(0, 80) + "..." //crop description at 80 characters.
 	}
 
-	let fallback =
+	let link =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/default/cover.jpg"
 
-	const handleError = (ev: Event) => {
-		/*ev.target.src = fallback)*/
-	}
 </script>
 
 <div
@@ -30,15 +27,11 @@
 	in:fade={{ duration: 300, delay: 300 }}
 	out:fade={{ duration: 300 }}
 >
+
 	<!-- Preview -->
 	<div class="inline relative group h-48">
 		<!-- Thumbnail -->
-		<img
-			class="absolute rounded-t object-cover h-full w-full"
-			src={img}
-			alt={altImg}
-			on:error={handleError}
-		/>
+    		<img src={link} srcset={img + " 2x"} alt={altImg} class="absolute rounded-t object-cover h-full w-full">
 
 		<!-- Hover Effect -->
 		<div
