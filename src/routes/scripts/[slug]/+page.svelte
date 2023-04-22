@@ -98,7 +98,7 @@
 	{/if}
 
 	<div class="absolute inset-0 container min-w-full h-96 mx-0 flex flex-col">
-		<img class="z-0 absolute object-cover h-full w-full" src={assets_path} alt={script.assets_alt} />
+		<img class="z-0 absolute object-contain h-full w-full" src={assets_path} alt={script.assets_alt} />
 		<header class="left-0 mt-auto z-10 text-center h-32 text-amber-500 text-shadow">
 			<div
 				class="absolute mx-0 h-32 w-full opacity-100
