@@ -1,3 +1,12 @@
+## [0.5.11](https://github.com/Torwent/wasp-webapp/compare/v0.5.10...v0.5.11) (2023-04-23)
+
+
+### Bug Fixes
+
+* small flaw with the new ordering way of stats ([84529be](https://github.com/Torwent/wasp-webapp/commit/84529be013207a9e7f91d92ab2f5d835eb9f3787))
+
+
+
 ## [0.5.10](https://github.com/Torwent/wasp-webapp/compare/v0.5.9...v0.5.10) (2023-04-23)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * ensure the warning cookie reading is only done in the browser and never in the server ([ce54f90](https://github.com/Torwent/wasp-webapp/commit/ce54f90bc10c680fd1a27c51a8b5345334f81955))
-
-
-
-## [0.5.6](https://github.com/Torwent/wasp-webapp/compare/v0.5.5...v0.5.6) (2023-04-05)
-
-
-### Bug Fixes
-
-* data refresh fixed ([646b6f7](https://github.com/Torwent/wasp-webapp/commit/646b6f7ffcd68180561838dd63b59e03f3230039))
 
 
 
