@@ -1,3 +1,12 @@
+## [0.5.10](https://github.com/Torwent/wasp-webapp/compare/v0.5.9...v0.5.10) (2023-04-23)
+
+
+### Bug Fixes
+
+* **stats:** added pagination ([1003db8](https://github.com/Torwent/wasp-webapp/commit/1003db86385b5916d7e8c12a534b7f14aea70ccf))
+
+
+
 ## [0.5.9](https://github.com/Torwent/wasp-webapp/compare/v0.5.8...v0.5.9) (2023-04-21)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * data refresh fixed ([646b6f7](https://github.com/Torwent/wasp-webapp/commit/646b6f7ffcd68180561838dd63b59e03f3230039))
-
-
-
-## [0.5.5](https://github.com/Torwent/wasp-webapp/compare/v0.5.4...v0.5.5) (2023-04-05)
-
-
-### Bug Fixes
-
-* forgot to remove old data fetch that was making script data auto-refresh. ([edd0169](https://github.com/Torwent/wasp-webapp/commit/edd016963913859987d62f3bbd365484cf312acc))
 
 
 
