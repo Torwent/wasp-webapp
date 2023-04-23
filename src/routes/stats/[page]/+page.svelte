@@ -1,58 +1,65 @@
 <script lang="ts">
-	import { browser } from "$app/environment"
-	import { invalidate } from "$app/navigation"
+	import { goto, invalidate } from "$app/navigation"
+	import { page } from "$app/stores"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import type { Stat } from "$lib/database/types"
-	import { createSearchStore, searchHandler } from "$lib/stores/search"
 	import { convertTime, formatRSNumber } from "$lib/utils"
-	import { onDestroy } from "svelte"
+	import { onMount } from "svelte"
 
 	import type { PageData } from "./$types"
+	import { browser } from "$app/environment"
 
 	export let data: PageData
 
-	const searchStats: Stat[] = data.stats.map((stat: Stat) => ({
-		...stat,
-		searchTerms: `${stat.username}`,
-		filters: ""
-	}))
-
-	const searchStore = createSearchStore(searchStats)
-	const unsubscribe = searchStore.subscribe((model) => searchHandler(model))
-
-	onDestroy(() => unsubscribe())
-
-	let ascending = false
+	let search: string
+	let ascending = $page.url.searchParams.get("ascending")?.toLowerCase() === "true"
 	let headers: (keyof Stat)[] = ["username", "experience", "gold", "levels", "runtime"]
-	let selectedHeader: keyof Stat = "experience"
-	let sortedStore = $searchStore.filtered
+	let selectedHeader: keyof Stat =
+		($page.url.searchParams.get("order") as keyof Stat) || "experience"
 
-	function sortByNumber(header: keyof Stat) {
-		selectedHeader = header
-		ascending = !ascending
-		sortedStore = $searchStore.filtered
-		sortedStore = sortedStore.sort((obj1, obj2) => {
-			if (header != "username") {
-				return ascending ? obj2[header] - obj1[header] : obj1[header] - obj2[header]
+	function preserveScroll(url: string) {
+		goto(url, { noScroll: true })
+	}
+
+	function replaceQuery(values: Record<string, string>) {
+		const url = new URL(window.location.toString())
+		for (let [k, v] of Object.entries(values)) {
+			if (!!v && v !== "") {
+				url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
+			} else {
+				url.searchParams.delete(k)
 			}
-
-			if (obj1[header].toLocaleLowerCase() < obj2[header].toLocaleLowerCase())
-				return ascending ? -1 : 1
-			if (obj1[header].toLocaleLowerCase() > obj2[header].toLocaleLowerCase())
-				return ascending ? 1 : -1
-			return 0
-		})
+		}
+		history.replaceState({}, "", url)
+		invalidate("stats:total")
 	}
 
 	function rerunLoad() {
-		if (browser) invalidate("stats:total")
-		setTimeout( rerunLoad, 5000 );
+		invalidate("stats:total")
+		setTimeout(rerunLoad, 5000)
 	}
-	
-	rerunLoad()
-	$: data
 
-	$: sortedStore = $searchStore.filtered
+	function sortBy(header: keyof Stat) {
+		ascending = selectedHeader === header ? !ascending : false
+		selectedHeader = header
+		replaceQuery({
+			ascending: ascending ? "true" : "false",
+			order: header
+		})
+	}
+
+	const range = data.range
+	const totalEntries = data.totalEntries || 0 //this shouldn't be needed but vscode complains...
+	const totalPages = Math.ceil(totalEntries / range)
+
+	onMount(() => {
+		replaceQuery({ search: search })
+		rerunLoad()
+	})
+
+	$: currentPage = Number($page.params.page) || 1
+	$: $page.url.searchParams.set("search", search)
+	$: if (browser) replaceQuery({ search: search })
 </script>
 
 <svelte:head>
@@ -91,7 +98,7 @@
 			type="search"
 			placeholder="Search biohash or username..."
 			class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
-			bind:value={$searchStore.search}
+			bind:value={search}
 		/>
 	</div>
 
@@ -101,7 +108,7 @@
 		>
 			<tr>
 				{#each headers as header}
-					<th scope="col" class="py-3 px-6" on:click={() => sortByNumber(header)}>
+					<th scope="col" class="py-3 px-6" on:click={() => sortBy(header)}>
 						<div class="flex justify-between text-sm">
 							<span>
 								{header}
@@ -120,13 +127,13 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each sortedStore as entry}
+			{#each data.stats as entry}
 				<tr
 					class="bg-white border-b dark:bg-stone-800 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-600"
 				>
 					<th
 						scope="row"
-						class="py-4 px-6 font-medium text-stone-900 whitespace-nowrap dark:text-white"
+						class="py-4 px-6 font-medium text-stone-900 whitespace-nowrap dark:text-white w-96"
 					>
 						{#if entry.username}
 							{entry.username}
@@ -134,36 +141,45 @@
 							Anonymous
 						{/if}
 					</th>
-					{#await formatRSNumber(entry.experience)}
-						<td class="py-4 px-6"> ... </td>
-					{:then value}
-						<td class="py-4 px-6"> {value} </td>
-					{/await}
-					{#await formatRSNumber(entry.gold)}
-						<td class="py-4 px-6"> ... </td>
-					{:then value}
-						<td class="py-4 px-6"> {value} </td>
-					{/await}
-					<td class="py-4 px-6"> {entry.levels} </td>
-					{#await convertTime(entry.runtime)}
-						<td class="py-4 px-6"> ... </td>
-					{:then value}
-						<td class="py-4 px-6"> {value} </td>
-					{/await}
+					<td class="py-4 px-6 w-64">
+						{#await formatRSNumber(entry.experience)}
+							...
+						{:then value}
+							{value}
+						{/await}
+					</td>
+					<td class="py-4 px-6 w-64">
+						{#await formatRSNumber(entry.gold)}
+							...
+						{:then value}
+							{value}
+						{/await}
+					</td>
+					<td class="py-4 px-6 w-64"> {entry.levels} </td>
+					<td class="py-4 px-6 w-64">
+						{#await convertTime(entry.runtime)}
+							...
+						{:then value}
+							{value}
+						{/await}
+					</td>
 				</tr>
 			{/each}
 		</tbody>
 	</table>
-	<!-- <nav class="flex justify-between items-center pt-4" aria-label="Table navigation">
+	<nav class="flex justify-between items-center pt-4" aria-label="Table navigation">
 		<span class="text-sm font-normal text-stone-500 dark:text-stone-400"
-			>Showing <span class="font-semibold text-stone-900 dark:text-white">1-10</span> of
-			<span class="font-semibold text-stone-900 dark:text-white">1000</span></span
+			>Showing <span class="font-semibold text-stone-900 dark:text-white"
+				>{(currentPage - 1) * range + 1}-{(currentPage - 1) * range + range + 1}</span
+			>
+			of
+			<span class="font-semibold text-stone-900 dark:text-white">{totalEntries}</span></span
 		>
 		<ul class="inline-flex items-center -space-x-px">
 			<li>
-				<a
-					href="#"
+				<button
 					class="block py-2 px-3 ml-0 leading-tight text-stone-500 bg-white rounded-l-lg border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
+					on:click={() => preserveScroll("/stats/" + (currentPage - 1 > 0 ? currentPage - 1 : 1))}
 				>
 					<span class="sr-only">Previous</span>
 					<svg
@@ -178,48 +194,29 @@
 							clip-rule="evenodd"
 						/></svg
 					>
-				</a>
+				</button>
 			</li>
+
+			{#each Array(totalPages) as _, idx}
+				<li>
+					<button
+						class="py-2 px-3 leading-tight text-stone-500 bg-white border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
+						on:click={() => preserveScroll("/stats/" + (idx + 1))}
+						class:text-orange-500={currentPage === idx + 1}
+						class:dark:text-orange-400={currentPage === idx + 1}
+					>
+						{idx + 1}
+					</button>
+				</li>
+			{/each}
+
 			<li>
-				<a
-					href="#"
-					class="py-2 px-3 leading-tight text-stone-500 bg-white border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
-					>1</a
-				>
-			</li>
-			<li>
-				<a
-					href="#"
-					class="py-2 px-3 leading-tight text-stone-500 bg-white border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
-					>2</a
-				>
-			</li>
-			<li>
-				<a
-					href="#"
-					aria-current="page"
-					class="z-10 py-2 px-3 leading-tight text-blue-600 bg-blue-50 border border-blue-300 hover:bg-blue-100 hover:text-blue-700 dark:border-stone-700 dark:bg-stone-700 dark:text-white"
-					>3</a
-				>
-			</li>
-			<li>
-				<a
-					href="#"
-					class="py-2 px-3 leading-tight text-stone-500 bg-white border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
-					>...</a
-				>
-			</li>
-			<li>
-				<a
-					href="#"
-					class="py-2 px-3 leading-tight text-stone-500 bg-white border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
-					>100</a
-				>
-			</li>
-			<li>
-				<a
-					href="#"
+				<button
 					class="block py-2 px-3 leading-tight text-stone-500 bg-white rounded-r-lg border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
+					on:click={() =>
+						preserveScroll(
+							"/stats/" + (currentPage + 1 < totalPages ? currentPage + 1 : totalPages)
+						)}
 				>
 					<span class="sr-only">Next</span>
 					<svg
@@ -234,8 +231,8 @@
 							clip-rule="evenodd"
 						/></svg
 					>
-				</a>
+				</button>
 			</li>
 		</ul>
-	</nav> -->
+	</nav>
 </div>

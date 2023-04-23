@@ -3,8 +3,19 @@ import { supabase } from "$lib/database/supabase"
 import type { Stat } from "$lib/database/types"
 import type { PageServerLoad } from "./$types"
 
-export const load: PageServerLoad = async ({ depends }) => {
+export const load: PageServerLoad = async ({ params, url, depends }) => {
 	depends("stats:total")
+
+	const order = url.searchParams.get("order") || "experience"
+	const ascending = url.searchParams.get("ascending")?.toLowerCase() === "true"
+	const search = url.searchParams.get("search") || ""
+
+	const range = 35
+	const page = Number(params.page) || 1
+
+	const start = (page - 1) * range
+	const finish = start + range
+
 	let total: Stat = {
 		username: "Total",
 		experience: 0,
@@ -12,6 +23,8 @@ export const load: PageServerLoad = async ({ depends }) => {
 		levels: 0,
 		runtime: 0
 	}
+
+	const totalEntries = 10
 
 	if (supabase.auth.user() == null) {
 		const { error } = await supabase.auth.signIn({
@@ -22,6 +35,8 @@ export const load: PageServerLoad = async ({ depends }) => {
 			const response = {
 				total: total,
 				stats: [],
+				totalEntries: totalEntries,
+				range: range,
 				status: 500,
 				error: new Error(
 					`The server failed to login to the database. This is not an issue on your side! Error message:\n\n${error.message}`
@@ -32,25 +47,38 @@ export const load: PageServerLoad = async ({ depends }) => {
 	}
 
 	let promises = []
-	promises.push(
-		supabase
-			.from("stats")
-			.select("username, experience, gold, levels, runtime")
-			.or("experience.gt.0,gold.gt.0")
-			.order("experience", { ascending: false })
-	)
+
+	if (search === "") {
+		promises.push(
+			supabase
+				.from("stats")
+				.select("username, experience, gold, levels, runtime", { count: "exact" })
+				.or("experience.gt.0,gold.gt.0")
+				.order(order, { ascending: ascending })
+				.range(start, finish)
+		)
+	} else {
+		promises.push(
+			supabase
+				.from("stats")
+				.select("username, experience, gold, levels, runtime", { count: "exact" })
+				.textSearch("username", search)
+		)
+	}
 
 	promises.push(supabase.rpc("get_stats_total"))
 
 	promises = await Promise.all(promises)
 
-	const { data, error } = promises[0]
+	const { data, count, error } = promises[0]
 	const { data: tData, error: tError } = promises[1]
 
 	if (error) {
 		const response = {
 			total: total,
 			stats: [],
+			totalEntries: totalEntries,
+			range: range,
 			status: 500,
 			error: new Error(
 				`The server failed to fetch data from the database. This is not an issue on your side! Error message:\n\n${error.message}`
@@ -63,6 +91,8 @@ export const load: PageServerLoad = async ({ depends }) => {
 		const response = {
 			total: total,
 			stats: [],
+			totalEntries: totalEntries,
+			range: range,
 			status: 500,
 			error: new Error(
 				`The server failed to fetch total data from the database. This is not an issue on your side! Error message:\n\n${tError.message}`
@@ -78,5 +108,5 @@ export const load: PageServerLoad = async ({ depends }) => {
 	total.levels += totalData.levels
 	total.runtime += totalData.runtime
 
-	return { total: total, stats: data }
+	return { total: total, stats: data, totalEntries: count || totalEntries, range: range }
 }
