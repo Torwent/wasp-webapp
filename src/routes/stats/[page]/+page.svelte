@@ -22,7 +22,10 @@
 	}
 
 	function replaceQuery(values: Record<string, string>) {
-		const url = new URL(window.location.toString())
+		const currentURL = window.location
+			.toString()
+			.replace(/\/stats\/([0-9][0-9][0-9][0-9]|[0-9][0-9][0-9]|[0-9][0-9]|[0-9])/, "/stats/1")
+		const url = new URL(currentURL)
 		for (let [k, v] of Object.entries(values)) {
 			if (!!v && v !== "") {
 				url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
