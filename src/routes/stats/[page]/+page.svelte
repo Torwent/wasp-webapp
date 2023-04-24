@@ -18,7 +18,10 @@
 		($page.url.searchParams.get("order") as keyof Stat) || "experience"
 
 	function preserveScroll(url: string) {
-		goto(url, { noScroll: true })
+		search = ""
+		const currentURL = new URL(window.location.toString())
+		const searchParams = currentURL.searchParams.toString()
+		goto(url + "?" + searchParams, { noScroll: true })
 	}
 
 	function replaceQuery(values: Record<string, string>) {
@@ -43,6 +46,7 @@
 	}
 
 	function sortBy(header: keyof Stat) {
+		search = ""
 		ascending = selectedHeader === header ? !ascending : false
 		selectedHeader = header
 		replaceQuery({
@@ -99,7 +103,7 @@
 	<div class="flex flex-col text-sm mb-2">
 		<input
 			type="search"
-			placeholder="Search biohash or username..."
+			placeholder="Search UUID or username..."
 			class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
 			bind:value={search}
 		/>

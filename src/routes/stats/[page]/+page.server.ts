@@ -3,6 +3,9 @@ import { supabase } from "$lib/database/supabase"
 import type { Stat } from "$lib/database/types"
 import type { PageServerLoad } from "./$types"
 
+const UUID_V4_REGEX =
+	/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89AB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/i
+
 export const load: PageServerLoad = async ({ params, url, depends }) => {
 	depends("stats:total")
 
@@ -57,12 +60,19 @@ export const load: PageServerLoad = async ({ params, url, depends }) => {
 				.order(order, { ascending: ascending })
 				.range(start, finish)
 		)
+	} else if (UUID_V4_REGEX.test(search)) {
+		promises.push(
+			supabase
+				.from("stats")
+				.select("username, experience, gold, levels, runtime", { count: "exact" })
+				.eq("userID", search)
+		)
 	} else {
 		promises.push(
 			supabase
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
-				.textSearch("username", search)
+				.textSearch("username", search, { type: "plain" })
 		)
 	}
 
