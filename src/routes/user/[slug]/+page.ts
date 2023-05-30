@@ -1,16 +1,16 @@
-import { profile, updateProfile } from "$lib/stores/authStore"
-import type { Load } from "@sveltejs/kit"
-import { loadError } from "$lib/utils"
-import { get } from "svelte/store"
+import type { PageLoad } from "./$types"
+import { redirect } from "@sveltejs/kit"
 
-export const load: Load = async ({ params, data }) => {
+export const load: PageLoad = async ({ parent, params, data }) => {
+	const { session, profile } = await parent()
+	if (!session || !profile) throw redirect(303, "/")
+
+	const email = session.user.email
 	const { slug } = params
-	await updateProfile()
-	const user = get(profile)
 
-	if (!user) throw loadError("user/" + slug)
+	if (profile.id != slug) throw redirect(303, "/user/" + profile.id)
 
-	const clientAddress = data != null && data.address != null ? data.address : ""
+	const { address, form } = data
 
-	return { data: user, clientAddress: clientAddress }
+	return { form, email, address }
 }

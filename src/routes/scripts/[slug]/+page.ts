@@ -1,62 +1,16 @@
-import type { Load } from "@sveltejs/kit"
-import { supabase } from "$lib/database/supabase"
-import { loadError } from "$lib/utils"
-import type { Script } from "$lib/database/types"
+import { redirect } from "@sveltejs/kit"
+import { getCategories, getScript, getSubCategories } from "$lib/backend/data"
+import type { PageLoad } from "./$types"
 
-async function getScript(id: string = "") {
-	const publicData = supabase
-		.from("scripts_public")
-		.select("title, description, content, categories, subcategories")
-		.eq("id", id)
-	const protectedData = supabase
-		.from("scripts_protected")
-		.select("revision, author, author_id, assets_path, assets_alt")
-		.eq("id", id)
-	const statsData = supabase.from("stats_scripts").select().eq("script_id", id)
-
-	const promises = await Promise.all([publicData, protectedData, statsData])
-
-	const { data: dataPublic, error: errorPublic } = promises[0]
-	const { data: dataProtected, error: errorProtected } = promises[1]
-	const { data: dataStats, error: errorStats } = promises[2]
-
-	if (errorPublic) return console.error(errorPublic)
-	if (errorProtected) return console.error(errorProtected)
-	if (errorStats) return console.error(errorStats)
-
-	const publicD = dataPublic[0]
-	const protectedD = dataProtected[0]
-	const statsD = dataStats[0]
-
-	const script: Script = {
-		id: id,
-		title: publicD.title,
-		description: publicD.description,
-		content: publicD.content,
-		categories: publicD.categories,
-		subcategories: publicD.subcategories,
-		revision: protectedD.revision,
-		author: protectedD.author,
-		author_id: protectedD.author_id,
-		assets_path: protectedD.assets_path,
-		assets_alt: protectedD.assets_alt,
-		experience: statsD.experience,
-		gold: statsD.gold,
-		levels: statsD.levels,
-		runtime: statsD.runtime
-	}
-
-	return script
-}
-
-export const load: Load = async ({ params, data }) => {
+export const load: PageLoad = async ({ params, data, parent }) => {
 	const { slug } = params
-	if (slug == null) return loadError()
+	if (slug == null || data == null) throw redirect(300, "/scripts")
 
-	let id = slug.substring(slug.indexOf("&") + 1)
-	const script = getScript(id)
+	await parent()
+	const script = await getScript(slug)
+	if (!script) throw redirect(300, "/scripts")
 
-	const warningDismissed = data != null ? data.warningDismissed : false
+	const { dismissed } = data
 
-	return { script: script, warningDismissed: warningDismissed }
+	return { script, dismissed, categories: getCategories(), subcategories: getSubCategories() }
 }

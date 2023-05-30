@@ -1,305 +1,393 @@
 <script lang="ts">
-	import Dropzone from "svelte-file-dropzone"
-	import MultiSelect from "$lib/components/MultiSelect.svelte"
-	import { profile } from "$lib/stores/authStore"
-
+	import { superForm } from "sveltekit-superforms/client"
+	import { FileDropzone, focusTrap } from "@skeletonlabs/skeleton"
+	import { convertTime, cropString, formatRSNumber } from "$lib/utils.js"
+	import { fade, slide } from "svelte/transition"
 	import Markdown from "$lib/Markdown.svelte"
-	import { uploadScript } from "$lib/database/storage"
-	import { getData } from "$lib/database/supabase"
+	import { scriptSchema, type IScriptCard } from "$lib/backend/types.js"
+	import FormInput from "$lib/components/forms/FormInput.svelte"
+	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
+	import MultiSelect from "$lib/components/forms/MultiSelect.svelte"
+	import { FileCode, ImagePlus } from "lucide-svelte"
+	import ScriptCardBase from "../ScriptCardBase.svelte"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 
-	import type { Category, Script, SubCategory } from "$lib/database/types"
-	import Card from "../Card.svelte"
+	export let data
+	const { categories, subcategories } = data
 
-	let script: Script = {
-		title: "New Script",
-		description: "New script description!",
-		content: "Add info about your script! You can user MarkDown!",
-		revision: 1,
+	const { form, errors, enhance, validate } = superForm(data.form, {
+		multipleSubmits: "prevent",
+		clearOnSubmit: "errors",
+		taintedMessage: "Are you sure you want to leave?",
+		validators: scriptSchema
+	})
+
+	const defaultBanner =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/default/banner.jpg"
+	let coverElement: HTMLImageElement
+	let bannerElement: HTMLImageElement
+
+	let coverFiles: FileList
+	let bannerFiles: FileList
+	let scriptFiles: FileList
+
+	let showScriptPage: boolean = false
+	let showScriptCard: boolean = false
+	let showSearchResult: boolean = false
+
+	let isFocused: boolean = true
+	let script: IScriptCard = {
+		title: "",
+		description: "",
+		content: "",
 		categories: [],
 		subcategories: [],
-		assets_path: "",
+		published: false,
 		min_xp: 0,
-		max_xp: 15000,
+		max_xp: 0,
 		min_gp: 0,
-		max_gp: 250000
+		max_gp: 0,
+		scripts_protected: {
+			author: data.profile ? data.profile.username : "undefined",
+			assets_path: "",
+			author_id: "",
+			assets_alt: "",
+			revision: 1
+		}
 	}
 
-	let cover: string, coverFile: File | undefined
-	const handleCoverSelect = (e: { detail: { acceptedFiles: File[] } }) => {
-		const { acceptedFiles } = e.detail
+	function getStyle(style: string, value: any, error: any) {
+		if (!value) return ""
+		if (!(error && error.length > 0)) return style + "-success-500"
+		return style + "-error-500"
+	}
 
-		if (acceptedFiles.length === 0) return
+	$: if ($form.categories) validate("categories")
+	$: if ($form.subcategories) validate("subcategories")
+	$: if ($form.min_xp) validate("min_xp")
+	$: if ($form.max_xp) validate("max_xp")
 
-		coverFile = acceptedFiles[acceptedFiles.length - 1]
+	$: if (coverFiles) {
+		$form.cover = coverFiles[0]
+		validate("cover").then((result) => {
+			if (result) return
 
-		if (coverFile.size > 250000) {
-			coverFile = undefined
-			return alert("This file is too large.")
-		}
-
-		let reader = new FileReader()
-		reader.readAsDataURL(coverFile)
-		reader.onload = (e) => {
-			if (e.target == null || e.target.result == null) return
-			cover = e.target.result as string
-
-			let img = new Image()
-
-			img.onload = function () {
-				if (img.width !== 300 || img.height !== 200) {
-					coverFile = undefined
-					return alert("The cover image has to be 300x200")
-				}
+			let reader = new FileReader()
+			reader.onload = function () {
+				coverElement.src = reader.result as string
 			}
-
-			img.src = cover
-		}
+			reader.readAsDataURL(coverFiles[0])
+		})
 	}
 
-	let banner: string, bannerFile: File | undefined
-	const handleBannerSelect = (e: { detail: { acceptedFiles: File[] } }) => {
-		const { acceptedFiles } = e.detail
-
-		if (acceptedFiles.length === 0) return
-
-		bannerFile = acceptedFiles[acceptedFiles.length - 1]
-
-		if (bannerFile.size > 625000) {
-			bannerFile = undefined
-			return alert("This file is too large.")
-		}
-
-		let reader = new FileReader()
-		reader.readAsDataURL(bannerFile)
-		reader.onload = (e) => {
-			if (e.target == null || e.target.result == null) return
-			banner = e.target.result as string
-
-			let img = new Image()
-
-			img.onload = function () {
-				if (img.width !== 1920 || img.height !== 768) {
-					bannerFile = undefined
-					return alert("The banner image has to be 1920x768")
-				}
+	$: if (bannerFiles) {
+		$form.banner = bannerFiles[0]
+		validate("banner").then((result) => {
+			if (result) {
+				bannerElement.src = defaultBanner
+				return
 			}
-
-			img.src = banner
-		}
+			let reader = new FileReader()
+			reader.onload = function () {
+				bannerElement.src = reader.result as string
+			}
+			reader.readAsDataURL(bannerFiles[0])
+		})
 	}
 
-	let file: File | undefined
-	const handleFileSelect = (e: { detail: { acceptedFiles: File[] } }) => {
-		const { acceptedFiles } = e.detail
-
-		if (acceptedFiles.length === 0) return
-
-		file = acceptedFiles[acceptedFiles.length - 1]
-
-		if (file.size > 125000) {
-			file = undefined
-			return alert("This simba file is abnormally large.")
-		}
+	$: if (scriptFiles) {
+		$form.script = scriptFiles[0]
+		validate("script")
 	}
 
-	async function handleSubmit() {
-		await uploadScript(script, file, coverFile, bannerFile)
-		location.replace(location.origin + "/scripts")
-	}
-
-	const categories = getData("categories") as unknown as Category[]
-	const subcategories = getData("subcategories") as unknown as SubCategory[]
+	$: script.title = $form.title
+	$: script.description = $form.description
+	$: script.categories = $form.categories
+	$: script.subcategories = $form.subcategories
 </script>
 
-<div class="container mx-auto my-6 max-w-3xl flex-grow">
-	<!-- Preview -->
-	<div>
-		<div class="group w-full absolute left-0 top-16">
-			<img class="inset-0 z-0 object-none h-96 w-full" src={banner} alt="Missing banner" />
+<svelte:head>
+	<MetaTags title="Add Script" description="Add Script." robots="noindex" />
+</svelte:head>
 
-			<header
-				class="text-center w-full h-32 absolute inset-0 z-10 top-64 text-amber-500 text-shadow"
-			>
-				<h1 class="mb-4 font-bold text-4xl">{script.title}</h1>
-				<h2 class="font-semibold leading-normal mb-4">{script.description}</h2>
-			</header>
-			<!-- Hover Effect -->
-			<div
-				class="absolute top-80
-                    h-16 w-full px-3 space-x-2
-                    bg-none opacity-0 group-hover:opacity-100
-                    group-hover:bg-gradient-to-t from-white/20 via-white-800/20 dark:from-black/20 dark:via-gray-800/20 to-transparent 
-                    transition-all ease-in-out duration-200 delay-100"
-			/>
-		</div>
-
-		<details class="container mx-auto mt-96 mb-6 max-w-2xl flex-grow">
-			<summary>Preview script page</summary>
-			<div class="container mx-auto max-w-2xl flex-grow">
-				<h2 class="text-amber-500 dark:text-amber-200 text-center py-6">Description:</h2>
-				<article class="prose dark:prose-invert py-6">
-					<Markdown src={script.content} />
-				</article>
+<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+	{#if showScriptPage}
+		<div in:slide={{ duration: 300, delay: 300 }} out:slide={{ duration: 300 }}>
+			<div class="absolute inset-0 container min-w-full h-96 mx-0 flex flex-col">
+				<img
+					bind:this={bannerElement}
+					class="z-0 absolute object-cover h-full w-full"
+					src={defaultBanner}
+					alt="Asset is missing!"
+				/>
+				<!-- Title and Description Hover Effect -->
+				<header class="left-0 mt-auto z-[1] text-center h-32 text-primary-500 text-shadow">
+					<div
+						class="absolute mx-0 h-32 w-full opacity-100 bg-gradient-to-t from-white/20 via-white-800/20
+					dark:from-black/60 dark:via-gray-800/20 to-transparent"
+					/>
+					<h2 class="mx-8 mb-4 font-bold text-4xl">{$form.title}</h2>
+					<h5 class="font-semibold leading-normal mb-4">{$form.description}</h5>
+				</header>
 			</div>
-		</details>
-	</div>
 
-	<form class="form my-6 static" on:submit|preventDefault|once={handleSubmit}>
-		<!-- Card Preview -->
-		<div class="2xl:absolute left-20">
-			<Card
-				img={cover}
-				title={script.title}
-				author={$profile.username}
-				description={script.description}
-				tooltips={[]}
-			/>
-		</div>
+			<div class="container mt-80 mx-auto mb-6 max-w-2xl flex-grow">
+				<header class="text-center">
+					<h3>
+						Total Experience Gained:
+						{#await formatRSNumber(2500000)}...{:then value}{value}{/await}
+					</h3>
 
-		<!-- Images -->
-		<h4>Cover image (300x200 .jpg):</h4>
-		<Dropzone accept={".jpg"} on:drop={handleCoverSelect} />
-		<h4>Banner image (1920x768 .jpg):</h4>
-		<Dropzone accept={".jpg"} on:drop={handleBannerSelect} />
+					<h3>
+						Total Gold Gained:
+						{#await formatRSNumber(3450000)}...{:then value}{value}{/await}
+					</h3>
+					<h3>
+						Total Runtime:
+						{#await convertTime(24 * 60 * 55 * 15)}...{:then value}{value}{/await}
+					</h3>
+				</header>
 
-		<!-- Title n Description -->
-		<div class="flex flex-col text-sm mb-2">
-			<label for="title" class="font-bold mb-2"> Title: </label>
-			<input
-				type="text"
-				name="title"
-				class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
-                border-orange-200 focus:border-orange-600 text-black"
-				bind:value={script.title}
-			/>
-		</div>
-		<div class="flex flex-col text-sm mb-2">
-			<label for="description" class="font-bold mb-2"> Description: </label>
-
-			<input
-				type="text"
-				name="description"
-				class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
-                border-orange-200 focus:border-orange-600 text-black"
-				bind:value={script.description}
-			/>
-		</div>
-
-		<!-- Categories -->
-		<div class="flex flex-col text-sm mb-2">
-			<label for="categories" class="font-bold mb-2"> Categories: </label>
-			{#await categories}
-				<MultiSelect id="cats" bind:value={script.categories} />
-			{:then categories}
-				<MultiSelect id="cats" bind:value={script.categories}>
-					{#each categories as cat}
-						<option value={cat.name}>{cat.emoji}{cat.name}</option>
-					{/each}
-				</MultiSelect>
-			{/await}
-		</div>
-		<div class="flex flex-col text-sm mb-2">
-			<label for="categories" class="font-bold mb-2"> Subcategories: </label>
-			{#await subcategories}
-				<MultiSelect id="subcats" bind:value={script.subcategories} />
-			{:then subcategories}
-				<MultiSelect id="subcats" bind:value={script.subcategories}>
-					{#each subcategories as subcat}
-						<option value={subcat.name}>{subcat.emoji}{subcat.name}</option>
-					{/each}
-				</MultiSelect>
-			{/await}
-		</div>
-
-		<!-- Content -->
-		<div class="flex flex-col text-sm mb-2">
-			<label for="content" class="font-bold mb-2"> Content (Markdown): </label>
-			<textarea
-				name="content"
-				class="p-2 rounded-lg appearance-none shadow-sm border focus:outline-none
-                border-orange-200 focus:border-orange-600 text-black h-64"
-				bind:value={script.content}
-			/>
-		</div>
-
-		<!-- Stats -->
-		<div class="flex flex-col text-sm mb-2">
-			<h3 class="text-center">Stats limits (every 5 minutes)</h3>
-			<div class="flex justify-evenly py-3">
-				<div class="grid">
-					<label for="min_xp" class="font-bold mb-2"> Minimum Experience: </label>
-					<input
-						type="number"
-						name="min_xp"
-						class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
-                border-orange-200 focus:border-orange-600 text-black"
-						bind:value={script.min_xp}
-					/>
-				</div>
-				<div class="grid">
-					<label for="max_xp" class="font-bold mb-2"> Maximum Experience: </label>
-					<input
-						type="number"
-						name="max_xp"
-						class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
-                border-orange-200 focus:border-orange-600 text-black"
-						bind:value={script.max_xp}
-					/>
-				</div>
-			</div>
-			<div class="flex justify-evenly py-3">
-				<div class="grid">
-					<label for="min_gp" class="font-bold mb-2"> Minimum Gold: </label>
-					<input
-						type="number"
-						name="min_gp"
-						class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
-                border-orange-200 focus:border-orange-600 text-black"
-						bind:value={script.min_gp}
-					/>
-				</div>
-				<div class="grid">
-					<label for="max_gp" class="font-bold mb-2"> Maximum Gold: </label>
-					<input
-						type="number"
-						name="max_gp"
-						class="p-2 rounded-lg appearance-none shadow-sm border-2 focus:outline-none
-                border-orange-200 focus:border-orange-600 text-black"
-						bind:value={script.max_gp}
-					/>
+				<h5 class="text-primary-500 text-center my-6">Description:</h5>
+				<div class="variant-ghost-surface max-h-[50rem] overflow-auto">
+					<article class="py-6 m-auto prose dark:prose-invert">
+						<Markdown src={$form.content} />
+					</article>
 				</div>
 			</div>
 		</div>
+	{/if}
 
-		<!-- File -->
-		<div class="flex flex-col text-sm mt-4 mb-2">
-			<Dropzone accept={".simba"} on:drop={handleFileSelect} />
-			<ol>
-				{#if file}
-					<li>{file.name}</li>
-				{/if}
-			</ol>
+	{#if showScriptCard}
+		<div
+			in:slide={{ duration: 300, delay: 300 }}
+			out:slide={{ duration: 300 }}
+			class="max-w-2x m-8"
+		>
+			<div class="grid grid-cols-1 justify-items-center">
+				<ScriptCardBase bind:script bind:imgElement={coverElement} />
+			</div>
 		</div>
+	{/if}
 
-		<!-- Buttons -->
-		<div class="flex justify-between">
-			<a href="/scripts">
-				<button
-					type="button"
-					class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
-		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
-				>
-					<span class="px-2">Back</span>
-				</button>
-			</a>
+	{#if showSearchResult}
+		<div
+			in:slide={{ duration: 300, delay: 300 }}
+			out:slide={{ duration: 300 }}
+			class="max-w-2x m-8"
+		>
+			<div class="text-left w-[36rem] bg-zinc-200 dark:bg-zinc-900 rounded-md mx-auto p-8">
+				<div class="flex">
+					<div
+						class="h-8 w-8 my-auto mr-3 rounded-full bg-white overflow-clip grid justify-center content-center"
+					>
+						<img src="/favicon.svg" alt="WS" class="h-5 align-middle" />
+					</div>
+					<div class="block">
+						<span class="block">WaspScripts</span>
+						<small class="block">https://waspscripts.com > scripts</small>
+					</div>
+				</div>
+				<div>
+					<span class="text-lg font-semibold text-blue-400">
+						{script.title} - 2007 OSRS Colour Bot | WaspScripts
+					</span>
+					<p>
+						{cropString("RuneScape OSRS Color Bot - " + script.description, 160)}
+					</p>
+				</div>
+			</div>
+			<div class="w-[40rem] my-8 mx-auto">
+				* this is not a real search result, just an example of what you might expect to see in
+				google/bing/duckduckgo
+			</div>
+		</div>
+	{/if}
 
+	<div class="container my-8 mx-auto mb-6 max-w-2x flex flex-col">
+		<div class="btn-group variant-filled-secondary mx-auto">
 			<button
-				type="submit"
-				class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
-		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
+				on:click={() => {
+					showScriptPage = !showScriptPage
+					showScriptCard = false
+					showSearchResult = false
+				}}
 			>
-				<span class="px-2">Upload</span>
+				{#if showScriptPage}Hide{:else}Show{/if} script page
+			</button>
+			<button
+				on:click={() => {
+					showScriptCard = !showScriptCard
+					showScriptPage = false
+					showSearchResult = false
+				}}
+			>
+				{#if showScriptCard}Hide{:else}Show{/if} script card
+			</button>
+			<button
+				on:click={() => {
+					showSearchResult = !showSearchResult
+					showScriptPage = false
+					showScriptCard = false
+				}}
+			>
+				{#if showSearchResult}Hide{:else}Show{/if} search result example
 			</button>
 		</div>
-	</form>
+
+		<article class="variant-ringed-secondary p-8 my-8 mx-auto w-3/4">
+			{#if $errors._errors && $errors._errors.length > 0}
+				{#each $errors._errors as error}
+					<div class="flex justify-center">{error}</div>
+				{/each}
+			{/if}
+			<header class="text-center my-8">
+				<h3>Update Script</h3>
+			</header>
+			<form method="POST" enctype="multipart/form-data" use:focusTrap={isFocused} use:enhance>
+				<label for="cover" class="my-4">
+					<span>Cover:</span>
+					<FileDropzone
+						name="cover"
+						bind:files={coverFiles}
+						slotMessage="mx-auto {getStyle('text', $form.cover, $errors.cover)}"
+						slotMeta="mx-auto {getStyle('text', $form.cover, $errors.cover)}"
+					>
+						<svelte:fragment slot="lead">
+							<ImagePlus class="mx-auto {getStyle('stroke', $form.cover, $errors.cover)}" />
+						</svelte:fragment>
+						<svelte:fragment slot="message">Cover image</svelte:fragment>
+						<svelte:fragment slot="meta">
+							{#if $errors.cover && $errors.cover.length > 0}
+								{#each $errors.cover as error}
+									{#if error}
+										<small class="flex justify-center">{error}</small>
+									{/if}
+								{/each}
+							{:else}
+								Must be exactly 300x200 pixels and JPG format.
+							{/if}
+						</svelte:fragment>
+					</FileDropzone>
+				</label>
+
+				<label for="banner" class="my-4">
+					<span>Banner:</span>
+					<FileDropzone
+						name="banner"
+						bind:files={bannerFiles}
+						slotMessage="mx-auto {getStyle('text', $form.banner, $errors.banner)}"
+						slotMeta="mx-auto {getStyle('text', $form.banner, $errors.banner)}"
+					>
+						<svelte:fragment slot="lead">
+							<ImagePlus class="mx-auto {getStyle('stroke', $form.banner, $errors.banner)}" />
+						</svelte:fragment>
+						<svelte:fragment slot="message">Banner image</svelte:fragment>
+						<svelte:fragment slot="meta">
+							{#if $errors.banner && $errors.banner.length > 0}
+								{#each $errors.banner as error}
+									{#if error}
+										<div class="flex justify-center">{error}</div>
+									{/if}
+								{/each}
+							{:else}
+								Must be exactly 1920x768 pixels and JPG format.
+							{/if}
+						</svelte:fragment>
+					</FileDropzone>
+				</label>
+
+				<FormInput title="Title" bind:value={$form.title} bind:error={$errors.title} />
+
+				<FormInput
+					title="Description"
+					extraTitle=" (recommended 60-80 characters)"
+					bind:value={$form.description}
+					bind:error={$errors.description}
+				/>
+
+				<MultiSelect
+					title="Categories"
+					bind:value={$form.categories}
+					bind:error={$errors.categories}
+					entries={categories}
+				/>
+
+				<MultiSelect
+					title="Subcategories"
+					bind:value={$form.subcategories}
+					bind:error={$errors.subcategories}
+					entries={subcategories}
+				/>
+
+				<FormTextarea title="Content" bind:value={$form.content} bind:error={$errors.content} />
+
+				<div class="flex flex-col text-sm mt-8 mb-2">
+					<h5 class="text-center">Stats limits (every 5 minutes)</h5>
+					<div class="grid grid-cols-2 gap-8">
+						<FormInput
+							title="Minimum Experience"
+							bind:value={$form.min_xp}
+							bind:error={$errors.min_xp}
+							type={"number"}
+						/>
+						<FormInput
+							title="Maximum Experience"
+							bind:value={$form.max_xp}
+							bind:error={$errors.max_xp}
+							type={"number"}
+						/>
+					</div>
+					<div class="grid grid-cols-2 gap-8">
+						<FormInput
+							title="Minimum Gold"
+							bind:value={$form.min_gp}
+							bind:error={$errors.min_gp}
+							type={"number"}
+						/>
+						<FormInput
+							title="Maximum Gold"
+							bind:value={$form.max_gp}
+							bind:error={$errors.max_gp}
+							type={"number"}
+						/>
+					</div>
+				</div>
+
+				<label for="script_file" class="my-4">
+					<span>Script:</span>
+					<FileDropzone
+						name="script"
+						bind:files={scriptFiles}
+						slotMessage="mx-auto {getStyle('text', $form.script, $errors.script)}"
+						slotMeta="mx-auto {getStyle('text', $form.script, $errors.script)}"
+					>
+						<svelte:fragment slot="lead">
+							<FileCode class="mx-auto {getStyle('stroke', $form.script, $errors.script)}" />
+						</svelte:fragment>
+						<svelte:fragment slot="message">Simba Script</svelte:fragment>
+						<svelte:fragment slot="meta">
+							{#if $errors.cover && $errors.cover.length > 0}
+								{#each $errors.cover as error}
+									{#if error}
+										<div class="flex justify-center">{error}</div>
+									{/if}
+								{/each}
+							{:else}
+								Must be a Simba script file.
+							{/if}
+						</svelte:fragment>
+					</FileDropzone>
+				</label>
+
+				<div class="flex justify-between">
+					<a href="./">
+						<button class="btn variant-filled-secondary">Back</button>
+					</a>
+
+					<button type="submit" class="btn variant-filled-secondary">Submit</button>
+				</div>
+			</form>
+		</article>
+	</div>
 </div>

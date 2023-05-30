@@ -16,7 +16,7 @@ const loadScripts = async () => {
 }
 
 const loadBlog = async () => {
-	const { data, error } = await supabase.from("blog").select("title")
+	const { data, error } = await supabase.from("tutorials").select("title")
 
 	if (error) return console.error(error)
 

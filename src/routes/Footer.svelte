@@ -1,107 +1,50 @@
 <script lang="ts">
+	import { page } from "$app/stores"
 	import Logo from "./Logo.svelte"
 </script>
 
-<footer
-	class="p-4 z-40 sticky sm:p-6 border-t border-stone-200 justify-between text-stone-500 
-	backdrop-blur transition-colors duration-500 bg-white/60 supports-backdrop-blur:bg-white/95 dark:border-stone-50/[0.06] dark:bg-stone-900/60"
->
-	<div class="md:flex md:justify-between">
+<footer class="variant-soft" style="text-decoration: none !important;">
+	<header class="md:flex md:justify-between md:m-8 md:pt-8">
 		<div class="mb-6 md:mb-0">
-			<a href="/" class="flex items-center hover:text-amber-500 dark:hover:text-amber-400">
-				<Logo selected={false} />
+			<a href="/">
+				<Logo selected={true} />
 			</a>
 		</div>
-		<div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
-			<div>
-				<h2 class="mb-6 text-sm font-semibold uppercase text-white">Resources</h2>
+		<div class="grid grid-cols-2 gap-8 sm:gap-4 sm:grid-cols-3">
+			<nav>
+				<h4 class="mb-6 text-sm font-semibold uppercase">Resources</h4>
 				<ul>
-					<li>
-						<a href="/setup" class="hover:text-amber-500 dark:hover:text-amber-400"> Setup </a>
-					</li>
-					<li>
-						<a
-							href="https://villavu.github.io/SRL-Development"
-							class="hover:text-amber-500 dark:hover:text-amber-400"
-						>
-							SRL Documentation
-						</a>
-					</li>
-					<li>
-						<a
-							href="https://torwent.github.io/WaspLib"
-							class="hover:text-amber-500 dark:hover:text-amber-400"
-						>
-							WaspLib Documentation
-						</a>
-					</li>
-					<li>
-						<a
-							href="https://github.com/villavu/Simba"
-							class="hover:text-amber-500 dark:hover:text-amber-400"
-						>
-							Simba repo
-						</a>
-					</li>
-					<li>
-						<a
-							href="https://github.com/villavu/SRL-Development"
-							class="hover:text-amber-500 dark:hover:text-amber-400"
-						>
-							SRL repo
-						</a>
-					</li>
-					<li>
-						<a
-							href="https://github.com/Torwent/WaspLib"
-							class="hover:text-amber-500 dark:hover:text-amber-400"
-						>
-							WaspLib repo
-						</a>
-					</li>
+					<li><a href="/setup">Setup</a></li>
+					<li><a href="https://torwent.github.io/SRL-T">SRL-T Documentation</a></li>
+					<li><a href="https://torwent.github.io/WaspLib">WaspLib Documentation</a></li>
+					<li><a href="https://github.com/villavu/Simba">Simba repo</a></li>
+					<li><a href="https://github.com/villavu/SRL-Development">SRL repo</a></li>
+					<li><a href="https://github.com/Torwent/WaspLib">WaspLib repo</a></li>
 				</ul>
-			</div>
-			<div>
-				<h2 class="mb-6 text-sm font-semibold uppercase text-white">Special thanks:</h2>
+			</nav>
+			<nav>
+				<h4 class="mb-6 text-sm font-semibold uppercase">Special thanks:</h4>
 				<ul>
-					<li>
-						<a href="/devs/Slacky" class="hover:text-amber-500 dark:hover:text-amber-400"
-							>Jarl Holta</a
-						>
-					</li>
-					<li>
-						<a href="/devs/Olly" class="hover:text-amber-500 dark:hover:text-amber-400">Olly</a>
-					</li>
-					<li>
-						<a href="/devs" class="hover:underline hover:text-amber-500 dark:hover:text-amber-400">
-							Many more devs...
-						</a>
-					</li>
+					<li><a href="/devs/Slacky">Jarl Holta</a></li>
+					<li><a href="/devs/Olly">Olly</a></li>
+					<li><a href="/devs"> Many more devs... </a></li>
 				</ul>
-			</div>
-			<div>
-				<h2 class="mb-6 text-sm font-semibold uppercase text-white">Legal</h2>
+			</nav>
+			<nav>
+				<h4 class="mb-6 text-sm font-semibold uppercase">Legal</h4>
 				<ul>
-					<li class="mb-4">
-						<a href="/" class="hover:text-amber-500 dark:hover:text-amber-400">Privacy Policy</a>
-					</li>
-					<li>
-						<a href="/" class="hover:text-amber-500 dark:hover:text-amber-400"
-							>Terms &amp; Conditions</a
-						>
-					</li>
+					<li><a href="/">Privacy Policy</a></li>
+					<li><a href="/">Terms &amp; Conditions</a></li>
 				</ul>
-			</div>
+			</nav>
 		</div>
-	</div>
-	<div class="sm:flex sm:items-center sm:justify-between p-8 sm:p-12">
-		<span class="text-sm sm:text-center"
-			>© 2022 <a href="https://waspbot.com" class="hover:text-amber-500 dark:hover:text-amber-400e"
-				>WaspScripts™</a
-			>. All Rights Reserved.
+	</header>
+	<footer class="sm:flex sm:items-center sm:justify-between p-8 sm:p-12">
+		<span class="text-sm sm:text-center">
+			© 2022 <a href={$page.url.origin}> WaspScripts™ </a>. All Rights Reserved.
 		</span>
 		<div class="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
-			<a href="https://github.com/torwent" class="hover:text-amber-500 dark:hover:text-amber-400">
+			<a href="https://github.com/torwent">
 				<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 					<path
 						fill-rule="evenodd"
@@ -110,7 +53,7 @@
 					/>
 				</svg>
 			</a>
-			<a href="/" class="hover:text-amber-500 dark:hover:text-amber-400">
+			<a href="/">
 				<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
 					<path
 						fill-rule="evenodd"
@@ -120,5 +63,5 @@
 				</svg>
 			</a>
 		</div>
-	</div>
+	</footer>
 </footer>

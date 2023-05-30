@@ -3,23 +3,25 @@
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import DropDown from "./DropDown.svelte"
 	import Discord from "$lib/components/Discord.svelte"
-	import type { PageData } from "./$types"
 
-	export let data: PageData
+	export let data
 
-	const faqData = data.questions
-	const faqErrors = data.errors
+	import type { FAQEntry } from "$lib/backend/types.js"
+
+	const { questions, errors } = data
+
+	const questionsData = questions.data as FAQEntry[]
+	const errorsData = errors.data as FAQEntry[]
 </script>
 
 <svelte:head>
 	<MetaTags
 		title="FAQ and Errors"
 		description="Need help botting osrs? See if what you are looking for is in this list."
-		url="/faq"
 	/>
 </svelte:head>
 
-<div
+<main
 	class="pb-16 container mx-auto my-6 max-w-2xl flex-grow"
 	in:fade={{ duration: 300, delay: 300 }}
 	out:fade={{ duration: 300 }}
@@ -28,13 +30,8 @@
 		<h2>Welcome to the Frequently Asked Questions and Common Errors section.</h2>
 	</header>
 
-	{#await faqData then faq}
-		<DropDown title="FAQ" entries={faq} />
-	{/await}
-
-	{#await faqErrors then errors}
-		<DropDown title="Common Errors" entries={errors} />
-	{/await}
+	<DropDown title="❓ Frequently Asked Questions" entries={questionsData} />
+	<DropDown title="⚠️ Common Errors" entries={errorsData} />
 
 	<header class="py-12 text-center">
 		<p class="py-6">
@@ -43,4 +40,4 @@
 		</p>
 		<Discord />
 	</header>
-</div>
+</main>

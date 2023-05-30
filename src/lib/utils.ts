@@ -88,3 +88,31 @@ export async function formatRSNumber(n: number): Promise<string> {
 
 	return parseFloat(f.toFixed(2)).toString() + " " + arr[i]
 }
+
+export function capitalizeString(string: string): string {
+	return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+export function randomString() {
+	const n = Math.random() + 1
+	return n.toString(36).substring(7)
+}
+
+export function cropString(str: string, length: number = 80) {
+	if (str.length > length) {
+		str = str.substring(0, length) + "..."
+	}
+
+	return str
+}
+
+export function encodeSEO(url: string) {
+	url = encodeURI(url.toLocaleLowerCase())
+		.replaceAll("%20", "-")
+		.replace(/&/g, "-and-")
+		.replace(/[^a-z\-]/g, "")
+		.replace(/-+/g, "-")
+		.replace(/^-*/, "")
+		.replace(/-*$/, "")
+	return url
+}

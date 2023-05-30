@@ -5,20 +5,28 @@
 
 	export let src: string
 
-	const md = new markdownIt("commonmark", {
-		langPrefix: true,
-		highlight: function (code: string, lang: string, callback: void) {
-			if (lang && hljs.getLanguage(lang)) {
-				try {
-					return hljs.highlight(code, { language: lang }).value
-				} catch (error) {
-					console.error(error)
-				}
-			}
+	function mdHighLight(str: string, lang: string) {
+		lang = lang.toLowerCase()
+		if (lang.includes("simba") || lang.includes("freepascal") || lang.includes("lape"))
+			lang = "pascal"
 
-			return "" // use external default escaping
+		if (hljs.getLanguage(lang)) {
+			try {
+				return hljs.highlight(str, { language: lang }).value
+			} catch (error) {
+				console.error(error)
+			}
 		}
-	})
+
+		return ""
+	}
+
+	const options: markdownIt.Options = {
+		langPrefix: "language-",
+		highlight: mdHighLight
+	}
+
+	const md = new markdownIt("commonmark", options)
 
 	$: html = md.render(src)
 </script>

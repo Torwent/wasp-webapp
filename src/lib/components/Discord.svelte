@@ -3,7 +3,7 @@
 </script>
 
 <div class="flex justify-center">
-	<a href="https://discord.com/invite/YMYUahmww9">
+	<a href="https://discord.com/invite/YMYUahmww9" class="decoration-transparent">
 		<button
 			type="button"
 			data-mdb-ripple="true"

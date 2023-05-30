@@ -1,18 +1,19 @@
-/// <reference types="@sveltejs/kit" />
+import { SupabaseClient, Session } from "@supabase/supabase-js"
+import type { Profile } from "$lib/backend/types"
 
-// See https://kit.svelte.dev/docs/types#app
-// for information about these interfaces
-// and what to do when importing types
-declare namespace App {
-	interface Locals {
-		warningDismissed: boolean
+declare global {
+	namespace App {
+		interface Locals {
+			warningDismissed: boolean
+			supabase: SupabaseClient
+			getSession(): Promise<Session | null>
+			setSession(access_token: string, refresh_token: string): Promise<void>
+			getProfile(): Promise<Profile | null>
+		}
+		interface PageData {
+			session: Session | null
+		}
+		// interface Error {}
+		// interface Platform {}
 	}
-	// interface Platform {}
-	// interface Session {}
-	// interface Stuff {}
 }
-
-declare module "svelte-file-dropzone"
-declare module "markdown-it"
-declare module "bluebird"
-declare module "file-saver"

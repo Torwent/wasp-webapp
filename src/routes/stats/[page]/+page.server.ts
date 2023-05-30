@@ -1,19 +1,18 @@
 import { SERVICE_USER, SERVICE_PASS } from "$env/static/private"
-import { supabase } from "$lib/database/supabase"
-import type { Stat } from "$lib/database/types"
+import type { Stat } from "$lib/backend/types"
 import type { PageServerLoad } from "./$types"
 
 const UUID_V4_REGEX =
 	/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89AB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/i
 
-export const load: PageServerLoad = async ({ params, url, depends }) => {
+export const load: PageServerLoad = async ({ params, url, depends, locals }) => {
 	depends("stats:total")
 
 	const order = url.searchParams.get("order") || "experience"
 	const ascending = url.searchParams.get("ascending")?.toLowerCase() === "true"
-	const search = url.searchParams.get("search") || ""
+	const search = decodeURI(url.searchParams.get("search") || "")
 
-	const range = 35
+	const range = 30
 	const page = Number(params.page) || 1
 
 	const start = (page - 1) * range
@@ -29,11 +28,12 @@ export const load: PageServerLoad = async ({ params, url, depends }) => {
 
 	const totalEntries = 10
 
-	if (supabase.auth.user() == null) {
-		const { error } = await supabase.auth.signIn({
+	if (locals.supabase.auth.getSession() == null) {
+		const { error } = await locals.supabase.auth.signInWithPassword({
 			email: SERVICE_USER,
 			password: SERVICE_PASS
 		})
+
 		if (error) {
 			const response = {
 				total: total,
@@ -53,7 +53,7 @@ export const load: PageServerLoad = async ({ params, url, depends }) => {
 
 	if (search === "") {
 		promises.push(
-			supabase
+			locals.supabase
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
 				.or("experience.gt.0,gold.gt.0")
@@ -62,21 +62,21 @@ export const load: PageServerLoad = async ({ params, url, depends }) => {
 		)
 	} else if (UUID_V4_REGEX.test(search)) {
 		promises.push(
-			supabase
+			locals.supabase
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
 				.eq("userID", search)
 		)
 	} else {
 		promises.push(
-			supabase
+			locals.supabase
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
 				.textSearch("username", search, { type: "plain" })
 		)
 	}
 
-	promises.push(supabase.rpc("get_stats_total"))
+	promises.push(locals.supabase.rpc("get_stats_total"))
 
 	promises = await Promise.all(promises)
 

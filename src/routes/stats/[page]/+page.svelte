@@ -1,15 +1,15 @@
 <script lang="ts">
 	import { goto, invalidate } from "$app/navigation"
 	import { page } from "$app/stores"
-	import MetaTags from "$lib/components/MetaTags.svelte"
-	import type { Stat } from "$lib/database/types"
-	import { convertTime, formatRSNumber } from "$lib/utils"
+	import { browser } from "$app/environment"
 	import { onMount } from "svelte"
 
-	import type { PageData } from "./$types"
-	import { browser } from "$app/environment"
+	import { fade } from "svelte/transition"
+	import type { Stat } from "$lib/backend/types"
+	import { convertTime, formatRSNumber } from "$lib/utils"
+	import MetaTags from "$lib/components/MetaTags.svelte"
 
-	export let data: PageData
+	export let data
 
 	let search: string
 	let ascending = $page.url.searchParams.get("ascending")?.toLowerCase() === "true"
@@ -30,11 +30,8 @@
 			.replace(/\/stats\/([0-9][0-9][0-9][0-9]|[0-9][0-9][0-9]|[0-9][0-9]|[0-9])/, "/stats/1")
 		const url = new URL(currentURL)
 		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") {
-				url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			} else {
-				url.searchParams.delete(k)
-			}
+			if (!!v && v !== "") url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
+			else url.searchParams.delete(k)
 		}
 		history.replaceState({}, "", url)
 		invalidate("stats:total")
@@ -70,41 +67,41 @@
 </script>
 
 <svelte:head>
-	<meta name="description" content="Wasp Scripts usage stats!" />
-	<MetaTags title="Stats" description="Wasp Scripts usage stats!" url="/stats" />
+	<MetaTags title="Stats" description="Wasp Scripts usage stats!" robots={"noindex"} />
 </svelte:head>
 
-<div class="overflow-x-auto relative shadow-md sm:rounded-lg my-4">
+<main
+	class="overflow-x-auto relative shadow-md sm:rounded-lg my-4 mx-12 md:mx-16 lg:mx-24"
+	in:fade={{ duration: 300, delay: 300 }}
+	out:fade={{ duration: 300 }}
+>
 	<header class="">
-		<h3 class="py-4 px-6 font-bold whitespace-nowrap text-center">
+		<h5 class="py-4 px-6 font-bold text-center whitespace-nowrap">
 			Total experience:
-			{#await formatRSNumber(data.total.experience)}
-				<span class="py-4 pr-6"> ... </span>
-			{:then value}
-				<span class="py-4 pr-6"> {value} </span>
-			{/await}
+			<span class="py-4 pr-6">
+				{#await formatRSNumber(data.total.experience)}...{:then value}{value}{/await}
+			</span>
+			<wbr />
 			Total gold:
-			{#await formatRSNumber(data.total.gold)}
-				<span class="py-4 pr-6"> ... </span>
-			{:then value}
-				<span class="py-4 pr-6"> {value} </span>
-			{/await}
+			<span class="py-4 pr-6">
+				{#await formatRSNumber(data.total.gold)}... {:then value}{value} {/await}
+			</span>
+			<wbr />
 			Total levels:
-			<span class="py-4 pr-6"> {data.total.levels} </span>
+			<span class="py-4 pr-6">{data.total.levels}</span>
+			<wbr />
 			Total runtime:
-			{#await convertTime(data.total.runtime)}
-				<span class="py-4 pr-6"> ... </span>
-			{:then value}
-				<span class="py-4 pr-6"> {value} </span>
-			{/await}
-		</h3>
+			<span class="py-4 pr-6">
+				{#await convertTime(data.total.runtime)}...{:then value} {value} {/await}
+			</span>
+		</h5>
 	</header>
 
 	<div class="flex flex-col text-sm mb-2">
 		<input
 			type="search"
 			placeholder="Search UUID or username..."
-			class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg"
+			class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg text-black"
 			bind:value={search}
 		/>
 	</div>
@@ -120,11 +117,16 @@
 							<span>
 								{header}
 								{#if header === "levels"}
-									<a href="/blog/WaspStats%20virtual%20levels" class="hover:text-amber-400"> * </a>
+									<a
+										href="/blog/WaspStats%20virtual%20levels"
+										class="text-stone-700 dark:text-stone-400 hover:text-primary-400"
+									>
+										*
+									</a>
 								{/if}
 							</span>
 							{#if selectedHeader === header}
-								<span class="text-amber-400">
+								<span class="text-primary-400">
 									{@html ascending ? "&#8638;" : "&#8643;"}
 								</span>
 							{/if}
@@ -162,7 +164,7 @@
 							{value}
 						{/await}
 					</td>
-					<td class="py-4 px-6 w-64"> {entry.levels} </td>
+					<td class="py-4 px-6 w-64">{entry.levels}</td>
 					<td class="py-4 px-6 w-64">
 						{#await convertTime(entry.runtime)}
 							...
@@ -175,13 +177,13 @@
 		</tbody>
 	</table>
 	<nav class="flex justify-between items-center pt-4" aria-label="Table navigation">
-		<span class="text-sm font-normal text-stone-500 dark:text-stone-400"
-			>Showing <span class="font-semibold text-stone-900 dark:text-white"
-				>{(currentPage - 1) * range + 1}-{(currentPage - 1) * range + range + 1}</span
-			>
+		<span class="text-sm font-normal text-stone-500 dark:text-stone-400">
+			Showing <span class="font-semibold text-stone-900 dark:text-white">
+				{(currentPage - 1) * range + 1}-{(currentPage - 1) * range + range + 1}
+			</span>
 			of
-			<span class="font-semibold text-stone-900 dark:text-white">{totalEntries}</span></span
-		>
+			<span class="font-semibold text-stone-900 dark:text-white">{totalEntries}</span>
+		</span>
 		<ul class="inline-flex items-center -space-x-px">
 			<li>
 				<button
@@ -195,12 +197,13 @@
 						fill="currentColor"
 						viewBox="0 0 20 20"
 						xmlns="http://www.w3.org/2000/svg"
-						><path
+					>
+						<path
 							fill-rule="evenodd"
 							d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
 							clip-rule="evenodd"
-						/></svg
-					>
+						/>
+					</svg>
 				</button>
 			</li>
 
@@ -209,8 +212,8 @@
 					<button
 						class="py-2 px-3 leading-tight text-stone-500 bg-white border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
 						on:click={() => preserveScroll("/stats/" + (idx + 1))}
-						class:text-orange-500={currentPage === idx + 1}
-						class:dark:text-orange-400={currentPage === idx + 1}
+						class:text-primary-500={currentPage === idx + 1}
+						class:dark:text-primary-400={currentPage === idx + 1}
 					>
 						{idx + 1}
 					</button>
@@ -232,14 +235,15 @@
 						fill="currentColor"
 						viewBox="0 0 20 20"
 						xmlns="http://www.w3.org/2000/svg"
-						><path
+					>
+						<path
 							fill-rule="evenodd"
 							d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
 							clip-rule="evenodd"
-						/></svg
-					>
+						/>
+					</svg>
 				</button>
 			</li>
 		</ul>
 	</nav>
-</div>
+</main>
