@@ -8,32 +8,30 @@
 	import type { Stat } from "$lib/backend/types"
 	import { convertTime, formatRSNumber } from "$lib/utils"
 	import MetaTags from "$lib/components/MetaTags.svelte"
+	import Paginator from "$lib/components/Paginator.svelte"
 
 	export let data
 
-	let search: string
+	const pageStr = $page.url.searchParams.get("page") || "-1"
+	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
+
+	let search = decodeURI($page.url.searchParams.get("search") || "")
 	let ascending = $page.url.searchParams.get("ascending")?.toLowerCase() === "true"
 	let headers: (keyof Stat)[] = ["username", "experience", "gold", "levels", "runtime"]
 	let selectedHeader: keyof Stat =
 		($page.url.searchParams.get("order") as keyof Stat) || "experience"
-
-	function preserveScroll(url: string) {
-		search = ""
-		const currentURL = new URL(window.location.toString())
-		const searchParams = currentURL.searchParams.toString()
-		goto(url + "?" + searchParams, { noScroll: true })
-	}
+	let loading = true
 
 	function replaceQuery(values: Record<string, string>) {
-		const currentURL = window.location
-			.toString()
-			.replace(/\/stats\/([0-9][0-9][0-9][0-9]|[0-9][0-9][0-9]|[0-9][0-9]|[0-9])/, "/stats/1")
-		const url = new URL(currentURL)
+		if (!browser) return
 		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else url.searchParams.delete(k)
+			if (!!v && v !== "") $page.url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
+			else $page.url.searchParams.delete(k)
 		}
-		history.replaceState({}, "", url)
+
+		if (loading) return
+
+		history.replaceState({}, "", $page.url)
 		invalidate("stats:total")
 	}
 
@@ -52,22 +50,25 @@
 		})
 	}
 
-	const range = data.range
-	const totalEntries = data.totalEntries || 0 //this shouldn't be needed but vscode complains...
-	const totalPages = Math.ceil(totalEntries / range)
+	const { range } = data
+
+	let count = 0
+	$: count = (data.count as number) || 0
 
 	onMount(() => {
-		replaceQuery({ search: search })
+		loading = false
 		rerunLoad()
 	})
 
-	$: currentPage = Number($page.params.page) || 1
-	$: $page.url.searchParams.set("search", search)
 	$: if (browser) replaceQuery({ search: search })
+
+	$: replaceQuery({ page: currentPage.toString() })
+	$: replaceQuery({ page: "1", search: search })
+	$: replaceQuery({ ascending: ascending.toString() })
 </script>
 
 <svelte:head>
-	<MetaTags title="Stats" description="Wasp Scripts usage stats!" robots={"noindex"} />
+	<MetaTags title="Stats" description="Wasp Scripts usage stats!" />
 </svelte:head>
 
 <main
@@ -176,74 +177,6 @@
 			{/each}
 		</tbody>
 	</table>
-	<nav class="flex justify-between items-center pt-4" aria-label="Table navigation">
-		<span class="text-sm font-normal text-stone-500 dark:text-stone-400">
-			Showing <span class="font-semibold text-stone-900 dark:text-white">
-				{(currentPage - 1) * range + 1}-{(currentPage - 1) * range + range + 1}
-			</span>
-			of
-			<span class="font-semibold text-stone-900 dark:text-white">{totalEntries}</span>
-		</span>
-		<ul class="inline-flex items-center -space-x-px">
-			<li>
-				<button
-					class="block py-2 px-3 ml-0 leading-tight text-stone-500 bg-white rounded-l-lg border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
-					on:click={() => preserveScroll("/stats/" + (currentPage - 1 > 0 ? currentPage - 1 : 1))}
-				>
-					<span class="sr-only">Previous</span>
-					<svg
-						class="w-5 h-5"
-						aria-hidden="true"
-						fill="currentColor"
-						viewBox="0 0 20 20"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							fill-rule="evenodd"
-							d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
-							clip-rule="evenodd"
-						/>
-					</svg>
-				</button>
-			</li>
 
-			{#each Array(totalPages) as _, idx}
-				<li>
-					<button
-						class="py-2 px-3 leading-tight text-stone-500 bg-white border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
-						on:click={() => preserveScroll("/stats/" + (idx + 1))}
-						class:text-primary-500={currentPage === idx + 1}
-						class:dark:text-primary-400={currentPage === idx + 1}
-					>
-						{idx + 1}
-					</button>
-				</li>
-			{/each}
-
-			<li>
-				<button
-					class="block py-2 px-3 leading-tight text-stone-500 bg-white rounded-r-lg border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
-					on:click={() =>
-						preserveScroll(
-							"/stats/" + (currentPage + 1 < totalPages ? currentPage + 1 : totalPages)
-						)}
-				>
-					<span class="sr-only">Next</span>
-					<svg
-						class="w-5 h-5"
-						aria-hidden="true"
-						fill="currentColor"
-						viewBox="0 0 20 20"
-						xmlns="http://www.w3.org/2000/svg"
-					>
-						<path
-							fill-rule="evenodd"
-							d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-							clip-rule="evenodd"
-						/>
-					</svg>
-				</button>
-			</li>
-		</ul>
-	</nav>
+	<Paginator srcData={"tutorials:posts"} bind:currentPage {range} bind:count />
 </main>

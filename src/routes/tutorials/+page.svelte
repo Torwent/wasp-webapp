@@ -136,5 +136,5 @@
 		{/if}
 	</div>
 
-	<Paginator srcData={"tutorials:posts"} {currentPage} {range} {count} />
+	<Paginator srcData={"tutorials:posts"} bind:currentPage {range} bind:count />
 </main>
