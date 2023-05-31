@@ -11,10 +11,14 @@
 	import { FileCode, ImagePlus } from "lucide-svelte"
 	import ScriptCardBase from "../../ScriptCardBase.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
+	import { redirect } from "@sveltejs/kit"
 
 	export let data
 
 	const { categories, subcategories } = data
+
+	if (!categories || !subcategories) throw redirect(303, "./")
+
 	let script = data.script as Script
 	const { form, errors, enhance, validate } = superForm(data.form, {
 		multipleSubmits: "prevent",
@@ -33,6 +37,7 @@
 	$form.max_xp = script.max_xp
 	$form.min_gp = script.min_gp
 	$form.max_gp = script.max_gp
+	$form.published == script.published
 
 	const defaultBanner = script.scripts_protected.assets_path + "/banner.jpg"
 	let coverElement: HTMLImageElement
@@ -366,6 +371,23 @@
 						</svelte:fragment>
 					</FileDropzone>
 				</label>
+
+				<div class="flex py-0.5">
+					<div>
+						<label
+							class="form-check-label inline-block cursor-pointer dark:hover:text-amber-100 hover:text-orange-400"
+							for={"checkbox"}
+						>
+							Published
+						</label>
+						<input
+							class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-amber-500"
+							type="checkbox"
+							id={"checkbox"}
+							bind:checked={script.published}
+						/>
+					</div>
+				</div>
 
 				<div class="flex justify-between">
 					<a href="./">

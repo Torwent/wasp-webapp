@@ -105,6 +105,11 @@
 	</div>
 
 	<div class="container mt-80 mx-auto mb-6 max-w-2xl flex-grow">
+		{#if !script.published}
+			<div class="text-center my-4">
+				<h4 class="text-secondary-500 mx-auto font-bold">Hidden</h4>
+			</div>
+		{/if}
 		{#if script.stats_scripts.experience || script.stats_scripts.gold || script.stats_scripts.runtime}
 			<header class="text-center">
 				{#if script.stats_scripts.experience}

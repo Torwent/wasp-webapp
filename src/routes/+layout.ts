@@ -27,7 +27,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 			await fetch(API_URL + "/discord/refresh/" + profile.discord_id, { method: "GET" }).catch(
 				(error) => console.error(error)
 			)
-		setTimeout(checkProfileUpdates, 5000)
+		setTimeout(checkProfileUpdates, 10000)
 	}
 
 	const profile = await getProfile()

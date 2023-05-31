@@ -1,11 +1,5 @@
-import {
-	addToolTips,
-	getCategories,
-	getCheckBoxes,
-	getScripts,
-	getSubCategories
-} from "$lib/backend/data"
-import type { Script } from "$lib/backend/types"
+import { addToolTips, getCategories, getCheckBoxes, getSubCategories } from "$lib/backend/data"
+import type { IScriptCard, Script } from "$lib/backend/types"
 import { redirect, type Load } from "@sveltejs/kit"
 
 export const load: Load = async ({ url, depends, parent }) => {
@@ -16,10 +10,15 @@ export const load: Load = async ({ url, depends, parent }) => {
 	const pageStr = url.searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
-	const ascending = url.searchParams.get("ascending")?.toLowerCase() !== "true"
 	const search = decodeURI(url.searchParams.get("search") || "")
+	const ascending = url.searchParams.get("ascending")?.toLowerCase() !== "true"
+	const categoriesStr = decodeURI(url.searchParams.get("categories") || "")
+	const categoriesFilters = categoriesStr.split("-")
 
-	const range = 10
+	const subcategoriesStr = decodeURI(url.searchParams.get("subcategories") || "")
+	const subcategoriesFilters = subcategoriesStr.split("-")
+
+	const range = 11
 	const start = (page - 1) * range
 	const finish = start + range
 
@@ -36,6 +35,8 @@ export const load: Load = async ({ url, depends, parent }) => {
 					count: "exact"
 				}
 			)
+			.contains("categories", categoriesFilters)
+			.contains("subcategories", subcategoriesFilters)
 			.order("title", { ascending: ascending })
 			.range(start, finish)
 	} else {
@@ -49,6 +50,8 @@ export const load: Load = async ({ url, depends, parent }) => {
 					count: "exact"
 				}
 			)
+			.contains("categories", categoriesFilters)
+			.contains("subcategories", subcategoriesFilters)
 			.textSearch("scripts_public_search", search, { type: "websearch" })
 	}
 
@@ -59,7 +62,7 @@ export const load: Load = async ({ url, depends, parent }) => {
 		getSubCategories()
 	])
 
-	const { data, error } = promises[0]
+	const { data, error, count } = promises[0]
 
 	if (error) {
 		console.error(error)
@@ -87,6 +90,8 @@ export const load: Load = async ({ url, depends, parent }) => {
 		scripts,
 		checkboxes,
 		categories,
-		subcategories
+		subcategories,
+		range,
+		count
 	}
 }

@@ -3,43 +3,67 @@
 	import ScriptCard from "./ScriptCard.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { AppShell } from "@skeletonlabs/skeleton"
-	import type { CheckboxType } from "$lib/backend/types"
+	import type { CheckboxType, IScriptCard } from "$lib/backend/types"
 	import { ChevronRight } from "lucide-svelte"
 	import { page } from "$app/stores"
 	import { invalidate } from "$app/navigation"
 	import { browser } from "$app/environment"
+	import Paginator from "$lib/components/Paginator.svelte"
+	import { onMount } from "svelte"
 
 	export let data
 
-	const { checkboxes } = data
+	const { profile, checkboxes, range } = data
+
+	let count = 0
+	$: count = (data.count as number) || 0
 
 	const pageStr = $page.url.searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
-	let search: string
+	let search = decodeURI($page.url.searchParams.get("search") || "")
 	let ascending = $page.url.searchParams.get("ascending")?.toLowerCase() === "true"
+	let categories: string[] = []
+	let subcategories: string[] = []
 	let show = false
+	let loading = true
 
 	function handleFilters() {
-		let filters = checkboxes
-			.filter((checkbox: CheckboxType) => checkbox.checked)
+		categories = checkboxes
+			.filter((checkbox: CheckboxType) => checkbox.checked && checkbox.main)
+			.map((checkbox: CheckboxType) => checkbox.name)
+		subcategories = checkboxes
+			.filter((checkbox: CheckboxType) => checkbox.checked && !checkbox.main)
 			.map((checkbox: CheckboxType) => checkbox.name)
 	}
 
 	function replaceQuery(values: Record<string, string>) {
-		const currentURL = window.location.toString()
-
-		const url = new URL(currentURL)
+		if (!browser) return
 		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else url.searchParams.delete(k)
+			if (!!v && v !== "") $page.url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
+			else $page.url.searchParams.delete(k)
 		}
-		history.replaceState({}, "", url)
+
+		if (loading) return
+
+		history.replaceState({}, "", $page.url)
 		invalidate("scripts:list")
 	}
 
-	$: if (browser) replaceQuery({ page: currentPage.toString() })
-	$: if (browser) replaceQuery({ search: search })
+	function canSeeScript(script: IScriptCard) {
+		if (script.published) return true
+		if (!profile) return false
+		if (profile.profiles_protected.moderator) return true
+		return script.scripts_protected.author_id === profile.id
+	}
+
+	onMount(() => (loading = false))
+
+	$: replaceQuery({ page: currentPage.toString() })
+	$: replaceQuery({ page: "1", search: search })
+	$: replaceQuery({ page: "1", categories: categories.toString().replaceAll(",", "-") })
+	$: replaceQuery({ page: "1", subcategories: subcategories.toString().replaceAll(",", "-") })
+	$: replaceQuery({ ascending: ascending.toString() })
 </script>
 
 <svelte:head>
@@ -103,7 +127,7 @@
 		out:fade={{ duration: 300 }}
 	>
 		<div>
-			{#if data.profile && data.profile.profiles_protected.developer}
+			{#if profile && profile.profiles_protected.developer}
 				<a href="/scripts/add" class="block mx-auto w-fit">
 					<button class="btn variant-filled-secondary inline-block">Add Script</button>
 				</a>
@@ -122,7 +146,7 @@
 			>
 				{#if data.scripts}
 					{#each data.scripts as script}
-						{#if script.published || (data.profile && script.scripts_protected.author_id === data.profile.id)}
+						{#if canSeeScript(script)}
 							<ScriptCard {script} />
 						{/if}
 					{/each}
@@ -148,5 +172,6 @@
 				{/if}
 			</div>
 		</div>
+		<Paginator srcData={"tutorials:posts"} bind:currentPage {range} bind:count />
 	</main>
 </AppShell>

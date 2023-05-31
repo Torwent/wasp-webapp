@@ -52,6 +52,7 @@
 			</h5>
 			<span class="dark:text-surface-200 text-surface-600 text-xs whitespace-nowrap">
 				by {script.scripts_protected.author}
+				{#if !script.published}<small class="text-secondary-500">Hidden</small>{/if}
 			</span>
 		</header>
 		<article class="h-20 mt-4 dark:text-surface-300 text-surface-600 text-sm break-all">

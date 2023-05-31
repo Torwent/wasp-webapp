@@ -1,8 +1,9 @@
-import type { PageServerLoad } from "./$types"
+import { redirect } from "@sveltejs/kit"
+import type { PageLoad } from "./$types"
 
-export const load: PageServerLoad = async ({ url, depends, locals }) => {
+export const load: PageLoad = async ({ url, depends, parent }) => {
 	depends("tutorials:posts")
-	const { supabase } = locals
+	const { supabase } = await parent()
 
 	const pageStr = url.searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
@@ -24,7 +25,7 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
 	let posts
 
 	if (level > -1) {
-		posts = await supabase
+		posts = supabase
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
@@ -32,7 +33,7 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
 			.eq("level", level)
 			.range(start, finish)
 	} else if (search === "") {
-		posts = await supabase
+		posts = supabase
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
@@ -40,27 +41,19 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
 			.order("level", { ascending: ascending })
 			.range(start, finish)
 	} else {
-		posts = await supabase
+		posts = supabase
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
 			})
-			.textSearch("title_description_content_author", search, { type: "websearch" })
+			.textSearch("tutorials_search", search, { type: "websearch" })
 	}
 
-	const { data, count, error } = posts
+	const { data, count, error } = await posts
 
 	if (error) {
-		const response = {
-			posts: [],
-			totalEntries: 0,
-			range: range,
-			status: 500,
-			error: new Error(
-				`The server failed to fetch data from the database. This is not an issue on your side! Error message:\n\n${error.message}`
-			)
-		}
-		return response
+		console.error(error)
+		throw redirect(303, "./")
 	}
 
 	return { posts: data, count, range }

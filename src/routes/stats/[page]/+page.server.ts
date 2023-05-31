@@ -1,4 +1,3 @@
-import { SERVICE_USER, SERVICE_PASS } from "$env/static/private"
 import type { Stat } from "$lib/backend/types"
 import type { PageServerLoad } from "./$types"
 
@@ -27,27 +26,6 @@ export const load: PageServerLoad = async ({ params, url, depends, locals }) => 
 	}
 
 	const totalEntries = 10
-
-	if (locals.supabase.auth.getSession() == null) {
-		const { error } = await locals.supabase.auth.signInWithPassword({
-			email: SERVICE_USER,
-			password: SERVICE_PASS
-		})
-
-		if (error) {
-			const response = {
-				total: total,
-				stats: [],
-				totalEntries: totalEntries,
-				range: range,
-				status: 500,
-				error: new Error(
-					`The server failed to login to the database. This is not an issue on your side! Error message:\n\n${error.message}`
-				)
-			}
-			return response
-		}
-	}
 
 	let promises = []
 

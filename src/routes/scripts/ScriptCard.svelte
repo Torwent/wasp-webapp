@@ -4,7 +4,8 @@
 	import ScriptCardBase from "./ScriptCardBase.svelte"
 	export let script: IScriptCard
 
-	const link = "/scripts/" + encodeSEO(script.title + " by " + script.scripts_protected.author)
+	let link = "/scripts/" + encodeSEO(script.title + " by " + script.scripts_protected.author)
+	$: link = "/scripts/" + encodeSEO(script.title + " by " + script.scripts_protected.author)
 </script>
 
 <a href={link}>
