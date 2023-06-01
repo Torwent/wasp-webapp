@@ -4,6 +4,7 @@ import { fail, redirect } from "@sveltejs/kit"
 
 export const actions: Actions = {
 	login: async ({ locals, url }) => {
+		console.log(url)
 		const redirectURL = url.href.replace(url.search, "")
 		const provider = url.searchParams.get("provider") as Provider
 
@@ -23,6 +24,7 @@ export const actions: Actions = {
 	},
 
 	logout: async ({ locals, url }) => {
+		console.log(url)
 		const redirectURL = url.href.replace(url.search, "")
 		const { error } = await locals.supabase.auth.signOut()
 		if (error) return fail(400, { message: "Something went wrong logging you out!" })
