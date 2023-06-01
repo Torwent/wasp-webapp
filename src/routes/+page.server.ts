@@ -14,10 +14,9 @@ export const actions: Actions = {
 					scopes: "identify email guilds guilds.members.read"
 				}
 			})
-			console.log("here1")
 
 			if (err) {
-				console.error("here2: " + err)
+				console.error(err)
 				return fail(400, { message: "Something went wrong logging you in!" })
 			}
 
