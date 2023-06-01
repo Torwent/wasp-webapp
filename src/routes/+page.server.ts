@@ -15,7 +15,10 @@ export const actions: Actions = {
 				}
 			})
 
-			if (err) return fail(400, { message: "Something went wrong logging you in!" })
+			if (err) {
+				console.error(err)
+				return fail(400, { message: "Something went wrong logging you in!" })
+			}
 
 			throw redirect(303, data.url)
 		}
