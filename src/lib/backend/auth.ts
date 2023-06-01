@@ -1,74 +1,88 @@
-import type { SupabaseClient, User } from "@supabase/supabase-js"
+import type { RealtimeChannel, Session, SupabaseClient, User } from "@supabase/supabase-js"
 
 import { get, writable } from "svelte/store"
+import type { Profile } from "./types"
 
 export const supabaseStore: any = writable(false)
-export const userFast: any = writable(false)
-export const userSlow: any = writable(false)
+export const session: any = writable(false)
+export const user: any = writable(false)
+export const profile: any = writable(false)
+let realtimeProfile: RealtimeChannel | false = false
 
-/* 
-Functions named with "Fast":
-- Gets the user from the current local session. Good for quick operations that don't require unauthorized access.
-Functions named with "Slow":
-- Gets the user id from the database. Must be used in things that the user might not be authorized to do.
- */
-
-async function getUserFast() {
-	const tmp = get(userFast)
-	if (tmp) return tmp as User
-	const supabase = get(supabaseStore) as SupabaseClient
-	const {
-		data: { session }
-	} = await supabase.auth.getSession()
-
-	const user = session?.user
-	const result = user != null ? user : false
-	userFast.set(result)
-	return result
+export async function getSession() {
+	const tmp = get(session) as Session | false
+	return tmp
 }
 
-async function getUserSlow() {
-	const supabase = get(supabaseStore) as SupabaseClient
-	const {
-		data: { user }
-	} = await supabase.auth.getUser()
-
-	const result = user != null ? user : false
-	userFast.set(result)
-	userSlow.set(result)
-	return result
+async function getUser() {
+	const tmp = get(user) as User | false
+	return tmp
 }
 
-export async function getUserID(fast: boolean = true) {
-	const user = fast ? await getUserFast() : await getUserSlow()
-
+export async function getUserID() {
+	const user = await getUser()
 	return user ? user.id : false
 }
 
-export async function login(redirect: string) {
-	const supabase = get(supabaseStore) as SupabaseClient
-	const { error } = await supabase.auth.signInWithOAuth({
-		provider: "discord",
-		options: {
-			redirectTo: redirect,
-			scopes: "identify email guilds guilds.members.read"
-		}
-	})
-
-	if (error) console.error(error)
+export async function disableProfile() {
+	profile.set(false)
+	if (realtimeProfile) realtimeProfile.unsubscribe()
+	realtimeProfile = false
 }
 
-export async function logout() {
+export async function getProfile(): Promise<Profile | false> {
+	const tmp = get(profile)
+	if (tmp) return tmp as Profile
 	const supabase = get(supabaseStore) as SupabaseClient
-	const { error } = await supabase.auth.signOut()
-	if (error) console.error(error)
-}
+	const id = await getUserID()
 
-export async function getSession() {
-	const supabase = get(supabaseStore) as SupabaseClient
-	const {
-		data: { session }
-	} = await supabase.auth.getSession()
+	if (!id) {
+		await disableProfile()
+		return false
+	}
 
-	return session
+	const { data, error } = await supabase
+		.from("profiles_public")
+		.select(
+			`id, discord_id, username, avatar_url,
+      		profiles_protected (developer, premium, vip, tester, moderator, administrator),
+			profiles_private (dismissed_warning)`
+		)
+		.eq("id", id)
+
+	if (error) {
+		console.error(error)
+		await disableProfile()
+		return false
+	}
+
+	const result = data[0] as Profile
+
+	profile.set(result)
+
+	if (realtimeProfile) realtimeProfile.unsubscribe()
+	realtimeProfile = realtimeProfile = supabase
+		.channel("any")
+		.on(
+			"postgres_changes",
+			{
+				event: "UPDATE",
+				schema: "public",
+				table: "profiles_protected",
+				filter: `id=eq.${id}`
+			},
+			(payload) => {
+				let tmp = get(profile) as Profile
+				tmp.profiles_protected.developer = payload.new.developer
+				tmp.profiles_protected.premium = payload.new.premium
+				tmp.profiles_protected.vip = payload.new.vip
+				tmp.profiles_protected.tester = payload.new.tester
+				tmp.profiles_protected.moderator = payload.new.moderator
+				tmp.profiles_protected.administrator = payload.new.administrator
+				profile.set(tmp)
+			}
+		)
+		.subscribe()
+
+	return result
 }

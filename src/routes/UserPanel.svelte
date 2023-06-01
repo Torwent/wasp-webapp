@@ -1,7 +1,5 @@
 <script lang="ts">
-	import { login, logout } from "$lib/backend/auth"
 	import { Avatar, popup, type PopupSettings } from "@skeletonlabs/skeleton"
-	import { onMount } from "svelte"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
 	import { browser } from "$app/environment"
 	import { randomString } from "$lib/utils"
@@ -15,11 +13,6 @@
 		target: "userPanelPopup",
 		placement: "bottom-end"
 	}
-
-	let redirect = "/"
-	onMount(() => {
-		redirect = location.origin + (location.pathname !== "/" ? location.pathname + "/" : "")
-	})
 </script>
 
 {#if large && profile}
@@ -44,7 +37,7 @@
 	<span class="mx-4">{profile.username}</span>
 {/if}
 
-<div class="card variant-filled-surface p-4" data-popup="userPanelPopup">
+<form method="POST" class="card variant-filled-surface p-4" data-popup="userPanelPopup">
 	<div class="arrow variant-filled-surface" />
 	{#if profile}
 		<header class="card-header flex">
@@ -64,15 +57,15 @@
 			</div>
 		</section>
 		<footer class="card-footer flex">
-			<button class="btn variant-filled-secondary mx-auto" on:click={logout}>Logout</button>
+			<button class="btn variant-filled-secondary mx-auto" formaction="/?/logout">Logout</button>
 		</footer>
 	{:else}
 		<header class="card-header">
 			<h3 class="text-2x1 font-bold text-center md:text-3x1">Log In</h3>
 		</header>
 
-		<section class="p-4">
-			<button class="btn variant-filled-secondary" on:click={() => login(redirect)}>
+		<f class="p-4">
+			<button class="btn variant-filled-secondary" formaction="/?/login&provider=discord">
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-4 h-4">
 					<path
 						fill="currentColor"
@@ -82,6 +75,6 @@
 
 				<span class="px-2">Login with Discord</span>
 			</button>
-		</section>
+		</f>
 	{/if}
-</div>
+</form>

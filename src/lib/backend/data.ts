@@ -1,8 +1,7 @@
 import { get, writable } from "svelte/store"
 import { encodeSEO } from "$lib/utils"
-import type { RealtimeChannel, SupabaseClient } from "@supabase/supabase-js"
+import type { SupabaseClient } from "@supabase/supabase-js"
 import type {
-	Profile,
 	Category,
 	SubCategory,
 	EmojiTooltip,
@@ -12,77 +11,14 @@ import type {
 	IScriptCard,
 	CheckboxType
 } from "./types"
-import { getUserID, supabaseStore } from "./auth"
+import { getProfile, getUserID, profile, supabaseStore } from "./auth"
 
-const profile: any = writable(false)
 const categories: any = writable(false)
 const subCategories: any = writable(false)
 const checkboxes: any = writable(false)
 const scripts: any = writable(false)
 const posts: any = writable(false)
 const developers: any = writable(false)
-
-let realtimeProfile: RealtimeChannel | false = false
-
-export async function getProfile(): Promise<Profile | false> {
-	const tmp = get(profile)
-	if (tmp) return tmp as Profile
-	const supabase = get(supabaseStore) as SupabaseClient
-	const id = await getUserID(true)
-
-	if (!id) {
-		profile.set(false)
-		if (realtimeProfile) realtimeProfile.unsubscribe()
-		realtimeProfile = false
-		return false
-	}
-
-	const { data, error } = await supabase
-		.from("profiles_public")
-		.select(
-			`id, discord_id, username, avatar_url,
-      		profiles_protected (developer, premium, vip, tester, moderator, administrator),
-			profiles_private (dismissed_warning)`
-		)
-		.eq("id", id)
-
-	if (error) {
-		console.error(error)
-		profile.set(false)
-		if (realtimeProfile) realtimeProfile.unsubscribe()
-		realtimeProfile = false
-		return false
-	}
-
-	const result = data[0] as Profile
-
-	profile.set(result)
-
-	realtimeProfile = supabase
-		.channel("any")
-		.on(
-			"postgres_changes",
-			{
-				event: "UPDATE",
-				schema: "public",
-				table: "profiles_protected",
-				filter: `id=eq.${profile.id}`
-			},
-			(payload) => {
-				let tmp = get(profile) as Profile
-				tmp.profiles_protected.premium = payload.new.premium
-				tmp.profiles_protected.vip = payload.new.vip
-				tmp.profiles_protected.moderator = payload.new.moderator
-				tmp.profiles_protected.tester = payload.new.tester
-				tmp.profiles_protected.developer = payload.new.developer
-
-				profile.set(tmp)
-			}
-		)
-		.subscribe()
-
-	return result
-}
 
 export async function updateUsername(id: string, username: string) {
 	const supabase = get(supabaseStore) as SupabaseClient
@@ -91,7 +27,7 @@ export async function updateUsername(id: string, username: string) {
 
 export async function updateWarning() {
 	const supabase = get(supabaseStore) as SupabaseClient
-	const id = getUserID(false)
+	const id = getUserID()
 	const { error } = await supabase
 		.from("profiles_private")
 		.update({ dismissed_warning: true })
@@ -334,7 +270,8 @@ export async function canEdit(author: string) {
 	const tmp = await getProfile()
 	if (!tmp) return false
 
-	return (
-		tmp.id === author || tmp.profiles_protected.moderator || tmp.profiles_protected.administrator
-	)
+	if (tmp.profiles_protected.moderator) return true
+	if (tmp.profiles_protected.administrator) return true
+
+	return tmp.id === author
 }

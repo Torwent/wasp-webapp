@@ -22,12 +22,9 @@
 	import UserPanel from "./UserPanel.svelte"
 	import Footer from "./Footer.svelte"
 	import { browser } from "$app/environment"
-
 	import { invalidate } from "$app/navigation"
 	import { onMount } from "svelte"
 	import type { LayoutData } from "./$types"
-	import { userFast, userSlow } from "$lib/backend/auth"
-	import { getProfile } from "$lib/backend/data"
 	export let data: LayoutData
 
 	$: ({ supabase, session } = data)
@@ -41,37 +38,7 @@
 			}
 		})
 
-		const {
-			data: { subscription: userStore }
-		} = supabase.auth.onAuthStateChange(async (_event, _session) => {
-			const user = _session?.user
-
-			if (user != null) {
-				userFast.set(user)
-				userSlow.set(user)
-				return
-			}
-
-			userFast.set(false)
-			userSlow.set(false)
-		})
-
-		const {
-			data: { subscription: profileStore }
-		} = supabase.auth.onAuthStateChange(async (_event, _session) => {
-			const user = _session?.user
-
-			if (user != null) {
-				getProfile()
-				return
-			}
-		})
-
-		return () => {
-			subscription.unsubscribe()
-			userStore.unsubscribe()
-			profileStore.unsubscribe()
-		}
+		return () => subscription.unsubscribe()
 	})
 </script>
 
