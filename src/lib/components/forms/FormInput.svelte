@@ -3,8 +3,8 @@
 	export let extraTitle: string = ""
 	export let value: string | number
 	export let error: string[] | undefined
-
 	export let type: string = "text"
+
 	function typeAction(e: HTMLInputElement) {
 		e.type = type
 	}
@@ -18,7 +18,7 @@
 		name={title.toLowerCase()}
 		class="input h-10"
 		class:input-error={error}
-		{value}
+		bind:value
 	/>
 	{#if error}
 		<small class="text-error-500">{error}</small>

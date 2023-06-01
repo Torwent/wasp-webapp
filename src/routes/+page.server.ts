@@ -3,11 +3,11 @@ import type { Actions } from "./$types"
 import { fail, redirect } from "@sveltejs/kit"
 
 export const actions: Actions = {
-	login: async ({ locals, url }) => {
+	login: async ({ locals: { supabase }, url }) => {
 		const provider = url.searchParams.get("provider") as Provider
 
 		if (provider) {
-			const { data, error: err } = await locals.supabase.auth.signInWithOAuth({
+			const { data, error: err } = await supabase.auth.signInWithOAuth({
 				provider: provider,
 				options: {
 					redirectTo: url.origin,
@@ -24,8 +24,9 @@ export const actions: Actions = {
 		}
 	},
 
-	logout: async ({ locals }) => {
-		const { error } = await locals.supabase.auth.signOut()
+	logout: async ({ locals: { supabase } }) => {
+		const { error } = await supabase.auth.signOut()
 		if (error) return fail(400, { message: "Something went wrong logging you out!" })
+		throw redirect(303, "/")
 	}
 }

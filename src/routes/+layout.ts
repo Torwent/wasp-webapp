@@ -20,15 +20,15 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	const {
 		data: { session: currentSession }
 	} = await supabase.auth.getSession()
-
+	data.session = currentSession
 	session.set(currentSession ? currentSession : false)
 
 	user.set(false)
 	if (currentSession) user.set(currentSession.user)
 
-	const profile = await getProfile()
+	data.profile = await getProfile()
 
-	async function checkProfileUpdates(profile: Profile | false) {
+	async function checkProfileUpdates(profile: Profile | null) {
 		if (profile) {
 			await fetch(API_URL + "/discord/refresh/" + profile.discord_id, { method: "GET" }).catch(
 				(error) => console.error(error)
@@ -37,7 +37,7 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 		}
 	}
 
-	checkProfileUpdates(profile)
+	checkProfileUpdates(data.profile)
 
-	return { supabase, session: currentSession, profile }
+	return { supabase, session: currentSession, profile: data.profile }
 }

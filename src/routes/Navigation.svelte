@@ -5,7 +5,7 @@
 	import UserPanel from "./UserPanel.svelte"
 	import type { Profile } from "$lib/backend/types"
 
-	export let profile: Profile | false
+	export let profile: Profile | null
 	export let large: boolean
 
 	const routeArray = ["Home", "Setup", "Scripts", "Stats", "Premium", "FAQ", "Tutorials"]

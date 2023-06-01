@@ -30,15 +30,16 @@ export async function disableProfile() {
 	realtimeProfile = false
 }
 
-export async function getProfile(): Promise<Profile | false> {
-	const tmp = get(profile)
-	if (tmp) return tmp as Profile
-	const supabase = get(supabaseStore) as SupabaseClient
+export async function getProfile(): Promise<Profile | null> {
+	const tmp = get(profile) as Profile | null
 	const id = await getUserID()
+	if (tmp && tmp.id === id) return tmp
+
+	const supabase = get(supabaseStore) as SupabaseClient
 
 	if (!id) {
 		await disableProfile()
-		return false
+		return null
 	}
 
 	const { data, error } = await supabase
@@ -53,7 +54,7 @@ export async function getProfile(): Promise<Profile | false> {
 	if (error) {
 		console.error(error)
 		await disableProfile()
-		return false
+		return null
 	}
 
 	const result = data[0] as Profile

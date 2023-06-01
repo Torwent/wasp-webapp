@@ -27,7 +27,7 @@
 	import type { LayoutData } from "./$types"
 	export let data: LayoutData
 
-	$: ({ supabase, session } = data)
+	$: ({ supabase, session, profile } = data)
 
 	onMount(() => {
 		const {
@@ -56,17 +56,17 @@
 				<AppBar class="max-w-7xl mx-auto" background="bg-transparent">
 					<svelte:fragment slot="lead">
 						{#if matches}
-							<Navigation bind:profile={data.profile} large={true} />
+							<Navigation bind:profile large={true} />
 						{:else}
 							<div />
 						{/if}
 					</svelte:fragment>
 					{#if !matches}
-						<Navigation bind:profile={data.profile} large={false} />
+						<Navigation bind:profile large={false} />
 					{/if}
 					<svelte:fragment slot="trail">
 						{#if matches}
-							<UserPanel bind:profile={data.profile} large={true} />
+							<UserPanel bind:profile large={true} />
 							<LightSwitch class="hidden md:block" />
 						{:else}
 							<div />

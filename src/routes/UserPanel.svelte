@@ -5,7 +5,7 @@
 	import { randomString } from "$lib/utils"
 	import type { Profile } from "$lib/backend/types"
 
-	export let profile: Profile | false
+	export let profile: Profile | null
 	export let large: boolean
 
 	let popupSettings: PopupSettings = {
