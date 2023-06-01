@@ -1,18 +1,12 @@
-import type { RealtimeChannel, Session, SupabaseClient, User } from "@supabase/supabase-js"
+import type { RealtimeChannel, SupabaseClient, User } from "@supabase/supabase-js"
 
 import { get, writable } from "svelte/store"
 import type { Profile } from "./types"
 
-export const supabaseStore: any = writable(false)
-export const session: any = writable(false)
-export const user: any = writable(false)
-export const profile: any = writable(false)
-let realtimeProfile: RealtimeChannel | false = false
-
-export async function getSession() {
-	const tmp = get(session) as Session | false
-	return tmp
-}
+export const supabaseStore: any = writable(null)
+export const user: any = writable(null)
+export const profile: any = writable(null)
+let realtimeProfile: RealtimeChannel | null = null
 
 async function getUser() {
 	const tmp = get(user) as User | false
@@ -27,7 +21,7 @@ export async function getUserID() {
 export async function disableProfile() {
 	profile.set(false)
 	if (realtimeProfile) realtimeProfile.unsubscribe()
-	realtimeProfile = false
+	realtimeProfile = null
 }
 
 export async function getProfile(): Promise<Profile | null> {

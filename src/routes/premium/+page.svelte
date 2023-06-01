@@ -41,8 +41,7 @@
 		<p class="py-2">
 			This means that if you had your permanent premium for 1 year and 8 months and it gets
 			terminated you will not get any refund.
-		</p>`,
-		response: (r: boolean) => console.log("response:", r)
+		</p>`
 	}
 
 	function handleClick() {
@@ -83,7 +82,7 @@
 	{/if}
 	<p class="py-4">
 		The shop is handled by <a href="https://upgrade.chat/waspscripts">upgrade.chat</a>
-		 for now.
+		for now.
 	</p>
 
 	<a href="https://upgrade.chat/waspscripts">
@@ -128,6 +127,6 @@
 		>
 			terms and condictions
 		</button>
-		 before making any purchase.
+		before making any purchase.
 	</h4>
 </div>

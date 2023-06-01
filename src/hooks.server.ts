@@ -20,14 +20,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return session
 	}
 
-	event.locals.setSession = async (access_token: string, refresh_token: string) => {
-		await event.locals.supabase.auth.setSession({
-			access_token: access_token,
-			refresh_token: refresh_token
-		})
-		return
-	}
-
 	event.locals.getProfile = async () => {
 		const session = await event.locals.getSession()
 		if (!session) return null

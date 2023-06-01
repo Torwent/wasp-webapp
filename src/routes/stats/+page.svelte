@@ -119,7 +119,7 @@
 								{header}
 								{#if header === "levels"}
 									<a
-										href="/blog/WaspStats%20virtual%20levels"
+										href="/tutorials/waspstats-virtual-levels-by-torwent"
 										class="text-stone-700 dark:text-stone-400 hover:text-primary-400"
 									>
 										*

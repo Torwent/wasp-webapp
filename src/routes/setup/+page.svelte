@@ -9,7 +9,7 @@
 	interface OSInfo {
 		OS: string
 		Extension: string
-		BlogID: string
+		tutorialID: string
 	}
 
 	let currentOS: OSInfo
@@ -18,33 +18,37 @@
 	function getOS(userAgent: string) {
 		userAgent = userAgent.toLowerCase()
 		if (userAgent.includes("win")) {
-			currentOS = { OS: "Windows", Extension: "exe", BlogID: "Setup%20(Windows)" }
-			secondaryOS = { OS: "Linux", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
+			currentOS = { OS: "Windows", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
+			secondaryOS = { OS: "Linux", Extension: "sh", tutorialID: "linux-setup-debian-by-torwent" }
 			return
 		}
 
 		if (userAgent.includes("linux")) {
 			if (userAgent.includes("debian")) {
-				currentOS = { OS: "Debian Linux", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
-				secondaryOS = { OS: "Windows", Extension: "exe", BlogID: "Setup%20(Windows)" }
+				currentOS = {
+					OS: "Debian Linux",
+					Extension: "sh",
+					tutorialID: "linux-setup-debian-by-torwent"
+				}
+				secondaryOS = { OS: "Windows", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
 				return
 			}
 
 			if (userAgent.includes("ubuntu")) {
-				currentOS = { OS: "Ubuntu", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
-				secondaryOS = { OS: "Windows", Extension: "exe", BlogID: "Setup%20(Windows)" }
+				currentOS = { OS: "Ubuntu", Extension: "sh", tutorialID: "linux-setup-debian-by-torwent" }
+				secondaryOS = { OS: "Windows", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
 				return
 			}
 
-			currentOS = { OS: "Linux", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
-			secondaryOS = { OS: "Windows", Extension: "exe", BlogID: "Setup%20(Windows)" }
+			currentOS = { OS: "Linux", Extension: "sh", tutorialID: "linux-setup-debian-by-torwent" }
+			secondaryOS = { OS: "Windows", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
 			return
 		}
 
 		if (userAgent.includes("mac")) {
 			hasMac = true
-			currentOS = { OS: "MacOS", Extension: "exe", BlogID: "Setup%20(Windows)" }
-			secondaryOS = { OS: "Linux", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
+			currentOS = { OS: "MacOS", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
+			secondaryOS = { OS: "Linux", Extension: "sh", tutorialID: "linux-setup-debian-by-torwent" }
 			return
 		}
 	}
@@ -88,7 +92,7 @@
 					<p class="text-center pb-24">
 						For a manual instalation guide for {currentOS.OS} you can go
 						<a
-							href="/blog/{currentOS.BlogID}"
+							href="/tutorials/{currentOS.tutorialID}"
 							class="font-semibold text-primary-500 dark:text-primary-200 hover:underline"
 						>
 							here
@@ -117,7 +121,7 @@
 				<p class="text-center">
 					For a manual instalation guide for {currentOS.OS} you can go
 					<a
-						href="/blog/{currentOS.BlogID}"
+						href="/tutorials/{currentOS.tutorialID}"
 						class="font-semibold hover:underline text-primary-400 dark:text-primary-100"
 					>
 						here
@@ -137,7 +141,7 @@
 			<p class="text-center">
 				For a manual instalation guide for {secondaryOS.OS} you can go
 				<a
-					href="/blog/{secondaryOS.BlogID}"
+					href="/tutorials/{secondaryOS.tutorialID}"
 					class="font-semibold hover:underline text-primary-400 dark:text-primary-100"
 				>
 					here

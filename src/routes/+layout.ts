@@ -3,7 +3,7 @@ import type { LayoutLoad } from "./$types"
 import { API_URL } from "$lib/utils"
 import type { Profile } from "$lib/backend/types"
 import { createSupabaseLoadClient } from "@supabase/auth-helpers-sveltekit"
-import { session, supabaseStore, user, getProfile } from "$lib/backend/auth"
+import { supabaseStore, user, getProfile } from "$lib/backend/auth"
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	depends("supabase:auth")
@@ -20,8 +20,6 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	const {
 		data: { session: currentSession }
 	} = await supabase.auth.getSession()
-	data.session = currentSession
-	session.set(currentSession ? currentSession : false)
 
 	user.set(false)
 	if (currentSession) user.set(currentSession.user)

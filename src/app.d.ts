@@ -7,7 +7,6 @@ declare global {
 			warningDismissed: boolean
 			supabase: SupabaseClient
 			getSession(): Promise<Session | null>
-			setSession(access_token: string, refresh_token: string): Promise<void>
 			getProfile(): Promise<Profile | null>
 		}
 		interface PageData {

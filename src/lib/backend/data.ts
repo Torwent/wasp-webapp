@@ -27,7 +27,9 @@ export async function updateUsername(id: string, username: string) {
 
 export async function updateWarning() {
 	const supabase = get(supabaseStore) as SupabaseClient
-	const id = getUserID()
+	const id = await getUserID()
+	if (!id) return false
+
 	const { error } = await supabase
 		.from("profiles_private")
 		.update({ dismissed_warning: true })
