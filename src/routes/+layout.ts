@@ -8,6 +8,8 @@ import { supabaseStore, user, getProfile } from "$lib/backend/auth"
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	depends("supabase:auth")
 
+	console.log("server session: ", data.session?.user.id)
+
 	const supabase = createSupabaseLoadClient({
 		supabaseUrl: PUBLIC_SUPABASE_URL,
 		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
@@ -20,6 +22,9 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	const {
 		data: { session }
 	} = await supabase.auth.getSession()
+
+	console.log("client session: ", session?.user.id)
+	console.log("server session2: ", data.session?.user.id)
 
 	user.set(false)
 	if (session) user.set(session.user)
