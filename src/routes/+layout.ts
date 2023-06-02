@@ -3,7 +3,7 @@ import type { LayoutLoad } from "./$types"
 import { API_URL } from "$lib/utils"
 import type { Profile } from "$lib/backend/types"
 import { createSupabaseLoadClient } from "@supabase/auth-helpers-sveltekit"
-import { supabaseStore, user } from "$lib/backend/auth"
+import { supabaseStore, user, getProfile } from "$lib/backend/auth"
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	depends("supabase:auth")
@@ -17,19 +17,25 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 	supabaseStore.set(supabase)
 
-	user.set(false)
-	if (data.session) user.set(data.session.user)
+	const {
+		data: { session }
+	} = await supabase.auth.getSession()
 
-	async function checkProfileUpdates(profile: Profile | null) {
-		if (profile) {
-			await fetch(API_URL + "/discord/refresh/" + profile.discord_id, { method: "GET" }).catch(
-				(error) => console.error(error)
-			)
+	user.set(false)
+	if (session) user.set(session.user)
+
+	const profile = await getProfile()
+
+	async function checkProfileUpdates(currentProfile: Profile | null) {
+		if (currentProfile) {
+			await fetch(API_URL + "/discord/refresh/" + currentProfile.discord_id, {
+				method: "GET"
+			}).catch((error) => console.error(error))
 			setTimeout(checkProfileUpdates, 3000)
 		}
 	}
 
-	checkProfileUpdates(data.profile)
+	checkProfileUpdates(profile)
 
-	return { supabase, session: data.session, profile: data.profile }
+	return { supabase, session, profile }
 }

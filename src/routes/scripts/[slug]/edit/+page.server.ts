@@ -39,7 +39,7 @@ export const actions = {
 		const form = await superValidate(formData, scriptSchema)
 
 		if (!profile) {
-			const msg = "You need to login to add a script."
+			const msg = "You need to login to edit a script."
 			console.error(msg)
 			return setError(form, null, msg)
 		}

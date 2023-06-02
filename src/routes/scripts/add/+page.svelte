@@ -325,32 +325,78 @@
 				<div class="flex flex-col text-sm mt-8 mb-2">
 					<h5 class="text-center">Stats limits (every 5 minutes)</h5>
 					<div class="grid grid-cols-2 gap-8">
-						<FormInput
-							title="Minimum Experience"
-							bind:value={$form.min_xp}
-							bind:error={$errors.min_xp}
-							type={"number"}
-						/>
-						<FormInput
-							title="Maximum Experience"
-							bind:value={$form.max_xp}
-							bind:error={$errors.max_xp}
-							type={"number"}
-						/>
+						<label for="min_xp" class="label my-2">
+							<span>Minimum Experience:</span>
+							<input
+								type="number"
+								id="min_xp"
+								name="min_xp"
+								class="input h-10"
+								class:input-error={$errors.min_xp}
+								bind:value={$form.min_xp}
+							/>
+
+							{#if $errors.min_xp}
+								<small class="text-error-500">{$errors.min_xp}</small>
+							{:else}
+								<div class="m-0 h-5" />
+							{/if}
+						</label>
+
+						<label for="max_xp" class="label my-2">
+							<span>Maximum Experience:</span>
+							<input
+								type="number"
+								id="max_xp"
+								name="max_xp"
+								class="input h-10"
+								class:input-error={$errors.max_xp}
+								bind:value={$form.max_xp}
+							/>
+
+							{#if $errors.min_xp}
+								<small class="text-error-500">{$errors.min_xp}</small>
+							{:else}
+								<div class="m-0 h-5" />
+							{/if}
+						</label>
 					</div>
 					<div class="grid grid-cols-2 gap-8">
-						<FormInput
-							title="Minimum Gold"
-							bind:value={$form.min_gp}
-							bind:error={$errors.min_gp}
-							type={"number"}
-						/>
-						<FormInput
-							title="Maximum Gold"
-							bind:value={$form.max_gp}
-							bind:error={$errors.max_gp}
-							type={"number"}
-						/>
+						<label for="min_gp" class="label my-2">
+							<span>Minimum Gold:</span>
+							<input
+								type="number"
+								id="min_gp"
+								name="min_gp"
+								class="input h-10"
+								class:input-error={$errors.min_gp}
+								bind:value={$form.min_gp}
+							/>
+
+							{#if $errors.min_gp}
+								<small class="text-error-500">{$errors.min_gp}</small>
+							{:else}
+								<div class="m-0 h-5" />
+							{/if}
+						</label>
+
+						<label for="max_gp" class="label my-2">
+							<span>Maximum Gold:</span>
+							<input
+								type="number"
+								id="max_gp"
+								name="max_gp"
+								class="input h-10"
+								class:input-error={$errors.max_gp}
+								bind:value={$form.max_gp}
+							/>
+
+							{#if $errors.max_gp}
+								<small class="text-error-500">{$errors.max_gp}</small>
+							{:else}
+								<div class="m-0 h-5" />
+							{/if}
+						</label>
 					</div>
 				</div>
 
