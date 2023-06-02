@@ -11,6 +11,7 @@ declare global {
 		}
 		interface PageData {
 			session: Session | null
+			profile: Profile | null
 		}
 		// interface Error {}
 		// interface Platform {}
