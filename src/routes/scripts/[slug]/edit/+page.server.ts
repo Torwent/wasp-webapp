@@ -11,16 +11,26 @@ export const load: PageServerLoad = async (event) => {
 	return { form }
 }
 
+interface FormFiles {
+	cover?: File
+	banner?: File
+	script?: File
+}
+
 export const actions = {
 	default: async ({ request, locals }) => {
 		const profile = await locals.getProfile()
 		const formData = await request.formData()
 
-		const files = {
-			cover: formData.get("cover"),
-			banner: formData.get("banner"),
-			script: formData.get("script")
-		}
+		let files: FormFiles = { cover: undefined, banner: undefined, script: undefined }
+
+		const coverFile = formData.get("cover") as File
+		const bannerFile = formData.get("banner") as File
+		const scriptFile = formData.get("script") as File
+
+		if (coverFile.size > 0) files.cover = coverFile
+		if (bannerFile.size > 0) files.banner = bannerFile
+		if (scriptFile.size > 0) files.script = scriptFile
 
 		formData.delete("cover")
 		formData.delete("banner")
@@ -36,7 +46,7 @@ export const actions = {
 
 		if (!form.valid) return fail(400, { form })
 
-		const script = await getScriptUUID(form.data.id)
+		let script = await getScriptUUID(form.data.id)
 		if (!script) {
 			const msg = "That script does not exist!"
 			console.error(msg)
@@ -48,6 +58,16 @@ export const actions = {
 			console.error(msg)
 			return setError(form, null, msg)
 		}
+
+		script.title = form.data.title
+		script.description = form.data.description
+		script.content = form.data.content
+		script.categories = form.data.categories
+		script.subcategories = form.data.subcategories
+		script.min_xp = form.data.min_xp
+		script.max_xp = form.data.max_xp
+		script.min_gp = form.data.min_gp
+		script.max_gp = form.data.max_gp
 
 		let validFiles
 		try {

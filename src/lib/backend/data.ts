@@ -16,9 +16,6 @@ import { getProfile, getUserID, profile, supabaseStore } from "./auth"
 const categories: any = writable(false)
 const subCategories: any = writable(false)
 const checkboxes: any = writable(false)
-const scripts: any = writable(false)
-const posts: any = writable(false)
-const developers: any = writable(false)
 
 export async function updateUsername(id: string, username: string) {
 	const supabase = get(supabaseStore) as SupabaseClient
@@ -139,12 +136,9 @@ export async function addToolTips(script: IScriptCard) {
 	script.emojiTooltips = await getToolTips(script.categories, script.subcategories)
 }
 
-export async function getScripts() {
-	const tmp = get(scripts)
-	if (tmp) return tmp as Script[]
+export async function getScripts(): Promise<Script[] | null> {
 	const supabase = get(supabaseStore) as SupabaseClient
-
-	if (!supabase) return false
+	if (!supabase) return null
 
 	const { data, error } = await supabase
 		.from("scripts_public")
@@ -157,8 +151,7 @@ export async function getScripts() {
 
 	if (error) {
 		console.error(error)
-		scripts.set(false)
-		return false
+		return null
 	}
 
 	let scriptsData = data as Script[]
@@ -166,94 +159,73 @@ export async function getScripts() {
 	await new Promise<void>((resolve) => {
 		scriptsData.forEach(async (script, index, array) => {
 			await addToolTips(script)
-
 			if (index === array.length - 1) resolve()
 		})
 	})
 
-	scripts.set(scriptsData)
 	return scriptsData
 }
 
 export async function getScript(path: string) {
 	const scripts = await getScripts()
-	if (!scripts) return false
+	if (!scripts) return null
 
 	for (let i = 0; i < scripts.length; i++) {
 		if (path === encodeSEO(scripts[i].title + " by " + scripts[i].scripts_protected.author))
 			return scripts[i]
 	}
-	return false
+	return null
 }
 
 export async function getScriptUUID(uuid: string | undefined) {
-	if (!uuid) return false
+	if (!uuid) return null
 	const scripts = await getScripts()
-	if (!scripts) return false
+	if (!scripts) return null
 	for (let i = 0; i < scripts.length; i++) if (uuid === scripts[i].id) return scripts[i]
-	return false
+	return null
 }
 
-export async function getPosts() {
-	const tmp = get(posts)
-	if (tmp) return tmp as Post[]
+export async function getPosts(): Promise<Post[] | null> {
 	const supabase = get(supabaseStore) as SupabaseClient
 	const { data, error } = await supabase
 		.from("tutorials")
 		.select("id, created_at, user_id, author, title, description, content, level")
 		.order("title", { ascending: true })
 
-	if (error) {
-		console.error(error)
-		posts.set(false)
-		return false
-	}
+	if (error) console.error(error)
 
-	let postsData = data as Post[]
-
-	posts.set(postsData)
-	return postsData
+	return data
 }
 
-export async function getPost(path: string) {
-	const tmp = await getPosts()
-	if (!tmp) return false
+export async function getPost(path: string): Promise<Post | null> {
+	const posts = await getPosts()
+	if (!posts) return null
 
-	for (let i = 0; i < tmp.length; i++) {
-		if (path === encodeSEO(tmp[i].title + " by " + tmp[i].author)) return tmp[i]
+	for (let i = 0; i < posts.length; i++) {
+		if (path === encodeSEO(posts[i].title + " by " + posts[i].author)) return posts[i]
 	}
-	return false
+	return null
 }
 
-export async function getDevelopers() {
-	const tmp = get(developers)
-	if (tmp) return tmp as Developer[]
+export async function getDevelopers(): Promise<Developer[] | null> {
 	const supabase = get(supabaseStore) as SupabaseClient
 	const { data, error } = await supabase
 		.from("devs")
 		.select("id, realname, username, description, github, paypal_id, content")
 		.order("username", { ascending: true })
 
-	if (error) {
-		console.error(error)
-		developers.set(false)
-		return false
-	}
-
-	let devsData = data as Developer[]
-
-	developers.set(devsData)
-	return devsData
+	if (error) console.error(error)
+	return data
 }
 
-export async function getDeveloper(path: string) {
-	const tmp = await getDevelopers()
-	if (!tmp) return false
+export async function getDeveloper(path: string): Promise<Developer | null> {
+	const developers = await getDevelopers()
+	if (!developers) return null
 
-	for (let i = 0; i < tmp.length; i++) {
-		if (path === encodeSEO(tmp[i].username)) return tmp[i]
+	for (let i = 0; i < developers.length; i++) {
+		if (path === encodeSEO(developers[i].username)) return developers[i]
 	}
-	return false
+	return null
 }
 
 export async function getSignedURL(bucket: string, path: string, file: string) {

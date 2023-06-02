@@ -3,7 +3,7 @@ import type { LayoutLoad } from "./$types"
 import { API_URL } from "$lib/utils"
 import type { Profile } from "$lib/backend/types"
 import { createSupabaseLoadClient } from "@supabase/auth-helpers-sveltekit"
-import { supabaseStore, user, getProfile } from "$lib/backend/auth"
+import { supabaseStore, user } from "$lib/backend/auth"
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	depends("supabase:auth")
@@ -17,14 +17,8 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 	supabaseStore.set(supabase)
 
-	const {
-		data: { session: currentSession }
-	} = await supabase.auth.getSession()
-
 	user.set(false)
-	if (currentSession) user.set(currentSession.user)
-
-	data.profile = await getProfile()
+	if (data.session) user.set(data.session.user)
 
 	async function checkProfileUpdates(profile: Profile | null) {
 		if (profile) {
@@ -37,5 +31,5 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 	checkProfileUpdates(data.profile)
 
-	return { supabase, session: currentSession, profile: data.profile }
+	return { supabase, session: data.session, profile: data.profile }
 }

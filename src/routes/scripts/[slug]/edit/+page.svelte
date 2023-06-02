@@ -237,6 +237,8 @@
 				<h3>Update Script</h3>
 			</header>
 			<form method="POST" enctype="multipart/form-data" use:focusTrap={isFocused} use:enhance>
+				<input type="text" id="id" name="id" class="hidden" bind:value={$form.id} />
+
 				<label for="cover" class="my-4">
 					<span>Cover:</span>
 					<FileDropzone
