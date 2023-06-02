@@ -1,8 +1,9 @@
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
+import { createSupabaseLoadClient } from "@supabase/auth-helpers-sveltekit"
 import type { LayoutLoad } from "./$types"
 import { API_URL } from "$lib/utils"
 import type { Profile } from "$lib/backend/types"
-import { createSupabaseLoadClient } from "@supabase/auth-helpers-sveltekit"
+
 import { supabaseStore, user, getProfile } from "$lib/backend/auth"
 
 export const load: LayoutLoad = async ({ fetch, data, depends }) => {
@@ -23,8 +24,6 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 	} = await supabase.auth.getSession()
 
 	if (error) console.error("error: ", error)
-	console.log("client session: ", session)
-	console.log("server session: ", data.session)
 
 	user.set(false)
 	if (session) user.set(session.user)
