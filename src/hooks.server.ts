@@ -52,7 +52,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	})
 	const loadTime = performance.now() - start
 
-	if (loadTime > 2000) console.log(`🚀 ${route} took ${loadTime.toFixed(2)} ms to load!`)
+	if (loadTime > 3000) console.log(`🚀 ${route} took ${loadTime.toFixed(2)} ms to load!`)
 
 	return response
 }
