@@ -17,21 +17,17 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 	supabaseStore.set(supabase)
 
+	const {
+		data: { session },
+		error
+	} = await supabase.auth.getSession()
+
+	if (error) console.error("error: ", error)
+	console.log("client session: ", session)
+	console.log("server session: ", data.session)
+
 	user.set(false)
-	if (data.session) {
-		supabase.auth.setSession({
-			access_token: data.session.access_token,
-			refresh_token: data.session.refresh_token
-		})
-		user.set(data.session.user)
-
-		const {
-			data: { session }
-		} = await supabase.auth.getSession()
-
-		console.log("client user id: ", session?.user.id)
-		console.log("server user id: ", data.session?.user.id)
-	}
+	if (session) user.set(session.user)
 
 	const profile = await getProfile()
 
@@ -46,5 +42,5 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 	checkProfileUpdates(profile)
 
-	return { supabase, session: data.session, profile }
+	return { supabase, session, profile }
 }
