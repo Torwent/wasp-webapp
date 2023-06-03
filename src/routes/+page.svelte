@@ -79,10 +79,11 @@
 		still around, it's ancestor, SCAR dates back to RuneScape Classic.
 	</p>
 	<p class="text-center py-6">
-		For more information, help and/or questions look through the <a
-			href="/faq"
-			class="decoration-transparent">FAQ</a
-		> or join the discord community!
+		For more information, help and/or questions look through the 
+		<a href="/faq" class="decoration-transparent" aria-label="Open frequently asked questions page">
+			FAQ
+		</a>
+		or join the discord community!
 	</p>
 
 	<Discord />
