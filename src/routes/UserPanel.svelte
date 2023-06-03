@@ -18,7 +18,7 @@
 {#if large && profile}
 	<span class="hidden lg:block">{profile.username}</span>
 {/if}
-<button use:popup={popupSettings}>
+<button name="userpanel" use:popup={popupSettings}>
 	{#if browser}
 		<Avatar
 			src={profile
@@ -28,6 +28,7 @@
 			border="border-4 border-surface-300-600-token hover:!border-primary-500"
 			cursor="cursor-pointer"
 			class={large ? "hidden md:block" : ""}
+			initials="WS"
 		/>
 	{:else}
 		<div class="placeholder-circle w-12 animate-pulse" />
@@ -45,7 +46,7 @@
 				<h3 class="hidden md:block lg:hidden my-6">{profile.username}</h3>
 
 				<a href="/user/{profile.id}">
-					<button class="btn variant-filled-secondary flex mx-auto">Profile</button>
+					<button name="Logout" class="btn variant-filled-secondary flex mx-auto">Profile</button>
 				</a>
 			</div>
 		</header>
@@ -65,7 +66,11 @@
 		</header>
 
 		<f class="p-4">
-			<button class="btn variant-filled-secondary" formaction="/?/login&provider=discord">
+			<button
+				name="Login"
+				class="btn variant-filled-secondary"
+				formaction="/?/login&provider=discord"
+			>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-4 h-4">
 					<path
 						fill="currentColor"
