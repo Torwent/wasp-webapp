@@ -18,7 +18,7 @@
 {#if large && profile}
 	<span class="hidden lg:block">{profile.username}</span>
 {/if}
-<button name="userpanel" use:popup={popupSettings}>
+<button name="User panel" use:popup={popupSettings} aria-label="Open user panel">
 	{#if browser}
 		<Avatar
 			src={profile
@@ -45,8 +45,8 @@
 			<div class="mx-auto">
 				<h3 class="hidden md:block lg:hidden my-6">{profile.username}</h3>
 
-				<a href="/user/{profile.id}">
-					<button name="Logout" class="btn variant-filled-secondary flex mx-auto">Profile</button>
+				<a href="/user/{profile.id}" aria-label="Open profile page">
+					<button name="Profile" aria-label="Open profile page" class="btn variant-filled-secondary flex mx-auto">Profile</button>
 				</a>
 			</div>
 		</header>
@@ -58,7 +58,7 @@
 			</div>
 		</section>
 		<footer class="card-footer flex">
-			<button class="btn variant-filled-secondary mx-auto" formaction="/?/logout">Logout</button>
+			<button name="Logout" aria-label="Logout" class="btn variant-filled-secondary mx-auto" formaction="/?/logout">Logout</button>
 		</footer>
 	{:else}
 		<header class="card-header">
@@ -68,6 +68,7 @@
 		<f class="p-4">
 			<button
 				name="Login"
+				aria-label="Logins"
 				class="btn variant-filled-secondary"
 				formaction="/?/login&provider=discord"
 			>

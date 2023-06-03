@@ -6,7 +6,7 @@
 <footer class="variant-soft" style="text-decoration: none !important;">
 	<header class="md:flex md:justify-between md:m-8 md:pt-8">
 		<div class="mb-6 md:mb-0">
-			<a href="/">
+			<a href="/" aria-label="Navigate to home page">
 				<Logo selected={true} />
 			</a>
 		</div>

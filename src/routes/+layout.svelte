@@ -27,7 +27,10 @@
 	import type { LayoutData } from "./$types"
 	export let data: LayoutData
 
-	$: ({ supabase, session, profile } = data)
+	$: ({ supabase, session, profile, serverSession } = data)
+
+	$: if (serverSession) supabase.auth.setSession({access_token: serverSession.access_token, refresh_token: serverSession.refresh_token})
+
 
 	onMount(() => {
 		const {

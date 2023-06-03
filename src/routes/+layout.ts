@@ -41,5 +41,5 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 
 	checkProfileUpdates(profile)
 
-	return { supabase, session, profile }
+	return { supabase, session, profile, serverSession: data.session }
 }
