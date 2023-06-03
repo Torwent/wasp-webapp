@@ -23,6 +23,9 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
 		error
 	} = await supabase.auth.getSession()
 
+	console.log("server session: ", data.session?.user.id)
+	console.log("client session: ", session?.user.id)
+
 	if (error) console.error("error: ", error)
 
 	user.set(false)
