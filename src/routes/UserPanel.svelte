@@ -1,29 +1,34 @@
 <script lang="ts">
 	import { Avatar, popup, type PopupSettings } from "@skeletonlabs/skeleton"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
-	import { browser } from "$app/environment"
 	import { randomString } from "$lib/utils"
 	import type { Profile } from "$lib/backend/types"
+	import { browser } from "$app/environment"
 
 	export let profile: Profile | null
 	export let large: boolean
+
+	let src = profile
+		? profile.avatar_url
+		: "https://api.dicebear.com/6.x/bottts/svg?seed=" + randomString()
 
 	let popupSettings: PopupSettings = {
 		event: "click",
 		target: "userPanelPopup",
 		placement: "bottom-end"
 	}
+
+	$: if (profile) src = profile.avatar_url
+	$: if (!profile) src = "https://api.dicebear.com/6.x/bottts/svg?seed=" + randomString()
 </script>
 
 {#if large && profile}
 	<span class="hidden lg:block">{profile.username}</span>
 {/if}
 <button name="User panel" use:popup={popupSettings} aria-label="Open user panel">
-	{#if browser}
+	{#if browser || profile}
 		<Avatar
-			src={profile
-				? profile.avatar_url
-				: "https://api.dicebear.com/6.x/bottts/svg?seed=" + randomString()}
+			{src}
 			width="w-12"
 			border="border-4 border-surface-300-600-token hover:!border-primary-500"
 			cursor="cursor-pointer"
@@ -46,7 +51,13 @@
 				<h3 class="hidden md:block lg:hidden my-6">{profile.username}</h3>
 
 				<a href="/user/{profile.id}" aria-label="Open profile page">
-					<button name="Profile" aria-label="Open profile page" class="btn variant-filled-secondary flex mx-auto">Profile</button>
+					<button
+						name="Profile"
+						aria-label="Open profile page"
+						class="btn variant-filled-secondary flex mx-auto"
+					>
+						Profile
+					</button>
 				</a>
 			</div>
 		</header>
@@ -58,7 +69,14 @@
 			</div>
 		</section>
 		<footer class="card-footer flex">
-			<button name="Logout" aria-label="Logout" class="btn variant-filled-secondary mx-auto" formaction="/?/logout">Logout</button>
+			<button
+				name="Logout"
+				aria-label="Logout"
+				class="btn variant-filled-secondary mx-auto"
+				formaction="/?/logout"
+			>
+				Logout
+			</button>
 		</footer>
 	{:else}
 		<header class="card-header">
