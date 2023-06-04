@@ -46,8 +46,8 @@ devDependencies:
     specifier: ^1.6.2
     version: 1.6.2
   '@supabase/auth-helpers-sveltekit':
-    specifier: ^0.10.0
-    version: 0.10.0(@supabase/supabase-js@2.24.0)(@sveltejs/kit@1.20.1)
+    specifier: ^0.8.7
+    version: 0.8.7(@supabase/supabase-js@2.24.0)
   '@sveltejs/adapter-auto':
     specifier: ^2.1.0
     version: 2.1.0(@sveltejs/kit@1.20.1)
@@ -934,24 +934,21 @@ packages:
       svelte: 3.58.0
     dev: true
 
-  /@supabase/auth-helpers-shared@0.4.0(@supabase/supabase-js@2.24.0):
-    resolution: {integrity: sha512-5wlCGb4HZ46W2fg8tdi22ZU1GAIOe3YxXrTgvAjWVapNFN+PiH5cFIbz51ZgZRK1TokRZ01pB1GEFy4e+NZE+A==}
+  /@supabase/auth-helpers-shared@0.2.4(@supabase/supabase-js@2.24.0):
+    resolution: {integrity: sha512-c+hi3N6DhjPTzjXGOokre4gmMZOqt0f1ORrwZwi2s07pk3cbkmn77DwwVtlYMNi3oZNYRQqAfxJu83UzpJrrmg==}
     peerDependencies:
-      '@supabase/supabase-js': ^2.19.0
+      '@supabase/supabase-js': ^2.0.4
     dependencies:
       '@supabase/supabase-js': 2.24.0
-      jose: 4.14.4
     dev: true
 
-  /@supabase/auth-helpers-sveltekit@0.10.0(@supabase/supabase-js@2.24.0)(@sveltejs/kit@1.20.1):
-    resolution: {integrity: sha512-Pq0BiN1ms+8Q7yxoRufhoayvI9YoDYTkIJ8EXy3MJeeI3n2meNUF8x6h/CRsWQ79pLmulESzIiJTkSVVGn/YlQ==}
+  /@supabase/auth-helpers-sveltekit@0.8.7(@supabase/supabase-js@2.24.0):
+    resolution: {integrity: sha512-sFXWaeyTVWK70Aekw+plqN+f8si2MqV4PbcEunqZ1H/QfujxxnDfG26j+O+eQ/ue84UFrJutNY+iB3DsTlXlCg==}
     peerDependencies:
-      '@supabase/supabase-js': ^2.19.0
-      '@sveltejs/kit': ^1.15.4
+      '@supabase/supabase-js': ^2.0.4
     dependencies:
-      '@supabase/auth-helpers-shared': 0.4.0(@supabase/supabase-js@2.24.0)
+      '@supabase/auth-helpers-shared': 0.2.4(@supabase/supabase-js@2.24.0)
       '@supabase/supabase-js': 2.24.0
-      '@sveltejs/kit': 1.20.1(svelte@3.59.1)(vite@4.3.9)
     dev: true
 
   /@supabase/functions-js@2.1.1:
@@ -2300,10 +2297,6 @@ packages:
   /jiti@1.18.2:
     resolution: {integrity: sha512-QAdOptna2NYiSSpv0O/BwoHBSmz4YhpzJHyi+fnMRTXFjp7B8i/YG5Z8IfusxB1ufjcD2Sre1F3R+nX3fvy7gg==}
     hasBin: true
-    dev: true
-
-  /jose@4.14.4:
-    resolution: {integrity: sha512-j8GhLiKmUAh+dsFXlX1aJCbt5KMibuKb+d7j1JaOJG6s2UjX1PQlW+OKB/sD4a/5ZYF4RcmYmLSndOoU3Lt/3g==}
     dev: true
 
   /jpeg-js@0.4.4:

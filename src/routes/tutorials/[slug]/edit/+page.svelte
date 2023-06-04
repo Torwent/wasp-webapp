@@ -7,7 +7,6 @@
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
 	import { slide } from "svelte/transition"
 	import TutorialLevel from "$lib/components/forms/TutorialLevel.svelte"
-	import SuperDebug from "sveltekit-superforms/client/SuperDebug.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 
 	export let data
@@ -58,10 +57,6 @@
 				{#if show}Hide{:else}Show{/if} Post Preview
 			</button>
 		</div>
-
-		{#if import.meta.env.MODE === "development"}
-			<SuperDebug data={$form} />
-		{/if}
 
 		<form method="POST" use:focusTrap={isFocused} use:enhance>
 			<FormInput title="Title" bind:value={$form.title} bind:error={$errors.title} />

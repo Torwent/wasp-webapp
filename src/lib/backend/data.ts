@@ -1,6 +1,5 @@
 import { get, writable } from "svelte/store"
 import { encodeSEO } from "$lib/utils"
-import type { SupabaseClient } from "@supabase/supabase-js"
 import type {
 	Category,
 	SubCategory,
@@ -9,25 +8,24 @@ import type {
 	Post,
 	Developer,
 	IScriptCard,
-	CheckboxType
+	CheckboxType,
+	Profile
 } from "./types"
-import { getProfile, getUserID, profile, supabaseStore } from "./auth"
+import { getProfile, getUserID, profile, supabaseClient } from "./auth"
 
 const categories: any = writable(false)
 const subCategories: any = writable(false)
 const checkboxes: any = writable(false)
 
 export async function updateUsername(id: string, username: string) {
-	const supabase = get(supabaseStore) as SupabaseClient
-	await supabase.from("profile").update({ username: username }).eq("id", id)
+	await supabaseClient.from("profile").update({ username: username }).eq("id", id)
 }
 
 export async function updateWarning() {
-	const supabase = get(supabaseStore) as SupabaseClient
 	const id = await getUserID()
 	if (!id) return false
 
-	const { error } = await supabase
+	const { error } = await supabaseClient
 		.from("profiles_private")
 		.update({ dismissed_warning: true })
 		.eq("id", id)
@@ -42,9 +40,8 @@ export async function updateWarning() {
 export async function getCategories() {
 	const tmp = get(categories)
 	if (tmp) return tmp as Category[]
-	const supabase = get(supabaseStore) as SupabaseClient
-	if (!supabase) return false
-	const { data: cats } = await supabase.from("scripts_categories").select("name, emoji")
+
+	const { data: cats } = await supabaseClient.from("scripts_categories").select("name, emoji")
 
 	const result: Category[] | false = cats != null ? cats : false
 	categories.set(result)
@@ -54,9 +51,8 @@ export async function getCategories() {
 export async function getSubCategories() {
 	const tmp = get(subCategories)
 	if (tmp) return tmp as SubCategory[]
-	const supabase = get(supabaseStore) as SupabaseClient
-	if (!supabase) return false
-	const { data: cats } = await supabase
+
+	const { data: cats } = await supabaseClient
 		.from("scripts_subcategories")
 		.select("category, name, emoji")
 
@@ -137,10 +133,7 @@ export async function addToolTips(script: IScriptCard) {
 }
 
 export async function getScripts(): Promise<Script[] | null> {
-	const supabase = get(supabaseStore) as SupabaseClient
-	if (!supabase) return null
-
-	const { data, error } = await supabase
+	const { data, error } = await supabaseClient
 		.from("scripts_public")
 		.select(
 			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
@@ -186,8 +179,7 @@ export async function getScriptUUID(uuid: string | undefined) {
 }
 
 export async function getPosts(): Promise<Post[] | null> {
-	const supabase = get(supabaseStore) as SupabaseClient
-	const { data, error } = await supabase
+	const { data, error } = await supabaseClient
 		.from("tutorials")
 		.select("id, created_at, user_id, author, title, description, content, level")
 		.order("title", { ascending: true })
@@ -208,8 +200,7 @@ export async function getPost(path: string): Promise<Post | null> {
 }
 
 export async function getDevelopers(): Promise<Developer[] | null> {
-	const supabase = get(supabaseStore) as SupabaseClient
-	const { data, error } = await supabase
+	const { data, error } = await supabaseClient
 		.from("devs")
 		.select("id, realname, username, description, github, paypal_id, content")
 		.order("username", { ascending: true })
@@ -230,8 +221,7 @@ export async function getDeveloper(path: string): Promise<Developer | null> {
 
 export async function getSignedURL(bucket: string, path: string, file: string) {
 	path += "/" + file
-	const supabase = get(supabaseStore) as SupabaseClient
-	const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
+	const { data, error } = await supabaseClient.storage.from(bucket).createSignedUrl(path, 10)
 
 	if (error) {
 		console.error(error)
@@ -240,12 +230,11 @@ export async function getSignedURL(bucket: string, path: string, file: string) {
 	return data.signedUrl
 }
 
-export async function canEdit(author: string) {
-	const tmp = await getProfile()
-	if (!tmp) return false
+export async function canEdit(profile: Profile | null, author: string) {
+	if (!profile) return false
 
-	if (tmp.profiles_protected.moderator) return true
-	if (tmp.profiles_protected.administrator) return true
+	if (profile.profiles_protected.moderator) return true
+	if (profile.profiles_protected.administrator) return true
 
-	return tmp.id === author
+	return profile.id === author
 }

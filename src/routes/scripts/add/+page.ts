@@ -1,8 +1,7 @@
 import { getCategories, getSubCategories } from "$lib/backend/data"
 import type { Load } from "@sveltejs/kit"
 
-export const load: Load = async ({ data, parent }) => {
-	await parent()
+export const load: Load = async ({ data }) => {
 	const promises = await Promise.all([getCategories(), getSubCategories()])
 	const categories = promises[0]
 	const subcategories = promises[1]

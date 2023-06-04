@@ -1,11 +1,10 @@
+import { supabaseClient } from "$lib/backend/auth"
 import { addToolTips, getCategories, getCheckBoxes, getSubCategories } from "$lib/backend/data"
-import type { IScriptCard, Script } from "$lib/backend/types"
+import type { Script } from "$lib/backend/types"
 import { redirect, type Load } from "@sveltejs/kit"
 
-export const load: Load = async ({ url, depends, parent }) => {
+export const load: Load = async ({ url, depends }) => {
 	depends("scripts:list")
-
-	const { supabase } = await parent()
 
 	const pageStr = url.searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
@@ -25,7 +24,7 @@ export const load: Load = async ({ url, depends, parent }) => {
 	let scriptsPromise
 
 	if (search === "") {
-		scriptsPromise = supabase
+		scriptsPromise = supabaseClient
 			.from("scripts_public")
 			.select(
 				`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
@@ -40,7 +39,7 @@ export const load: Load = async ({ url, depends, parent }) => {
 			.order("title", { ascending: ascending })
 			.range(start, finish)
 	} else {
-		scriptsPromise = supabase
+		scriptsPromise = supabaseClient
 			.from("scripts_public")
 			.select(
 				`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,

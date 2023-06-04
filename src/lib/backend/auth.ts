@@ -1,25 +1,29 @@
-import type { RealtimeChannel, SupabaseClient, User } from "@supabase/supabase-js"
+import { createClient } from "@supabase/auth-helpers-sveltekit"
+import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
+import type { RealtimeChannel, User } from "@supabase/supabase-js"
 
 import { get, writable } from "svelte/store"
 import type { Profile } from "./types"
 
-export const supabaseStore: any = writable(null)
 export const user: any = writable(null)
 export const profile: any = writable(null)
+
 let realtimeProfile: RealtimeChannel | null = null
 
+export const supabaseClient = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY)
+
 async function getUser() {
-	const tmp = get(user) as User | false
+	const tmp = get(user) as User | null
 	return tmp
 }
 
 export async function getUserID() {
 	const user = await getUser()
-	return user ? user.id : false
+	return user ? user.id : null
 }
 
 export async function disableProfile() {
-	profile.set(false)
+	profile.set(null)
 	if (realtimeProfile) realtimeProfile.unsubscribe()
 	realtimeProfile = null
 }
@@ -29,14 +33,12 @@ export async function getProfile(): Promise<Profile | null> {
 	const id = await getUserID()
 	if (tmp && tmp.id === id) return tmp
 
-	const supabase = get(supabaseStore) as SupabaseClient
-
 	if (!id) {
 		await disableProfile()
 		return null
 	}
 
-	const { data, error } = await supabase
+	const { data, error } = await supabaseClient
 		.from("profiles_public")
 		.select(
 			`id, discord_id, username, avatar_url,
@@ -56,7 +58,7 @@ export async function getProfile(): Promise<Profile | null> {
 	profile.set(result)
 
 	if (realtimeProfile) realtimeProfile.unsubscribe()
-	realtimeProfile = realtimeProfile = supabase
+	realtimeProfile = realtimeProfile = supabaseClient
 		.channel("any")
 		.on(
 			"postgres_changes",
@@ -66,7 +68,7 @@ export async function getProfile(): Promise<Profile | null> {
 				table: "profiles_protected",
 				filter: `id=eq.${id}`
 			},
-			(payload) => {
+			(payload: any) => {
 				let tmp = get(profile) as Profile
 				tmp.profiles_protected.developer = payload.new.developer
 				tmp.profiles_protected.premium = payload.new.premium
