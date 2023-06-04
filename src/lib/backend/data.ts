@@ -11,7 +11,7 @@ import type {
 	CheckboxType,
 	Profile
 } from "./types"
-import { getProfile, getUserID, profile, supabaseClient } from "./auth"
+import { getUserID, profile, supabaseClient } from "./auth"
 
 const categories: any = writable(false)
 const subCategories: any = writable(false)
@@ -137,7 +137,7 @@ export async function getScripts(): Promise<Script[] | null> {
 		.from("scripts_public")
 		.select(
 			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-      				scripts_protected (author, assets_path, author_id, assets_alt, revision),
+      				scripts_protected(author, assets_path, author_id, assets_alt, revision),
 	  				stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
 		)
 		.order("title", { ascending: true })
@@ -147,7 +147,7 @@ export async function getScripts(): Promise<Script[] | null> {
 		return null
 	}
 
-	let scriptsData = data as Script[]
+	let scriptsData = data as unknown as Script[]
 
 	await new Promise<void>((resolve) => {
 		scriptsData.forEach(async (script, index, array) => {

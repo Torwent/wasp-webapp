@@ -26,15 +26,27 @@
 	import { onMount } from "svelte"
 	import type { LayoutData } from "./$types"
 	import { supabaseClient } from "$lib/backend/auth"
+	import type { Profile } from "$lib/backend/types"
+	import { API_URL } from "$lib/utils"
 	export let data: LayoutData
+
+	async function checkProfileUpdates(currentProfile: Profile | null) {
+		if (currentProfile) {
+			await fetch(API_URL + "/discord/refresh/" + currentProfile.discord_id, {
+				method: "GET"
+			}).catch((error) => console.error(error))
+			setTimeout(checkProfileUpdates, 10000, currentProfile)
+		}
+	}
 
 	$: ({ profile } = data)
 
-	onMount(() => {
+	onMount(async () => {
 		const {
 			data: { subscription }
-		} = supabaseClient.auth.onAuthStateChange(() => {
+		} = supabaseClient.auth.onAuthStateChange(async () => {
 			invalidate("supabase:auth")
+			checkProfileUpdates(profile)
 		})
 
 		return () => subscription.unsubscribe()

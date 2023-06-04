@@ -11,6 +11,7 @@
 	import { FileCode, ImagePlus } from "lucide-svelte"
 	import ScriptCardBase from "../ScriptCardBase.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
+	import { browser } from "$app/environment"
 
 	export let data
 	const { categories, subcategories } = data
@@ -24,8 +25,8 @@
 
 	const defaultBanner =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/default/banner.jpg"
-	let coverElement: HTMLImageElement
-	let bannerElement: HTMLImageElement
+	let coverElement: HTMLImageElement | undefined
+	let bannerElement: HTMLImageElement | undefined
 
 	let coverFiles: FileList
 	let bannerFiles: FileList
@@ -70,10 +71,12 @@
 	$: if (coverFiles) {
 		$form.cover = coverFiles[0]
 		validate("cover").then((result) => {
+			if (!browser) return
 			if (result) return
 
 			let reader = new FileReader()
 			reader.onload = function () {
+				if (!coverElement) coverElement = new Image()
 				coverElement.src = reader.result as string
 			}
 			reader.readAsDataURL(coverFiles[0])
@@ -83,12 +86,15 @@
 	$: if (bannerFiles) {
 		$form.banner = bannerFiles[0]
 		validate("banner").then((result) => {
+			if (!browser) return
+			if (!bannerElement) bannerElement = new Image()
 			if (result) {
 				bannerElement.src = defaultBanner
 				return
 			}
 			let reader = new FileReader()
 			reader.onload = function () {
+				if (!bannerElement) bannerElement = new Image()
 				bannerElement.src = reader.result as string
 			}
 			reader.readAsDataURL(bannerFiles[0])

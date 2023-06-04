@@ -1,5 +1,6 @@
 <!-- Based on https://svelte.dev/repl/c7094fb1004b440482d2a88f4d1d7ef5?version=3.14.0 -->
 <script lang="ts">
+	import { page } from "$app/stores"
 	import type { Category } from "$lib/backend/types"
 	import { fly } from "svelte/transition"
 	export let title: string
@@ -64,6 +65,19 @@
 	})
 
 	$: hasError = checkErrors(error)
+
+	$: ({ profile } = $page.data)
+	$: if (!profile || !profile.profiles_protected.administrator) {
+		if (value.includes("Official") || value.includes("Premium")) {
+			for (let i = 0; i < value.length; i++) {
+				if (value[i] === "Official" || value[i] === "Premium") {
+					value.splice(i, 1)
+					i--
+				}
+			}
+		}
+		value = ["Community", "Free", ...value]
+	}
 </script>
 
 <div class="mb-8">
