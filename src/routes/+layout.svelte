@@ -27,10 +27,7 @@
 	import type { LayoutData } from "./$types"
 	export let data: LayoutData
 
-	$: ({ supabase, session, profile, serverSession } = data)
-
-	
-
+	$: ({ supabase, session, profile } = data)
 
 	onMount(() => {
 		const {

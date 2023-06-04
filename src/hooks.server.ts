@@ -36,7 +36,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 		if (error) return null
 
-		const profile = data[0] as Profile
+		const profile = data[0] as unknown as Profile
 
 		return profile
 	}
