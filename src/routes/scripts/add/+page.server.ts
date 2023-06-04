@@ -69,6 +69,7 @@ export const actions = {
 		}
 
 		const { error } = await uploadScript(
+			locals.supabase,
 			script,
 			validFiles.data.script,
 			validFiles.data.cover,

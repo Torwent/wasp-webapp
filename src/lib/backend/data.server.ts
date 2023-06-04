@@ -1,8 +1,6 @@
-import { get } from "svelte/store"
 import type { Script, ScriptPublic } from "./types"
-import { supabaseStore } from "./auth"
-import type { SupabaseClient } from "@supabase/supabase-js"
 import { pad } from "$lib/utils"
+import type { SupabaseClient } from "@supabase/supabase-js"
 
 function updateID(str: string, id: string) {
 	const regex = /{\$UNDEF SCRIPT_ID}{\$DEFINE SCRIPT_ID := '(.*?)'}/
@@ -27,14 +25,13 @@ async function updateScriptFile(file: File, id: string, revision: number) {
 	return new File([fileString], file.name, { type: "text/plain" })
 }
 
-async function uploadFile(bucket: string, path: string, file: File) {
-	const supabase = get(supabaseStore) as SupabaseClient
+async function uploadFile(supabase: SupabaseClient, bucket: string, path: string, file: File) {
 	const { error } = await supabase.storage.from(bucket).upload(path, file)
-
 	if (error) console.error(error)
 }
 
 export async function uploadScript(
+	supabase: SupabaseClient,
 	script: ScriptPublic,
 	file: File | undefined,
 	coverFile: File | undefined,
@@ -54,8 +51,6 @@ export async function uploadScript(
 		console.error("Banner image is missing!")
 		return { error: "Banner image is missing!" }
 	}
-
-	const supabase = get(supabaseStore) as SupabaseClient
 
 	const publicData = {
 		title: script.title,
@@ -82,20 +77,21 @@ export async function uploadScript(
 	//rename all scripts to script so we can always fetch them later regardless of name changes.
 	const path = script.id + "/" + pad(1, 9) + "/script.simba"
 
-	uploadFile("scripts", path, file)
-	uploadFile("imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
-	uploadFile("imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+	uploadFile(supabase, "scripts", path, file)
+	uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
+	uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
 
 	return { error: undefined }
 }
 
 export async function updateScript(
+	supabase: SupabaseClient,
 	script: Script,
 	file: File | undefined,
 	coverFile: File | undefined,
 	bannerFile: File | undefined
 ) {
-	const supabase = get(supabaseStore) as SupabaseClient
+	console.log("Updating script ", script.id)
 
 	const publicData = {
 		title: script.title,
@@ -117,13 +113,14 @@ export async function updateScript(
 
 	if (file) {
 		const revision = script.scripts_protected.revision + 1
+		console.log("Updating script revision to ", revision)
 		file = await updateScriptFile(file, script.id as string, revision)
 		const path = script.id + "/" + pad(revision, 9) + "/script.simba"
-		uploadFile("scripts", path, file)
+		uploadFile(supabase, "scripts", path, file)
 	}
 
-	if (coverFile) uploadFile("imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
-	if (bannerFile) uploadFile("imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+	if (coverFile) uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
+	if (bannerFile) uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
 
 	return { error: undefined }
 }

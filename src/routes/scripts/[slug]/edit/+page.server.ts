@@ -80,6 +80,7 @@ export const actions = {
 		if (!validFiles.success) return fail(400, { form })
 
 		const { error } = await updateScript(
+			locals.supabase,
 			script,
 			validFiles.data.script,
 			validFiles.data.cover,
