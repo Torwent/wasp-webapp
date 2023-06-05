@@ -1,58 +1,86 @@
 <script lang="ts">
 	import { onMount } from "svelte"
-	import { Rowp, type TBox, type TPoint, type TRectangle } from "$lib/simba/srl"
+	import { rowp, type TBox, type TPoint, type TRectangle } from "$lib/simba/srl"
 	import { drawInterface } from "$lib/simba/interface"
 
 	let mouse: TPoint = { x: 0, y: 0 }
 	let canvas: HTMLCanvasElement
 	let context: CanvasRenderingContext2D
 	let canvasData: ImageData
-	let box: TBox
-	let rect: TRectangle
-	let mouseP: TPoint
+	const box: TBox = {
+		x1: 106,
+		y1: 2,
+		x2: 135,
+		y2: 34
+	}
+	const rect: TRectangle = {
+		Top: { x: 106, y: 2 },
+		Right: { x: 135, y: 2 },
+		Btm: { x: 135, y: 34 },
+		Left: { x: 106, y: 34 }
+	}
+
+	function getNextCycleColor(r: number, g: number, b: number, step: number) {
+		if (r === 0 && g === 0 && b === 0) b = 255
+		else if (r === 255 && g === 0 && b < 255) b += step
+		else if (r > 0 && g === 0 && b === 255) r -= step
+		else if (r === 0 && g < 255 && b === 255) g += step
+		else if (r === 0 && g === 255 && b > 0) b -= step
+		else if (r < 255 && g === 255 && b === 0) r += step
+		else if (r === 255 && g > 0 && b === 0) g -= step
+
+		if (r < 0) r = 0
+		if (r > 255) r = 255
+
+		if (g < 0) g = 0
+		if (g > 255) g = 255
+
+		if (b < 0) b = 0
+		if (b > 255) b = 255
+
+		return [r, g, b]
+	}
 
 	async function drawPixel(p: TPoint) {
 		const setPixel = async (i: number) => {
-			if (
-				canvasData.data[i + 0] == 0 &&
-				canvasData.data[i + 1] >= 0 &&
-				canvasData.data[i + 1] < 255
-			) {
-				canvasData.data[i + 1] = 255
-			} else if (
-				canvasData.data[i + 0] >= 0 &&
-				canvasData.data[i + 0] < 255 &&
-				canvasData.data[i + 1] == 255
-			) {
-				canvasData.data[i + 0] = 255
-			} else if (
-				canvasData.data[i + 0] == 255 &&
-				canvasData.data[i + 1] <= 255 &&
-				canvasData.data[i + 1] > 0
-			) {
-				canvasData.data[i + 1] = 0
-			}
+			const { data } = canvasData
+			const pixel = getNextCycleColor(data[i], data[i + 1], data[i + 2], 255)
 
-			canvasData.data[i + 2] = 0
-			canvasData.data[i + 3] = 255
+			data[i] = pixel[0]
+			data[i + 1] = pixel[1]
+			data[i + 2] = pixel[2]
+			data[i + 3] = 255
 			context.putImageData(canvasData, 0, 0)
 		}
 
 		setPixel((p.x + p.y * canvas.width) * 4)
 	}
 
-	async function drawHeatMap() {
-		context.clearRect(box.x1, box.y1, 29, 32)
+	let lastFrameTime = 0
+	let tpa: TPoint[] = []
 
-		mouseP = mouse
+	async function getNextTPA(iterations: number) {
+		for (let i = 0; i < iterations; i++) {
+			tpa.push(rowp(mouse, rect))
+		}
+	}
+
+	async function drawHeatMap(elapsedTime: number) {
+		let delta = elapsedTime - (lastFrameTime || 0)
+
+		if (tpa.length === 0) getNextTPA(800)
+		requestAnimationFrame(drawHeatMap)
+
+		if (lastFrameTime && delta < 33) return
+
+		lastFrameTime = elapsedTime
+
+		context.clearRect(106, 2, 29, 32)
 		canvasData = context.getImageData(0, 0, canvas.width, canvas.height)
 
-		for (let i = 0; i < 100; i++) {
-			const p = Rowp(mouseP, rect)
-			await drawPixel(p)
-		}
+		tpa.forEach(async (p) => drawPixel(p))
 
-		requestAnimationFrame(() => drawHeatMap())
+		tpa = []
 	}
 
 	function resizeCanvas() {
@@ -61,19 +89,6 @@
 
 		// Redraw everything after resizing the window
 		drawInterface(canvas, context)
-		box = {
-			x1: canvas.width - 240 + 6 + 3 * 33,
-			y1: canvas.height - 333,
-			x2: canvas.width - 245 + 6 + 3 * 33 + 30,
-			y2: canvas.height - 333 + 33
-		}
-
-		rect = {
-			Top: { x: box.x1, y: box.y1 },
-			Right: { x: box.x2, y: box.y1 },
-			Btm: { x: box.x2, y: box.y2 },
-			Left: { x: box.x1, y: box.y2 }
-		}
 	}
 
 	onMount(async () => {
@@ -85,12 +100,18 @@
 
 		window.addEventListener("resize", resizeCanvas, false)
 		window.onmousemove = async (e: MouseEvent) => {
-			mouse.x = e.pageX
-			mouse.y = e.pageY - document.documentElement.scrollTop
+			const page = document.getElementById("page")
+			const appShell = document.getElementById("appShell")
+			if (!appShell || !page) return
+
+			mouse = {
+				x: e.pageX - Math.round(appShell.clientWidth / 2) + 80,
+				y: e.pageY - Math.round(page.clientHeight / 2) - 115
+			}
 		}
 
 		resizeCanvas()
-		drawHeatMap()
+		drawHeatMap(lastFrameTime)
 	})
 </script>
 

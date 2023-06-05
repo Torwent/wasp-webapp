@@ -4,36 +4,32 @@ export interface TPoint {
 }
 
 export interface TRectangle {
-	Top: TPoint
-	Right: TPoint
-	Btm: TPoint
-	Left: TPoint
+	readonly Top: TPoint
+	readonly Right: TPoint
+	readonly Btm: TPoint
+	readonly Left: TPoint
 }
 
 export interface TBox {
-	x1: number
-	y1: number
-	x2: number
-	y2: number
+	readonly x1: number
+	readonly y1: number
+	readonly x2: number
+	readonly y2: number
 }
 
-function DistToLineEx(p: TPoint, sA: TPoint, sB: TPoint) {
-	let dx, dy, d
-	let f
-	let result: { nearest: TPoint; result: number } = { nearest: { x: 0, y: 0 }, result: 0 }
+function distToLineEx(p: TPoint, sA: TPoint, sB: TPoint) {
+	let result = { nearest: { x: sA.x, y: sA.y }, result: 0 }
 
-	result.nearest.x = sA.x
-	result.nearest.y = sA.y
-	dx = sB.x - sA.x
-	dy = sB.y - sA.y
-	d = dx * dx + dy * dy
+	const dx = sB.x - sA.x
+	const dy = sB.y - sA.y
+	const d = dx * dx + dy * dy
 
 	if (d === 0) {
 		result.result = Math.hypot(p.x - sA.x, p.y - sA.y)
 		return result
 	}
 
-	f = ((p.x - sA.x) * dx + (p.y - sA.y) * dy) / d
+	const f = ((p.x - sA.x) * dx + (p.y - sA.y) * dy) / d
 
 	if (f < 0) {
 		result.result = Math.hypot(p.x - sA.x, p.y - sA.y)
@@ -48,136 +44,122 @@ function DistToLineEx(p: TPoint, sA: TPoint, sB: TPoint) {
 	return result
 }
 
-function NearestEdgeTo(p: TPoint, Rect: TRectangle) {
-	let best, dist
-	let x
-	let result = DistToLineEx(p, Rect.Top, Rect.Left)
-	let tempResult = { nearest: { x: 0, y: 0 }, result: 0 }
-	let fResult: TPoint
+function nearestEdgeTo(p: TPoint, rect: TRectangle) {
+	let result = distToLineEx(p, rect.Top, rect.Left)
 
-	fResult = result.nearest
-	best = result.result
+	let finalResult = result.nearest
+	let best = result.result
 
-	tempResult = DistToLineEx(p, Rect.Left, Rect.Btm)
-	x = tempResult.nearest
-	dist = tempResult.result
+	let tmpResult = distToLineEx(p, rect.Left, rect.Btm)
+	let x = tmpResult.nearest
+	let dist = tmpResult.result
 
 	if (dist < best) {
-		fResult = x
+		finalResult = x
 		best = dist
 	}
 
-	tempResult = DistToLineEx(p, Rect.Btm, Rect.Right)
-	x = tempResult.nearest
-	dist = tempResult.result
+	tmpResult = distToLineEx(p, rect.Btm, rect.Right)
+	x = tmpResult.nearest
+	dist = tmpResult.result
 
 	if (dist < best) {
-		fResult = x
+		finalResult = x
 		best = dist
 	}
 
-	tempResult = DistToLineEx(p, Rect.Right, Rect.Top)
-	x = tempResult.nearest
-	dist = tempResult.result
+	tmpResult = distToLineEx(p, rect.Right, rect.Top)
+	x = tmpResult.nearest
+	dist = tmpResult.result
 
 	if (dist < best) {
-		fResult = x
+		finalResult = x
 		best = dist
 	}
 
-	return fResult
+	return finalResult
 }
 
-function TruncatedGauss(Left = 0, Right = 1, CUTOFF = 0) {
-	if (CUTOFF <= 0) CUTOFF = 4.0
+function truncatedGauss(left = 0, right = 1, cutoff = 0) {
+	if (cutoff <= 0) cutoff = 4.0
 
-	let Result = CUTOFF + 1
-	while (Result >= CUTOFF) {
+	let result = cutoff + 1
+	while (result >= cutoff) {
 		//need to implement nzRandom
-		Result = Math.abs(
+		result = Math.abs(
 			Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random())
 		)
 	}
 
-	return (Result / CUTOFF) * (Right - Left) + Left
+	return (result / cutoff) * (right - left) + left
 }
 
-function NormalRange(Min: number, Max: number, CUTOFF = 0) {
-	if (CUTOFF <= 0) CUTOFF = 4.0
-
-	let Result
+function normalRange(min: number, max: number, cutoff = 0) {
+	if (cutoff <= 0) cutoff = 4.0
 
 	if (Math.random() < 0.5) {
-		Result = Math.round((Max + Min) / 2.0 + TruncatedGauss(0, (Max - Min) / 2, CUTOFF))
-	} else {
-		Result = Math.round((Max + Min) / 2.0 - TruncatedGauss(0, (Max - Min) / 2, CUTOFF))
+		return Math.round((max + min) / 2.0 + truncatedGauss(0, (max - min) / 2, cutoff))
 	}
-
-	return Result
+	return Math.round((max + min) / 2.0 - truncatedGauss(0, (max - min) / 2, cutoff))
 }
 
 function rotatePoint(p: TPoint, angle: number, center: TPoint) {
-	angle = angle * (Math.PI / 180) // Convert to radians
-	let rotatedX = Math.round(
-		Math.cos(angle) * (p.x - center.x) - Math.sin(angle) * (p.y - center.y) + center.x
+	const radians = angle * (Math.PI / 180) // Convert to radians
+	const rotatedX = Math.round(
+		Math.cos(radians) * (p.x - center.x) - Math.sin(radians) * (p.y - center.y) + center.x
 	)
-	let rotatedY = Math.round(
-		Math.sin(angle) * (p.x - center.x) + Math.cos(angle) * (p.y - center.y) + center.y
+	const rotatedY = Math.round(
+		Math.sin(radians) * (p.x - center.x) + Math.cos(radians) * (p.y - center.y) + center.y
 	)
 	return { x: rotatedX, y: rotatedY }
 }
 
-function RandomPoint(R: TRectangle, CUTOFF = 0) {
-	let Result: TPoint = { x: 0, y: 0 }
-	let a = Math.atan2(R.Left.y - R.Top.y, R.Left.x - R.Top.y)
-	let x = (R.Top.x + R.Right.x + R.Btm.x + R.Left.x) / 4
-	let y = (R.Top.y + R.Right.y + R.Btm.y + R.Left.y) / 4
-	let x1 = x - Math.hypot(R.Left.y - R.Top.y, R.Left.x - R.Top.x) / 2
-	let y1 = y - Math.hypot(R.Left.y - R.Btm.y, R.Left.x - R.Btm.x) / 2
-	let x2 = x + Math.hypot(R.Left.y - R.Top.y, R.Left.x - R.Top.x) / 2
-	let y2 = y + Math.hypot(R.Left.y - R.Btm.y, R.Left.x - R.Btm.x) / 2
+function randomPoint(R: TRectangle, cutoff = 0) {
+	const a = Math.atan2(R.Left.y - R.Top.y, R.Left.x - R.Top.y)
+	const x = (R.Top.x + R.Right.x + R.Btm.x + R.Left.x) / 4
+	const y = (R.Top.y + R.Right.y + R.Btm.y + R.Left.y) / 4
+	const x1 = x - Math.hypot(R.Left.y - R.Top.y, R.Left.x - R.Top.x) / 2
+	const y1 = y - Math.hypot(R.Left.y - R.Btm.y, R.Left.x - R.Btm.x) / 2
+	const x2 = x + Math.hypot(R.Left.y - R.Top.y, R.Left.x - R.Top.x) / 2
+	const y2 = y + Math.hypot(R.Left.y - R.Btm.y, R.Left.x - R.Btm.x) / 2
 
-	Result.x = Math.round(NormalRange(x1 + 1, x2 - 1, CUTOFF))
-	Result.y = Math.round(NormalRange(y1 + 1, y2 - 1, CUTOFF))
+	const result = {
+		x: Math.round(normalRange(x1 + 1, x2 - 1, cutoff)),
+		y: Math.round(normalRange(y1 + 1, y2 - 1, cutoff))
+	}
 
-	let center: TPoint = { x: 0, y: 0 }
-	center.x = (x2 + x1) / 2 + Math.random() - 0.5
-	center.y = (y2 + y1) / 2 + Math.random() - 0.5
-	return rotatePoint(Result, a, center)
+	const center = { x: (x2 + x1) / 2 + Math.random() - 0.5, y: (y2 + y1) / 2 + Math.random() - 0.5 }
+
+	return rotatePoint(result, a, center)
 }
 
-function SkewedRand(Mode: number, Lo: number, Hi: number, CUTOFF = 0) {
-	let top = Lo
+function skewedRand(mode: number, lo: number, hi: number, cutoff = 0) {
+	let top = lo
 
-	if (CUTOFF <= 0) CUTOFF = 4.0
+	if (cutoff <= 0) cutoff = 4.0
 
-	if (Math.random() * (Hi - Lo) > Mode - Lo) top = Hi
+	if (Math.random() * (hi - lo) > mode - lo) top = hi
 
-	let Result = CUTOFF + 1
+	let result = cutoff + 1
 
-	while (Result >= CUTOFF) {
+	while (result >= cutoff) {
 		//todo: implement nzRandom
-		Result = Math.abs(
+		result = Math.abs(
 			Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random())
 		)
 	}
 
-	return (Result / CUTOFF) * (top - Mode) + Mode
+	return (result / cutoff) * (top - mode) + mode
 }
 
-export function Rowp(from: TPoint, rect: TRectangle, force = -0.9, Smoothness = Math.PI / 12) {
-	let p,
-		e,
-		Result: TPoint = { x: 0, y: 0 }
-	let t, dist: number
+export function rowp(from: TPoint, rect: TRectangle, force = -0.9, smoothness = Math.PI / 12) {
+	const p = randomPoint(rect, 4.0 / 1.5)
+	const e = nearestEdgeTo(p, rect)
+	const dist = Math.hypot(p.x - e.x, p.y - e.y)
+	const t = Math.atan2(p.y - from.y, p.x - from.x) + (Math.random() - 0.5) * smoothness
 
-	p = RandomPoint(rect, 4.0 / 1.5)
-	e = NearestEdgeTo(p, rect)
-	dist = Math.hypot(p.x - e.x, p.y - e.y)
-
-	t = Math.atan2(p.y - from.y, p.x - from.x) + (Math.random() - 0.5) * Smoothness
-	Result.x = Math.round(p.x + Math.cos(t) * SkewedRand(dist * force, 0, dist))
-	Result.y = Math.round(p.y + Math.sin(t) * SkewedRand(dist * force, 0, dist))
-
-	return Result
+	return {
+		x: Math.round(p.x + Math.cos(t) * skewedRand(dist * force, 0, dist)),
+		y: Math.round(p.y + Math.sin(t) * skewedRand(dist * force, 0, dist))
+	}
 }
