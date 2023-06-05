@@ -1,18 +1,14 @@
 <script lang="ts">
 	import { onMount } from "svelte"
-	import { rowp, type TBox, type TPoint, type TRectangle } from "$lib/simba/srl"
+	import { rowp, type TPoint, type TRectangle } from "$lib/simba/srl"
 	import { drawInterface } from "$lib/simba/interface"
 
 	let mouse: TPoint = { x: 0, y: 0 }
 	let canvas: HTMLCanvasElement
 	let context: CanvasRenderingContext2D
 	let canvasData: ImageData
-	const box: TBox = {
-		x1: 106,
-		y1: 2,
-		x2: 135,
-		y2: 34
-	}
+	let frameReady = false
+
 	const rect: TRectangle = {
 		Top: { x: 106, y: 2 },
 		Right: { x: 135, y: 2 },
@@ -44,43 +40,34 @@
 	async function drawPixel(p: TPoint) {
 		const setPixel = async (i: number) => {
 			const { data } = canvasData
-			const pixel = getNextCycleColor(data[i], data[i + 1], data[i + 2], 255)
+			const pixel = getNextCycleColor(data[i], data[i + 1], data[i + 2], 25)
 
 			data[i] = pixel[0]
 			data[i + 1] = pixel[1]
 			data[i + 2] = pixel[2]
 			data[i + 3] = 255
-			context.putImageData(canvasData, 0, 0)
 		}
 
 		setPixel((p.x + p.y * canvas.width) * 4)
 	}
 
-	let lastFrameTime = 0
-	let tpa: TPoint[] = []
-
-	async function getNextTPA(iterations: number) {
+	async function getNextFrame(iterations: number) {
 		for (let i = 0; i < iterations; i++) {
-			tpa.push(rowp(mouse, rect))
+			drawPixel(rowp(mouse, rect))
 		}
+		frameReady = true
 	}
 
-	async function drawHeatMap(elapsedTime: number) {
-		let delta = elapsedTime - (lastFrameTime || 0)
+	async function drawHeatMap() {
+		if (!frameReady) {
+			context.clearRect(106, 2, 29, 32)
+			canvasData = context.getImageData(0, 0, canvas.width, canvas.height)
+			getNextFrame(10000)
+		}
 
-		if (tpa.length === 0) getNextTPA(800)
 		requestAnimationFrame(drawHeatMap)
-
-		if (lastFrameTime && delta < 33) return
-
-		lastFrameTime = elapsedTime
-
-		context.clearRect(106, 2, 29, 32)
-		canvasData = context.getImageData(0, 0, canvas.width, canvas.height)
-
-		tpa.forEach(async (p) => drawPixel(p))
-
-		tpa = []
+		context.putImageData(canvasData, 0, 0)
+		frameReady = false
 	}
 
 	function resizeCanvas() {
@@ -100,18 +87,16 @@
 
 		window.addEventListener("resize", resizeCanvas, false)
 		window.onmousemove = async (e: MouseEvent) => {
-			const page = document.getElementById("page")
-			const appShell = document.getElementById("appShell")
-			if (!appShell || !page) return
+			const { x, y } = canvas.getBoundingClientRect()
 
 			mouse = {
-				x: e.pageX - Math.round(appShell.clientWidth / 2) + 80,
-				y: e.pageY - Math.round(page.clientHeight / 2) - 115
+				x: e.pageX - x,
+				y: e.pageY - y
 			}
 		}
 
 		resizeCanvas()
-		drawHeatMap(lastFrameTime)
+		drawHeatMap()
 	})
 </script>
 
