@@ -7,13 +7,15 @@
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import PostCard from "./PostCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
+	import { ArrowDownAZ, ArrowUpZA } from "lucide-svelte"
 	export let data: PageData
 
 	const pageStr = $page.url.searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
 	let search = decodeURI($page.url.searchParams.get("search") || "")
-	let ascending = $page.url.searchParams.get("ascending")?.toLowerCase() === "true"
+	const ascendingStr = $page.url.searchParams.get("ascending")
+	let ascending = ascendingStr ? ascendingStr.toLowerCase() === "true" : true
 
 	const levelStr = $page.url.searchParams.get("level") || "-1"
 	let level =
@@ -98,16 +100,11 @@
 					Advanced tutorial
 				</button>
 				<button on:click={sort}>
-					<svg
-						class="stroke-primary-500"
-						class:rotate-180={!ascending}
-						xmlns="http://www.w3.org/2000/svg"
-						width="24"
-						height="24"
-						viewBox="0 0 24 24"
-					>
-						<path stroke-width="2" d="M12 5v14m6-8l-6-6m-6 6l6-6" />
-					</svg>
+					{#if ascending}
+						<ArrowDownAZ />
+					{:else}
+						<ArrowUpZA />
+					{/if}
 				</button>
 			</div>
 			<div class="max-w-2xl mx-auto justify-center md:flex md:space-x-5 mb-2">

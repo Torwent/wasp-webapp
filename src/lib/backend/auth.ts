@@ -8,7 +8,8 @@ import type { Profile } from "./types"
 export const user: any = writable(null)
 export const profile: any = writable(null)
 
-let realtimeProfile: RealtimeChannel | null = null
+let realtimeRoles: RealtimeChannel | null = null
+let realtimeWarning: RealtimeChannel | null = null
 
 export const supabaseClient = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY)
 
@@ -24,8 +25,11 @@ export async function getUserID() {
 
 export async function disableProfile() {
 	profile.set(null)
-	if (realtimeProfile) realtimeProfile.unsubscribe()
-	realtimeProfile = null
+	if (realtimeRoles) realtimeRoles.unsubscribe()
+	realtimeRoles = null
+
+	if (realtimeWarning) realtimeWarning.unsubscribe()
+	realtimeWarning = null
 }
 
 export async function getProfile(): Promise<Profile | null> {
@@ -53,12 +57,12 @@ export async function getProfile(): Promise<Profile | null> {
 		return null
 	}
 
-	const result = data[0] as Profile
+	const result = data[0] as unknown as Profile
 
 	profile.set(result)
 
-	if (realtimeProfile) realtimeProfile.unsubscribe()
-	realtimeProfile = realtimeProfile = supabaseClient
+	if (realtimeRoles) realtimeRoles.unsubscribe()
+	realtimeRoles = supabaseClient
 		.channel("any")
 		.on(
 			"postgres_changes",
@@ -76,6 +80,25 @@ export async function getProfile(): Promise<Profile | null> {
 				tmp.profiles_protected.tester = payload.new.tester
 				tmp.profiles_protected.moderator = payload.new.moderator
 				tmp.profiles_protected.administrator = payload.new.administrator
+				profile.set(tmp)
+			}
+		)
+		.subscribe()
+
+	if (realtimeWarning) realtimeWarning.unsubscribe()
+	realtimeWarning = supabaseClient
+		.channel("any")
+		.on(
+			"postgres_changes",
+			{
+				event: "UPDATE",
+				schema: "public",
+				table: "profiles_private",
+				filter: `id=eq.${id}`
+			},
+			(payload: any) => {
+				let tmp = get(profile) as Profile
+				tmp.profiles_private.dismissed_warning = payload.new.dismissed_warning
 				profile.set(tmp)
 			}
 		)

@@ -179,7 +179,7 @@
 					<div
 						class="h-8 w-8 my-auto mr-3 rounded-full bg-white overflow-clip grid justify-center content-center"
 					>
-						<img src="/favicon.svg" alt="WS" class="h-5 align-middle" />
+						<img src="/favicon.png" alt="WS" class="h-5 align-middle" />
 					</div>
 					<div class="block">
 						<span class="block">WaspScripts</span>

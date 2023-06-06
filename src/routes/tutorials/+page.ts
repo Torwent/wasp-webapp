@@ -8,7 +8,9 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 	const pageStr = url.searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
-	const ascending = url.searchParams.get("ascending")?.toLowerCase() !== "true"
+	const ascendingStr = url.searchParams.get("ascending")
+	const ascending = ascendingStr ? ascendingStr.toLowerCase() === "true" : true
+
 	const search = decodeURI(url.searchParams.get("search") || "")
 
 	const levelStr = url.searchParams.get("level") || "-1"

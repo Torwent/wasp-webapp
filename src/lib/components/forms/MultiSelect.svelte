@@ -2,6 +2,7 @@
 <script lang="ts">
 	import { page } from "$app/stores"
 	import type { Category } from "$lib/backend/types"
+	import { ChevronDown, X } from "lucide-svelte"
 	import { fly } from "svelte/transition"
 	export let title: string
 	export let value: string[]
@@ -38,12 +39,6 @@
 				return
 			}
 		}
-	}
-
-	function clear() {
-		value = []
-		inputValue = ""
-		input.focus()
 	}
 
 	function handleOptionMousedown(e: any) {
@@ -104,35 +99,11 @@
 				{placeholder}
 			/>
 
-			<svg
-				class="fill-white hover:cursor-pointer"
-				class:fill-error-500={hasError}
-				xmlns="http://www.w3.org/2000/svg"
-				width="14"
-				height="14"
-				viewBox="0 0 24 24"
-				class:hidden={!value.length}
-				on:keypress={() => clear()}
-				on:click={() => clear()}
-				on:focus={() => input.focus()}
-			>
-				<path
-					d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-				/>
-			</svg>
-
-			<svg
-				class="fill-primary-500"
-				class:rotate-180={showOptions}
-				class:fill-black={hasError}
-				xmlns="http://www.w3.org/2000/svg"
-				width="18"
-				height="18"
-				viewBox="0 0 18 18"
-				on:focus={() => input.focus()}
-			>
-				<path d="M5 8l4 4 4-4z" />
-			</svg>
+			<ChevronDown
+				class="{hasError ? 'text-error-500' : 'text-black dark:text-white'} {showOptions
+					? 'rotate-180'
+					: ''}"
+			/>
 		</div>
 
 		{#each entries as entry}
@@ -144,17 +115,7 @@
 					on:click={() => remove(entry)}
 				>
 					<span class:text-error-500={hasError}>{entry.emoji + entry.name}</span>
-					<svg
-						class={hasError ? "fill-error-500" : "fill-white"}
-						xmlns="http://www.w3.org/2000/svg"
-						width="14"
-						height="14"
-						viewBox="0 0 24 24"
-					>
-						<path
-							d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
-						/>
-					</svg>
+					<X class="h-4 {hasError ? 'text-error-500' : 'text-black dark:text-white'}" />
 				</button>
 			{/if}
 		{/each}

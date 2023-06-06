@@ -5,6 +5,7 @@
 	import { pad } from "$lib/utils"
 	import type { Script } from "$lib/backend/types"
 	import { browser } from "$app/environment"
+	import { ChevronDown, FileDown } from "lucide-svelte"
 
 	export let script: Script
 	export let rev = script.scripts_protected.revision
@@ -42,21 +43,14 @@
 		class="variant-filled-primary hover:variant-filled-primary uppercase"
 		on:click|preventDefault={download}
 	>
-		<svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-			<path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
-		</svg>
+		<FileDown />
 		<span class="border-0">{script.title}</span>
 	</button>
 	<button
 		class="variant-filled-secondary hover:variant-filled-secondary uppercase"
 		use:popup={popupSettings}
 	>
-		<span>rev. {rev}</span>
-		<svg class="h-5 w-5 border-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-			<path
-				d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-			/>
-		</svg>
+		<span class="flex">rev. {rev}<ChevronDown class="ml-2" /></span>
 	</button>
 </div>
 

@@ -6,8 +6,36 @@
 	import type { Profile, Script } from "$lib/backend/types"
 	import { pad } from "$lib/utils"
 	import { slide } from "svelte/transition"
+	import { ChevronDown, FileArchive } from "lucide-svelte"
 
 	export let profile: Profile
+
+	const ALL_ZIPS = [
+		"wasp-premium.zip",
+		"wasp-free.zip",
+		"wasp-all.zip",
+		"community-premium.zip",
+		"community-free.zip",
+		"all-premium.zip",
+		"all-free.zip",
+		"all.zip"
+	]
+
+	$: ({ profiles_protected } = profile)
+	$: isPremium = profiles_protected.premium || profiles_protected.vip || profiles_protected.tester
+	$: dismissed = profile.profiles_private.dismissed_warning
+	$: zipName = isPremium ? "wasp-premium.zip" : "wasp-free.zip"
+
+	function availableZIPs(isPremium: boolean, dismissed: boolean) {
+		let zips: string[] = ["wasp-free.zip"]
+		if (dismissed) zips = ["wasp-free.zip", "community-free.zip", "all-free.zip"]
+		if (isPremium) zips = ["wasp-premium.zip", "wasp-free.zip", "wasp-all.zip"]
+		if (isPremium && dismissed) zips = ALL_ZIPS
+
+		return zips
+	}
+
+	$: zipsAvailable = availableZIPs(isPremium, dismissed)
 
 	let progress: number = -1
 
@@ -15,27 +43,6 @@
 		event: "click",
 		target: "zipDropDown"
 	}
-
-	let isPremium =
-		profile.profiles_protected.premium ||
-		profile.profiles_protected.vip ||
-		profile.profiles_protected.tester
-
-	function availableZIPs(isPremium: boolean) {
-		return isPremium
-			? [
-					"wasp-premium.zip",
-					"wasp-free.zip",
-					"wasp-community-premium.zip",
-					"wasp-community-free.zip",
-					"wasp-all-premium.zip",
-					"wasp-all-free.zip",
-					"wasp-all.zip"
-			  ]
-			: ["wasp-free.zip", "wasp-community-free.zip", "wasp-all-free.zip"]
-	}
-
-	let zipName: string = isPremium ? "wasp-premium.zip" : "wasp-free.zip"
 
 	async function downloadFile(url: string) {
 		const response = await fetch(url)
@@ -69,7 +76,7 @@
 		return saveAs(zipBlob, zipName)
 	}
 
-	const downloadAndZip = async () => {
+	async function downloadAndZip() {
 		let scripts = await getScripts()
 
 		if (!scripts) {
@@ -78,19 +85,21 @@
 		}
 
 		scripts = scripts.filter((script) => {
-			if (availableZIPs(isPremium)[0].match(zipName))
+			if (ALL_ZIPS[0].match(zipName))
 				return script.categories.includes("Official") && script.categories.includes("Premium")
-			else if (availableZIPs(isPremium)[1].match(zipName))
+			else if (ALL_ZIPS[1].match(zipName))
 				return script.categories.includes("Official") && script.categories.includes("Free")
-			else if (availableZIPs(isPremium)[2].match(zipName))
+			else if (ALL_ZIPS[2].match(zipName)) return script.categories.includes("Official")
+			else if (ALL_ZIPS[3].match(zipName))
 				return script.categories.includes("Community") && script.categories.includes("Premium")
-			else if (availableZIPs(isPremium)[3].match(zipName))
+			else if (ALL_ZIPS[4].match(zipName))
 				return script.categories.includes("Community") && script.categories.includes("Free")
-			else if (availableZIPs(isPremium)[4].match(zipName))
-				return script.categories.includes("Premium")
-			else if (availableZIPs(isPremium)[5].match(zipName)) return script.categories.includes("Free")
+			else if (ALL_ZIPS[5].match(zipName)) return script.categories.includes("Premium")
+			else if (ALL_ZIPS[6].match(zipName)) return script.categories.includes("Free")
 			else return true
 		})
+
+		scripts.forEach((s) => console.log(s.title))
 
 		let urls: (string | false)[] = []
 		let promises = []
@@ -121,12 +130,6 @@
 		await downloadAndZip()
 		console.log("Took ", performance.now() - start, "ms to download all files 🚀")
 	}
-
-	$: isPremium =
-		profile.profiles_protected.premium ||
-		profile.profiles_protected.vip ||
-		profile.profiles_protected.tester
-	$: zipName = isPremium ? "wasp-premium.zip" : "wasp-free.zip"
 </script>
 
 <div class="btn-group text-black fill-black">
@@ -134,20 +137,14 @@
 		class="variant-filled-primary hover:variant-filled-primary uppercase"
 		on:click|preventDefault={download}
 	>
-		<svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-			<path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
-		</svg>
+		<FileArchive />
 		<span class="border-0">{zipName}</span>
 	</button>
 	<button
 		class="variant-filled-secondary hover:variant-filled-secondary uppercase"
 		use:popup={popupSettings}
 	>
-		<svg class="h-5 w-5 border-0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-			<path
-				d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-			/>
-		</svg>
+		<ChevronDown />
 	</button>
 </div>
 
@@ -159,12 +156,12 @@
 >
 	<div class="arrow bg-surface-800" />
 	<ul class="overflow-y-auto max-h-48 py-1 text-sm mt-2">
-		{#each availableZIPs(isPremium) as z}
+		{#each zipsAvailable as zip}
 			<li
 				class="block py-2 px-4 hover:bg-primary-100 dark:hover:bg-primary-300 dark:hover:text-surface-900"
 			>
-				<button on:click={() => (zipName = z)}>
-					{z}
+				<button on:click={() => (zipName = zip)}>
+					{zip}
 				</button>
 			</li>
 		{/each}

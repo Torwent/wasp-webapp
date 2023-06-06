@@ -3,6 +3,7 @@
 	import DropDownEntry from "./DropDownEntry.svelte"
 	import { search } from "$lib/utils"
 	import type { FAQEntry } from "$lib/backend/types"
+	import { ChevronsDownUp, ChevronsUpDown } from "lucide-svelte"
 	export let title: string
 	export let entries: FAQEntry[]
 
@@ -37,20 +38,11 @@
 		on:click={() => (show = !show)}
 	>
 		{title}
-		<!-- Heroicon name: solid/chevron-down -->
-		<svg
-			class="mr-1 ml-2 h-5 w-5"
-			class:rotate-180={show}
-			xmlns="http://www.w3.org/2000/svg"
-			fill="currentColor"
-			aria-hidden="true"
-		>
-			<path
-				fill-rule="evenodd"
-				d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-				clip-rule="evenodd"
-			/>
-		</svg>
+		{#if show}
+			<ChevronsDownUp class="h-5" />
+		{:else}
+			<ChevronsUpDown class="h-5" />
+		{/if}
 	</button>
 	{#if show}
 		<div in:slide={{ duration: 700 }} out:slide={{ duration: 300 }}>
@@ -67,9 +59,7 @@
 							border-stone-100 hover:border-stone-200
 							dark:border-stone-600 dark:hover:border-stone-700
 							bg-stone-50 hover:bg-stone-100 dark:bg-stone-700 dark:hover:bg-stone-600
-							placeholder-amber-600 dark:placeholder-amber-200
-							text-amber-500 dark:text-amber-400
-							focus:text-amber-600 dark:focus:text-amber-300"
+							placeholder-secondary-500 text-primary-500"
 						/>
 					</div>
 				</form>

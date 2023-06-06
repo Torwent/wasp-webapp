@@ -26,8 +26,6 @@
 	import { onMount } from "svelte"
 	import type { LayoutData } from "./$types"
 	import { supabaseClient } from "$lib/backend/auth"
-	import type { Profile } from "$lib/backend/types"
-	import { API_URL } from "$lib/utils"
 	export let data: LayoutData
 
 	$: ({ profile } = data)
