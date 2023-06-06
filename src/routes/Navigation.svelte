@@ -25,7 +25,9 @@
 
 <nav class="transition-colors duration-500 font-semibold">
 	{#if !large}
-		<button name="Menu" aria-label="Open the navigation menu"
+		<button
+			name="Menu"
+			aria-label="Open the navigation menu"
 			class="flex mx-auto text-primary-500 dark:text-primary-400"
 			on:click={() => (showMenu = !showMenu)}
 		>
@@ -39,27 +41,25 @@
 			: ''}"
 	>
 		{#each routeArray as route, index}
-			
-				<li class="py-2 md:py-0">
-					<a
-						href={getLink(route)}
-						class="dark:hover:text-primary-100 hover:text-primary-400
+			<li class="py-2 md:py-0">
+				<a
+					href={getLink(route)}
+					class="dark:hover:text-primary-100 hover:text-primary-400
 									{active(route) ? 'text-primary-500 dark:text-primary-400' : ''}"
-						aria-label="Navigate to {route.toLowerCase()} page"
-						on:click={() => (showMenu = !showMenu)}
-					>
-						{#if index === 0}
-							{#if !large}
-								{route}
-							{:else}
-								<Logo selected={active(route)} />
-							{/if}
-						{:else}
+					aria-label="Navigate to {route.toLowerCase()} page"
+					on:click={() => (showMenu = !showMenu)}
+				>
+					{#if index === 0}
+						{#if !large}
 							{route}
+						{:else}
+							<Logo selected={active(route)} />
 						{/if}
-					</a>
-				</li>
-			
+					{:else}
+						{route}
+					{/if}
+				</a>
+			</li>
 		{/each}
 
 		{#if !large}

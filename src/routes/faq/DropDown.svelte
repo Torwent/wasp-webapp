@@ -32,8 +32,7 @@
 		class="inline-flex justify-between w-full rounded-t border shadow-sm px-4 py-2 text-sm font-medium
 		border-stone-200 bg-stone-100 hover:bg-stone-50
 		dark:border-stone-700 dark:bg-stone-800 dark:hover:bg-stone-900"
-		id="menu-button"
-		aria-expanded="true"
+		aria-expanded={show}
 		aria-haspopup="true"
 		on:click={() => (show = !show)}
 	>

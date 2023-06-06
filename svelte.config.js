@@ -6,7 +6,19 @@ const config = {
 	preprocess: vitePreprocess(),
 
 	kit: {
-		adapter: adapter()
+		adapter: adapter(),
+		csp: {
+			mode: "auto",
+			directives: {
+				"script-src": [
+					"self",
+					"sha256-PBmRLzA7Ofi7WtgbjS5vmS9t83AYv5oRRywasLtzZ9Y=",
+					"unsafe-inline"
+				],
+				"base-uri": ["self"],
+				"object-src": ["none"]
+			}
+		}
 	}
 }
 

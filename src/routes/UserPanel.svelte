@@ -83,7 +83,7 @@
 			<h3 class="text-2x1 font-bold text-center md:text-3x1">Log In</h3>
 		</header>
 
-		<f class="p-4">
+		<div class="p-4">
 			<button
 				name="Login"
 				aria-label="Logins"
@@ -99,6 +99,6 @@
 
 				<span class="px-2">Login with Discord</span>
 			</button>
-		</f>
+		</div>
 	{/if}
 </form>

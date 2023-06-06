@@ -100,7 +100,7 @@
 				 dark:from-black/60 dark:via-gray-800/20 to-transparent"
 			/>
 			<h2 class="mx-8 mb-4 font-bold text-4xl">{script.title}</h2>
-			<h5 class="font-semibold leading-normal mb-4">{script.description}</h5>
+			<h3 class="font-semibold leading-normal mb-4">{script.description}</h3>
 		</header>
 	</div>
 
@@ -161,7 +161,10 @@
 			</div>
 		{/if}
 
-		<h5 class="text-primary-500 text-center my-6">Description:</h5>
+		<header class="text-center my-6 text-primary-500">
+			<span class="text-lg">Description:</span>
+		</header>
+
 		<div class="variant-ghost-surface max-h-[50rem] overflow-auto">
 			<article class="py-6 m-auto prose dark:prose-invert">
 				<Markdown src={script.content} />

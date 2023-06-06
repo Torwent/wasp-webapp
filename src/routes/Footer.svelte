@@ -13,7 +13,7 @@
 		</div>
 		<div class="grid grid-cols-2 gap-8 sm:gap-4 sm:grid-cols-3">
 			<nav>
-				<h4 class="mb-6 text-sm font-semibold uppercase">Resources</h4>
+				<span class="mb-6 text-sm font-semibold uppercase">Resources</span>
 				<ul>
 					<li><a href="/setup">Setup</a></li>
 					<li><a href="https://torwent.github.io/SRL-T">SRL-T Documentation</a></li>
@@ -24,7 +24,7 @@
 				</ul>
 			</nav>
 			<nav>
-				<h4 class="mb-6 text-sm font-semibold uppercase">Special thanks:</h4>
+				<span class="mb-6 text-sm font-semibold uppercase">Special thanks:</span>
 				<ul>
 					<li><a href="/devs/Slacky">Jarl Holta</a></li>
 					<li><a href="/devs/Olly">Olly</a></li>
@@ -32,7 +32,7 @@
 				</ul>
 			</nav>
 			<nav>
-				<h4 class="mb-6 text-sm font-semibold uppercase">Legal</h4>
+				<span class="mb-6 text-sm font-semibold uppercase">Legal</span>
 				<ul>
 					<li><a href="/">Privacy Policy</a></li>
 					<li><a href="/">Terms &amp; Conditions</a></li>
@@ -46,10 +46,10 @@
 			. All Rights Reserved.
 		</span>
 		<div class="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
-			<a href="https://github.com/torwent">
+			<a href="https://github.com/torwent" aria-label="Navigate to GitHub">
 				<Github />
 			</a>
-			<a href="/">
+			<a href="https://waspscripts.com" aria-label="Navigate to main site">
 				<Globe />
 			</a>
 		</div>

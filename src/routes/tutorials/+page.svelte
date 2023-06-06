@@ -99,7 +99,7 @@
 				>
 					Advanced tutorial
 				</button>
-				<button on:click={sort}>
+				<button on:click={sort} aria-label="Sort posts by level">
 					{#if ascending}
 						<ArrowDownAZ />
 					{:else}
