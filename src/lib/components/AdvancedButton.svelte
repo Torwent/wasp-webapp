@@ -16,7 +16,6 @@
 		const url = await getSignedURL("scripts", script.id + "/" + pad(rev, 9), "script.simba")
 		if (!url || !browser) return
 
-		console.log(url)
 		const response = await fetch(url)
 		const blobObject = await response.blob()
 
