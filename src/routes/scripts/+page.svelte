@@ -53,6 +53,7 @@
 	function canSeeScript(script: IScriptCard) {
 		if (script.published) return true
 		if (!profile) return false
+		if (profile.profiles_protected.administrator) return true
 		if (profile.profiles_protected.moderator) return true
 		return script.scripts_protected.author_id === profile.id
 	}

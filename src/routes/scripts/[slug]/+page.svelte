@@ -2,7 +2,7 @@
 	import { browser } from "$app/environment"
 	import { goto } from "$app/navigation"
 	import Markdown from "$lib/Markdown.svelte"
-	import { updateWarning } from "$lib/backend/data"
+	import { canDownload, updateWarning } from "$lib/backend/data"
 	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import ZipDownload from "$lib/components/ZIPDownload.svelte"
@@ -59,15 +59,9 @@
 
 	if (!dismissed && script && script.categories.includes("Community")) modalStore.trigger(warn)
 
-	function canDownload() {
+	function canDownloadScript() {
 		if (script.categories.includes("Free")) return true
-		if (!profile) return false
-		if (profile.id === script.scripts_protected.author_id) return true
-		return (
-			profile.profiles_protected.premium ||
-			profile.profiles_protected.vip ||
-			profile.profiles_protected.tester
-		)
+		return canDownload(profile)
 	}
 
 	const t: ToastSettings = {
@@ -135,7 +129,7 @@
 
 		{#if profile}
 			<div class="text-center">
-				{#if canDownload()}
+				{#if canDownloadScript()}
 					<div class="py-12">
 						<AdvancedButton {script} />
 					</div>

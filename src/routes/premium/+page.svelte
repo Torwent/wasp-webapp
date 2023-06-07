@@ -2,8 +2,11 @@
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { fade } from "svelte/transition"
 	import { modalStore, type ModalSettings } from "@skeletonlabs/skeleton"
+	import { canDownload } from "$lib/backend/data.js"
 
 	export let data
+
+	$: ({ profile } = data)
 
 	const confirm: ModalSettings = {
 		type: "alert",
@@ -61,23 +64,32 @@
 	in:fade={{ duration: 300, delay: 300 }}
 	out:fade={{ duration: 300 }}
 >
-	{#if data.profile && (data.profile.profiles_protected.vip || data.profile.profiles_protected.premium || data.profile.profiles_protected.tester)}
+	{#if profile && canDownload(profile)}
 		<header class="py-8">
-			<h2>
-				Thank you for having joined
-				{#if data.profile.profiles_protected.vip}
-					<span class="text-red-600 dark:text-red-500">VIP</span>
-				{:else if data.profile.profiles_protected.premium}
+			<h2 class="my-4">Thank you for having joined WaspScripts!</h2>
+			<h3>
+				You already have the
+				{#if profile.profiles_protected.administrator}
+					<span class="text-orange-500">Administrator</span>
+				{:else if profile.profiles_protected.moderator}
+					<span class="text-purple-500">Moderator</span>
+				{:else if profile.profiles_protected.scripter}
+					<span class="text-teal-500">Scripter</span>
+				{:else if profile.profiles_protected.tester}
+					<span class="text-green-500">Tester</span>
+				{:else if profile.profiles_protected.vip}
+					<span class="text-red-500">VIP</span>
+				{:else if profile.profiles_protected.premium}
+					<span class="text-orange-500">Premium</span>
+				{/if}
+				Role.
+				{#if !profile.profiles_protected.vip || profile.profiles_protected.premium}
+					You already have access to every script and you don't need to buy
 					<span class="text-orange-500 dark:text-orange-400">Premium</span>
-				{:else if data.profile.profiles_protected.tester}
-					<span class="text-green-500 dark:text-green-400">Tester</span>
-					you already have access to every script and you don't need to buy
-					<span class="text-orange-500 dark:text-orange-400">Premium</span>
-					.
 					<br />
 					But of course, I appreciate it if you do!
 				{/if}
-			</h2>
+			</h3>
 		</header>
 	{/if}
 	<p class="py-4">

@@ -8,6 +8,7 @@
 	import { slide } from "svelte/transition"
 	import PayPal from "../PayPal.svelte"
 	import { Github } from "lucide-svelte"
+	import { canEdit } from "$lib/backend/data"
 
 	export let data
 
@@ -70,7 +71,7 @@
 		</div>
 	{/if}
 
-	{#if data.profile && data.profile.profiles_protected.moderator}
+	{#if canEdit(data.profile, developer.id)}
 		<div class="flex">
 			<button class="btn variant-filled-secondary mx-auto" on:click={() => (show = !show)}>
 				{#if show}Hide{:else}Show{/if} Preview
