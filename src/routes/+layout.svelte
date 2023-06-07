@@ -31,6 +31,10 @@
 	$: ({ profile } = data)
 
 	onMount(async () => {
+		console.log(data.session?.user.id)
+		const session2 = await supabaseClient.auth.getSession()
+		console.log(session2.data.session?.user.id)
+
 		const {
 			data: { subscription }
 		} = supabaseClient.auth.onAuthStateChange(async () => {
