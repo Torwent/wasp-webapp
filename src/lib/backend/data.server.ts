@@ -124,3 +124,19 @@ export async function updateScript(
 
 	return { error: undefined }
 }
+
+export async function getSignedURLServer(
+	supabase: SupabaseClient,
+	bucket: string,
+	path: string,
+	file: string
+) {
+	path += "/" + file
+
+	const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
+	if (error) {
+		console.error("Failed to get signed URL. Error message: " + error)
+		return false
+	}
+	return data.signedUrl
+}

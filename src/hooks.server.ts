@@ -22,7 +22,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			.from("profiles_public")
 			.select(
 				`id, discord_id, username, avatar_url,
-      		profiles_protected (developer, premium, vip, tester, moderator, administrator),
+      		profiles_protected (developer, premium, vip, tester, scripter, moderator, administrator),
 			profiles_private (dismissed_warning)`
 			)
 			.eq("id", id)

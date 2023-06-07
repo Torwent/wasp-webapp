@@ -2,7 +2,7 @@
 	import { popup, type PopupSettings } from "@skeletonlabs/skeleton"
 	import JsZip from "jszip"
 	import { saveAs } from "file-saver"
-	import { getScripts, getSignedURL } from "$lib/backend/data"
+	import { canDownload, getScripts, getSignedURL } from "$lib/backend/data"
 	import type { Profile, Script } from "$lib/backend/types"
 	import { pad } from "$lib/utils"
 	import { slide } from "svelte/transition"
@@ -21,8 +21,7 @@
 		"all.zip"
 	]
 
-	$: ({ profiles_protected } = profile)
-	$: isPremium = profiles_protected.premium || profiles_protected.vip || profiles_protected.tester
+	$: isPremium = canDownload(profile)
 	$: dismissed = profile.profiles_private.dismissed_warning
 	$: zipName = isPremium ? "wasp-premium.zip" : "wasp-free.zip"
 

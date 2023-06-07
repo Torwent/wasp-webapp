@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { PUBLIC_SUPER_USER_ID } from "$env/static/public"
 	import Markdown from "$lib/Markdown.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { Github } from "lucide-svelte"
 	import { fade } from "svelte/transition"
 	import PayPal from "./PayPal.svelte"
+	import EditButton from "$lib/components/EditButton.svelte"
 	export let data
 
 	const { developer, profile } = data
@@ -53,14 +53,6 @@
 			<button class="btn variant-filled-secondary">Back</button>
 		</a>
 
-		{#if profile}
-			{#if profile.id === developer.id || profile.profiles_protected.moderator}
-				<div class="flex">
-					<a href="/devs/{developer.username}/edit" class="mx-auto">
-						<button class="btn variant-filled-secondary">Edit</button>
-					</a>
-				</div>
-			{/if}
-		{/if}
+		<EditButton author_id={developer.id} />
 	</div>
 </div>

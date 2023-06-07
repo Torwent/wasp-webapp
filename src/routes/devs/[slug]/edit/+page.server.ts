@@ -3,6 +3,7 @@ import { setError, superValidate } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
 import { developerSchema } from "$lib/backend/types"
 import { PUBLIC_SUPER_USER_ID } from "$env/static/public"
+import { canEdit } from "$lib/backend/data"
 
 export const load: PageServerLoad = async (event) => {
 	const form = superValidate(event, developerSchema)
@@ -22,7 +23,7 @@ export const actions = {
 			return setError(form, null, msg)
 		}
 
-		if (profile.id != form.data.id && !profile.profiles_protected.moderator) {
+		if (canEdit(profile, form.data.id)) {
 			const msg = "You can't edit another developer profile."
 			console.error(msg)
 			return setError(form, null, msg)

@@ -46,7 +46,7 @@ export async function getProfile(): Promise<Profile | null> {
 		.from("profiles_public")
 		.select(
 			`id, discord_id, username, avatar_url,
-      		profiles_protected (developer, premium, vip, tester, moderator, administrator),
+      		profiles_protected (developer, premium, vip, tester, scripter, moderator, administrator),
 			profiles_private (dismissed_warning)`
 		)
 		.eq("id", id)
@@ -78,6 +78,7 @@ export async function getProfile(): Promise<Profile | null> {
 				tmp.profiles_protected.premium = payload.new.premium
 				tmp.profiles_protected.vip = payload.new.vip
 				tmp.profiles_protected.tester = payload.new.tester
+				tmp.profiles_protected.scripter = payload.new.scripter
 				tmp.profiles_protected.moderator = payload.new.moderator
 				tmp.profiles_protected.administrator = payload.new.administrator
 				profile.set(tmp)

@@ -223,8 +223,7 @@ export async function getSignedURL(bucket: string, path: string, file: string) {
 	path += "/" + file
 
 	const session = await supabaseClient.auth.getSession()
-
-	console.log(session.data.session)
+	console.log(session.data.session?.user)
 
 	const { data, error } = await supabaseClient.storage.from(bucket).createSignedUrl(path, 10)
 	if (error) {
@@ -234,11 +233,22 @@ export async function getSignedURL(bucket: string, path: string, file: string) {
 	return data.signedUrl
 }
 
-export async function canEdit(profile: Profile | null, author: string) {
+export function canEdit(profile: Profile | null, author: string | null | undefined) {
 	if (!profile) return false
 
-	if (profile.profiles_protected.moderator) return true
 	if (profile.profiles_protected.administrator) return true
+	if (profile.profiles_protected.moderator) return true
 
 	return profile.id === author
+}
+
+export function canDownload(profile: Profile | null) {
+	if (!profile) return false
+	if (profile.profiles_protected.administrator) return true
+	if (profile.profiles_protected.moderator) return true
+	if (profile.profiles_protected.scripter) return true
+	if (profile.profiles_protected.tester) return true
+	if (profile.profiles_protected.vip) return true
+	if (profile.profiles_protected.premium) return true
+	return false
 }

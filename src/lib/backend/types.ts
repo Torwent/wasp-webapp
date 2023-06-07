@@ -13,6 +13,7 @@ interface ProfileProtected {
 	premium: boolean
 	vip: boolean
 	tester: boolean
+	scripter: boolean
 	moderator: boolean
 	administrator: boolean
 }
