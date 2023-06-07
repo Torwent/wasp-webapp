@@ -256,6 +256,7 @@
 					<FileDropzone
 						name="cover"
 						bind:files={coverFiles}
+						accept="image/jpeg"
 						slotMessage="mx-auto {getStyle('text', $form.cover, $errors.cover)}"
 						slotMeta="mx-auto {getStyle('text', $form.cover, $errors.cover)}"
 					>
@@ -282,6 +283,7 @@
 					<FileDropzone
 						name="banner"
 						bind:files={bannerFiles}
+						accept="image/jpeg"
 						slotMessage="mx-auto {getStyle('text', $form.banner, $errors.banner)}"
 						slotMeta="mx-auto {getStyle('text', $form.banner, $errors.banner)}"
 					>
@@ -411,6 +413,7 @@
 					<FileDropzone
 						name="script"
 						bind:files={scriptFiles}
+						accept=".simba"
 						slotMessage="mx-auto {getStyle('text', $form.script, $errors.script)}"
 						slotMeta="mx-auto {getStyle('text', $form.script, $errors.script)}"
 					>
