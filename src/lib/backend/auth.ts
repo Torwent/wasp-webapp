@@ -14,7 +14,7 @@ let realtimeWarning: RealtimeChannel | null = null
 
 export const sbClient = createSBClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
 	auth: {
-		autoRefreshToken: true
+		persistSession: true
 	}
 })
 
