@@ -222,9 +222,6 @@ export async function getDeveloper(path: string): Promise<Developer | null> {
 export async function getSignedURL(bucket: string, path: string, file: string) {
 	path += "/" + file
 
-	const session = await sbClient.auth.getSession()
-	console.log(session.data.session?.user)
-
 	const { data, error } = await sbClient.storage.from(bucket).createSignedUrl(path, 10)
 	if (error) {
 		console.error("Failed to get signed URL. Error message: " + error)

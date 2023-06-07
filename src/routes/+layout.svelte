@@ -25,20 +25,12 @@
 	import { invalidate } from "$app/navigation"
 	import { onMount } from "svelte"
 	import type { LayoutData } from "./$types"
-	import { sbClient, supabaseClient } from "$lib/backend/auth"
+	import { supabaseClient } from "$lib/backend/auth"
 	export let data: LayoutData
 
-	$: ({ profile, session } = data)
+	$: ({ profile } = data)
 
 	onMount(async () => {
-		console.log("server:", session?.user.id)
-
-		const session2 = await supabaseClient.auth.getSession()
-		console.log("clientHelper:", session2.data.session?.user.id)
-
-		const session3 = await sbClient.auth.getSession()
-		console.log("clientTrue:", session3.data.session?.user.id)
-
 		const {
 			data: { subscription }
 		} = supabaseClient.auth.onAuthStateChange(async () => {
