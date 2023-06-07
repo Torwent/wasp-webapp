@@ -11,7 +11,7 @@ import type {
 	CheckboxType,
 	Profile
 } from "./types"
-import { getUserID, profile, supabaseClient } from "./auth"
+import { getUserID, profile, sbClient, supabaseClient } from "./auth"
 
 const categories: any = writable(false)
 const subCategories: any = writable(false)
@@ -222,10 +222,10 @@ export async function getDeveloper(path: string): Promise<Developer | null> {
 export async function getSignedURL(bucket: string, path: string, file: string) {
 	path += "/" + file
 
-	const session = await supabaseClient.auth.getSession()
+	const session = await sbClient.auth.getSession()
 	console.log(session.data.session?.user)
 
-	const { data, error } = await supabaseClient.storage.from(bucket).createSignedUrl(path, 10)
+	const { data, error } = await sbClient.storage.from(bucket).createSignedUrl(path, 10)
 	if (error) {
 		console.error("Failed to get signed URL. Error message: " + error)
 		return false
