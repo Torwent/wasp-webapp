@@ -1,4 +1,5 @@
-import { createClient } from "@supabase/supabase-js"
+import { createClient } from "@supabase/auth-helpers-sveltekit"
+import { createClient as createSBClient } from "@supabase/supabase-js"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import type { RealtimeChannel, User } from "@supabase/supabase-js"
 
@@ -10,18 +11,14 @@ export const profile: any = writable(null)
 
 let realtimeRoles: RealtimeChannel | null = null
 let realtimeWarning: RealtimeChannel | null = null
-const options = {
-	autoRefreshToken: true,
-	persistSession: true
-}
 
-export const supabaseClient = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+export const sbClient = createSBClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
 	auth: {
-		autoRefreshToken: true,
-		persistSession: true,
-		detectSessionInUrl: true
+		autoRefreshToken: true
 	}
 })
+
+export const supabaseClient = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY)
 
 async function getUser() {
 	const tmp = get(user) as User | null
