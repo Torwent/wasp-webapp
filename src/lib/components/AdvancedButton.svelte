@@ -12,24 +12,22 @@
 
 	const revisions = Array.from({ length: rev }, (_, i) => i + 1).reverse()
 
-	function download() {
-		getSignedURL("scripts", script.id + "/" + pad(rev, 9), "script.simba").then((url) => {
-			if (!url || !browser) return
+	async function download() {
+		const url = await getSignedURL("scripts", script.id + "/" + pad(rev, 9), "script.simba")
+		if (!url || !browser) return
 
-			fetch(url)
-				.then((resp) => resp.blob())
-				.then((blobobject) => {
-					const blob = window.URL.createObjectURL(blobobject)
-					const anchor = document.createElement("a")
-					anchor.style.display = "none"
-					anchor.href = blob
-					anchor.download = script.title.toLowerCase().replace(/\s/g, "_") + ".simba"
-					document.body.appendChild(anchor)
-					anchor.click()
-					window.URL.revokeObjectURL(blob)
-				})
-				.catch(() => console.log("An error occured while downloading the file, sorry!"))
-		})
+		console.log(url)
+		const response = await fetch(url)
+		const blobObject = await response.blob()
+
+		const blob = window.URL.createObjectURL(blobObject)
+		const anchor = document.createElement("a")
+		anchor.style.display = "none"
+		anchor.href = blob
+		anchor.download = script.title.toLowerCase().replace(/\s/g, "_") + ".simba"
+		document.body.appendChild(anchor)
+		anchor.click()
+		window.URL.revokeObjectURL(blob)
 	}
 
 	let popupSettings: PopupSettings = {

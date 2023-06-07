@@ -221,10 +221,14 @@ export async function getDeveloper(path: string): Promise<Developer | null> {
 
 export async function getSignedURL(bucket: string, path: string, file: string) {
 	path += "/" + file
-	const { data, error } = await supabaseClient.storage.from(bucket).createSignedUrl(path, 10)
 
+	const session = await supabaseClient.auth.getSession()
+
+	console.log(session.data.session)
+
+	const { data, error } = await supabaseClient.storage.from(bucket).createSignedUrl(path, 10)
 	if (error) {
-		console.error(error)
+		console.error("Failed to get signed URL. Error message: " + error)
 		return false
 	}
 	return data.signedUrl
