@@ -28,12 +28,22 @@
 	import { supabaseClient } from "$lib/backend/auth"
 	export let data: LayoutData
 
-	$: ({ profile } = data)
+	$: ({ profile, session } = data)
 
 	onMount(async () => {
-		console.log(data.session?.user.id)
+		console.log("1:", session?.user.id)
+
 		const session2 = await supabaseClient.auth.getSession()
-		console.log(session2.data.session?.user.id)
+		console.log("2:", session2.data.session?.user.id)
+
+		if (session)
+			supabaseClient.auth.setSession({
+				access_token: session.access_token,
+				refresh_token: session.refresh_token
+			})
+
+		const session3 = await supabaseClient.auth.getSession()
+		console.log("3:", session3.data.session?.user.id)
 
 		const {
 			data: { subscription }
