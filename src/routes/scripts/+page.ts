@@ -1,9 +1,9 @@
-import { supabaseClient } from "$lib/backend/auth"
 import { addToolTips, getCategories, getCheckBoxes, getSubCategories } from "$lib/backend/data"
 import type { Script } from "$lib/backend/types"
 import { redirect, type Load } from "@sveltejs/kit"
 
-export const load: Load = async ({ url, depends }) => {
+export const load: Load = async ({ url, depends, parent }) => {
+	const tmp = parent()
 	depends("scripts:list")
 
 	const pageStr = url.searchParams.get("page") || "-1"
@@ -23,8 +23,9 @@ export const load: Load = async ({ url, depends }) => {
 
 	let scriptsPromise
 
+	const { supabase } = await tmp
 	if (search === "") {
-		scriptsPromise = supabaseClient
+		scriptsPromise = supabase
 			.from("scripts_public")
 			.select(
 				`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
@@ -39,7 +40,7 @@ export const load: Load = async ({ url, depends }) => {
 			.order("title", { ascending: ascending })
 			.range(start, finish)
 	} else {
-		scriptsPromise = supabaseClient
+		scriptsPromise = supabase
 			.from("scripts_public")
 			.select(
 				`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,

@@ -12,8 +12,9 @@ export const load: PageServerLoad = async (event) => {
 
 export const actions = {
 	default: async ({ request, locals }) => {
-		const profile = await locals.getProfile()
-		const formData = await request.formData()
+		const promises = await Promise.all([locals.getProfile(), request.formData()])
+		const profile = promises[0]
+		const formData = promises[1]
 
 		const form = await superValidate(formData, developerSchema)
 

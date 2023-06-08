@@ -7,7 +7,7 @@ declare global {
 		interface Locals {
 			warningDismissed: boolean
 			supabase: TypedSupabaseClient
-			session: Session | null
+			getSession(): Promise<Session | null>
 			getProfile(): Promise<Profile | null>
 		}
 		interface PageData {

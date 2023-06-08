@@ -25,16 +25,17 @@
 	import { invalidate } from "$app/navigation"
 	import { onMount } from "svelte"
 	import type { LayoutData } from "./$types"
-	import { supabaseClient } from "$lib/backend/auth"
 	export let data: LayoutData
 
-	$: ({ profile } = data)
+	$: ({ supabase, session, profile } = data)
 
 	onMount(async () => {
 		const {
 			data: { subscription }
-		} = supabaseClient.auth.onAuthStateChange(async () => {
-			invalidate("supabase:auth")
+		} = supabase.auth.onAuthStateChange((event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) {
+				invalidate("supabase:auth")
+			}
 		})
 
 		return () => subscription.unsubscribe()

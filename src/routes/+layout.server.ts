@@ -1,10 +1,8 @@
-import { getServerSession } from "@supabase/auth-helpers-sveltekit"
 import type { LayoutServerLoad } from "./$types"
 
-export const load: LayoutServerLoad = async (event) => {
-	event.depends("supabase:auth")
+export const load: LayoutServerLoad = async ({ locals: { getSession, getProfile } }) => {
 	return {
-		session: getServerSession(event),
-		profile: event.locals.getProfile()
+		session: getSession(),
+		profile: getProfile()
 	}
 }

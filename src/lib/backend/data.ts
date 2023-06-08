@@ -11,21 +11,25 @@ import type {
 	CheckboxType,
 	Profile
 } from "./types"
-import { getUserID, profile, sbClient, supabaseClient } from "./auth"
+import { getUserID, profileStore, supabaseStore } from "./auth"
 
-const categories: any = writable(false)
-const subCategories: any = writable(false)
-const checkboxes: any = writable(false)
+const categoriesStore = writable<Category[] | null>(null)
+const subCategoriesStore = writable<SubCategory[] | null>(null)
+const checkboxesStore = writable<CheckboxType[] | null>(null)
 
 export async function updateUsername(id: string, username: string) {
-	await supabaseClient.from("profile").update({ username: username }).eq("id", id)
+	const supabase = get(supabaseStore)
+	if (supabase) await supabase.from("profile").update({ username: username }).eq("id", id)
 }
 
 export async function updateWarning() {
+	const supabase = get(supabaseStore)
+	if (!supabase) return false
+
 	const id = await getUserID()
 	if (!id) return false
 
-	const { error } = await supabaseClient
+	const { error } = await supabase
 		.from("profiles_private")
 		.update({ dismissed_warning: true })
 		.eq("id", id)
@@ -34,43 +38,49 @@ export async function updateWarning() {
 		console.error(error)
 		return false
 	}
-	profile.set(false)
+	profileStore.set(null)
 }
 
 export async function getCategories() {
-	const tmp = get(categories)
-	if (tmp) return tmp as Category[]
+	const tmp = get(categoriesStore)
+	if (tmp) return tmp
 
-	const { data: cats } = await supabaseClient.from("scripts_categories").select("name, emoji")
+	const supabase = get(supabaseStore)
+	if (!supabase) return null
 
-	const result: Category[] | false = cats != null ? cats : false
-	categories.set(result)
+	const { data: cats } = await supabase.from("scripts_categories").select("name, emoji")
+
+	const result: Category[] | null = cats != null ? cats : null
+	categoriesStore.set(result)
 	return result
 }
 
 export async function getSubCategories() {
-	const tmp = get(subCategories)
-	if (tmp) return tmp as SubCategory[]
+	const tmp = get(subCategoriesStore)
+	if (tmp) return tmp
 
-	const { data: cats } = await supabaseClient
+	const supabase = get(supabaseStore)
+	if (!supabase) return null
+
+	const { data: cats } = await supabase
 		.from("scripts_subcategories")
 		.select("category, name, emoji")
 
-	const result: SubCategory[] | false = cats != null ? cats : false
-	subCategories.set(result)
+	const result: SubCategory[] | null = cats != null ? cats : null
+	subCategoriesStore.set(result)
 	return result
 }
 
 export async function getCheckBoxes() {
-	const tmp = get(checkboxes)
-	if (tmp) return tmp as CheckboxType[]
+	const tmp = get(checkboxesStore)
+	if (tmp) return tmp
 
 	let result: CheckboxType[] = []
 	const promises = await Promise.all([getCategories(), getSubCategories()])
 	const categories = promises[0]
 	const subcategories = promises[1]
 
-	if (!categories || !subcategories) return false
+	if (!categories || !subcategories) return null
 
 	let id = 0
 
@@ -96,7 +106,7 @@ export async function getCheckBoxes() {
 		}
 	}
 
-	checkboxes.set(result)
+	checkboxesStore.set(result)
 	return result
 }
 
@@ -105,7 +115,7 @@ async function getAllCategories() {
 	const c = promises[0]
 	const sc = promises[1]
 
-	if (!c || !sc) return false
+	if (!c || !sc) return null
 	return [...c, ...sc]
 }
 
@@ -133,7 +143,10 @@ export async function addToolTips(script: IScriptCard) {
 }
 
 export async function getScripts(): Promise<Script[] | null> {
-	const { data, error } = await supabaseClient
+	const supabase = get(supabaseStore)
+	if (!supabase) return null
+
+	const { data, error } = await supabase
 		.from("scripts_public")
 		.select(
 			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
@@ -179,7 +192,10 @@ export async function getScriptUUID(uuid: string | undefined) {
 }
 
 export async function getPosts(): Promise<Post[] | null> {
-	const { data, error } = await supabaseClient
+	const supabase = get(supabaseStore)
+	if (!supabase) return null
+
+	const { data, error } = await supabase
 		.from("tutorials")
 		.select("id, created_at, user_id, author, title, description, content, level")
 		.order("title", { ascending: true })
@@ -200,7 +216,10 @@ export async function getPost(path: string): Promise<Post | null> {
 }
 
 export async function getDevelopers(): Promise<Developer[] | null> {
-	const { data, error } = await supabaseClient
+	const supabase = get(supabaseStore)
+	if (!supabase) return null
+
+	const { data, error } = await supabase
 		.from("devs")
 		.select("id, realname, username, description, github, paypal_id, content")
 		.order("username", { ascending: true })
@@ -220,9 +239,12 @@ export async function getDeveloper(path: string): Promise<Developer | null> {
 }
 
 export async function getSignedURL(bucket: string, path: string, file: string) {
+	const supabase = get(supabaseStore)
+	if (!supabase) return null
+
 	path += "/" + file
 
-	const { data, error } = await sbClient.storage.from(bucket).createSignedUrl(path, 10)
+	const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
 	if (error) {
 		console.error("Failed to get signed URL. Error message: " + error)
 		return false
