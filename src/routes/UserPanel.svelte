@@ -2,11 +2,12 @@
 	import { Avatar, popup, type PopupSettings } from "@skeletonlabs/skeleton"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
 	import { randomString } from "$lib/utils"
-	import type { Profile } from "$lib/backend/types"
 	import { browser } from "$app/environment"
+	import { page } from "$app/stores"
 
-	export let profile: Profile | null
 	export let large: boolean
+
+	$: ({ profile } = $page.data)
 
 	let src = profile
 		? profile.avatar_url

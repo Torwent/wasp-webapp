@@ -3,9 +3,6 @@
 	import { LightSwitch } from "@skeletonlabs/skeleton"
 	import Logo from "./Logo.svelte"
 	import UserPanel from "./UserPanel.svelte"
-	import type { Profile } from "$lib/backend/types"
-
-	export let profile: Profile | null
 	export let large: boolean
 
 	const routeArray = ["Home", "Setup", "Scripts", "Stats", "Premium", "FAQ", "Tutorials"]
@@ -65,7 +62,7 @@
 		{#if !large}
 			<li class="mt-8 py-2 flex items-center justify-between">
 				<div class="flex items-center">
-					<UserPanel bind:profile large={false} />
+					<UserPanel large={false} />
 				</div>
 				<LightSwitch />
 			</li>
