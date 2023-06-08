@@ -9,12 +9,12 @@ export const load: Load = async ({ url, depends }) => {
 	const pageStr = url.searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
-	const search = decodeURI(url.searchParams.get("search") || "")
+	const search = decodeURIComponent(url.searchParams.get("search") || "").trim()
 	const ascending = url.searchParams.get("ascending")?.toLowerCase() !== "true"
-	const categoriesStr = decodeURI(url.searchParams.get("categories") || "")
+	const categoriesStr = decodeURIComponent(url.searchParams.get("categories") || "")
 	const categoriesFilters = categoriesStr.split("-")
 
-	const subcategoriesStr = decodeURI(url.searchParams.get("subcategories") || "")
+	const subcategoriesStr = decodeURIComponent(url.searchParams.get("subcategories") || "")
 	const subcategoriesFilters = subcategoriesStr.split("-")
 
 	const range = 11
@@ -68,7 +68,7 @@ export const load: Load = async ({ url, depends }) => {
 		throw redirect(303, "/")
 	}
 
-	const scriptData = data as Script[]
+	const scriptData = data as unknown as Script[]
 
 	await new Promise<void>((resolve) => {
 		scriptData.forEach(async (script, index, array) => {

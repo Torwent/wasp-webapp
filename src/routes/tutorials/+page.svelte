@@ -13,7 +13,7 @@
 	const pageStr = $page.url.searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
-	let search = decodeURI($page.url.searchParams.get("search") || "")
+	let search = decodeURIComponent($page.url.searchParams.get("search") || "").trim()
 	const ascendingStr = $page.url.searchParams.get("ascending")
 	let ascending = ascendingStr ? ascendingStr.toLowerCase() === "true" : true
 

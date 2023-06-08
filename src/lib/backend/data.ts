@@ -11,11 +11,11 @@ import type {
 	CheckboxType,
 	Profile
 } from "./types"
-import { getUserID, profile, sbClient, supabaseClient } from "./auth"
+import { getUserID, profileStore, sbClient, supabaseClient } from "./auth"
 
-const categories: any = writable(false)
-const subCategories: any = writable(false)
-const checkboxes: any = writable(false)
+const categories = writable<Category[] | null>(null)
+const subCategories = writable<SubCategory[] | null>(null)
+const checkboxes = writable<CheckboxType[] | null>(null)
 
 export async function updateUsername(id: string, username: string) {
 	await supabaseClient.from("profile").update({ username: username }).eq("id", id)
@@ -34,7 +34,7 @@ export async function updateWarning() {
 		console.error(error)
 		return false
 	}
-	profile.set(false)
+	profileStore.set(null)
 }
 
 export async function getCategories() {
@@ -43,7 +43,7 @@ export async function getCategories() {
 
 	const { data: cats } = await supabaseClient.from("scripts_categories").select("name, emoji")
 
-	const result: Category[] | false = cats != null ? cats : false
+	const result: Category[] | null = cats != null ? cats : null
 	categories.set(result)
 	return result
 }
@@ -56,7 +56,7 @@ export async function getSubCategories() {
 		.from("scripts_subcategories")
 		.select("category, name, emoji")
 
-	const result: SubCategory[] | false = cats != null ? cats : false
+	const result: SubCategory[] | null = cats != null ? cats : null
 	subCategories.set(result)
 	return result
 }
@@ -65,13 +65,14 @@ export async function getCheckBoxes() {
 	const tmp = get(checkboxes)
 	if (tmp) return tmp as CheckboxType[]
 
-	let result: CheckboxType[] = []
+	let result: CheckboxType[] | null = null
 	const promises = await Promise.all([getCategories(), getSubCategories()])
 	const categories = promises[0]
 	const subcategories = promises[1]
 
-	if (!categories || !subcategories) return false
+	if (!categories || !subcategories) return null
 
+	result = []
 	let id = 0
 
 	for (let category of categories) {
@@ -105,7 +106,7 @@ async function getAllCategories() {
 	const c = promises[0]
 	const sc = promises[1]
 
-	if (!c || !sc) return false
+	if (!c || !sc) return null
 	return [...c, ...sc]
 }
 

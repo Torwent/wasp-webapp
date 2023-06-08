@@ -11,7 +11,7 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 	const ascendingStr = url.searchParams.get("ascending")
 	const ascending = ascendingStr ? ascendingStr.toLowerCase() === "true" : true
 
-	const search = decodeURI(url.searchParams.get("search") || "")
+	const search = decodeURIComponent(url.searchParams.get("search") || "").trim()
 
 	const levelStr = url.searchParams.get("level") || "-1"
 	const level =

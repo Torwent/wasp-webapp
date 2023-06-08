@@ -10,7 +10,7 @@ export const load: PageLoad = async ({ url, depends }) => {
 
 	const order = url.searchParams.get("order") || "experience"
 	const ascending = url.searchParams.get("ascending")?.toLowerCase() === "true"
-	const search = decodeURI(url.searchParams.get("search") || "")
+	const search = decodeURIComponent(url.searchParams.get("search") || "").trim()
 
 	const pageStr = url.searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)

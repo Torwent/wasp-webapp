@@ -6,7 +6,7 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
 
 	const pageStr = url.searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
-	const search = decodeURI(url.searchParams.get("search") || "")
+	const search = decodeURIComponent(url.searchParams.get("search") || "").trim()
 	const range = 10
 
 	const start = (page - 1) * range
