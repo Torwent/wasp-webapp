@@ -15,7 +15,7 @@
 	const pageStr = $page.url.searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
-	let search = decodeURIComponent($page.url.searchParams.get("search") || "").trim()
+	let search = decodeURI($page.url.searchParams.get("search") || "")
 	let ascending = $page.url.searchParams.get("ascending")?.toLowerCase() === "true"
 	let headers: (keyof Stat)[] = ["username", "experience", "gold", "levels", "runtime"]
 	let selectedHeader: keyof Stat =

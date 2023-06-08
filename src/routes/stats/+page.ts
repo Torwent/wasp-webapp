@@ -1,16 +1,16 @@
+import { supabaseClient } from "$lib/backend/auth"
 import type { Stat } from "$lib/backend/types"
 import type { PageLoad } from "./$types"
 
 const UUID_V4_REGEX =
 	/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89AB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/i
 
-export const load: PageLoad = async ({ url, depends, parent }) => {
-	const tmp = parent()
+export const load: PageLoad = async ({ url, depends }) => {
 	depends("stats:total")
 
 	const order = url.searchParams.get("order") || "experience"
 	const ascending = url.searchParams.get("ascending")?.toLowerCase() === "true"
-	const search = decodeURIComponent(url.searchParams.get("search") || "").trim()
+	const search = decodeURI(url.searchParams.get("search") || "")
 
 	const pageStr = url.searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
@@ -31,11 +31,9 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 
 	let promises = []
 
-	const { supabase } = await tmp
-
 	if (search === "") {
 		promises.push(
-			supabase
+			supabaseClient
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
 				.or("experience.gt.0,gold.gt.0")
@@ -44,23 +42,21 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 		)
 	} else if (UUID_V4_REGEX.test(search)) {
 		promises.push(
-			supabase
+			supabaseClient
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
 				.eq("userID", search)
 		)
 	} else {
-		const tmp = search.replaceAll(",", "|")
-		console.log(tmp)
 		promises.push(
-			supabase
+			supabaseClient
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
-				.textSearch("username", tmp)
+				.textSearch("username", search, { type: "plain" })
 		)
 	}
 
-	promises.push(supabase.rpc("get_stats_total"))
+	promises.push(supabaseClient.rpc("get_stats_total"))
 
 	promises = await Promise.all(promises)
 

@@ -12,7 +12,7 @@ const loadScripts = async (supabase: SupabaseClient) => {
 
 	if (error) return console.error(error)
 
-	const scriptData = data as unknown as IScriptCard[]
+	const scriptData = data as IScriptCard[]
 
 	let result: string[] = []
 	scriptData.forEach((script) => {

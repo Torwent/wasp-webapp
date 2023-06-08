@@ -1,8 +1,8 @@
+import { supabaseClient } from "$lib/backend/auth"
 import type { Stat } from "$lib/backend/types"
 import type { PageLoad } from "./$types"
 
-export const load: PageLoad = async ({ depends, parent }) => {
-	const tmp = parent()
+export const load: PageLoad = async ({ depends }) => {
 	depends("stats:total")
 	let total: Stat = {
 		username: "Total",
@@ -12,9 +12,7 @@ export const load: PageLoad = async ({ depends, parent }) => {
 		runtime: 0
 	}
 
-	const { supabase } = await tmp
-
-	const { data, error } = await supabase.rpc("get_stats_total")
+	const { data, error } = await supabaseClient.rpc("get_stats_total")
 
 	if (error) {
 		const response = {

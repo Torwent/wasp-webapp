@@ -1,8 +1,8 @@
 import { redirect } from "@sveltejs/kit"
 import type { PageLoad } from "./$types"
+import { supabaseClient } from "$lib/backend/auth"
 
 export const load: PageLoad = async ({ url, depends, parent }) => {
-	const tmp = parent()
 	depends("tutorials:posts")
 
 	const pageStr = url.searchParams.get("page") || "-1"
@@ -26,9 +26,8 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 
 	let posts
 
-	const { supabase } = await tmp
 	if (level > -1) {
-		posts = supabase
+		posts = supabaseClient
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
@@ -36,7 +35,7 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 			.eq("level", level)
 			.range(start, finish)
 	} else if (search === "") {
-		posts = supabase
+		posts = supabaseClient
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
@@ -44,7 +43,7 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 			.order("level", { ascending: ascending })
 			.range(start, finish)
 	} else {
-		posts = supabase
+		posts = supabaseClient
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
