@@ -48,7 +48,7 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
 			})
-			.textSearch("tutorials_search", search, { type: "websearch" })
+			.ilike("tutorials_search", "%" + search.replaceAll("%", "") + "%")
 	}
 
 	const { data, count, error } = await posts

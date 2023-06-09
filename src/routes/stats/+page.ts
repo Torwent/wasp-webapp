@@ -52,7 +52,7 @@ export const load: PageLoad = async ({ url, depends }) => {
 			supabaseClient
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
-				.textSearch("username", search, { type: "plain" })
+				.ilike("username", "%" + search.replaceAll("%", "") + "%")
 		)
 	}
 

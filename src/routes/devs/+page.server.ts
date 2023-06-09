@@ -28,7 +28,7 @@ export const load: PageServerLoad = async ({ url, depends, locals }) => {
 			.select("realname, username, description, github, paypal_id, content", {
 				count: "exact"
 			})
-			.textSearch("id_realname_username_description_content", search, { type: "websearch" })
+			.ilike("id_realname_username_description_content", "%" + search + "%")
 	}
 
 	const { data, count, error } = devs

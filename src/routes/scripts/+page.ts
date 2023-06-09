@@ -51,7 +51,7 @@ export const load: Load = async ({ url, depends }) => {
 			)
 			.contains("categories", categoriesFilters)
 			.contains("subcategories", subcategoriesFilters)
-			.textSearch("scripts_public_search", search, { type: "websearch" })
+			.ilike("scripts_public_search", "%" + search + "%")
 	}
 
 	const promises = await Promise.all([
