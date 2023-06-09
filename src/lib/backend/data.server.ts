@@ -91,7 +91,14 @@ export async function updateScript(
 	coverFile: File | undefined,
 	bannerFile: File | undefined
 ) {
-	console.log("Updating script ", script.id)
+	console.log(
+		"📜 Updating ",
+		script.title,
+		" by ",
+		script.scripts_protected.author,
+		" id: ",
+		script.id
+	)
 
 	const publicData = {
 		title: script.title,
@@ -102,7 +109,8 @@ export async function updateScript(
 		min_xp: script.min_xp,
 		max_xp: script.max_xp,
 		min_gp: script.min_gp,
-		max_gp: script.max_gp
+		max_gp: script.max_gp,
+		published: script.published
 	}
 
 	const { error } = await supabase.from("scripts_public").update(publicData).eq("id", script.id)

@@ -4,7 +4,7 @@
 	import { convertTime, cropString, formatRSNumber } from "$lib/utils.js"
 	import { fade, slide } from "svelte/transition"
 	import Markdown from "$lib/Markdown.svelte"
-	import { scriptSchema, type Script } from "$lib/backend/types.js"
+	import { scriptSchema } from "$lib/backend/types.js"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
 	import MultiSelect from "$lib/components/forms/MultiSelect.svelte"
@@ -20,8 +20,10 @@
 
 	if (!categories || !subcategories) throw redirect(303, "./")
 
-	let script = data.script as Script
+	let { script } = data
+
 	const { form, errors, enhance, validate } = superForm(data.form, {
+		dataType: "form",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
@@ -38,7 +40,6 @@
 	$form.max_xp = script.max_xp
 	$form.min_gp = script.min_gp
 	$form.max_gp = script.max_gp
-	$form.published == script.published
 
 	const defaultBanner = script.scripts_protected.assets_path + "/banner.jpg"
 	let coverElement: HTMLImageElement | undefined
@@ -402,7 +403,7 @@
 					</div>
 				</div>
 
-				<label for="script_file" class="my-4">
+				<label for="script" class="my-4">
 					<span>Script:</span>
 					<FileDropzone
 						name="script"
@@ -429,21 +430,20 @@
 					</FileDropzone>
 				</label>
 
-				<div class="flex py-0.5">
-					<div>
-						<label
-							class="form-check-label inline-block cursor-pointer dark:hover:text-amber-100 hover:text-orange-400"
-							for={"checkbox"}
-						>
-							Published
-						</label>
+				<div class="flex my-8">
+					<label
+						for="published"
+						class="form-check-label inline-block cursor-pointer dark:hover:text-primary-100 hover:text-primary-400"
+					>
+						Published
 						<input
-							class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-amber-500"
 							type="checkbox"
-							id={"checkbox"}
+							id="published"
+							name="published"
+							class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-primary-500"
 							bind:checked={script.published}
 						/>
-					</div>
+					</label>
 				</div>
 
 				<div class="flex justify-between">

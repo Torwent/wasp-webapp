@@ -228,8 +228,7 @@ export const scriptSchema = z
 			.any()
 			.refine((file) => file.size <= 2 * MB_SIZE, `Max script size is 2MB.`)
 			.refine((file) => file.name.endsWith(".simba"), "Only .simba files are allowed.")
-			.optional(),
-		published: z.boolean().optional()
+			.optional()
 	})
 	.refine(
 		(schema) => schema.min_xp <= schema.max_xp,

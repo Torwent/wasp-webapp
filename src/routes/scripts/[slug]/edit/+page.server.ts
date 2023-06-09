@@ -2,7 +2,7 @@ import type { PageServerLoad } from "./$types"
 import { superValidate, setError } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
 import { scriptSchema } from "$lib/backend/types"
-import { getScriptUUID } from "$lib/backend/data"
+import { canEdit, getScriptUUID } from "$lib/backend/data"
 import { filesEditSchema } from "$lib/backend/types.server"
 import { updateScript } from "$lib/backend/data.server"
 
@@ -53,7 +53,13 @@ export const actions = {
 			return setError(form, null, msg)
 		}
 
-		if (script.scripts_protected.author_id !== profile.id) {
+		if (script.categories.includes("Official") && !profile.profiles_protected.administrator) {
+			const msg = "You cannot edit an official script!"
+			console.error(msg)
+			return setError(form, null, msg)
+		}
+
+		if (!canEdit(profile, script.scripts_protected.author_id)) {
 			const msg = "That script does not belong to you!"
 			console.error(msg)
 			return setError(form, null, msg)
@@ -68,6 +74,7 @@ export const actions = {
 		script.max_xp = form.data.max_xp
 		script.min_gp = form.data.min_gp
 		script.max_gp = form.data.max_gp
+		script.published = formData.has("published")
 
 		let validFiles
 		try {
