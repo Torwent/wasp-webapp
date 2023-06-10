@@ -33,11 +33,11 @@ async function uploadFile(supabase: SupabaseClient, bucket: string, path: string
 export async function uploadScript(
 	supabase: SupabaseClient,
 	script: ScriptPublic,
-	file: File | undefined,
+	scriptFile: File | undefined,
 	coverFile: File | undefined,
 	bannerFile: File | undefined
 ) {
-	if (!file) {
+	if (!scriptFile) {
 		console.error("Script file is missing!")
 		return { error: "Script file is missing!" }
 	}
@@ -72,12 +72,12 @@ export async function uploadScript(
 
 	script.id = data[0].id
 
-	file = await updateScriptFile(file, script.id as string, 1)
+	scriptFile = await updateScriptFile(scriptFile, script.id as string, 1)
 
 	//rename all scripts to script so we can always fetch them later regardless of name changes.
 	const path = script.id + "/" + pad(1, 9) + "/script.simba"
 
-	uploadFile(supabase, "scripts", path, file)
+	uploadFile(supabase, "scripts", path, scriptFile)
 	uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
 	uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
 
@@ -87,7 +87,7 @@ export async function uploadScript(
 export async function updateScript(
 	supabase: SupabaseClient,
 	script: Script,
-	file: File | undefined,
+	scriptFile: File | undefined,
 	coverFile: File | undefined,
 	bannerFile: File | undefined
 ) {
@@ -119,16 +119,22 @@ export async function updateScript(
 		return { error: error.message }
 	}
 
-	if (file) {
+	if (scriptFile) {
 		const revision = script.scripts_protected.revision + 1
 		console.log("Updating script revision to ", revision)
-		file = await updateScriptFile(file, script.id as string, revision)
+		scriptFile = await updateScriptFile(scriptFile, script.id as string, revision)
 		const path = script.id + "/" + pad(revision, 9) + "/script.simba"
-		uploadFile(supabase, "scripts", path, file)
+		uploadFile(supabase, "scripts", path, scriptFile)
 	}
 
-	if (coverFile) uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
-	if (bannerFile) uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+	if (coverFile) {
+		console.log("Updating script cover")
+		uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
+	}
+	if (bannerFile) {
+		console.log("Updating script banner")
+		uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+	}
 
 	return { error: undefined }
 }
