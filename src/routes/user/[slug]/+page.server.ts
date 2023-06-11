@@ -27,7 +27,7 @@ export const actions = {
 
 		const { error } = await locals.supabase.auth.updateUser(form.data)
 		if (error) {
-			console.error(error)
+			console.error("User data UPDATE failed: " + error)
 			return setError(form, null, error.message)
 		}
 

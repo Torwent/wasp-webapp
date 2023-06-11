@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit"
 import type { PageLoad } from "./$types"
-import { supabaseClient } from "$lib/backend/auth"
+import { supabaseHelper } from "$lib/backend/auth"
 
 export const load: PageLoad = async ({ url, depends, parent }) => {
 	depends("tutorials:posts")
@@ -27,7 +27,7 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 	let posts
 
 	if (level > -1) {
-		posts = supabaseClient
+		posts = supabaseHelper
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
@@ -35,7 +35,7 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 			.eq("level", level)
 			.range(start, finish)
 	} else if (search === "") {
-		posts = supabaseClient
+		posts = supabaseHelper
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
@@ -43,7 +43,7 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 			.order("level", { ascending: ascending })
 			.range(start, finish)
 	} else {
-		posts = supabaseClient
+		posts = supabaseHelper
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
@@ -54,7 +54,7 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 	const { data, count, error } = await posts
 
 	if (error) {
-		console.error(error)
+		console.error("tutorials SELECT failed: " + error)
 		throw redirect(303, "./")
 	}
 

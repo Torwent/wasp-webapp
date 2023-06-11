@@ -24,16 +24,28 @@
 	import { browser } from "$app/environment"
 	import { invalidate } from "$app/navigation"
 	import { onMount } from "svelte"
-	import { supabaseClient } from "$lib/backend/auth"
+	import { supabaseClient, supabaseHelper } from "$lib/backend/auth"
+	export let data
+
+	$: ({ session } = data)
 
 	onMount(async () => {
 		const {
-			data: { subscription }
-		} = supabaseClient.auth.onAuthStateChange(async () => {
-			invalidate("supabase:auth")
+			data: { subscription: helperSubscription }
+		} = supabaseHelper.auth.onAuthStateChange(async (_event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) invalidate("supabase:auth")
 		})
 
-		return () => subscription.unsubscribe()
+		const {
+			data: { subscription: clientSubscription }
+		} = supabaseClient.auth.onAuthStateChange(async (_event, _session) => {
+			if (_session?.expires_at !== session?.expires_at) invalidate("supabase:auth")
+		})
+
+		return () => {
+			helperSubscription.unsubscribe()
+			clientSubscription.unsubscribe()
+		}
 	})
 </script>
 

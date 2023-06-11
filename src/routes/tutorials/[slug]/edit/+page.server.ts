@@ -21,7 +21,7 @@ export const actions = {
 			.eq("id", form.data.id)
 
 		if (error) {
-			console.error(error)
+			console.error("tutorials UPDATE failed: " + error)
 			return setError(form, null, error.message)
 		}
 

@@ -12,13 +12,13 @@ export const profileStore = writable<Profile | null>(null)
 let realtimeRoles: RealtimeChannel | null = null
 let realtimeWarning: RealtimeChannel | null = null
 
-export const sbClient = createSBClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+export const supabaseClient = createSBClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
 	auth: {
 		persistSession: true
 	}
 })
 
-export const supabaseClient = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY)
+export const supabaseHelper = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY)
 
 async function getUser() {
 	const tmp = get(userStore)
@@ -26,7 +26,7 @@ async function getUser() {
 
 	const {
 		data: { user }
-	} = await supabaseClient.auth.getUser()
+	} = await supabaseHelper.auth.getUser()
 
 	userStore.set(user)
 	return user
@@ -57,7 +57,7 @@ export async function getProfile(): Promise<Profile | null> {
 		return null
 	}
 
-	const { data, error } = await supabaseClient
+	const { data, error } = await supabaseHelper
 		.from("profiles_public")
 		.select(
 			`id, discord_id, username, avatar_url,
@@ -67,7 +67,7 @@ export async function getProfile(): Promise<Profile | null> {
 		.eq("id", id)
 
 	if (error) {
-		console.error(error)
+		console.error("profiles_public SELECT failed: " + error)
 		await disableProfile()
 		return null
 	}
@@ -77,7 +77,7 @@ export async function getProfile(): Promise<Profile | null> {
 	profileStore.set(result)
 
 	if (realtimeRoles) realtimeRoles.unsubscribe()
-	realtimeRoles = supabaseClient
+	realtimeRoles = supabaseHelper
 		.channel("any")
 		.on(
 			"postgres_changes",
@@ -102,7 +102,7 @@ export async function getProfile(): Promise<Profile | null> {
 		.subscribe()
 
 	if (realtimeWarning) realtimeWarning.unsubscribe()
-	realtimeWarning = supabaseClient
+	realtimeWarning = supabaseHelper
 		.channel("any")
 		.on(
 			"postgres_changes",

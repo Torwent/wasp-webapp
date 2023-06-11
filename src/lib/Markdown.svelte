@@ -14,7 +14,7 @@
 			try {
 				return hljs.highlight(str, { language: lang }).value
 			} catch (error) {
-				console.error(error)
+				console.error("Failed to highlight " + lang + ": " + error)
 			}
 		}
 

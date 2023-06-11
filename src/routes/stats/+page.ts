@@ -1,4 +1,4 @@
-import { supabaseClient } from "$lib/backend/auth"
+import { supabaseHelper } from "$lib/backend/auth"
 import type { Stat } from "$lib/backend/types"
 import type { PageLoad } from "./$types"
 
@@ -33,7 +33,7 @@ export const load: PageLoad = async ({ url, depends }) => {
 
 	if (search === "") {
 		promises.push(
-			supabaseClient
+			supabaseHelper
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
 				.or("experience.gt.0,gold.gt.0")
@@ -42,21 +42,21 @@ export const load: PageLoad = async ({ url, depends }) => {
 		)
 	} else if (UUID_V4_REGEX.test(search)) {
 		promises.push(
-			supabaseClient
+			supabaseHelper
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
 				.eq("userID", search)
 		)
 	} else {
 		promises.push(
-			supabaseClient
+			supabaseHelper
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
 				.ilike("username", "%" + search.replaceAll("%", "") + "%")
 		)
 	}
 
-	promises.push(supabaseClient.rpc("get_stats_total"))
+	promises.push(supabaseHelper.rpc("get_stats_total"))
 
 	promises = await Promise.all(promises)
 

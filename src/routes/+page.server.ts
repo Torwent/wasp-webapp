@@ -16,7 +16,7 @@ export const actions: Actions = {
 			})
 
 			if (err) {
-				console.error(err)
+				console.error("Login failed: " + err)
 				return fail(400, { message: "Something went wrong logging you in!" })
 			}
 
@@ -25,8 +25,11 @@ export const actions: Actions = {
 	},
 
 	logout: async ({ locals: { supabase } }) => {
-		const { error } = await supabase.auth.signOut()
-		if (error) return fail(400, { message: "Something went wrong logging you out!" })
+		const { error: err } = await supabase.auth.signOut()
+		if (err) {
+			console.error("Logout failed: " + err)
+			return fail(400, { message: "Something went wrong logging you out!" })
+		}
 
 		return { success: true }
 	}

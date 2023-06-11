@@ -60,7 +60,7 @@
 		{/each}
 
 		{#if !large}
-			<li class="mt-8 py-2 flex items-center justify-between">
+			<li class="mt-8 py-2 flex items-center justify-between {!showMenu ? 'hidden md:block' : ''}">
 				<div class="flex items-center">
 					<UserPanel large={false} />
 				</div>

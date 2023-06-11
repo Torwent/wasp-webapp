@@ -11,27 +11,27 @@ import type {
 	CheckboxType,
 	Profile
 } from "./types"
-import { getUserID, profileStore, sbClient, supabaseClient } from "./auth"
+import { getUserID, profileStore, supabaseClient, supabaseHelper } from "./auth"
 
 const categories = writable<Category[] | null>(null)
 const subCategories = writable<SubCategory[] | null>(null)
 const checkboxes = writable<CheckboxType[] | null>(null)
 
 export async function updateUsername(id: string, username: string) {
-	await supabaseClient.from("profile").update({ username: username }).eq("id", id)
+	await supabaseHelper.from("profile").update({ username: username }).eq("id", id)
 }
 
 export async function updateWarning() {
 	const id = await getUserID()
 	if (!id) return false
 
-	const { error } = await supabaseClient
+	const { error } = await supabaseHelper
 		.from("profiles_private")
 		.update({ dismissed_warning: true })
 		.eq("id", id)
 
 	if (error) {
-		console.error(error)
+		console.error("profiles_private UPDATE failed: " + error)
 		return false
 	}
 	profileStore.set(null)
@@ -41,7 +41,7 @@ export async function getCategories() {
 	const tmp = get(categories)
 	if (tmp) return tmp as Category[]
 
-	const { data: cats } = await supabaseClient.from("scripts_categories").select("name, emoji")
+	const { data: cats } = await supabaseHelper.from("scripts_categories").select("name, emoji")
 
 	const result: Category[] | null = cats != null ? cats : null
 	categories.set(result)
@@ -52,7 +52,7 @@ export async function getSubCategories() {
 	const tmp = get(subCategories)
 	if (tmp) return tmp as SubCategory[]
 
-	const { data: cats } = await supabaseClient
+	const { data: cats } = await supabaseHelper
 		.from("scripts_subcategories")
 		.select("category, name, emoji")
 
@@ -134,7 +134,7 @@ export async function addToolTips(script: IScriptCard) {
 }
 
 export async function getScripts(): Promise<Script[] | null> {
-	const { data, error } = await supabaseClient
+	const { data, error } = await supabaseHelper
 		.from("scripts_public")
 		.select(
 			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
@@ -144,7 +144,7 @@ export async function getScripts(): Promise<Script[] | null> {
 		.order("title", { ascending: true })
 
 	if (error) {
-		console.error(error)
+		console.error("scripts_public SELECT failed: " + error)
 		return null
 	}
 
@@ -180,12 +180,12 @@ export async function getScriptUUID(uuid: string | undefined) {
 }
 
 export async function getPosts(): Promise<Post[] | null> {
-	const { data, error } = await supabaseClient
+	const { data, error } = await supabaseHelper
 		.from("tutorials")
 		.select("id, created_at, user_id, author, title, description, content, level")
 		.order("title", { ascending: true })
 
-	if (error) console.error(error)
+	if (error) console.error("tutorials SELECT failed: " + error)
 
 	return data
 }
@@ -201,12 +201,12 @@ export async function getPost(path: string): Promise<Post | null> {
 }
 
 export async function getDevelopers(): Promise<Developer[] | null> {
-	const { data, error } = await supabaseClient
+	const { data, error } = await supabaseHelper
 		.from("devs")
 		.select("id, realname, username, description, github, paypal_id, content")
 		.order("username", { ascending: true })
 
-	if (error) console.error(error)
+	if (error) console.error("devs SELECT failed: " + error)
 	return data
 }
 
@@ -223,9 +223,9 @@ export async function getDeveloper(path: string): Promise<Developer | null> {
 export async function getSignedURL(bucket: string, path: string, file: string) {
 	path += "/" + file
 
-	const { data, error } = await sbClient.storage.from(bucket).createSignedUrl(path, 10)
+	const { data, error } = await supabaseClient.storage.from(bucket).createSignedUrl(path, 10)
 	if (error) {
-		console.error("Failed to get signed URL. Error message: " + error)
+		console.error("Signed URL for " + bucket + " to " + path + " failed: " + error)
 		return false
 	}
 	return data.signedUrl

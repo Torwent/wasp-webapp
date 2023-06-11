@@ -79,7 +79,7 @@
 		let scripts = await getScripts()
 
 		if (!scripts) {
-			console.error("Can't read scripts from the database.")
+			console.error("Couldn't read scripts from the database.")
 			return false
 		}
 

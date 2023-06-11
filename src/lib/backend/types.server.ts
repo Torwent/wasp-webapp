@@ -15,7 +15,7 @@ async function checkServerImageDimensions(
 		const { bitmap } = await Jimp.read(data)
 		return bitmap.width === width && bitmap.height === height
 	} catch (error) {
-		console.error(error)
+		console.error("checkServerImageDimensions() failed: " + error)
 		return false
 	}
 }
