@@ -1,8 +1,8 @@
 version: "3.9"
 
 services:
-  wasp-webapp-v2:
-    container_name: "wasp-webapp-v2"
+  wasp-webapp:
+    container_name: "wasp-webapp"
     build:
       context: .
       args:
