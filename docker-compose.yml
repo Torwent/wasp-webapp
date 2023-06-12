@@ -1,15 +1,14 @@
 version: "3.9"
 
 services:
-  wasp-webapp:
-    container_name: "wasp-webapp"
+  wasp-webapp-v2:
+    container_name: "wasp-webapp-v2"
     build:
       context: .
       args:
-        VITE_SB_URL: $VITE_SB_URL
-        VITE_SB_ANON_KEY: $VITE_SB_ANON_KEY
-        SERVICE_USER: $SERVICE_USER
-        SERVICE_PASS: $SERVICE_PASS
+        PUBLIC_SUPABASE_URL: $PUBLIC_SUPABASE_URL
+        PUBLIC_SUPABASE_ANON_KEY: $PUBLIC_SUPABASE_ANON_KEY
+        PUBLIC_SUPER_USER_ID: $PUBLIC_SUPER_USER_ID
         VITE_DEV: $VITE_DEV
     restart: unless-stopped
     networks:

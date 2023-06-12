@@ -1,167 +1,44 @@
 <script lang="ts">
-	import { onMount } from "svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import Discord from "$lib/components/Discord.svelte"
+	import CanvasAnimation from "./CanvasAnimation.svelte"
 	import { fade } from "svelte/transition"
-	import { Rowp, type TBox, type TPoint, type TRectangle } from "$lib/simbacode/srl"
-	import { drawInterface } from "$lib/simbacode/interface"
 	import type { PageData } from "./$types"
 	import { convertTime, formatRSNumber } from "$lib/utils"
 	import { invalidate } from "$app/navigation"
 	import { browser } from "$app/environment"
 	export let data: PageData
 
-	let canvasData: ImageData
-
-	const clearPixel = async (context: CanvasRenderingContext2D, i: number) => {
-		if (canvasData.data[i + 0] == 0 && canvasData.data[i + 1] == 0) {
-			canvasData.data[i + 3] = 0
-		} else if (canvasData.data[i + 0] == 0 && canvasData.data[i + 1] > 0) {
-			canvasData.data[i + 1] = 0
-			canvasData.data[i + 2] = 0
-			canvasData.data[i + 3] = 0
-		} else if (
-			canvasData.data[i + 0] <= 255 &&
-			canvasData.data[i + 0] > 0 &&
-			canvasData.data[i + 1] <= 255
-		) {
-			canvasData.data[i + 0] = 0
-		} else if (
-			canvasData.data[i + 0] <= 255 &&
-			canvasData.data[i + 1] > 255 &&
-			canvasData.data[i + 1] >= 0
-		) {
-			canvasData.data[i + 1] = 255
-		}
-
-		canvasData.data[i + 2] = 0
-		context.putImageData(canvasData, 0, 0)
-	}
-
-	const drawPixel = async (
-		context: CanvasRenderingContext2D,
-		canvas: HTMLCanvasElement,
-		p: TPoint
-	) => {
-		const setPixel = async (i: number) => {
-			if (
-				canvasData.data[i + 0] == 0 &&
-				canvasData.data[i + 1] >= 0 &&
-				canvasData.data[i + 1] < 255
-			) {
-				canvasData.data[i + 1] = 255
-			} else if (
-				canvasData.data[i + 0] >= 0 &&
-				canvasData.data[i + 0] < 255 &&
-				canvasData.data[i + 1] == 255
-			) {
-				canvasData.data[i + 0] = 255
-			} else if (
-				canvasData.data[i + 0] == 255 &&
-				canvasData.data[i + 1] <= 255 &&
-				canvasData.data[i + 1] > 0
-			) {
-				canvasData.data[i + 1] = 0
-			}
-
-			canvasData.data[i + 2] = 0
-			canvasData.data[i + 3] = 255
-			context.putImageData(canvasData, 0, 0)
-			setTimeout(clearPixel, 20000, context, i)
-		}
-
-		setPixel((p.x + p.y * canvas.width) * 4)
-	}
-
-	const drawInvTabHits = async (
-		canvas: HTMLCanvasElement,
-		context: CanvasRenderingContext2D,
-		Mouse: TPoint
-	) => {
-		context.strokeStyle = "rgba(255, 0, 0, 1)"
-		canvasData = context.getImageData(0, 0, canvas.width, canvas.height)
-
-		let Box: TBox = {
-			x1: canvas.width - 240 + 6 + 3 * 33,
-			y1: canvas.height - 333,
-			x2: canvas.width - 240 + 6 + 3 * 33 + 30,
-			y2: canvas.height - 333 + 33
-		}
-
-		let rect: TRectangle = {
-			Top: { x: Box.x1, y: Box.y1 },
-			Right: { x: Box.x2, y: Box.y1 },
-			Btm: { x: Box.x2, y: Box.y2 },
-			Left: { x: Box.x1, y: Box.y2 }
-		}
-
-		let p: TPoint = Rowp({ x: Mouse.x, y: Mouse.y }, rect)
-		drawPixel(context, canvas, p)
-	}
-
-	onMount(async () => {
-		let canvas: any = document.getElementById("canvas")
-		const context = canvas.getContext("2d", { willReadFrequently: true })
-
-		let Mouse: TPoint = { x: 0, y: 0 }
-
-		window.addEventListener("resize", resizeCanvas, false)
-		window.onmousemove = async (e) => {
-			Mouse.x = e.pageX
-			Mouse.y = e.pageY - document.documentElement.scrollTop
-		}
-
-		const drawHitBox = async () => {
-			for (let i = 0; i < 5; i++) {
-				drawInvTabHits(canvas, context, Mouse)
-			}
-			requestAnimationFrame(drawHitBox)
-		}
-
-		drawHitBox()
-
-		function resizeCanvas() {
-			canvas.width = 241
-			canvas.height = 335
-
-			// Redraw everything after resizing the window
-			drawInterface(canvas, context)
-		}
-		resizeCanvas()
-	})
-	
 	function rerunLoad() {
 		if (browser) invalidate("stats:total")
-		setTimeout( rerunLoad, 5000 );
+		setTimeout(rerunLoad, 5000)
 	}
-	
+
 	rerunLoad()
-	$: data.total
 </script>
 
 <svelte:head>
 	<MetaTags
-		title=""
+		title="WaspScripts"
 		description="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
 	/>
 </svelte:head>
 
-<div
-	class="container my-6 mx-auto flex-grow"
+<main
+	class="container my-6 mx-auto flex-grow max-w-2xl"
 	in:fade={{ duration: 300, delay: 300 }}
 	out:fade={{ duration: 300 }}
 >
-	<div class="mx-auto max-w-2xl">
-		<header>
-			<h1 class="text-2xl font-bold text-center md:text-3xl py-12">
-				<div class="py-4">WaspScripts</div>
-				<div>
-					100% <span class="bg-clip-text animate-character text-transparent pl-1 inline-block"
-						>color</span
-					>, 100% open source.
-				</div>
-			</h1>
-		</header>
+	<header>
+		<h1 class="text-2xl font-bold text-center md:text-3xl py-12">
+			<div class="py-4">WaspScripts</div>
+			<div>
+				100%
+				<span class="bg-clip-text animate-character text-transparent inline-block"> color </span>,
+				100% open source.
+			</div>
+		</h1>
+	</header>
 
 	<header>
 		<h2 class="pt-6 px-6 font-bold whitespace-nowrap text-center">
@@ -194,20 +71,23 @@
 		</h2>
 	</header>
 
-		<p class="py-12 text-center">
-			WaspScripts is a collection of open source color scripts written for Simba on top of SRL and
-			WaspLib.
-			<br />
-			If you are new to Simba and don't know what it is, Simba is just the oldest color botting program
-			still around, it's ancestor, SCAR dates back to RuneScape Classic.
-		</p>
-		<h2 class="text-center py-6">
-			For more information, help and/or questions look through the <a href="/faq">FAQ</a> or join the
-			discord community!
-		</h2>
+	<p class="py-12 text-center">
+		WaspScripts is a collection of open source color scripts written for Simba on top of SRL and
+		WaspLib.
+		<br />
+		If you are new to Simba and don't know what it is, Simba is just the oldest color botting program
+		still around, it's ancestor, SCAR dates back to RuneScape Classic.
+	</p>
+	<p class="text-center py-6">
+		For more information, help and/or questions look through the 
+		<a href="/faq" class="decoration-transparent" aria-label="Open frequently asked questions page">
+			FAQ
+		</a>
+		or join the discord community!
+	</p>
 
-		<Discord />
-	</div>
+	<Discord />
+
 	<div class="py-6">
 		<header>
 			<h2 class="text-2xl font-bold text-center md:text-3xl py-16">
@@ -215,9 +95,9 @@
 			</h2>
 		</header>
 
-		<canvas id="canvas" class="m-auto" />
+		<CanvasAnimation />
 	</div>
-</div>
+</main>
 
 <style>
 	.animate-character {

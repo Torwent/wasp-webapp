@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { onMount } from "svelte"
 	import { fade } from "svelte/transition"
-	import DownloadButton from "$lib/components/LinkButton.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 
 	let checkedOS: boolean = false
@@ -10,33 +9,52 @@
 	interface OSInfo {
 		OS: string
 		Extension: string
-		BlogID: string
+		tutorialID: string
 	}
 
 	let currentOS: OSInfo
 	let secondaryOS: OSInfo
 
-	onMount(async () => {
-		let userAgent = navigator.userAgent
-		if (userAgent.indexOf("Win") != -1) {
-			currentOS = { OS: "Windows", Extension: "exe", BlogID: "Setup%20(Windows)" }
-			secondaryOS = { OS: "Linux", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
-		} else if (userAgent.indexOf("Linux") != -1) {
-			if (userAgent.indexOf("Debian") != -1) {
-				currentOS = { OS: "Debian Linux", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
-				secondaryOS = { OS: "Windows", Extension: "exe", BlogID: "Setup%20(Windows)" }
-			} else if (userAgent.indexOf("Ubuntu Linux") != -1) {
-				currentOS = { OS: "Ubuntu", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
-				secondaryOS = { OS: "Windows", Extension: "exe", BlogID: "Setup%20(Windows)" }
-			} else {
-				currentOS = { OS: "Linux", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
-				secondaryOS = { OS: "Windows", Extension: "exe", BlogID: "Setup%20(Windows)" }
-			}
-		} else if (userAgent.indexOf("Mac") != -1) {
-			hasMac = true
-			currentOS = { OS: "MacOS", Extension: "exe", BlogID: "Setup%20(Windows)" }
-			secondaryOS = { OS: "Linux", Extension: "sh", BlogID: "OSRS%20Setup%20(Debian)" }
+	function getOS(userAgent: string) {
+		userAgent = userAgent.toLowerCase()
+		if (userAgent.includes("win")) {
+			currentOS = { OS: "Windows", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
+			secondaryOS = { OS: "Linux", Extension: "sh", tutorialID: "linux-setup-debian-by-torwent" }
+			return
 		}
+
+		if (userAgent.includes("linux")) {
+			if (userAgent.includes("debian")) {
+				currentOS = {
+					OS: "Debian Linux",
+					Extension: "sh",
+					tutorialID: "linux-setup-debian-by-torwent"
+				}
+				secondaryOS = { OS: "Windows", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
+				return
+			}
+
+			if (userAgent.includes("ubuntu")) {
+				currentOS = { OS: "Ubuntu", Extension: "sh", tutorialID: "linux-setup-debian-by-torwent" }
+				secondaryOS = { OS: "Windows", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
+				return
+			}
+
+			currentOS = { OS: "Linux", Extension: "sh", tutorialID: "linux-setup-debian-by-torwent" }
+			secondaryOS = { OS: "Windows", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
+			return
+		}
+
+		if (userAgent.includes("mac")) {
+			hasMac = true
+			currentOS = { OS: "MacOS", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
+			secondaryOS = { OS: "Linux", Extension: "sh", tutorialID: "linux-setup-debian-by-torwent" }
+			return
+		}
+	}
+
+	onMount(() => {
+		getOS(navigator.userAgent)
 		checkedOS = true
 	})
 </script>
@@ -44,8 +62,7 @@
 <svelte:head>
 	<MetaTags
 		title="Setup"
-		description="Fully setup Simba and WaspScripts from scratch to bot OldSchool RuneScape. Start your road to max on osrs today!"
-		url="/setup"
+		description="Setup Simba and WaspScripts from scratch to bot OldSchool RuneScape. Start your road to max on osrs today!"
 	/>
 </svelte:head>
 
@@ -57,23 +74,30 @@
 	{#if checkedOS}
 		<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
 			<header>
-				<h1 class="text-xl py-16 text-center text-amber-500 dark:text-amber-100 md:text-3xl">
-					{currentOS.OS} was detected as your operating system.
+				<h1 class="text-xl py-16 text-center text-primary-500 dark:text-primary-100 md:text-3xl">
+					{currentOS.OS} OS detected!
 				</h1>
 				{#if !hasMac}
 					<p class="text-lg text-center pt-4">
 						For an automated install script download the following file:
-						<DownloadButton
-							url={`https://github.com/torwent/wasp-setup/releases/latest/download/simba-setup.${currentOS.Extension}`}
-							text={`setup.${currentOS.Extension}`}
-						/>
 					</p>
+					<div class="flex justify-center py-8">
+						<a
+							href="https://github.com/torwent/wasp-setup/releases/latest/download/simba-setup.{currentOS.Extension}"
+						>
+							<button class="btn variant-filled-secondary">{`setup.${currentOS.Extension}`}</button>
+						</a>
+					</div>
+
 					<p class="text-center pb-24">
 						For a manual instalation guide for {currentOS.OS} you can go
 						<a
-							href="/blog/{currentOS.BlogID}"
-							class="font-semibold text-amber-500 dark:text-amber-200 hover:underline">here</a
-						>.
+							href="/tutorials/{currentOS.tutorialID}"
+							class="font-semibold text-primary-500 dark:text-primary-200 hover:underline"
+						>
+							here
+						</a>
+						.
 					</p>
 				{:else}
 					<p class="text-lg text-center pt-4">Simba doesn't work with M1 Macs.</p>
@@ -89,7 +113,7 @@
 					For a Windows install script you can get it here:
 					<a
 						href="https://github.com/torwent/wasp-setup/releases/latest/download/setup.{currentOS.Extension}"
-						class="font-semibold hover:underline text-amber-400 dark:text-amber-100"
+						class="font-semibold hover:underline text-primary-400 dark:text-primary-100"
 					>
 						setup.{currentOS.Extension}
 					</a>
@@ -97,16 +121,19 @@
 				<p class="text-center">
 					For a manual instalation guide for {currentOS.OS} you can go
 					<a
-						href="/blog/{currentOS.BlogID}"
-						class="font-semibold hover:underline text-amber-400 dark:text-amber-100">here</a
-					>.
+						href="/tutorials/{currentOS.tutorialID}"
+						class="font-semibold hover:underline text-primary-400 dark:text-primary-100"
+					>
+						here
+					</a>
+					.
 				</p>
 			{/if}
 			<p class="text-center pt-24">
 				For a {secondaryOS.OS} install script you can get it here:
 				<a
 					href="https://github.com/torwent/wasp-setup/releases/latest/download/setup.{secondaryOS.Extension}"
-					class="font-semibold hover:underline text-amber-400 dark:text-amber-100"
+					class="font-semibold hover:underline text-primary-400 dark:text-primary-100"
 				>
 					setup.{secondaryOS.Extension}
 				</a>
@@ -114,14 +141,17 @@
 			<p class="text-center">
 				For a manual instalation guide for {secondaryOS.OS} you can go
 				<a
-					href="/blog/{secondaryOS.BlogID}"
-					class="font-semibold hover:underline text-amber-400 dark:text-amber-100">here</a
-				>.
+					href="/tutorials/{secondaryOS.tutorialID}"
+					class="font-semibold hover:underline text-primary-400 dark:text-primary-100"
+				>
+					here
+				</a>
+				.
 			</p>
 		</div>
 	{:else}
 		<header in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
-			<h1 class="text-xl py-16 text-center text-amber-500 dark:text-amber-100 md:text-3xl">
+			<h1 class="text-xl py-16 text-center text-primary-500 dark:text-primary-100 md:text-3xl">
 				Checking your operating system...
 			</h1>
 		</header>

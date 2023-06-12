@@ -1,30 +1,30 @@
 <script lang="ts">
-	import type { Developer } from "$lib/database/types"
+	import type { Developer } from "$lib/backend/types"
+	import { encodeSEO } from "$lib/utils"
 	import { fly } from "svelte/transition"
-	export let dev: Developer
+	export let developer: Developer
 </script>
 
 <div
 	in:fly={{ duration: 600, delay: 900, x: 500 }}
 	out:fly={{ duration: 600, x: -500 }}
-	class="flex flex-col shadow-md my-8 cursor-pointer hover:-translate-y-1 duration-300 w-full bg-stone-100 dark:bg-stone-800 rounded-md"
+	class="card variant-ghost-surface m-4"
 >
-	<a href="/devs/{dev.username}">
+	<a href="/devs/{encodeSEO(developer.username)}">
 		<div class="flex flex-col p-3">
 			<!-- Title -->
-			<div class="text-md font-semibold text-amber-500 hover:underline truncate">
-				{dev.username}
+			<div class="text-md font-semibold text-primary-600 dark:text-primary-500 truncate">
+				{developer.username}
+				{#if developer.real_name}
+					<!-- Name -->
+					<small class="text-xs text-surface-400 truncate">
+						A.K.A {developer.real_name}
+					</small>
+				{/if}
 			</div>
 
-			{#if dev.real_name}
-				<!-- Name -->
-				<span class="text-stone-400 truncate mt-1font-semibold hover:underline">
-					{dev.real_name}
-				</span>
-			{/if}
-
 			<!-- content -->
-			<div class="text-sm text-stone-500 mt-4 mb-1">{dev.description}</div>
+			<div class="text-sm text-stone-500 mt-4 mb-1">{developer.description}</div>
 		</div>
 	</a>
 </div>

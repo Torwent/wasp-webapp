@@ -1,158 +1,178 @@
 <script lang="ts">
-	import { profile, updateProfile } from "$lib/stores/authStore"
-	import { fly } from "svelte/transition"
-	import Card from "./ScriptCard.svelte"
-	import LinkButton from "$lib/components/LinkButton.svelte"
+	import { fade, slide } from "svelte/transition"
+	import ScriptCard from "./ScriptCard.svelte"
 	import MetaTags from "$lib/components/MetaTags.svelte"
-	import type { Category, ScriptCard, SubCategory } from "$lib/database/types"
-	import type { PageData } from "./$types"
-	import { createSearchStore, searchHandler } from "$lib/stores/search"
-	import { onDestroy } from "svelte"
+	import { AppShell } from "@skeletonlabs/skeleton"
+	import type { CheckboxType, IScriptCard } from "$lib/backend/types"
+	import { ChevronRight } from "lucide-svelte"
+	import { page } from "$app/stores"
+	import { invalidate } from "$app/navigation"
+	import { browser } from "$app/environment"
+	import Paginator from "$lib/components/Paginator.svelte"
+	import { onMount } from "svelte"
 
-	export let data: PageData
+	export let data
 
-	updateProfile()
+	const { profile, checkboxes, range } = data
 
-	interface CheckboxType {
-		id: number
-		name: string
-		emoji: string
-		main: boolean
-		checked: boolean
-	}
+	let count = 0
+	$: count = (data.count as number) || 0
 
-	//sets up checkboxes to what's available from the database
-	let checkboxes: CheckboxType[] = []
-	const loadCheckboxes = async () => {
-		const categories: Category[] = data.categories
-		const subcategories: SubCategory[] = data.subcategories
+	const pageStr = $page.url.searchParams.get("page") || "-1"
+	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
-		let id = 0
-
-		for (let category of categories) {
-			checkboxes.push({
-				id: id++,
-				name: category.name,
-				emoji: category.emoji,
-				main: true,
-				checked: false
-			})
-
-			for (let subcategory of subcategories) {
-				if (category.name === subcategory.category) {
-					checkboxes.push({
-						id: id++,
-						name: subcategory.name,
-						emoji: subcategory.emoji,
-						main: false,
-						checked: false
-					})
-				}
-			}
-		}
-	}
+	let search = decodeURIComponent($page.url.searchParams.get("search") || "").trim()
+	let ascending = $page.url.searchParams.get("ascending")?.toLowerCase() === "true"
+	let categories: string[] = []
+	let subcategories: string[] = []
+	let show = false
+	let loading = true
 
 	function handleFilters() {
-		let filters = checkboxes
-			.filter((checkbox: CheckboxType) => checkbox.checked)
+		categories = checkboxes
+			.filter((checkbox: CheckboxType) => checkbox.checked && checkbox.main)
 			.map((checkbox: CheckboxType) => checkbox.name)
-
-		$searchStore.filters = filters
+		subcategories = checkboxes
+			.filter((checkbox: CheckboxType) => checkbox.checked && !checkbox.main)
+			.map((checkbox: CheckboxType) => checkbox.name)
 	}
 
-	const searchStats: ScriptCard[] = data.scripts.map((script: ScriptCard) => ({
-		...script,
-		searchTerms: `${script.title} ${script.description} ${script.categories} ${script.subcategories} ${script.author}`,
-		filters: `${script.categories} ${script.subcategories}`
-	}))
+	function replaceQuery(values: Record<string, string>) {
+		if (!browser) return
+		for (let [k, v] of Object.entries(values)) {
+			if (!!v && v !== "") $page.url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
+			else $page.url.searchParams.delete(k)
+		}
 
-	const searchStore = createSearchStore(searchStats)
-	const unsubscribe = searchStore.subscribe((model) => searchHandler(model))
+		if (loading) return
 
-	onDestroy(() => unsubscribe())
+		history.replaceState({}, "", $page.url)
+		invalidate("scripts:list")
+	}
+
+	function canSeeScript(script: IScriptCard) {
+		if (script.published) return true
+		if (!profile) return false
+		if (profile.profiles_protected.administrator) return true
+		if (profile.profiles_protected.moderator) return true
+		return script.scripts_protected.author_id === profile.id
+	}
+
+	onMount(() => (loading = false))
+
+	$: replaceQuery({ page: currentPage.toString() })
+	$: replaceQuery({ page: "1", search: search })
+	$: replaceQuery({ page: "1", categories: categories.toString().replaceAll(",", "-") })
+	$: replaceQuery({ page: "1", subcategories: subcategories.toString().replaceAll(",", "-") })
+	$: replaceQuery({ ascending: ascending.toString() })
 </script>
 
 <svelte:head>
-	<meta
-		name="description"
-		content="Large script collection to bot OldSchool RuneScape with Simba, SRL and WaspLib. Get that 99 on osrs today!"
-	/>
 	<MetaTags
 		title="Scripts"
 		description="Large script collection to bot OldSchool RuneScape with Simba, SRL and WaspLib. Get that 99 on osrs today!"
-		url="/scripts"
 	/>
 </svelte:head>
 
-<div class="flex absolute min-h-screen inset-0 overflow-x-hidden">
-	<div
-		class="w-64 border-r dark:border-stone-800 sticky bottom-0 min-h-full overflow-y-scroll no-scrollbar pt-16"
-		in:fly={{ duration: 600, delay: 600, x: -100 }}
-		out:fly={{ duration: 300, x: -100 }}
-	>
-		<h4 class="text-center py-4">Categories</h4>
-		{#await loadCheckboxes()}
-			<span class="px-4">Loading...</span>
-		{:then}
-			<div class="flex justify-center font-semibold text-sm">
-				<div>
-					{#each checkboxes as checkbox}
-						<div class="flex py-0.5">
-							{#if !checkbox.main}
-								<div class="w-4 h-2 " />
-							{/if}
-							<div
-								id={"checkboxdiv" + checkbox.id}
-								class:font-thin={!checkbox.main}
-								on:change={() => handleFilters()}
+<AppShell>
+	<svelte:fragment slot="sidebarLeft">
+		<div
+			class="flex h-screen border-r dark:border-stone-800 sticky bottom-0 min-h-full overflow-y-scroll
+				   no-scrollbar font-semibold text-sm"
+			in:slide={{ duration: 600, delay: 600, axis: "x" }}
+			out:slide={{ duration: 300, axis: "x" }}
+		>
+			<div class="sm:grid w-60 justify-center my-4" class:hidden={!show}>
+				{#each checkboxes as checkbox}
+					<div class="flex py-0.5">
+						{#if !checkbox.main}
+							<div class="w-4 h-2" />
+						{/if}
+						<div
+							id={"checkboxdiv" + checkbox.id}
+							class:font-thin={!checkbox.main}
+							on:change={() => handleFilters()}
+						>
+							<input
+								class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-amber-500"
+								type="checkbox"
+								id={"checkbox" + checkbox.id}
+								bind:checked={checkbox.checked}
+							/>
+							<label
+								class="form-check-label inline-block cursor-pointer dark:hover:text-amber-100 hover:text-orange-400"
+								for={"checkbox" + checkbox.id}
+								class:text-amber-500={checkbox.checked}
 							>
-								<input
-									class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-amber-500"
-									type="checkbox"
-									id={"checkbox" + checkbox.id}
-									bind:checked={checkbox.checked}
-								/>
-								<label
-									class="form-check-label inline-block cursor-pointer dark:hover:text-amber-100 hover:text-orange-400"
-									for={"checkbox" + checkbox.id}
-									class:text-amber-500={checkbox.checked}
-								>
-									{checkbox.name + checkbox.emoji}
-								</label>
-							</div>
+								{checkbox.name + checkbox.emoji}
+							</label>
 						</div>
-						{#if checkbox.id === 3}
-							<br />
+					</div>
+					{#if checkbox.id === 3}
+						<br />
+					{/if}
+				{/each}
+			</div>
+			<button
+				class="grid sm:hidden fill-white content-center justify-items-center justify-center h-full"
+				on:click={() => (show = !show)}
+			>
+				<ChevronRight class="flex duration-100 {show ? 'rotate-180' : ''}" />
+			</button>
+		</div>
+	</svelte:fragment>
+
+	<main
+		class="container mt-8 mx-auto flex-grow w-[95%] max-h-screen overflow-y-visible hide-scrollbar"
+		in:fade={{ duration: 300, delay: 300 }}
+		out:fade={{ duration: 300 }}
+	>
+		<div>
+			{#if profile && profile.profiles_protected.developer}
+				<a href="/scripts/add" class="block mx-auto w-fit">
+					<button class="btn variant-filled-secondary inline-block">Add Script</button>
+				</a>
+			{/if}
+			<div class="py-6 flex flex-col text-sm mb-2 max-w-2xl m-auto">
+				<input
+					type="search"
+					placeholder="Search script id, name, categories, author,..."
+					class="input"
+					bind:value={search}
+				/>
+			</div>
+
+			<div
+				class="grid gap-8 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 justify-center justify-items-center"
+			>
+				{#if data.scripts}
+					{#each data.scripts as script}
+						{#if canSeeScript(script)}
+							<ScriptCard {script} />
 						{/if}
 					{/each}
-				</div>
+				{:else}
+					{#each Array(10) as _i}
+						<div class="card w-[300px]">
+							<header class="group h-[200px] p-0">
+								<div class="placeholder h-full" />
+							</header>
+							<section class="p-4">
+								<header class="h-6"><div class="placeholder w-full h-full m-0" /></header>
+								<article class="h-20 mt-4">
+									<div class="placeholder w-full h-full m-0" />
+								</article>
+							</section>
+							<footer class="card-footer flex h-8 w-full justify-end">
+								{#each Array(10) as i}
+									<div class="placeholder-circle w-4 mx-1" />
+								{/each}
+							</footer>
+						</div>
+					{/each}
+				{/if}
 			</div>
-		{/await}
-	</div>
-	<div
-		class="w-full overflow-y-scroll no-scrollbar max-h-full pt-16"
-		in:fly={{ duration: 600, delay: 600, x: 100 }}
-		out:fly={{ duration: 300, x: 100 }}
-	>
-		{#if $profile && $profile.developer}
-			<LinkButton text="Add Script" url="/scripts/add" arrow={false} />
-		{/if}
-		<div class="flex flex-col text-sm mb-2 max-w-2xl m-auto">
-			<input
-				type="search"
-				placeholder="Search script, categories, author,..."
-				class="appearance-none shadow-sm border border-amber-200 p-2 focus:outline-none focus:border-amber-500 rounded-lg"
-				bind:value={$searchStore.search}
-			/>
 		</div>
-
-		<div
-			class="grid 2xl:grid-cols-4 xl:grid-cols-3 lg:grid-cols-2 md:grid-cols-1 sm:grid-cols-1 sm:px-20 container gap-6 mx-auto xl:max-w-full lg:max-w-6xl md:max-w-4xl sm:max-w-xl content-start pt-10 xl:px-12"
-		>
-			{#each $searchStore.filtered as script}
-				<Card {script} />
-			{/each}
-		</div>
-		<div class="h-24 w-full place-items-center" />
-	</div>
-</div>
+		<Paginator srcData={"tutorials:posts"} bind:currentPage {range} bind:count />
+	</main>
+</AppShell>

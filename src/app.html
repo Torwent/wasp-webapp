@@ -1,20 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" class="">
+<html lang="en" class="dark">
 	<head>
 		<meta charset="utf-8" />
-		<link rel="icon" href="%sveltekit.assets%/favicon.svg" />
+		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width" />
-
-		<!-- Social media tags -->
-		<meta property="og:site_name" content="WaspScripts" />
-		<meta name="twitter:site" content="WaspScripts" />
-
-		<!-- Dynamic head -->
 		%sveltekit.head%
 	</head>
-	<body
-		class="antialiased overflow-y-scroll text-stone-500 dark:text-stone-400 bg-white dark:bg-stone-900"
-	>
-		<div>%sveltekit.body%</div>
+	<body data-sveltekit-preload-data="hover" data-theme="skeleton">
+		<div style="display: contents" class="h-full overflow-hidden">%sveltekit.body%</div>
 	</body>
 </html>

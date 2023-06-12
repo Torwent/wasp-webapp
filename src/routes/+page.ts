@@ -1,5 +1,5 @@
-import { supabase } from "$lib/database/supabase"
-import type { Stat } from "$lib/database/types"
+import { supabaseHelper } from "$lib/backend/auth"
+import type { Stat } from "$lib/backend/types"
 import type { PageLoad } from "./$types"
 
 export const load: PageLoad = async ({ depends }) => {
@@ -12,7 +12,7 @@ export const load: PageLoad = async ({ depends }) => {
 		runtime: 0
 	}
 
-	const { data, error } = await supabase.rpc("get_stats_total")
+	const { data, error } = await supabaseHelper.rpc("get_stats_total")
 
 	if (error) {
 		const response = {

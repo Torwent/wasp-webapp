@@ -1,5 +1,5 @@
-import type { ServerLoad } from "@sveltejs/kit"
+import type { PageServerLoad } from "./$types"
 
-export const load: ServerLoad = async ({ locals }) => {
-	return { warningDismissed: locals.warningDismissed }
+export const load: PageServerLoad = async ({ locals }) => {
+	return { dismissed: locals.warningDismissed }
 }

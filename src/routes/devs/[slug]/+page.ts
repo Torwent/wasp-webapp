@@ -1,13 +1,13 @@
-import type { Load } from "@sveltejs/kit"
-import { supabase } from "$lib/database/supabase"
-import { loadError } from "$lib/utils"
+import { redirect } from "@sveltejs/kit"
+import { getDeveloper } from "$lib/backend/data"
+import type { PageLoad } from "./$types"
 
-export const load: Load = async ({ params }) => {
-	const { slug } = params
-	if (slug == null) return loadError()
+export const load: PageLoad = async ({ params }) => {
+	let { slug } = params
+	if (!slug) throw redirect(300, "/devs")
 
-	const { data, error } = await supabase.from("devs").select("*").eq("username", slug)
-	if (error) return loadError("devs/" + slug)
+	const developer = await getDeveloper(slug.toLowerCase())
+	if (!developer) throw redirect(300, "/devs")
 
-	return data[0]
+	return { developer }
 }

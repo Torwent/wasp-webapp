@@ -1,39 +1,46 @@
-import { supabase } from "$lib/database/supabase"
+import type { SupabaseClient } from "@supabase/supabase-js"
+import { encodeSEO } from "$lib/utils"
+import type { IScriptCard } from "$lib/backend/types"
 
 const website = "https://waspscripts.com"
 
-const loadScripts = async () => {
-	const { data, error } = await supabase.from("scripts_public").select("title, id")
+const loadScripts = async (supabase: SupabaseClient) => {
+	const { data, error } = await supabase
+		.from("scripts_public")
+		.select(`title,	scripts_protected (author)`)
+		.order("title", { ascending: true })
 
-	if (error) return console.error(error)
+	if (error) return console.error("scripts_public SELECT failed:" + error)
+
+	const scriptData = data as unknown as IScriptCard[]
 
 	let result: string[] = []
-	data.forEach((entry) => {
-		result.push(encodeURI(entry.title) + "&amp;" + entry.id)
+	scriptData.forEach((script) => {
+		result.push(encodeSEO(script.title + " by " + script.scripts_protected.author))
 	})
 
 	return result
 }
 
-const loadBlog = async () => {
-	const { data, error } = await supabase.from("blog").select("title")
+const loadTutorials = async (supabase: SupabaseClient) => {
+	const { data, error } = await supabase.from("tutorials").select("title, author")
 
-	if (error) return console.error(error)
+	if (error) return console.error("tutorials SELECT failed: " + error)
 
 	let result: string[] = []
-	data.forEach((entry) => {
-		result.push(encodeURI(entry.title))
+	data.forEach((post) => {
+		result.push(encodeSEO(post.title + " by " + post.author))
 	})
 
 	return result
 }
 
-const buildLoc = async (loc: string) => {
+const buildLoc = async (supabase: SupabaseClient, loc: string) => {
 	let data: string[] = []
 	if (loc === "scripts") {
-		data = (await loadScripts()) as string[]
+		data = (await loadScripts(supabase)) as string[]
 	} else {
-		data = (await loadBlog()) as string[]
+		data = (await loadTutorials(supabase)) as string[]
 	}
 
 	let result: string = ""
@@ -51,9 +58,9 @@ const buildLoc = async (loc: string) => {
 	return result
 }
 
-export const GET = async () => {
-	const scripts = await buildLoc("scripts")
-	const blog = await buildLoc("blog")
+export const GET = async ({ locals: { supabase } }) => {
+	const scripts = await buildLoc(supabase, "scripts")
+	const tutorials = await buildLoc(supabase, "tutorials")
 
 	const headers = {
 		"Cache-Control": "max-age=0, s-maxage=3600",
@@ -86,6 +93,11 @@ export const GET = async () => {
       </url>
       ${scripts}
       <url>
+        <loc>${website}/stats</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.7</priority>
+      </url>
+      <url>
         <loc>${website}/premium</loc>
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
@@ -100,7 +112,7 @@ export const GET = async () => {
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
       </url>
-      ${blog}
+      ${tutorials}
       <url>
         <loc>${website}/devs</loc>
         <changefreq>daily</changefreq>

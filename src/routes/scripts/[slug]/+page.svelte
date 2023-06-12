@@ -1,221 +1,168 @@
 <script lang="ts">
-	import type { Script } from "$lib/database/types"
-	export let data
-	import Markdown from "$lib/Markdown.svelte"
-	import AdvancedButton from "$lib/components/AdvancedDownloadButton.svelte"
-	import ZipDownload from "$lib/components/ZIPDownloadButton.svelte"
-	import Carousel from "$lib/components/Carousel.svelte"
-	import MetaTags from "$lib/components/MetaTags.svelte"
-
-	import { fade } from "svelte/transition"
-	import { profile, updateProfile } from "$lib/stores/authStore"
-	import { supabase } from "$lib/database/supabase"
-	import { convertTime, formatRSNumber } from "$lib/utils"
 	import { browser } from "$app/environment"
+	import { goto } from "$app/navigation"
+	import Markdown from "$lib/Markdown.svelte"
+	import { canDownload, updateWarning } from "$lib/backend/data"
+	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
+	import MetaTags from "$lib/components/MetaTags.svelte"
+	import ZipDownload from "$lib/components/ZIPDownload.svelte"
 
-	const script: Script = data.script as Script
-	let dismissed: Boolean = data.warningDismissed as Boolean
+	import EditButton from "$lib/components/EditButton.svelte"
+	import { convertTime, formatRSNumber } from "$lib/utils"
+	import {
+		modalStore,
+		type ModalSettings,
+		type ToastSettings,
+		toastStore
+	} from "@skeletonlabs/skeleton"
+	import { fade } from "svelte/transition"
 
-	updateProfile()
+	export let data
 
-	const fullDismiss = async () => {
-		dismissed = true
-		const { error } = await supabase
-			.from("profiles_private")
-			.update({ dismissed_warning: true })
-			.eq("id", supabase.auth.user()?.id)
+	let { script, dismissed, profile } = data
 
-		if (error) return console.error(error)
-		profile.set(false)
-		updateProfile()	
-		if (browser) document.cookie = `warningDismissed=true;max-age=31536000;path="/"`
+	function warningDismissed(r: boolean) {
+		if (r) {
+			updateWarning()
+			if (browser) document.cookie = `warningDismissed=true;max-age=31536000;path="/"`
+		} else goto("/scripts")
 	}
 
-	let assets_path =
-		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/" +
-		script.id +
-		"/banner.jpg"
+	const warn: ModalSettings = {
+		type: "confirm",
+		// Data
+		title: "Community Script",
+		buttonTextConfirm: "I agree",
+		body: `
+		<div class="variant-ghost-error flex">
+			<div class="block p-4">
+				<p>
+					Community scripts can be uploaded by anyone with the
+					<span class="text-sky-500 dark:text-sky-400"> Developer </span>
+					role and are not reviewed, therefore they can be malicious.
+				</p>
+				<br>
+				<p>
+					You shouldn't use a community script you are not willing to review or that you don't
+					trust it's developer.
+				</p>
+				<br>
+				<p>
+					Maintenance of the script is also responsibility of it's developer. So if the script
+					doesn't work or has bugs you need to report those issues to the developer.
+				</p>
+			</div>
+		</div>
+		`,
+		response: (r: boolean) => warningDismissed(r)
+	}
 
-	$: if ($profile && $profile.dismissed_warning) {
-		dismissed = true
-		if (browser) document.cookie = `warningDismissed=true;max-age=31536000;path="/"`
-		}
+	if (!dismissed && script && script.categories.includes("Community")) modalStore.trigger(warn)
+
+	function canDownloadScript() {
+		if (script.categories.includes("Free")) return true
+		return canDownload(profile)
+	}
+
+	const t: ToastSettings = {
+		message: "Please login to be able to download this script."
+	}
+
+	if (!profile) toastStore.trigger(t)
 </script>
 
 <svelte:head>
 	<MetaTags
 		title={script.title}
-		description={script.description}
-		url={"/scripts/" + encodeURI(script.title) + "&" + script.id}
+		description="RuneScape OSRS Color Bot - {script.description}"
+		keywords="OldSchool, RuneScape, OSRS, 2007, Color, Bot, Wasp, Scripts, {script.subcategories}"
+		author={script.scripts_protected.author}
 	/>
 </svelte:head>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
-	{#if script.categories.includes("Community") && !dismissed}
-		<div
-			class="fixed inset-0 bg-stone-900 bg-opacity-50 overflow-y-auto h-full w-full backdrop-blur transition-colors z-40"
-			in:fade={{ duration: 300, delay: 300 }}
-			out:fade={{ duration: 300 }}
-		>
-			<div class="m-auto my-36 p-12 max-w-4xl rounded-md shadow-md bg-stone-100 dark:bg-stone-800">
-				<div class="text-center px-8">
-					<h2 class="py-6 text-orange-500">⚠️This is a community script.⚠️</h2>
-					<h3 class="text-base">
-						Community scripts can be uploaded by anyone with the
-						<span class="text-sky-500 dark:text-sky-400"> Developer </span>
-						role and are not reviewed, therefore they can be malicious.
-					</h3>
-					<h3 class="text-base py-6">
-						You shouldn't use a community script you are not willing to review or that you don't
-						trust it's developer.
-					</h3>
-					<h3 class="text-base py-6">
-						Maintenance of the script is also responsibility of it's developer. So if the script
-						doesn't work or has bugs you need to report those issues to the developer.
-					</h3>
-					<div class="flex justify-between">
-						<button
-							type="button"
-							class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
-		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
-							on:click={() => (dismissed = true)}
-						>
-							<span class="px-2">I understand!</span>
-						</button>
-
-						<button
-							type="button"
-							class="px-6 py-2.5 text-white text-xs font-semibold leading-tight uppercase rounded shadow-md hover:shadow-lg active:shadow-lg transition duration-150 ease-in-out flex items-center
-		justify-between bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 my-2"
-							on:click={() => fullDismiss()}
-						>
-							<span class="px-2">I understand and I don't want to see this warning again!</span>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
-	{/if}
-
 	<div class="absolute inset-0 container min-w-full h-96 mx-0 flex flex-col">
-		<img class="z-0 absolute object-cover h-full w-full" src={assets_path} alt={script.assets_alt} />
-		<header class="left-0 mt-auto z-10 text-center h-32 text-amber-500 text-shadow">
-			<div
-				class="absolute mx-0 h-32 w-full opacity-100
-					   bg-gradient-to-t from-white/20 via-white-800/20 dark:from-black/60 dark:via-gray-800/20 to-transparent"
-			/>
-			<h1 class="mx-8 mb-4 font-bold text-4xl">{script.title}</h1>
-			<h2 class="font-semibold leading-normal mb-4">{script.description}</h2>
-		</header>
+		<img
+			class="z-0 absolute object-cover h-full w-full"
+			src={script?.scripts_protected.assets_path + "banner.jpg"}
+			alt={script?.scripts_protected.assets_alt}
+		/>
 		<!-- Title and Description Hover Effect -->
+		<header class="left-0 mt-auto z-[1] text-center h-32 text-primary-500 text-shadow">
+			<div
+				class="absolute mx-0 h-32 w-full opacity-100 bg-gradient-to-t from-white/20 via-white-800/20
+				 dark:from-black/60 dark:via-gray-800/20 to-transparent"
+			/>
+			<h2 class="mx-8 mb-4 font-bold text-4xl">{script.title}</h2>
+			<h3 class="font-semibold leading-normal mb-4">{script.description}</h3>
+		</header>
 	</div>
 
-	<div class="h-96 w-fill" />
-	<div class="container mx-auto mb-6 max-w-2xl flex-grow">
-		<div class="container w-full mx-auto my-3">
-			<Carousel
-				bucket="imgs"
-				folder={"scripts/" + script.title.toLowerCase().replace(" ", "_") + "/assets"}
-			/>
-		</div>
-
-		<header class="text-center">
-			{#if script.experience}
-				{#await formatRSNumber(script.experience)}
-					<h2>Total Experience Gained: ...</h2>
-				{:then value}
-					<h2>Total Experience Gained: {value}</h2>
-				{/await}
-			{/if}
-			{#if script.gold}
-				{#await formatRSNumber(script.gold)}
-					<h2>Total Gold Gained: ...</h2>
-				{:then value}
-					<h2>Total Gold Gained: {value}</h2>
-				{/await}
-			{/if}
-			{#if script.runtime}
-				{#await convertTime(script.runtime)}
-					<h2>Total Runtime: ...</h2>
-				{:then value}
-					<h2>Total Runtime: {value}</h2>
-				{/await}
-			{/if}
-		</header>
-
-		<div class="text-center py-12">
-			{#if script.categories.includes("Free")}
-				<AdvancedButton script={script} />
-
-				{#if script.categories.includes("Official")}
-					<h3 class="py-6">
-						This is a free wasp script, you can add it to Simba's package manager with the following
-						link:
+	<div class="container mt-80 mx-auto mb-6 max-w-2xl flex-grow">
+		{#if !script.published}
+			<div class="text-center my-4">
+				<h4 class="text-secondary-500 mx-auto font-bold">Hidden</h4>
+			</div>
+		{/if}
+		{#if script.stats_scripts.experience || script.stats_scripts.gold || script.stats_scripts.runtime}
+			<header class="text-center">
+				{#if script.stats_scripts.experience}
+					<h3>
+						Total Experience Gained:
+						{#await formatRSNumber(script.stats_scripts.experience)}...{:then value}{value}{/await}
 					</h3>
-					<h4>
-						<a
-							href="https://github.com/Torwent/wasp-free"
-							class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
-							>https://github.com/Torwent/wasp-free</a
-						>
-					</h4>
-					<h5 class="py-4">
-						For more information check this
-						<a
-							href="/blog/Simba%20packages"
-							class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
-						>
-							guide</a
-						>.
-					</h5>
 				{/if}
-			{:else if script.categories.includes("Premium")}
-				{#if !$profile.id}
-					<h3 class="py-6">Please login to be able to download this script.</h3>
-				{:else if $profile.premium || $profile.vip || $profile.tester || $profile.id === script.author_id}
-					<AdvancedButton script={script} />
-					<h4 class="pt-6">
-						This is a premium script, you need to move it to
-						<b class="text-amber-500 dark:text-amber-200"> Simba/Scripts/wasp-premium </b>
-					</h4>
+				{#if script.stats_scripts.gold}
+					<h3>
+						Total Gold Gained:
+						{#await formatRSNumber(script.stats_scripts.gold)}...{:then value}{value}{/await}
+					</h3>
+				{/if}
+				{#if script.stats_scripts.runtime}
+					<h3>
+						Total Runtime:
+						{#await convertTime(script.stats_scripts.runtime)}...{:then value}{value}{/await}
+					</h3>
+				{/if}
+			</header>
+		{/if}
 
-					{#if script.categories.includes("Official")}
-						<h4 class="py-6">To download all official premium scripts a zip click here:</h4>
-						<ZipDownload />
-					{/if}
+		{#if profile}
+			<div class="text-center">
+				{#if canDownloadScript()}
+					<div class="py-12">
+						<AdvancedButton {script} />
+					</div>
+
+					<h5 class="pt-6">
+						You should move this script to
+						<b class="text-primary-500">/Simba/Scripts/</b>
+						and place it in the respective folder.
+					</h5>
 				{:else}
 					<h3 class="py-2">This is a premium script and you are not premium.</h3>
 					<h4>
 						To be able to download this script join
-						<a
-							href="/premium"
-							class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
-						>
-							Premium
-						</a>!
+						<a href="/premium" class="font-semibold text-primary-500 hover:underline">Premium</a>
+						!
 					</h4>
 				{/if}
-			{/if}
-		</div>
 
-		{#if $profile.id === script.author_id || $profile.administrator}
-			<div class="grid place-items-center">
-				<a href="/scripts/{encodeURI(script.title) + '&' + script.id}/edit">
-					<button
-						data-mdb-ripple="true"
-						data-mdb-ripple-color="light"
-						class=" text-white text-xs font-semibold leading-tight px-6 py-2.5 uppercase rounded transition duration-300 ease-in-out flex justify-start shadow-md hover:shadow-lg
-				 			 bg-orange-500 hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500 outline-orange-300 active:outline"
-					>
-						Edit
-					</button>
-				</a>
+				<h4 class="mt-24 mb-4">To download several scripts as a zip click the following button:</h4>
+				<ZipDownload bind:profile />
+
+				<EditButton author_id={script.scripts_protected.author_id} />
 			</div>
 		{/if}
 
-		<h2 class="text-amber-500 dark:text-amber-200 text-center py-6">Description:</h2>
-		<article class="prose dark:prose-invert py-6">
-			<Markdown src={script.content} />
-		</article>
+		<header class="text-center my-6 text-primary-500">
+			<span class="text-lg">Description:</span>
+		</header>
+
+		<div class="variant-ghost-surface max-h-[50rem] overflow-auto">
+			<article class="py-6 m-auto prose dark:prose-invert">
+				<Markdown src={script.content} />
+			</article>
+		</div>
 	</div>
 </div>
