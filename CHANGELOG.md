@@ -1,3 +1,12 @@
+## [0.6.1](https://github.com/Torwent/wasp-webapp/compare/v0.6.0...v0.6.1) (2023-06-12)
+
+
+### Bug Fixes
+
+* typo in docker-compose.yml ([8360cf1](https://github.com/Torwent/wasp-webapp/commit/8360cf158d61b4e065851f0bfbcdc967096d35d9))
+
+
+
 # [0.6.0](https://github.com/Torwent/wasp-webapp/compare/v0.5.13...v0.6.0) (2023-06-12)
 
 
@@ -74,15 +83,6 @@
 ### Bug Fixes
 
 * small flaw with the new ordering way of stats ([84529be](https://github.com/Torwent/wasp-webapp/commit/84529be013207a9e7f91d92ab2f5d835eb9f3787))
-
-
-
-## [0.5.10](https://github.com/Torwent/wasp-webapp/compare/v0.5.9...v0.5.10) (2023-04-23)
-
-
-### Bug Fixes
-
-* **stats:** added pagination ([1003db8](https://github.com/Torwent/wasp-webapp/commit/1003db86385b5916d7e8c12a534b7f14aea70ccf))
 
 
 
