@@ -10,15 +10,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const { session, supabaseClient } = await getSupabase(event)
 
 	event.locals.supabase = supabaseClient
-
 	event.locals.session = session
-
 	event.locals.getProfile = async () => {
-		const { session } = event.locals
 		if (!session) return null
 
 		const id = session.user.id
-		const { data, error } = await event.locals.supabase
+		const { data, error } = await supabaseClient
 			.from("profiles_public")
 			.select(
 				`id, discord_id, username, avatar_url,
@@ -29,9 +26,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 		if (error) return null
 
-		const profile = data[0] as unknown as Profile
-
-		return profile
+		return data[0] as unknown as Profile
 	}
 
 	let warning = event.cookies.get("warningDismissed")
@@ -43,9 +38,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 			return name === "content-range"
 		}
 	})
-	const loadTime = performance.now() - start
 
-	if (loadTime > 3000) console.log(`🚀 ${route} took ${loadTime.toFixed(2)} ms to load!`)
+	const loadTime = performance.now() - start
+	if (loadTime < 3000) console.log(`🚀 ${route} took ${loadTime.toFixed(2)} ms to load!`)
+	else console.log(`🐌 ${route} took ${loadTime.toFixed(2)} ms to load!`)
 
 	return response
 }

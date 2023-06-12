@@ -1,6 +1,8 @@
 import { redirect } from "@sveltejs/kit"
 import type { PageLoad } from "./$types"
 import { supabaseHelper } from "$lib/backend/auth"
+import { browser } from "$app/environment"
+import { encodeSEO } from "$lib/utils"
 
 export const load: PageLoad = async ({ url, depends, parent }) => {
 	depends("tutorials:posts")
@@ -24,10 +26,10 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 	const start = (page - 1) * range
 	const finish = start + range
 
-	let posts
+	let postsData
 
 	if (level > -1) {
-		posts = supabaseHelper
+		postsData = supabaseHelper
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
@@ -35,7 +37,7 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 			.eq("level", level)
 			.range(start, finish)
 	} else if (search === "") {
-		posts = supabaseHelper
+		postsData = supabaseHelper
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
@@ -43,7 +45,7 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 			.order("level", { ascending: ascending })
 			.range(start, finish)
 	} else {
-		posts = supabaseHelper
+		postsData = supabaseHelper
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
@@ -51,12 +53,17 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 			.ilike("tutorials_search", "%" + search.replaceAll("%", "") + "%")
 	}
 
-	const { data, count, error } = await posts
+	const { data, count, error } = await postsData
 
 	if (error) {
 		console.error("tutorials SELECT failed: " + error)
 		throw redirect(303, "./")
 	}
 
-	return { posts: data, count, range }
+	const posts = data
+
+	if (!browser && posts.length === 1)
+		throw redirect(303, "/tutorials/" + encodeSEO(posts[0].title + " by " + posts[0].author))
+
+	return { posts, count, range }
 }

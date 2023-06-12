@@ -34,7 +34,9 @@
 	<span class="text-sm font-normal text-stone-500 dark:text-stone-400">
 		Showing
 		<span class="font-semibold text-stone-900 dark:text-white">
-			{(currentPage - 1) * range + 1}-{(currentPage - 1) * range + range + 1}
+			{(currentPage - 1) * range + 1}-{(currentPage - 1) * range + range + 1 < count
+				? (currentPage - 1) * range + range + 1
+				: count}
 		</span>
 		of
 		<span class="font-semibold text-stone-900 dark:text-white">{count}</span>

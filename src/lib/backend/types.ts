@@ -29,7 +29,7 @@ export interface Profile extends ProfilePublic {
 
 export interface Developer {
 	id?: string
-	realname: string
+	real_name: string
 	username: string
 	description: string
 	content: string

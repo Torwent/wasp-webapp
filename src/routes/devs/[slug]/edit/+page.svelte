@@ -25,7 +25,7 @@
 	})
 
 	$form.id = developer.id
-	$: $form.realname = developer.realname
+	$: $form.realname = developer.real_name
 	$: $form.username = developer.username
 	$: $form.description = developer.description
 	$: $form.content = developer.content
@@ -44,7 +44,7 @@
 				<div class="flex my-auto">
 					<header>
 						<h3 class="font-bold text-2xl">
-							{#if developer.realname && developer.realname != ""} {developer.realname} / {/if}
+							{#if developer.real_name && developer.real_name != ""} {developer.real_name} / {/if}
 							{developer.username}
 						</h3>
 					</header>
@@ -79,7 +79,7 @@
 		</div>
 
 		<form method="POST" use:focusTrap={isFocused} use:enhance>
-			<FormInput title="Name" bind:value={developer.realname} bind:error={$errors.realname} />
+			<FormInput title="Name" bind:value={developer.real_name} bind:error={$errors.realname} />
 			<FormInput title="Username" bind:value={developer.username} bind:error={$errors.username} />
 
 			<FormInput

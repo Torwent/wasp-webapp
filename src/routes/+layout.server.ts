@@ -3,8 +3,7 @@ import type { LayoutServerLoad } from "./$types"
 
 export const load: LayoutServerLoad = async (event) => {
 	event.depends("supabase:auth")
-	return {
-		session: getServerSession(event),
-		profile: event.locals.getProfile()
-	}
+	const session = getServerSession(event)
+	const profile = event.locals.getProfile()
+	return { session, profile }
 }

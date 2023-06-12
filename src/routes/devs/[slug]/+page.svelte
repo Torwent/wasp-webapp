@@ -23,7 +23,7 @@
 		<div class="flex my-auto">
 			<header>
 				<h3 class="font-bold text-2xl">
-					{#if developer.realname && developer.realname != ""} {developer.realname} / {/if}
+					{#if developer.real_name && developer.real_name != ""} {developer.real_name} / {/if}
 					{developer.username}
 				</h3>
 			</header>

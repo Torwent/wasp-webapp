@@ -11,7 +11,7 @@ import type {
 	CheckboxType,
 	Profile
 } from "./types"
-import { getUserID, profileStore, supabaseClient, supabaseHelper } from "./auth"
+import { supabaseClient, supabaseHelper } from "./auth"
 
 const categories = writable<Category[] | null>(null)
 const subCategories = writable<SubCategory[] | null>(null)
@@ -22,19 +22,21 @@ export async function updateUsername(id: string, username: string) {
 }
 
 export async function updateWarning() {
-	const id = await getUserID()
-	if (!id) return false
+	const {
+		data: { user }
+	} = await supabaseHelper.auth.getUser()
+
+	if (!user) return false
 
 	const { error } = await supabaseHelper
 		.from("profiles_private")
 		.update({ dismissed_warning: true })
-		.eq("id", id)
+		.eq("id", user.id)
 
 	if (error) {
 		console.error("profiles_private UPDATE failed: " + error)
 		return false
 	}
-	profileStore.set(null)
 }
 
 export async function getCategories() {
@@ -203,7 +205,7 @@ export async function getPost(path: string): Promise<Post | null> {
 export async function getDevelopers(): Promise<Developer[] | null> {
 	const { data, error } = await supabaseHelper
 		.from("devs")
-		.select("id, realname, username, description, github, paypal_id, content")
+		.select("id, real_name, username, description, github, paypal_id, content")
 		.order("username", { ascending: true })
 
 	if (error) console.error("devs SELECT failed: " + error)

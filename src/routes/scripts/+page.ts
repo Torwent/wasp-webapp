@@ -1,6 +1,8 @@
+import { browser } from "$app/environment"
 import { supabaseHelper } from "$lib/backend/auth"
 import { addToolTips, getCategories, getCheckBoxes, getSubCategories } from "$lib/backend/data"
 import type { Script } from "$lib/backend/types"
+import { encodeSEO } from "$lib/utils"
 import { redirect, type Load } from "@sveltejs/kit"
 
 export const load: Load = async ({ url, depends }) => {
@@ -82,6 +84,12 @@ export const load: Load = async ({ url, depends }) => {
 	const checkboxes = promises[1]
 	const categories = promises[2]
 	const subcategories = promises[3]
+
+	if (!browser && scripts.length === 1)
+		throw redirect(
+			303,
+			"/scripts/" + encodeSEO(scripts[0].title + " by " + scripts[0].scripts_protected.author)
+		)
 
 	if (!checkboxes || !categories || !subcategories) throw redirect(303, "/")
 
