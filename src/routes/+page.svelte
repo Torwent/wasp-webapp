@@ -3,11 +3,10 @@
 	import Discord from "$lib/components/Discord.svelte"
 	import CanvasAnimation from "./CanvasAnimation.svelte"
 	import { fade } from "svelte/transition"
-	import type { PageData } from "./$types"
 	import { convertTime, formatRSNumber } from "$lib/utils"
 	import { invalidate } from "$app/navigation"
 	import { browser } from "$app/environment"
-	export let data: PageData
+	export let data
 
 	function rerunLoad() {
 		if (browser) invalidate("stats:total")
@@ -34,8 +33,8 @@
 			<div class="py-4">WaspScripts</div>
 			<div>
 				100%
-				<span class="bg-clip-text animate-character text-transparent inline-block"> color </span>,
-				100% open source.
+				<span class="bg-clip-text animate-character text-transparent inline-block">color</span>
+				, 100% open source.
 			</div>
 		</h1>
 	</header>
@@ -44,29 +43,29 @@
 		<h2 class="pt-6 px-6 font-bold whitespace-nowrap text-center">
 			Total Experience Earned:
 			{#await formatRSNumber(data.total.experience)}
-				<span class="py-4 pr-6"> ... </span>
+				<span class="py-4 pr-6">...</span>
 			{:then value}
-				<span class="py-4 pr-6"> {value} </span>
+				<span class="py-4 pr-6">{value}</span>
 			{/await}
 		</h2>
 		<h2 class="px-6 font-bold whitespace-nowrap text-center">
 			Total Gold Earned:
 			{#await formatRSNumber(data.total.gold)}
-				<span class="py-4 pr-6"> ... </span>
+				<span class="py-4 pr-6">...</span>
 			{:then value}
-				<span class="py-4 pr-6"> {value} </span>
+				<span class="py-4 pr-6">{value}</span>
 			{/await}
 		</h2>
 		<h2 class="px-6 font-bold whitespace-nowrap text-center">
 			Total Levels Earned:
-			<span class="py-4 pr-6"> {data.total.levels} </span>
+			<span class="py-4 pr-6">{data.total.levels}</span>
 		</h2>
 		<h2 class="pb-4 px-6 font-bold whitespace-nowrap text-center">
 			Total Runtime:
 			{#await convertTime(data.total.runtime)}
-				<span class="py-4 pr-6"> ... </span>
+				<span class="py-4 pr-6">...</span>
 			{:then value}
-				<span class="py-4 pr-6"> {value} </span>
+				<span class="py-4 pr-6">{value}</span>
 			{/await}
 		</h2>
 	</header>
@@ -79,7 +78,7 @@
 		still around, it's ancestor, SCAR dates back to RuneScape Classic.
 	</p>
 	<p class="text-center py-6">
-		For more information, help and/or questions look through the 
+		For more information, help and/or questions look through the
 		<a href="/faq" class="decoration-transparent" aria-label="Open frequently asked questions page">
 			FAQ
 		</a>
@@ -91,7 +90,7 @@
 	<div class="py-6">
 		<header>
 			<h2 class="text-2xl font-bold text-center md:text-3xl py-16">
-				<span> Advanced mouse movements and click patterns </span>
+				<span>Advanced mouse movements and click patterns</span>
 			</h2>
 		</header>
 

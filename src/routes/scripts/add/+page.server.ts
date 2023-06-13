@@ -1,4 +1,3 @@
-import type { PageServerLoad } from "./$types"
 import { superValidate, setError } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
 import { scriptSchema, type ScriptPublic } from "$lib/backend/types"
@@ -7,7 +6,7 @@ import { uploadScript } from "$lib/backend/data.server"
 import { encodeSEO } from "$lib/utils"
 import { getScript } from "$lib/backend/data"
 
-export const load: PageServerLoad = async (event) => {
+export const load = async (event) => {
 	const form = superValidate(event, scriptSchema)
 	return { form }
 }

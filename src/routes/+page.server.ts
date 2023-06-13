@@ -1,8 +1,7 @@
 import type { Provider } from "@supabase/supabase-js"
-import type { Actions } from "./$types"
 import { fail, redirect } from "@sveltejs/kit"
 
-export const actions: Actions = {
+export const actions = {
 	login: async ({ locals: { supabase }, url }) => {
 		const provider = url.searchParams.get("provider") as Provider
 

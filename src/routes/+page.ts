@@ -1,8 +1,7 @@
 import { supabaseHelper } from "$lib/backend/auth"
 import type { Stat } from "$lib/backend/types"
-import type { PageLoad } from "./$types"
 
-export const load: PageLoad = async ({ depends }) => {
+export const load = async ({ depends }) => {
 	depends("stats:total")
 	let total: Stat = {
 		username: "Total",

@@ -2,13 +2,12 @@
 	import { invalidate } from "$app/navigation"
 	import { page } from "$app/stores"
 	import { onMount } from "svelte"
-	import type { PageData } from "./$types"
 	import { browser } from "$app/environment"
 	import MetaTags from "$lib/components/MetaTags.svelte"
 	import PostCard from "./PostCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
 	import { ArrowDownAZ, ArrowUpZA } from "lucide-svelte"
-	export let data: PageData
+	export let data
 
 	const pageStr = $page.url.searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)

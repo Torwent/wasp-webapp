@@ -222,6 +222,13 @@ export async function getDeveloper(path: string): Promise<Developer | null> {
 	return null
 }
 
+export async function getDeveloperUUID(uuid: string): Promise<Developer | null> {
+	const developers = await getDevelopers()
+	if (!developers) return null
+	for (let i = 0; i < developers.length; i++) if (uuid === developers[i].id) return developers[i]
+	return null
+}
+
 export async function getSignedURL(bucket: string, path: string, file: string) {
 	path += "/" + file
 

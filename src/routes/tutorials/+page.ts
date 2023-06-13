@@ -1,10 +1,9 @@
 import { redirect } from "@sveltejs/kit"
-import type { PageLoad } from "./$types"
 import { supabaseHelper } from "$lib/backend/auth"
 import { browser } from "$app/environment"
 import { encodeSEO } from "$lib/utils"
 
-export const load: PageLoad = async ({ url, depends, parent }) => {
+export const load = async ({ url, depends, parent }) => {
 	depends("tutorials:posts")
 
 	const pageStr = url.searchParams.get("page") || "-1"
