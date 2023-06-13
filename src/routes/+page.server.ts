@@ -1,3 +1,4 @@
+import { API_URL } from "$lib/utils"
 import type { Provider } from "@supabase/supabase-js"
 import { fail, redirect } from "@sveltejs/kit"
 
@@ -29,6 +30,17 @@ export const actions = {
 			console.error("Logout failed: " + err)
 			return fail(400, { message: "Something went wrong logging you out!" })
 		}
+
+		return { success: true }
+	},
+
+	refresh: async ({ locals: { getProfile } }) => {
+		const profile = await getProfile()
+		if (!profile) return { success: false, message: "You are not logged in!" }
+
+		await fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
+			method: "GET"
+		}).catch((error) => console.error(error))
 
 		return { success: true }
 	}
