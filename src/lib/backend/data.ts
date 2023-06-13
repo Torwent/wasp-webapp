@@ -34,7 +34,7 @@ export async function updateWarning() {
 		.eq("id", user.id)
 
 	if (error) {
-		console.error("profiles_private UPDATE failed: " + error)
+		console.error("profiles_private UPDATE failed: " + error.message)
 		return false
 	}
 }
@@ -146,7 +146,7 @@ export async function getScripts(): Promise<Script[] | null> {
 		.order("title", { ascending: true })
 
 	if (error) {
-		console.error("scripts_public SELECT failed: " + error)
+		console.error("scripts_public SELECT failed: " + error.message)
 		return null
 	}
 
@@ -187,7 +187,7 @@ export async function getPosts(): Promise<Post[] | null> {
 		.select("id, created_at, user_id, author, title, description, content, level")
 		.order("title", { ascending: true })
 
-	if (error) console.error("tutorials SELECT failed: " + error)
+	if (error) console.error("tutorials SELECT failed: " + error.message)
 
 	return data
 }
@@ -208,7 +208,7 @@ export async function getDevelopers(): Promise<Developer[] | null> {
 		.select("id, real_name, username, description, github, paypal_id, content")
 		.order("username", { ascending: true })
 
-	if (error) console.error("devs SELECT failed: " + error)
+	if (error) console.error("devs SELECT failed: " + error.message)
 	return data
 }
 
@@ -227,7 +227,7 @@ export async function getSignedURL(bucket: string, path: string, file: string) {
 
 	const { data, error } = await supabaseClient.storage.from(bucket).createSignedUrl(path, 10)
 	if (error) {
-		console.error("Signed URL for " + bucket + " to " + path + " failed: " + error)
+		console.error("Signed URL for " + bucket + " to " + path + " failed: " + error.message)
 		return false
 	}
 	return data.signedUrl

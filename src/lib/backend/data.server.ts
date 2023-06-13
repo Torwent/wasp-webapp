@@ -26,8 +26,8 @@ async function updateScriptFile(file: File, id: string, revision: number) {
 }
 
 async function uploadFile(supabase: SupabaseClient, bucket: string, path: string, file: File) {
-	const { error } = await supabase.storage.from(bucket).upload(path, file)
-	if (error) console.error("storage " + bucket + " UPLOAD " + path + " failed: " + error)
+	const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true })
+	if (error) console.error("storage " + bucket + " UPLOAD " + path + " failed: " + error.message)
 }
 
 export async function uploadScript(
@@ -66,7 +66,7 @@ export async function uploadScript(
 
 	const { data, error } = await supabase.from("scripts_public").insert(publicData).select()
 	if (error) {
-		console.error("scripts_public INSERT failed: " + error)
+		console.error("scripts_public INSERT failed: " + error.message)
 		return { error: error.message }
 	}
 
@@ -115,7 +115,7 @@ export async function updateScript(
 
 	const { error } = await supabase.from("scripts_public").update(publicData).eq("id", script.id)
 	if (error) {
-		console.error("scripts_public UPDATE failed: " + error)
+		console.error("scripts_public UPDATE failed: " + error.message)
 		return { error: error.message }
 	}
 
@@ -149,7 +149,7 @@ export async function getSignedURLServer(
 
 	const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
 	if (error) {
-		console.error("Signed URL for " + bucket + " to " + path + " failed: " + error)
+		console.error("Signed URL for " + bucket + " to " + path + " failed: " + error.message)
 		return false
 	}
 	return data.signedUrl

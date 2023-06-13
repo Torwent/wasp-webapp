@@ -36,7 +36,7 @@ export const actions = {
 		const { error } = await locals.supabase.from("tutorials").insert(form.data)
 
 		if (error) {
-			console.error("tutorials INSERT failed: " + error)
+			console.error("tutorials INSERT failed: " + error.message)
 			return setError(form, null, error.message)
 		}
 

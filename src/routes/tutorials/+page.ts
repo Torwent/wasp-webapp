@@ -56,7 +56,7 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 	const { data, count, error } = await postsData
 
 	if (error) {
-		console.error("tutorials SELECT failed: " + error)
+		console.error("tutorials SELECT failed: " + error.message)
 		throw redirect(303, "/tutorials")
 	}
 
