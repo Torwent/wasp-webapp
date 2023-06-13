@@ -1,3 +1,12 @@
+## [0.6.2](https://github.com/Torwent/wasp-webapp/compare/v0.6.1...v0.6.2) (2023-06-13)
+
+
+### Bug Fixes
+
+* search fixes ([2e859a3](https://github.com/Torwent/wasp-webapp/commit/2e859a3ea123fba5765e1dd3546fa37db34faac9))
+
+
+
 ## [0.6.1](https://github.com/Torwent/wasp-webapp/compare/v0.6.0...v0.6.1) (2023-06-12)
 
 
@@ -74,15 +83,6 @@
 ### Bug Fixes
 
 * **stats:** some tweaks and improvements ([72f5e4c](https://github.com/Torwent/wasp-webapp/commit/72f5e4c231b6e80ef752b13e3e11ccb443bee542))
-
-
-
-## [0.5.11](https://github.com/Torwent/wasp-webapp/compare/v0.5.10...v0.5.11) (2023-04-23)
-
-
-### Bug Fixes
-
-* small flaw with the new ordering way of stats ([84529be](https://github.com/Torwent/wasp-webapp/commit/84529be013207a9e7f91d92ab2f5d835eb9f3787))
 
 
 
