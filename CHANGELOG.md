@@ -1,3 +1,12 @@
+## [0.6.4](https://github.com/Torwent/wasp-webapp/compare/v0.6.3...v0.6.4) (2023-06-13)
+
+
+### Bug Fixes
+
+* read notes ([63a1fe5](https://github.com/Torwent/wasp-webapp/commit/63a1fe5c5a8f16dc12e286bc2cfd13f7f7138e4b))
+
+
+
 ## [0.6.3](https://github.com/Torwent/wasp-webapp/compare/v0.6.2...v0.6.3) (2023-06-13)
 
 
@@ -74,15 +83,6 @@
 ### Reverts
 
 * Revert "Update svelte.config.js" ([e169d25](https://github.com/Torwent/wasp-webapp/commit/e169d25cb043b82e7a3cbddc201254fc8820b117))
-
-
-
-## [0.5.13](https://github.com/Torwent/wasp-webapp/compare/v0.5.12...v0.5.13) (2023-05-31)
-
-
-### Bug Fixes
-
-* add banner to advertise the new site version ([3c7e6f2](https://github.com/Torwent/wasp-webapp/commit/3c7e6f2a056af16316c69df613848be0a3010f00))
 
 
 
