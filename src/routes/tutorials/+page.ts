@@ -50,14 +50,14 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
 			})
-			.ilike("tutorials_search", "%" + search.replaceAll("%", "") + "%")
+			.ilike("search_tutorials", "%" + search.replaceAll("%", "") + "%")
 	}
 
 	const { data, count, error } = await postsData
 
 	if (error) {
 		console.error("tutorials SELECT failed: " + error)
-		throw redirect(303, "./")
+		throw redirect(303, "/tutorials")
 	}
 
 	const posts = data
