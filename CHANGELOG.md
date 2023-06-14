@@ -1,3 +1,12 @@
+## [0.6.6](https://github.com/Torwent/wasp-webapp/compare/v0.6.5...v0.6.6) (2023-06-14)
+
+
+### Bug Fixes
+
+* read notes ([b5fb877](https://github.com/Torwent/wasp-webapp/commit/b5fb87764e807013ce8c0a0a8f8c46ff74a29d46))
+
+
+
 ## [0.6.5](https://github.com/Torwent/wasp-webapp/compare/v0.6.4...v0.6.5) (2023-06-13)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * search fixes ([2e859a3](https://github.com/Torwent/wasp-webapp/commit/2e859a3ea123fba5765e1dd3546fa37db34faac9))
-
-
-
-## [0.6.1](https://github.com/Torwent/wasp-webapp/compare/v0.6.0...v0.6.1) (2023-06-12)
-
-
-### Bug Fixes
-
-* typo in docker-compose.yml ([8360cf1](https://github.com/Torwent/wasp-webapp/commit/8360cf158d61b4e065851f0bfbcdc967096d35d9))
 
 
 
