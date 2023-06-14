@@ -7,10 +7,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
 	const route = event.url
 
+	console.log("here0")
 	const { session, supabaseClient } = await getSupabase(event)
-
+	console.log("here1")
 	event.locals.supabase = supabaseClient
 	event.locals.session = session
+
 	event.locals.getProfile = async () => {
 		if (!session) return null
 

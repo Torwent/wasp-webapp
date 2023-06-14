@@ -123,7 +123,7 @@
 	</svelte:fragment>
 
 	<main
-		class="container mt-8 mx-auto flex-grow w-[95%] max-h-screen overflow-y-visible hide-scrollbar"
+		class="container mt-8 mx-auto flex-grow w-[95%] max-h-screen overflow-y-visible"
 		in:fade={{ duration: 300, delay: 300 }}
 		out:fade={{ duration: 300 }}
 	>

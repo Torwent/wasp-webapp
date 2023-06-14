@@ -37,6 +37,7 @@ export async function uploadScript(
 	coverFile: File | undefined,
 	bannerFile: File | undefined
 ) {
+	console.log("📜 Uploading ", script.title)
 	if (!scriptFile) {
 		console.error("Script file is missing!")
 		return { error: "Script file is missing!" }
