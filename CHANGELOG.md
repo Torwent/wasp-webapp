@@ -1,3 +1,12 @@
+## [0.6.7](https://github.com/Torwent/wasp-webapp/compare/v0.6.6...v0.6.7) (2023-06-15)
+
+
+### Bug Fixes
+
+* read notes ([f6220fe](https://github.com/Torwent/wasp-webapp/commit/f6220fe865efdd57519733acebc1234692559ce5))
+
+
+
 ## [0.6.6](https://github.com/Torwent/wasp-webapp/compare/v0.6.5...v0.6.6) (2023-06-14)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * file replacing works again (covers and banners) ([0b1d671](https://github.com/Torwent/wasp-webapp/commit/0b1d671f940dd2528a41c0df38fb47e8ee3e279f))
-
-
-
-## [0.6.2](https://github.com/Torwent/wasp-webapp/compare/v0.6.1...v0.6.2) (2023-06-13)
-
-
-### Bug Fixes
-
-* search fixes ([2e859a3](https://github.com/Torwent/wasp-webapp/commit/2e859a3ea123fba5765e1dd3546fa37db34faac9))
 
 
 
