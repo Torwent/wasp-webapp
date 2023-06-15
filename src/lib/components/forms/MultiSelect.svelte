@@ -59,19 +59,21 @@
 		if (value.length < 2 && (e.name === "Community" || e.name === "Free")) add(e)
 	})
 
+	const hadPremium = value.includes("Premium")
 	$: hasError = checkErrors(error)
 
 	$: ({ profile } = $page.data)
+
 	$: if (!profile || !profile.profiles_protected.administrator) {
-		if (value.includes("Official") || value.includes("Premium")) {
+		if (value.includes("Official") || (value.includes("Premium") && !hadPremium)) {
 			for (let i = 0; i < value.length; i++) {
-				if (value[i] === "Official" || value[i] === "Premium") {
+				if (value[i] === "Official" || (value[i] === "Premium" && !hadPremium)) {
 					value.splice(i, 1)
 					i--
 				}
 			}
 		}
-		value = ["Community", "Free", ...value]
+		value = hadPremium ? ["Community", "Premium", ...value] : ["Community", "Free", ...value]
 	}
 </script>
 
