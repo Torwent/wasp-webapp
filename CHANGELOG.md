@@ -1,3 +1,12 @@
+## [0.6.8](https://github.com/Torwent/wasp-webapp/compare/v0.6.7...v0.6.8) (2023-06-16)
+
+
+### Bug Fixes
+
+* **script forms:** proper file input coloring on validation ([e420ed8](https://github.com/Torwent/wasp-webapp/commit/e420ed8fccf62b4b227428e7518d8ab4e3070eea))
+
+
+
 ## [0.6.7](https://github.com/Torwent/wasp-webapp/compare/v0.6.6...v0.6.7) (2023-06-15)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * read notes ([63a1fe5](https://github.com/Torwent/wasp-webapp/commit/63a1fe5c5a8f16dc12e286bc2cfd13f7f7138e4b))
-
-
-
-## [0.6.3](https://github.com/Torwent/wasp-webapp/compare/v0.6.2...v0.6.3) (2023-06-13)
-
-
-### Bug Fixes
-
-* file replacing works again (covers and banners) ([0b1d671](https://github.com/Torwent/wasp-webapp/commit/0b1d671f940dd2528a41c0df38fb47e8ee3e279f))
 
 
 
