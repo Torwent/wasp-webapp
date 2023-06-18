@@ -61,13 +61,6 @@
 		}
 	}
 
-	function getStyle(style: string, value: any, error: string[] | undefined) {
-		if (!value) return ""
-		if (!error) return style + "-success-500"
-		if ((error.length = 0)) return style + "-success-500"
-		return style + "-error-500"
-	}
-
 	$: if ($form.categories) validate("categories")
 	$: if ($form.subcategories) validate("subcategories")
 	$: if ($form.min_xp) validate("min_xp")

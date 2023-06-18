@@ -41,8 +41,9 @@
 			<li class="h-12 mx-auto">
 				<a
 					href={getLink(route)}
-					class="dark:hover:text-primary-100 hover:text-primary-400 h-full flex place-items-center
-									{active(route) ? 'text-primary-500 dark:text-primary-400' : ''}"
+					class="dark:hover:text-primary-100 hover:text-primary-400 h-full flex place-items-center"
+					class:text-primary-500={active(route)}
+					class:dark:text-primary-400={active(route)}
 					aria-label="Navigate to {route.toLowerCase()} page"
 					on:click={() => (showMenu = !showMenu)}
 				>
