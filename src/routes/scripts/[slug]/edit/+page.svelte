@@ -149,10 +149,13 @@
 	<meta property="og:title" content={headTitle} />
 	<meta property="og:url" content={$page.url.href} />
 	<meta property="og:image" content={headImage} />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta property="og:image:alt" content="WaspScripts Logo" />
 	<meta property="og:description" content={headDescription} />
 
 	<!-- Twitter tags -->
-	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta property="twitter:domain" content={$page.url.host}>
 	<meta name="twitter:title" content={headTitle} />
 	<meta name="twitter:description" content={headDescription} />
 	<meta name="twitter:image" content={headImage} />

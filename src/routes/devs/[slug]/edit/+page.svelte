@@ -40,7 +40,7 @@
 		developer.username
 	const headAuthor = developer.username
 	const headImage =
-		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/logo.png"
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -55,6 +55,8 @@
 	<meta property="og:title" content={headTitle} />
 	<meta property="og:url" content={$page.url.href} />
 	<meta property="og:image" content={headImage} />
+	<meta property="og:image:type" content="image/png" />
+	<meta property="og:image:alt" content="WaspScripts Logo" />
 	<meta property="og:description" content={headDescription} />
 
 	<!-- Twitter tags -->
