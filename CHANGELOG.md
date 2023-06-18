@@ -1,3 +1,12 @@
+## [0.6.9](https://github.com/Torwent/wasp-webapp/compare/v0.6.8...v0.6.9) (2023-06-18)
+
+
+### Bug Fixes
+
+* roles are now refreshed with the site initial load ([7bb40dd](https://github.com/Torwent/wasp-webapp/commit/7bb40dd7aeef021839fd130746b1d7e751a35ae1))
+
+
+
 ## [0.6.8](https://github.com/Torwent/wasp-webapp/compare/v0.6.7...v0.6.8) (2023-06-16)
 
 
@@ -31,15 +40,6 @@
 ### Bug Fixes
 
 * added a roles refresh button to the userpanel ([cabc8ab](https://github.com/Torwent/wasp-webapp/commit/cabc8abe89232a29f2c6fe41d6235d93b44c2f43))
-
-
-
-## [0.6.4](https://github.com/Torwent/wasp-webapp/compare/v0.6.3...v0.6.4) (2023-06-13)
-
-
-### Bug Fixes
-
-* read notes ([63a1fe5](https://github.com/Torwent/wasp-webapp/commit/63a1fe5c5a8f16dc12e286bc2cfd13f7f7138e4b))
 
 
 
