@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { fade, slide } from "svelte/transition"
 	import ScriptCard from "./ScriptCard.svelte"
-	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { AppShell } from "@skeletonlabs/skeleton"
 	import type { CheckboxType, IScriptCard } from "$lib/backend/types"
 	import { ChevronRight } from "lucide-svelte"
@@ -65,13 +64,35 @@
 	$: replaceQuery({ page: "1", categories: categories.toString().replaceAll(",", "-") })
 	$: replaceQuery({ page: "1", subcategories: subcategories.toString().replaceAll(",", "-") })
 	$: replaceQuery({ ascending: ascending.toString() })
+
+	const headTitle = "Scripts - WaspScripts"
+	const headDescription =
+		"Large script collection to bot OldSchool RuneScape with Simba, SRL and WaspLib. Get that 99 on osrs today!"
+	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba"
+	const headAuthor = "Torwent"
+	const headImage =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/logo.png"
 </script>
 
 <svelte:head>
-	<MetaTags
-		title="Scripts"
-		description="Large script collection to bot OldSchool RuneScape with Simba, SRL and WaspLib. Get that 99 on osrs today!"
-	/>
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={headKeywords} />
+	<meta name="author" content={headAuthor} />
+	<meta name="robots" content="all" />
+
+	<!-- OpenGraph tags -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:image" content={headImage} />
+	<meta property="og:description" content={headDescription} />
+
+	<!-- Twitter tags -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
 <AppShell>

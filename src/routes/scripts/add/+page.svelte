@@ -10,8 +10,8 @@
 	import MultiSelect from "$lib/components/forms/MultiSelect.svelte"
 	import { FileCode, ImagePlus } from "lucide-svelte"
 	import ScriptCardBase from "../ScriptCardBase.svelte"
-	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { browser } from "$app/environment"
+	import { page } from "$app/stores"
 
 	export let data
 	const { categories, subcategories } = data
@@ -133,10 +133,34 @@
 	$: script.description = $form.description
 	$: script.categories = $form.categories
 	$: script.subcategories = $form.subcategories
+
+	const headTitle = "WaspScripts - Add Script"
+	const headDescription = "Add a new script to WaspScripts."
+	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba"
+	const headAuthor = "Torwent"
+	const headImage =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/logo.png"
 </script>
 
 <svelte:head>
-	<MetaTags title="Add Script" description="Add Script." robots="noindex" />
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={headKeywords} />
+	<meta name="author" content={headAuthor} />
+	<meta name="robots" content="noindex" />
+
+	<!-- OpenGraph tags -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:image" content={headImage} />
+	<meta property="og:description" content={headDescription} />
+
+	<!-- Twitter tags -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
@@ -219,7 +243,7 @@
 				</div>
 				<div>
 					<span class="text-lg font-semibold text-blue-400">
-						{script.title} - 2007 OSRS Colour Bot | WaspScripts
+						{script.title} - WaspScripts
 					</span>
 					<p>
 						{cropString("RuneScape OSRS Color Bot - " + script.description, 160)}

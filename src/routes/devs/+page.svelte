@@ -3,7 +3,6 @@
 	import { page } from "$app/stores"
 	import { onMount } from "svelte"
 	import { browser } from "$app/environment"
-	import MetaTags from "$lib/components/MetaTags.svelte"
 	import DevCard from "./DevCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
 	export let data
@@ -33,13 +32,36 @@
 
 	$: if (browser) replaceQuery({ page: currentPage.toString() })
 	$: if (browser) replaceQuery({ search: search })
+
+	const headTitle = "Developers - WaspScripts"
+	const headDescription =
+		"List of developers that are behind the project directly and/or indirerectly."
+	const headKeywords =
+		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Developers"
+	const headAuthor = "Torwent"
+	const headImage =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/logo.png"
 </script>
 
 <svelte:head>
-	<MetaTags
-		title="Developers"
-		description="List of developers that are behind the project directly and/or indirerectly."
-	/>
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={headKeywords} />
+	<meta name="author" content={headAuthor} />
+	<meta name="robots" content="all" />
+
+	<!-- OpenGraph tags -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:image" content={headImage} />
+	<meta property="og:description" content={headDescription} />
+
+	<!-- Twitter tags -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
 <main>

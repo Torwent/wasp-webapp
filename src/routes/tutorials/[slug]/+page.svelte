@@ -1,18 +1,40 @@
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { fade } from "svelte/transition"
 	import EditButton from "$lib/components/EditButton.svelte"
+	import { page } from "$app/stores"
 	export let data
 	const { post } = data
+
+	const headTitle = post.title + " - WaspScripts"
+	const headDescription = "OSRS Botting tutorial: " + post.description
+	const headKeywords =
+		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide. " +
+		post.author
+	const headAuthor = post.author
+	const headImage =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/logo.png"
 </script>
 
 <svelte:head>
-	<MetaTags
-		title={post.title}
-		description={post.description}
-		keywords={"OldSchool, RuneScape, OSRS, 2007, Color, Bot, Wasp, Scripts, Tutorials, Guides"}
-	/>
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={headKeywords} />
+	<meta name="author" content={headAuthor} />
+	<meta name="robots" content="all" />
+
+	<!-- OpenGraph tags -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:image" content={headImage} />
+	<meta property="og:description" content={headDescription} />
+
+	<!-- Twitter tags -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
 <main

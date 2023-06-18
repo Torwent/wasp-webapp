@@ -1,17 +1,43 @@
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { Github } from "lucide-svelte"
 	import { fade } from "svelte/transition"
 	import PayPal from "./PayPal.svelte"
 	import EditButton from "$lib/components/EditButton.svelte"
+	import { page } from "$app/stores"
 	export let data
 
-	const { developer, profile } = data
+	const { developer } = data
+
+	const headTitle = developer.username + " - WaspScripts"
+	const headDescription = developer.description
+	const headKeywords =
+		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Developer, " +
+		developer.username
+	const headAuthor = developer.username
+	const headImage =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/logo.png"
 </script>
 
 <svelte:head>
-	<MetaTags title={developer.username} description={developer.description} />
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={headKeywords} />
+	<meta name="author" content={headAuthor} />
+	<meta name="robots" content="all" />
+
+	<!-- OpenGraph tags -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:image" content={headImage} />
+	<meta property="og:description" content={headDescription} />
+
+	<!-- Twitter tags -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
 <div

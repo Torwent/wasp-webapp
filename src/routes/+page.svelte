@@ -1,11 +1,11 @@
 <script lang="ts">
-	import MetaTags from "$lib/components/MetaTags.svelte"
 	import Discord from "$lib/components/Discord.svelte"
 	import CanvasAnimation from "./CanvasAnimation.svelte"
 	import { fade } from "svelte/transition"
 	import { convertTime, formatRSNumber } from "$lib/utils"
 	import { invalidate } from "$app/navigation"
 	import { browser } from "$app/environment"
+	import { page } from "$app/stores"
 	export let data
 
 	function rerunLoad() {
@@ -14,13 +14,35 @@
 	}
 
 	rerunLoad()
+
+	const headTitle = "WaspScripts"
+	const headDescription =
+		"OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
+	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Bot, Wasp, Scripts"
+	const headAuthor = "Torwent"
+	const headImage =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/logo.png"
 </script>
 
 <svelte:head>
-	<MetaTags
-		title="WaspScripts"
-		description="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
-	/>
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={headKeywords} />
+	<meta name="author" content={headAuthor} />
+	<meta name="robots" content="all" />
+
+	<!-- OpenGraph tags -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:image" content={headImage} />
+	<meta property="og:description" content={headDescription} />
+
+	<!-- Twitter tags -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
 <main
