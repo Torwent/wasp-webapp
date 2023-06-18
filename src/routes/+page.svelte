@@ -1,13 +1,12 @@
 <script lang="ts">
-	import MetaTags from "$lib/components/MetaTags.svelte"
 	import Discord from "$lib/components/Discord.svelte"
 	import CanvasAnimation from "./CanvasAnimation.svelte"
 	import { fade } from "svelte/transition"
-	import type { PageData } from "./$types"
 	import { convertTime, formatRSNumber } from "$lib/utils"
 	import { invalidate } from "$app/navigation"
 	import { browser } from "$app/environment"
-	export let data: PageData
+	import { page } from "$app/stores"
+	export let data
 
 	function rerunLoad() {
 		if (browser) invalidate("stats:total")
@@ -15,13 +14,37 @@
 	}
 
 	rerunLoad()
+
+	const headTitle = "WaspScripts"
+	const headDescription =
+		"OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
+	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Bot, Wasp, Scripts"
+	const headAuthor = "Torwent"
+	const headImage =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
 
 <svelte:head>
-	<MetaTags
-		title="WaspScripts"
-		description="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
-	/>
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={headKeywords} />
+	<meta name="author" content={headAuthor} />
+	<meta name="robots" content="all" />
+
+	<!-- OpenGraph tags -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:image" content={headImage} />
+	<meta property="og:image:type" content="image/png" />
+	<meta property="og:image:alt" content="WaspScripts Logo" />
+	<meta property="og:description" content={headDescription} />
+
+	<!-- Twitter tags -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
 <main
@@ -34,8 +57,8 @@
 			<div class="py-4">WaspScripts</div>
 			<div>
 				100%
-				<span class="bg-clip-text animate-character text-transparent inline-block"> color </span>,
-				100% open source.
+				<span class="bg-clip-text animate-character text-transparent inline-block">color</span>
+				, 100% open source.
 			</div>
 		</h1>
 	</header>
@@ -44,29 +67,29 @@
 		<h2 class="pt-6 px-6 font-bold whitespace-nowrap text-center">
 			Total Experience Earned:
 			{#await formatRSNumber(data.total.experience)}
-				<span class="py-4 pr-6"> ... </span>
+				<span class="py-4 pr-6">...</span>
 			{:then value}
-				<span class="py-4 pr-6"> {value} </span>
+				<span class="py-4 pr-6">{value}</span>
 			{/await}
 		</h2>
 		<h2 class="px-6 font-bold whitespace-nowrap text-center">
 			Total Gold Earned:
 			{#await formatRSNumber(data.total.gold)}
-				<span class="py-4 pr-6"> ... </span>
+				<span class="py-4 pr-6">...</span>
 			{:then value}
-				<span class="py-4 pr-6"> {value} </span>
+				<span class="py-4 pr-6">{value}</span>
 			{/await}
 		</h2>
 		<h2 class="px-6 font-bold whitespace-nowrap text-center">
 			Total Levels Earned:
-			<span class="py-4 pr-6"> {data.total.levels} </span>
+			<span class="py-4 pr-6">{data.total.levels}</span>
 		</h2>
 		<h2 class="pb-4 px-6 font-bold whitespace-nowrap text-center">
 			Total Runtime:
 			{#await convertTime(data.total.runtime)}
-				<span class="py-4 pr-6"> ... </span>
+				<span class="py-4 pr-6">...</span>
 			{:then value}
-				<span class="py-4 pr-6"> {value} </span>
+				<span class="py-4 pr-6">{value}</span>
 			{/await}
 		</h2>
 	</header>
@@ -79,7 +102,7 @@
 		still around, it's ancestor, SCAR dates back to RuneScape Classic.
 	</p>
 	<p class="text-center py-6">
-		For more information, help and/or questions look through the 
+		For more information, help and/or questions look through the
 		<a href="/faq" class="decoration-transparent" aria-label="Open frequently asked questions page">
 			FAQ
 		</a>
@@ -91,7 +114,7 @@
 	<div class="py-6">
 		<header>
 			<h2 class="text-2xl font-bold text-center md:text-3xl py-16">
-				<span> Advanced mouse movements and click patterns </span>
+				<span>Advanced mouse movements and click patterns</span>
 			</h2>
 		</header>
 

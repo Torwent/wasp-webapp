@@ -1,4 +1,3 @@
-import type { PageServerLoad } from "./$types"
 import { superValidate, setError } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
 import { scriptSchema, type ScriptPublic } from "$lib/backend/types"
@@ -6,8 +5,9 @@ import { filesSchema } from "$lib/backend/types.server"
 import { uploadScript } from "$lib/backend/data.server"
 import { encodeSEO } from "$lib/utils"
 import { getScript } from "$lib/backend/data"
+import { updateProfileRoles } from "$lib/backend/auth.server.js"
 
-export const load: PageServerLoad = async (event) => {
+export const load = async (event) => {
 	const form = superValidate(event, scriptSchema)
 	return { form }
 }
@@ -80,6 +80,9 @@ export const actions = {
 			console.error(error)
 			return setError(form, null, error)
 		}
+
+		profile.profiles_protected.scripter = true
+		updateProfileRoles(profile)
 
 		throw redirect(303, "./" + url)
 	}

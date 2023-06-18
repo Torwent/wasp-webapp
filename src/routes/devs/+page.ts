@@ -1,11 +1,9 @@
 import { browser } from "$app/environment"
 import { encodeSEO } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
-import type { PageLoad } from "./$types"
 import { supabaseHelper } from "$lib/backend/auth"
-import type { Developer } from "$lib/backend/types"
 
-export const load: PageLoad = async ({ url, depends }) => {
+export const load = async ({ url, depends }) => {
 	depends("developers:devs")
 
 	const pageStr = url.searchParams.get("page") || "-1"
@@ -32,14 +30,14 @@ export const load: PageLoad = async ({ url, depends }) => {
 			.select("real_name, username, description, github, paypal_id, content", {
 				count: "exact"
 			})
-			.ilike("id_realname_username_description_content", "%" + search + "%")
+			.ilike("search_devs", "%" + search + "%")
 	}
 
 	const { data, count, error } = devsData
 
 	if (error) {
 		console.error(error)
-		throw redirect(303, "/")
+		throw redirect(303, "/devs")
 	}
 	const devs = data
 

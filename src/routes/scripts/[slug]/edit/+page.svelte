@@ -10,9 +10,9 @@
 	import MultiSelect from "$lib/components/forms/MultiSelect.svelte"
 	import { FileCode, ImagePlus } from "lucide-svelte"
 	import ScriptCardBase from "../../ScriptCardBase.svelte"
-	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { redirect } from "@sveltejs/kit"
 	import { browser } from "$app/environment"
+	import { page } from "$app/stores"
 
 	export let data
 
@@ -49,29 +49,36 @@
 	let bannerFiles: FileList
 	let scriptFiles: FileList
 
+	let coverStyle: 0 | 1 | 2 = 0
+	let bannerStyle: 0 | 1 | 2 = 0
+	let scriptStyle: 0 | 1 | 2 = 0
+
 	let showScriptPage: boolean = false
 	let showScriptCard: boolean = false
 	let showSearchResult: boolean = false
 
 	let isFocused: boolean = true
 
-	function getStyle(style: string, value: any, error: any) {
-		if (!value) return ""
-		if (!(error && error.length > 0)) return style + "-success-500"
-		return style + "-error-500"
-	}
-
 	$: if ($form.categories) validate("categories")
 	$: if ($form.subcategories) validate("subcategories")
 	$: if ($form.min_xp) validate("min_xp")
 	$: if ($form.max_xp) validate("max_xp")
 
-	$: if (coverFiles) {
+	function onChangeCover(e: Event): void {
+		if (coverFiles.length === 0) {
+			coverStyle = 0
+			return
+		}
+
 		$form.cover = coverFiles[0]
 		validate("cover").then((result) => {
 			if (!browser) return
-			if (result) return
-
+			if (result) {
+				coverStyle = 2
+				return
+			}
+			coverStyle = 1
+			console.log(coverStyle)
 			let reader = new FileReader()
 			reader.onload = function () {
 				if (!coverElement) coverElement = new Image()
@@ -81,15 +88,22 @@
 		})
 	}
 
-	$: if (bannerFiles) {
+	function onChangeBanner(e: Event): void {
+		if (bannerFiles.length === 0) {
+			bannerStyle = 0
+			return
+		}
 		$form.banner = bannerFiles[0]
 		validate("banner").then((result) => {
 			if (!browser) return
 			if (!bannerElement) bannerElement = new Image()
 			if (result) {
 				bannerElement.src = defaultBanner
+				bannerStyle = 2
 				return
 			}
+			bannerStyle = 1
+
 			let reader = new FileReader()
 			reader.onload = function () {
 				if (!bannerElement) bannerElement = new Image()
@@ -99,14 +113,52 @@
 		})
 	}
 
-	$: if (scriptFiles) {
+	function onChangeScript(e: Event): void {
+		if (scriptFiles.length === 0) {
+			scriptStyle = 0
+			return
+		}
 		$form.script = scriptFiles[0]
-		validate("script")
+		validate("script").then((result) => {
+			if (result) {
+				scriptStyle = 2
+				return
+			}
+			scriptStyle = 1
+		})
 	}
+
+	const headTitle = "Edit " + script.title + " - WaspScripts"
+	const headDescription = "Edit " + script.title
+	const headKeywords =
+		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, " +
+		script.subcategories
+	const headAuthor = script.scripts_protected.author
+	const headImage = script?.scripts_protected.assets_path + "banner.jpg"
 </script>
 
 <svelte:head>
-	<MetaTags title="Edit Script" description="Edit Script." robots="noindex" />
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={headKeywords} />
+	<meta name="author" content={headAuthor} />
+	<meta name="robots" content="noindex" />
+
+	<!-- OpenGraph tags -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:image" content={headImage} />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta property="og:image:alt" content="WaspScripts Logo" />
+	<meta property="og:description" content={headDescription} />
+
+	<!-- Twitter tags -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta property="twitter:domain" content={$page.url.host}>
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
@@ -189,7 +241,7 @@
 				</div>
 				<div>
 					<span class="text-lg font-semibold text-blue-400">
-						{script.title} - 2007 OSRS Colour Bot | WaspScripts
+						{script.title} - WaspScripts
 					</span>
 					<p>
 						{cropString("RuneScape OSRS Color Bot - " + script.description, 160)}
@@ -252,22 +304,37 @@
 						name="cover"
 						bind:files={coverFiles}
 						accept="image/jpeg"
-						slotMessage="mx-auto {getStyle('text', $form.cover, $errors.cover)}"
-						slotMeta="mx-auto {getStyle('text', $form.cover, $errors.cover)}"
+						on:change={onChangeCover}
 					>
 						<svelte:fragment slot="lead">
-							<ImagePlus class="mx-auto {getStyle('stroke', $form.cover, $errors.cover)}" />
+							{#if coverStyle === 0}
+								<ImagePlus class="mx-auto" />
+							{:else if coverStyle === 1}
+								<ImagePlus class="mx-auto stroke-success-500" />
+							{:else}
+								<ImagePlus class="mx-auto stroke-error-500" />
+							{/if}
 						</svelte:fragment>
-						<svelte:fragment slot="message">Cover image</svelte:fragment>
+						<svelte:fragment slot="message">
+							{#if coverStyle === 0}
+								<span class="mx-auto">Cover image</span>
+							{:else if coverStyle === 1}
+								<span class="mx-auto text-success-500">Cover image</span>
+							{:else}
+								<span class="mx-auto text-error-500">Cover image</span>
+							{/if}
+						</svelte:fragment>
 						<svelte:fragment slot="meta">
-							{#if $errors.cover && $errors.cover.length > 0}
+							{#if coverStyle === 0}
+								<span>Must be exactly 300x200 pixels and JPG format.</span>
+							{:else if coverStyle === 1}
+								<span class="text-success-500">{$form.cover.name}</span>
+							{:else if $errors.cover && $errors.cover.length > 0}
 								{#each $errors.cover as error}
 									{#if error}
-										<small class="flex justify-center">{error}</small>
+										<small class="flex justify-center text-error-500">{error}</small>
 									{/if}
 								{/each}
-							{:else}
-								Must be exactly 300x200 pixels and JPG format.
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>
@@ -279,22 +346,37 @@
 						name="banner"
 						bind:files={bannerFiles}
 						accept="image/jpeg"
-						slotMessage="mx-auto {getStyle('text', $form.banner, $errors.banner)}"
-						slotMeta="mx-auto {getStyle('text', $form.banner, $errors.banner)}"
+						on:change={onChangeBanner}
 					>
 						<svelte:fragment slot="lead">
-							<ImagePlus class="mx-auto {getStyle('stroke', $form.banner, $errors.banner)}" />
+							{#if bannerStyle === 0}
+								<ImagePlus class="mx-auto" />
+							{:else if bannerStyle === 1}
+								<ImagePlus class="mx-auto stroke-success-500" />
+							{:else}
+								<ImagePlus class="mx-auto stroke-error-500" />
+							{/if}
 						</svelte:fragment>
-						<svelte:fragment slot="message">Banner image</svelte:fragment>
+						<svelte:fragment slot="message">
+							{#if bannerStyle === 0}
+								<span class="mx-auto">Banner image</span>
+							{:else if bannerStyle === 1}
+								<span class="mx-auto text-success-500">Banner image</span>
+							{:else}
+								<span class="mx-auto text-error-500">Banner image</span>
+							{/if}
+						</svelte:fragment>
 						<svelte:fragment slot="meta">
-							{#if $errors.banner && $errors.banner.length > 0}
+							{#if bannerStyle === 0}
+								<span>Must be exactly 1920x768 pixels and JPG format.</span>
+							{:else if bannerStyle === 1}
+								<span class="text-success-500">{$form.banner.name}</span>
+							{:else if $errors.banner && $errors.banner.length > 0}
 								{#each $errors.banner as error}
 									{#if error}
-										<div class="flex justify-center">{error}</div>
+										<small class="flex justify-center text-error-500">{error}</small>
 									{/if}
 								{/each}
-							{:else}
-								Must be exactly 1920x768 pixels and JPG format.
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>
@@ -409,22 +491,37 @@
 						name="script"
 						bind:files={scriptFiles}
 						accept=".simba"
-						slotMessage="mx-auto {getStyle('text', $form.script, $errors.script)}"
-						slotMeta="mx-auto {getStyle('text', $form.script, $errors.script)}"
+						on:change={onChangeScript}
 					>
 						<svelte:fragment slot="lead">
-							<FileCode class="mx-auto {getStyle('stroke', $form.script, $errors.script)}" />
+							{#if scriptStyle === 0}
+								<FileCode class="mx-auto" />
+							{:else if scriptStyle === 1}
+								<FileCode class="mx-auto stroke-success-500" />
+							{:else}
+								<FileCode class="mx-auto stroke-error-500" />
+							{/if}
 						</svelte:fragment>
-						<svelte:fragment slot="message">Simba Script</svelte:fragment>
+						<svelte:fragment slot="message">
+							{#if scriptStyle === 0}
+								<span class="mx-auto">Simba script</span>
+							{:else if scriptStyle === 1}
+								<span class="mx-auto text-success-500">Simba script</span>
+							{:else}
+								<span class="mx-auto text-error-500">Simba script</span>
+							{/if}
+						</svelte:fragment>
 						<svelte:fragment slot="meta">
-							{#if $errors.cover && $errors.cover.length > 0}
-								{#each $errors.cover as error}
+							{#if scriptStyle === 0}
+								<span>Must be a Simba script file.</span>
+							{:else if scriptStyle === 1}
+								<span class="text-success-500">{$form.script.name}</span>
+							{:else if $errors.script && $errors.script.length > 0}
+								{#each $errors.script as error}
 									{#if error}
-										<div class="flex justify-center">{error}</div>
+										<small class="flex justify-center text-error-500">{error}</small>
 									{/if}
 								{/each}
-							{:else}
-								Must be a Simba script file.
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>

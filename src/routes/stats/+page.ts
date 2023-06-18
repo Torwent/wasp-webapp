@@ -1,11 +1,8 @@
 import { supabaseHelper } from "$lib/backend/auth"
 import type { Stat } from "$lib/backend/types"
-import type { PageLoad } from "./$types"
+import { UUID_V4_REGEX } from "$lib/utils"
 
-const UUID_V4_REGEX =
-	/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89AB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/i
-
-export const load: PageLoad = async ({ url, depends }) => {
+export const load = async ({ url, depends }) => {
 	depends("stats:total")
 
 	const order = url.searchParams.get("order") || "experience"

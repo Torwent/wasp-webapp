@@ -7,7 +7,7 @@
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
 	import { slide } from "svelte/transition"
 	import TutorialLevel from "$lib/components/forms/TutorialLevel.svelte"
-	import MetaTags from "$lib/components/MetaTags.svelte"
+	import { page } from "$app/stores"
 
 	export let data
 
@@ -27,10 +27,38 @@
 	$form.description = data.post.description
 	$form.content = data.post.content
 	$form.level = data.post.level
+
+	const headTitle = "Edit " + data.post.title + " - WaspScripts"
+	const headDescription = "Edit " + data.post.title + " in WaspScripts."
+	const headKeywords =
+		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide, " +
+		data.post.author
+	const headAuthor = data.post.author
+	const headImage =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
 
 <svelte:head>
-	<MetaTags title="Edit Tutorial" description="Edit tutorial." robots="noindex" />
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={headKeywords} />
+	<meta name="author" content={headAuthor} />
+	<meta name="robots" content="noindex" />
+
+	<!-- OpenGraph tags -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:image" content={headImage} />
+	<meta property="og:image:type" content="image/png" />
+	<meta property="og:image:alt" content="WaspScripts Logo" />
+	<meta property="og:description" content={headDescription} />
+
+	<!-- Twitter tags -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
 <div class="container mx-auto my-6 max-w-2xl flex-grow">

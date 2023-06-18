@@ -1,10 +1,9 @@
 import { redirect } from "@sveltejs/kit"
-import type { PageLoad } from "./$types"
 import { supabaseHelper } from "$lib/backend/auth"
 import { browser } from "$app/environment"
 import { encodeSEO } from "$lib/utils"
 
-export const load: PageLoad = async ({ url, depends, parent }) => {
+export const load = async ({ url, depends, parent }) => {
 	depends("tutorials:posts")
 
 	const pageStr = url.searchParams.get("page") || "-1"
@@ -50,14 +49,14 @@ export const load: PageLoad = async ({ url, depends, parent }) => {
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
 			})
-			.ilike("tutorials_search", "%" + search.replaceAll("%", "") + "%")
+			.ilike("search_tutorials", "%" + search.replaceAll("%", "") + "%")
 	}
 
 	const { data, count, error } = await postsData
 
 	if (error) {
-		console.error("tutorials SELECT failed: " + error)
-		throw redirect(303, "./")
+		console.error("tutorials SELECT failed: " + error.message)
+		throw redirect(303, "/tutorials")
 	}
 
 	const posts = data

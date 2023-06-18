@@ -4,7 +4,6 @@
 	import Markdown from "$lib/Markdown.svelte"
 	import { canDownload, updateWarning } from "$lib/backend/data"
 	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
-	import MetaTags from "$lib/components/MetaTags.svelte"
 	import ZipDownload from "$lib/components/ZIPDownload.svelte"
 
 	import EditButton from "$lib/components/EditButton.svelte"
@@ -16,6 +15,7 @@
 		toastStore
 	} from "@skeletonlabs/skeleton"
 	import { fade } from "svelte/transition"
+	import { page } from "$app/stores"
 
 	export let data
 
@@ -69,15 +69,37 @@
 	}
 
 	if (!profile) toastStore.trigger(t)
+
+	const headTitle = script.title + " - WaspScripts"
+	const headDescription = "RuneScape OSRS Color Bot - " + script.description
+	const headKeywords =
+		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, " +
+		script.subcategories
+	const headAuthor = script.scripts_protected.author
+	const headImage = script?.scripts_protected.assets_path + "banner.jpg"
 </script>
 
 <svelte:head>
-	<MetaTags
-		title={script.title}
-		description="RuneScape OSRS Color Bot - {script.description}"
-		keywords="OldSchool, RuneScape, OSRS, 2007, Color, Bot, Wasp, Scripts, {script.subcategories}"
-		author={script.scripts_protected.author}
-	/>
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={headKeywords} />
+	<meta name="author" content={headAuthor} />
+	<meta name="robots" content="all" />
+
+	<!-- OpenGraph tags -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:image" content={headImage} />
+	<meta property="og:image:type" content="image/jpeg" />
+	<meta property="og:image:alt" content="WaspScripts Logo" />
+	<meta property="og:description" content={headDescription} />
+
+	<!-- Twitter tags -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>

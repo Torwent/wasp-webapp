@@ -1,8 +1,8 @@
 <script lang="ts">
-	import MetaTags from "$lib/components/MetaTags.svelte"
 	import { fade } from "svelte/transition"
 	import { modalStore, type ModalSettings } from "@skeletonlabs/skeleton"
 	import { canDownload } from "$lib/backend/data.js"
+	import { page } from "$app/stores"
 
 	export let data
 
@@ -50,16 +50,40 @@
 	function handleClick() {
 		modalStore.trigger(confirm)
 	}
+
+	const headTitle = "Premium - WaspScripts"
+	const headDescription =
+		"Get WaspScripts premium role and gain access to exclusive scripts. With premium you have scripts for nearly all skills in OSRS."
+	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Colour, Bot, Wasp, Scripts, Simba"
+	const headAuthor = "Torwent"
+	const headImage =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
 
 <svelte:head>
-	<MetaTags
-		title="Premium"
-		description="Get WaspScripts premium role and gain access to exclusive scripts. With premium you have scripts for nearly all skills in OSRS."
-	/>
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={headKeywords} />
+	<meta name="author" content={headAuthor} />
+	<meta name="robots" content="all" />
+
+	<!-- OpenGraph tags -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:image" content={headImage} />
+	<meta property="og:image:type" content="image/png" />
+	<meta property="og:image:alt" content="WaspScripts Logo" />
+	<meta property="og:description" content={headDescription} />
+
+	<!-- Twitter tags -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<div
+<main
 	class="container mx-auto my-6 max-w-5xl flex-grow text-center"
 	in:fade={{ duration: 300, delay: 300 }}
 	out:fade={{ duration: 300 }}
@@ -141,4 +165,4 @@
 		</button>
 		before making any purchase.
 	</h4>
-</div>
+</main>

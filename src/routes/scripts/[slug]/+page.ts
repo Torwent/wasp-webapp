@@ -1,12 +1,11 @@
 import { redirect } from "@sveltejs/kit"
-import { getCategories, getScript, getSubCategories } from "$lib/backend/data"
-import type { PageLoad } from "./$types"
+import { getCategories, getScript, getScriptUUID, getSubCategories } from "$lib/backend/data"
+import { UUID_V4_REGEX } from "$lib/utils"
 
-export const load: PageLoad = async ({ params, data }) => {
+export const load = async ({ params, data }) => {
 	const { slug } = params
-	if (slug == null || data == null) throw redirect(300, "/scripts")
 
-	const script = await getScript(slug)
+	const script = UUID_V4_REGEX.test(slug) ? await getScriptUUID(slug) : await getScript(slug)
 	if (!script) throw redirect(300, "/scripts")
 
 	const { dismissed } = data

@@ -1,11 +1,10 @@
-import type { PageServerLoad } from "./$types"
 import { setError, superValidate } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
 import { postSchema } from "$lib/backend/types"
 import { encodeSEO } from "$lib/utils"
 import { getPost } from "$lib/backend/data"
 
-export const load: PageServerLoad = async (event) => {
+export const load = async (event) => {
 	const form = superValidate(event, postSchema)
 	return { form }
 }
@@ -36,7 +35,7 @@ export const actions = {
 		const { error } = await locals.supabase.from("tutorials").insert(form.data)
 
 		if (error) {
-			console.error("tutorials INSERT failed: " + error)
+			console.error("tutorials INSERT failed: " + error.message)
 			return setError(form, null, error.message)
 		}
 

@@ -4,6 +4,8 @@
 	import { randomString } from "$lib/utils"
 	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
+	import { LogIn, LogOut, RotateCcw, User2 } from "lucide-svelte"
+	import { enhance } from "$app/forms"
 
 	export let large: boolean
 
@@ -44,7 +46,7 @@
 	<span class="mx-4">{profile.username}</span>
 {/if}
 
-<form method="POST" class="card variant-filled-surface p-4" data-popup="userPanelPopup">
+<form method="POST" class="card variant-filled-surface p-4" data-popup="userPanelPopup" use:enhance>
 	<div class="arrow variant-filled-surface" />
 	{#if profile}
 		<header class="card-header flex">
@@ -57,6 +59,7 @@
 						aria-label="Open profile page"
 						class="btn variant-filled-secondary flex mx-auto"
 					>
+						<User2 />
 						Profile
 					</button>
 				</a>
@@ -67,6 +70,14 @@
 			<h3 class="text-center py-2">Roles</h3>
 			<div class="flex pt-2 pb-8">
 				<RoleBadges {profile} />
+				<button
+					name="Refresh"
+					aria-label="Refresh roles"
+					class="mx-4 text-secondary-500 hover:text-secondary-400"
+					formaction="/?/refresh"
+				>
+					<RotateCcw />
+				</button>
 			</div>
 		</section>
 		<footer class="card-footer flex">
@@ -76,6 +87,7 @@
 				class="btn variant-filled-secondary mx-auto"
 				formaction="/?/logout"
 			>
+				<LogOut />
 				Logout
 			</button>
 		</footer>

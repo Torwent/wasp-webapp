@@ -25,9 +25,10 @@
 	import { invalidate } from "$app/navigation"
 	import { onMount } from "svelte"
 	import { supabaseClient, supabaseHelper } from "$lib/backend/auth"
+	import { API_URL } from "$lib/utils"
 	export let data
 
-	$: ({ session } = data)
+	$: ({ profile, session } = data)
 
 	onMount(async () => {
 		const {
@@ -41,6 +42,12 @@
 		} = supabaseClient.auth.onAuthStateChange(async (_event, _session) => {
 			if (_session?.expires_at !== session?.expires_at) invalidate("supabase:auth")
 		})
+
+		if (profile) {
+			await fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
+				method: "GET"
+			}).catch((error) => console.error(error))
+		}
 
 		return () => {
 			helperSubscription.unsubscribe()

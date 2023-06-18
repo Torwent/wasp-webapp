@@ -47,13 +47,11 @@ export const load: Load = async ({ url, depends }) => {
 				`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
       				scripts_protected (author, assets_path, author_id, assets_alt, revision),
 	  				stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`,
-				{
-					count: "exact"
-				}
+				{ count: "exact" }
 			)
 			.contains("categories", categoriesFilters)
 			.contains("subcategories", subcategoriesFilters)
-			.ilike("scripts_public_search", "%" + search + "%")
+			.ilike("search_script", "%" + search + "%")
 	}
 
 	const promises = await Promise.all([
@@ -67,7 +65,7 @@ export const load: Load = async ({ url, depends }) => {
 
 	if (error) {
 		console.error(error)
-		throw redirect(303, "/")
+		throw redirect(303, "/scripts")
 	}
 
 	const scriptData = data as unknown as Script[]

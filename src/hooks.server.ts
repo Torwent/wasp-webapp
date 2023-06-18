@@ -1,16 +1,16 @@
 import "$lib/backend/auth"
 import { getSupabase } from "@supabase/auth-helpers-sveltekit"
 import type { Profile } from "$lib/backend/types"
-import type { Handle } from "@sveltejs/kit"
 
-export const handle: Handle = async ({ event, resolve }) => {
+export const handle = async ({ event, resolve }) => {
 	const start = performance.now()
 	const route = event.url
 
 	const { session, supabaseClient } = await getSupabase(event)
-
+	//console.log(session)
 	event.locals.supabase = supabaseClient
 	event.locals.session = session
+
 	event.locals.getProfile = async () => {
 		if (!session) return null
 
@@ -25,7 +25,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 			.eq("id", id)
 
 		if (error) return null
-
 		return data[0] as unknown as Profile
 	}
 

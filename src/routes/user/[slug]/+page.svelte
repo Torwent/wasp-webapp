@@ -6,6 +6,7 @@
 	import { superForm } from "sveltekit-superforms/client"
 	import { focusTrap } from "@skeletonlabs/skeleton"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
+	import { page } from "$app/stores"
 
 	export let data
 	const { profile } = data
@@ -24,7 +25,39 @@
 
 	$: $form.email = email === "" ? undefined : email
 	$: $form.password = password === "" ? undefined : password
+
+	const headTitle = profile.username + " - WaspScripts"
+	const headDescription = "Information about " + profile.username + " in WaspScripts"
+	const headKeywords =
+		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, " +
+		profile.username
+	const headAuthor = profile.username
+	const headImage =
+		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
+
+<svelte:head>
+	<title>{headTitle}</title>
+	<meta name="description" content={headDescription} />
+	<meta name="keywords" content={headKeywords} />
+	<meta name="author" content={headAuthor} />
+	<meta name="robots" content="noindex" />
+
+	<!-- OpenGraph tags -->
+	<meta property="og:type" content="website" />
+	<meta property="og:title" content={headTitle} />
+	<meta property="og:url" content={$page.url.href} />
+	<meta property="og:image" content={headImage} />
+	<meta property="og:image:type" content="image/png" />
+	<meta property="og:image:alt" content="WaspScripts Logo" />
+	<meta property="og:description" content={headDescription} />
+
+	<!-- Twitter tags -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:title" content={headTitle} />
+	<meta name="twitter:description" content={headDescription} />
+	<meta name="twitter:image" content={headImage} />
+</svelte:head>
 
 <div
 	class="container mx-auto my-6 max-w-2xl flex-grow"

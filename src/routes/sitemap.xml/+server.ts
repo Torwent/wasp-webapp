@@ -10,7 +10,7 @@ const loadScripts = async (supabase: SupabaseClient) => {
 		.select(`title,	scripts_protected (author)`)
 		.order("title", { ascending: true })
 
-	if (error) return console.error("scripts_public SELECT failed:" + error)
+	if (error) return console.error("scripts_public SELECT failed:" + error.message)
 
 	const scriptData = data as unknown as IScriptCard[]
 
@@ -25,7 +25,7 @@ const loadScripts = async (supabase: SupabaseClient) => {
 const loadTutorials = async (supabase: SupabaseClient) => {
 	const { data, error } = await supabase.from("tutorials").select("title, author")
 
-	if (error) return console.error("tutorials SELECT failed: " + error)
+	if (error) return console.error("tutorials SELECT failed: " + error.message)
 
 	let result: string[] = []
 	data.forEach((post) => {
