@@ -29,7 +29,10 @@ export const actions = {
 
 		if (!form.valid) return fail(400, { form })
 
-		const { error } = await locals.supabase.from("devs").update(form.data).eq("id", form.data.id)
+		const { error } = await locals.supabaseServer
+			.from("developers")
+			.update(form.data)
+			.eq("id", form.data.id)
 
 		if (error) {
 			console.error(error)

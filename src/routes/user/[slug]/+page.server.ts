@@ -1,8 +1,8 @@
 import { profileSchema } from "$lib/backend/types"
-import { fail, type ServerLoad } from "@sveltejs/kit"
+import { fail } from "@sveltejs/kit"
 import { setError, superValidate } from "sveltekit-superforms/server"
 
-export const load: ServerLoad = async (event) => {
+export const load = async (event) => {
 	const form = superValidate(event, profileSchema)
 	return { form, address: event.getClientAddress() }
 }
@@ -25,7 +25,7 @@ export const actions = {
 
 		if (!form.valid) return fail(400, { form })
 
-		const { error } = await locals.supabase.auth.updateUser(form.data)
+		const { error } = await locals.supabaseServer.auth.updateUser(form.data)
 		if (error) {
 			console.error("User data UPDATE failed: " + error.message)
 			return setError(form, null, error.message)

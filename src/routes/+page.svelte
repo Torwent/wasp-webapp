@@ -9,7 +9,7 @@
 	export let data
 
 	function rerunLoad() {
-		if (browser) invalidate("stats:total")
+		if (browser) invalidate("supabase:stats_total")
 		setTimeout(rerunLoad, 5000)
 	}
 

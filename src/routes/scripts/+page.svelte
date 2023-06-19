@@ -46,7 +46,7 @@
 		if (loading) return
 
 		history.replaceState({}, "", $page.url)
-		invalidate("scripts:list")
+		invalidate("supabase:scripts")
 	}
 
 	function canSeeScript(script: IScriptCard) {

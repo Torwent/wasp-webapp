@@ -58,9 +58,9 @@ const buildLoc = async (supabase: SupabaseClient, loc: string) => {
 	return result
 }
 
-export const GET = async ({ locals: { supabase } }) => {
-	const scripts = await buildLoc(supabase, "scripts")
-	const tutorials = await buildLoc(supabase, "tutorials")
+export const GET = async ({ locals: { supabaseServer } }) => {
+	const scripts = await buildLoc(supabaseServer, "scripts")
+	const tutorials = await buildLoc(supabaseServer, "tutorials")
 
 	const headers = {
 		"Cache-Control": "max-age=0, s-maxage=3600",
@@ -114,7 +114,7 @@ export const GET = async ({ locals: { supabase } }) => {
       </url>
       ${tutorials}
       <url>
-        <loc>${website}/devs</loc>
+        <loc>${website}/developers</loc>
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
       </url>

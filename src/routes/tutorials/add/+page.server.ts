@@ -2,7 +2,6 @@ import { setError, superValidate } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
 import { postSchema } from "$lib/backend/types"
 import { encodeSEO } from "$lib/utils"
-import { getPost } from "$lib/backend/data"
 
 export const load = async (event) => {
 	const form = superValidate(event, postSchema)
@@ -16,7 +15,9 @@ export const actions = {
 
 		if (!form.valid) return fail(400, { form })
 
-		const profile = await locals.getProfile()
+		const { getProfile, supabaseServer } = locals
+
+		const profile = await getProfile()
 
 		if (!profile) {
 			const msg = "You need to login to add a script."
@@ -24,21 +25,26 @@ export const actions = {
 			return setError(form, null, msg)
 		}
 
-		const url = encodeSEO(form.data.title + " by " + profile.username)
+		const { data } = await supabaseServer
+			.from("tutorials")
+			.select("id, created_at, user_id, author, title, description, content, level")
+			.eq("title", form.data.title)
+			.eq("user_id", profile.id)
 
-		if (await getPost(url)) {
+		if (data && data.length > 0) {
 			const msg = "A post with that name by you already exists! Choose a different title."
 			console.error(msg)
 			return setError(form, null, msg)
 		}
 
-		const { error } = await locals.supabase.from("tutorials").insert(form.data)
+		const { error } = await locals.supabaseServer.from("tutorials").insert(form.data)
 
 		if (error) {
 			console.error("tutorials INSERT failed: " + error.message)
 			return setError(form, null, error.message)
 		}
 
+		const url = encodeSEO(form.data.title + " by " + profile.username)
 		throw redirect(303, "./" + url)
 	}
 }

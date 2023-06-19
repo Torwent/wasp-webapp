@@ -4,7 +4,7 @@
 	import { randomString } from "$lib/utils"
 	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
-	import { LogIn, LogOut, RotateCcw, User2 } from "lucide-svelte"
+	import { LogOut, RotateCcw, User2 } from "lucide-svelte"
 	import { enhance } from "$app/forms"
 
 	export let large: boolean

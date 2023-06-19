@@ -1,8 +1,20 @@
-import { supabaseClient } from "$lib/backend/auth"
-export const load = async ({ url, data }) => {
-	//const didLogin = url.searchParams.has("/login")
-	const didLogout = url.searchParams.has("/logout")
-	if (didLogout) await supabaseClient.auth.signOut()
+import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
+import { createSupabaseLoadClient } from "@supabase/auth-helpers-sveltekit"
 
-	return data
+export const load = async ({ fetch, data }) => {
+	/* const didLogout = url.searchParams.has("/logout")
+	if (didLogout) await data.supabase.auth.signOut() */
+
+	const supabaseClient = createSupabaseLoadClient({
+		supabaseUrl: PUBLIC_SUPABASE_URL,
+		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+		event: { fetch },
+		serverSession: data.session
+	})
+
+	const {
+		data: { session }
+	} = await supabaseClient.auth.getSession()
+
+	return { supabaseClient, session, profile: data.profile }
 }

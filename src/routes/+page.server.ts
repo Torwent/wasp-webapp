@@ -3,11 +3,11 @@ import type { Provider } from "@supabase/supabase-js"
 import { fail, redirect } from "@sveltejs/kit"
 
 export const actions = {
-	login: async ({ locals: { supabase }, url }) => {
+	login: async ({ locals: { supabaseServer }, url }) => {
 		const provider = url.searchParams.get("provider") as Provider
 
 		if (provider) {
-			const { data, error: err } = await supabase.auth.signInWithOAuth({
+			const { data, error: err } = await supabaseServer.auth.signInWithOAuth({
 				provider: provider,
 				options: {
 					redirectTo: url.origin,
@@ -24,8 +24,8 @@ export const actions = {
 		}
 	},
 
-	logout: async ({ locals: { supabase } }) => {
-		const { error: err } = await supabase.auth.signOut()
+	logout: async ({ locals: { supabaseServer } }) => {
+		const { error: err } = await supabaseServer.auth.signOut()
 		if (err) {
 			console.error("Logout failed: " + err)
 			return fail(400, { message: "Something went wrong logging you out!" })

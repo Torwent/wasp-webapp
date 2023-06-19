@@ -1,21 +1,31 @@
-import "$lib/backend/auth"
-import { getSupabase } from "@supabase/auth-helpers-sveltekit"
 import type { Profile } from "$lib/backend/types"
+import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit"
+import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
+import type { Handle } from "@sveltejs/kit"
 
-export const handle = async ({ event, resolve }) => {
+export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
 	const route = event.url
 
-	const { session, supabaseClient } = await getSupabase(event)
-	//console.log(session)
-	event.locals.supabase = supabaseClient
-	event.locals.session = session
+	event.locals.supabaseServer = createSupabaseServerClient({
+		supabaseUrl: PUBLIC_SUPABASE_URL,
+		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+		event
+	})
+
+	event.locals.getSession = async () => {
+		const {
+			data: { session }
+		} = await event.locals.supabaseServer.auth.getSession()
+		return session
+	}
 
 	event.locals.getProfile = async () => {
+		const session = await event.locals.getSession()
 		if (!session) return null
 
 		const id = session.user.id
-		const { data, error } = await supabaseClient
+		const { data, error } = await event.locals.supabaseServer
 			.from("profiles_public")
 			.select(
 				`id, discord_id, username, avatar_url,
@@ -29,7 +39,6 @@ export const handle = async ({ event, resolve }) => {
 	}
 
 	let warning = event.cookies.get("warningDismissed")
-	if (warning == null) warning = "false"
 	event.locals.warningDismissed = warning === "true"
 
 	const response = await resolve(event, {

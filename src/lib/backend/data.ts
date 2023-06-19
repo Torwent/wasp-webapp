@@ -1,34 +1,24 @@
-import { get, writable } from "svelte/store"
 import { encodeSEO } from "$lib/utils"
+import type { SupabaseClient } from "@supabase/supabase-js"
 import type {
 	Category,
 	SubCategory,
 	EmojiTooltip,
 	Script,
-	Post,
 	Developer,
 	IScriptCard,
 	CheckboxType,
 	Profile
 } from "./types"
-import { supabaseClient, supabaseHelper } from "./auth"
 
-const categories = writable<Category[] | null>(null)
-const subCategories = writable<SubCategory[] | null>(null)
-const checkboxes = writable<CheckboxType[] | null>(null)
-
-export async function updateUsername(id: string, username: string) {
-	await supabaseHelper.from("profile").update({ username: username }).eq("id", id)
-}
-
-export async function updateWarning() {
+export async function updateWarning(supabase: SupabaseClient) {
 	const {
 		data: { user }
-	} = await supabaseHelper.auth.getUser()
+	} = await supabase.auth.getUser()
 
 	if (!user) return false
 
-	const { error } = await supabaseHelper
+	const { error } = await supabase
 		.from("profiles_private")
 		.update({ dismissed_warning: true })
 		.eq("id", user.id)
@@ -39,42 +29,8 @@ export async function updateWarning() {
 	}
 }
 
-export async function getCategories() {
-	const tmp = get(categories)
-	if (tmp) return tmp as Category[]
-
-	const { data: cats } = await supabaseHelper.from("scripts_categories").select("name, emoji")
-
-	const result: Category[] | null = cats != null ? cats : null
-	categories.set(result)
-	return result
-}
-
-export async function getSubCategories() {
-	const tmp = get(subCategories)
-	if (tmp) return tmp as SubCategory[]
-
-	const { data: cats } = await supabaseHelper
-		.from("scripts_subcategories")
-		.select("category, name, emoji")
-
-	const result: SubCategory[] | null = cats != null ? cats : null
-	subCategories.set(result)
-	return result
-}
-
-export async function getCheckBoxes() {
-	const tmp = get(checkboxes)
-	if (tmp) return tmp as CheckboxType[]
-
-	let result: CheckboxType[] | null = null
-	const promises = await Promise.all([getCategories(), getSubCategories()])
-	const categories = promises[0]
-	const subcategories = promises[1]
-
-	if (!categories || !subcategories) return null
-
-	result = []
+export async function getCheckBoxes(categories: Category[], subcategories: SubCategory[]) {
+	let result: CheckboxType[] = []
 	let id = 0
 
 	for (let category of categories) {
@@ -99,25 +55,23 @@ export async function getCheckBoxes() {
 		}
 	}
 
-	checkboxes.set(result)
 	return result
 }
 
-async function getAllCategories() {
-	const promises = await Promise.all([getCategories(), getSubCategories()])
-	const c = promises[0]
-	const sc = promises[1]
-
-	if (!c || !sc) return null
-	return [...c, ...sc]
+async function getAllCategories(categories: Category[], subcategories: SubCategory[]) {
+	return [...categories, ...subcategories]
 }
 
-async function getToolTips(categories: string[], subcategories: string[]) {
-	const allCategories = await getAllCategories()
-	if (!allCategories) return []
+async function getToolTips(
+	categoriesStr: string[],
+	subcategoriesStr: string[],
+	categories: Category[],
+	subcategories: SubCategory[]
+) {
+	const allCategories = await getAllCategories(categories, subcategories)
 
 	let result: EmojiTooltip[] = []
-	const scriptCategories = [...categories, ...subcategories]
+	const scriptCategories = [...categoriesStr, ...subcategoriesStr]
 
 	for (let c of scriptCategories) {
 		for (let c2 of allCategories) {
@@ -131,108 +85,74 @@ async function getToolTips(categories: string[], subcategories: string[]) {
 	return result
 }
 
-export async function addToolTips(script: IScriptCard) {
-	script.emojiTooltips = await getToolTips(script.categories, script.subcategories)
+export async function addToolTips(
+	script: IScriptCard,
+	categories: Category[],
+	subcategories: SubCategory[]
+) {
+	script.emojiTooltips = await getToolTips(
+		script.categories,
+		script.subcategories,
+		categories,
+		subcategories
+	)
 }
 
-export async function getScripts(): Promise<Script[] | null> {
-	const { data, error } = await supabaseHelper
+export async function getScripts(supabase: SupabaseClient) {
+	const { data, error } = await supabase
 		.from("scripts_public")
 		.select(
 			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-      				scripts_protected(author, assets_path, author_id, assets_alt, revision),
+      				scripts_protected (author, assets_path, author_id, assets_alt, revision),
 	  				stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
 		)
 		.order("title", { ascending: true })
-
-	if (error) {
-		console.error("scripts_public SELECT failed: " + error.message)
-		return null
-	}
-
-	let scriptsData = data as unknown as Script[]
-
-	await new Promise<void>((resolve) => {
-		scriptsData.forEach(async (script, index, array) => {
-			await addToolTips(script)
-			if (index === array.length - 1) resolve()
-		})
-	})
-
-	return scriptsData
+	if (error) console.error(error)
+	return data as unknown as Script[]
 }
 
-export async function getScript(path: string) {
-	const scripts = await getScripts()
-	if (!scripts) return null
-
-	for (let i = 0; i < scripts.length; i++) {
+export async function getScript(supabase: SupabaseClient, path: string) {
+	const scripts = await getScripts(supabase)
+	for (let i = 0; i < scripts.length; i++)
 		if (path === encodeSEO(scripts[i].title + " by " + scripts[i].scripts_protected.author))
 			return scripts[i]
-	}
+
 	return null
 }
 
-export async function getScriptUUID(uuid: string | undefined) {
-	if (!uuid) return null
-	const scripts = await getScripts()
-	if (!scripts) return null
+export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {
+	const scripts = await getScripts(supabase)
 	for (let i = 0; i < scripts.length; i++) if (uuid === scripts[i].id) return scripts[i]
 	return null
 }
 
-export async function getPosts(): Promise<Post[] | null> {
-	const { data, error } = await supabaseHelper
-		.from("tutorials")
-		.select("id, created_at, user_id, author, title, description, content, level")
-		.order("title", { ascending: true })
-
-	if (error) console.error("tutorials SELECT failed: " + error.message)
-
-	return data
-}
-
-export async function getPost(path: string): Promise<Post | null> {
-	const posts = await getPosts()
-	if (!posts) return null
-
-	for (let i = 0; i < posts.length; i++) {
-		if (path === encodeSEO(posts[i].title + " by " + posts[i].author)) return posts[i]
-	}
-	return null
-}
-
-export async function getDevelopers(): Promise<Developer[] | null> {
-	const { data, error } = await supabaseHelper
-		.from("devs")
-		.select("id, real_name, username, description, github, paypal_id, content")
-		.order("username", { ascending: true })
-
-	if (error) console.error("devs SELECT failed: " + error.message)
-	return data
-}
-
-export async function getDeveloper(path: string): Promise<Developer | null> {
-	const developers = await getDevelopers()
-	if (!developers) return null
-
+export async function getDeveloper(
+	path: string,
+	developers: Developer[]
+): Promise<Developer | null> {
 	for (let i = 0; i < developers.length; i++) {
 		if (path === encodeSEO(developers[i].username)) return developers[i]
 	}
 	return null
 }
 
-export async function getDeveloperUUID(uuid: string): Promise<Developer | null> {
-	const developers = await getDevelopers()
-	if (!developers) return null
+export async function getDeveloperUUID(
+	uuid: string,
+	developers: Developer[]
+): Promise<Developer | null> {
 	for (let i = 0; i < developers.length; i++) if (uuid === developers[i].id) return developers[i]
 	return null
 }
 
-export async function getSignedURL(bucket: string, path: string, file: string) {
+export async function getSignedURL(
+	supabase: SupabaseClient,
+	bucket: string,
+	path: string,
+	file: string
+) {
 	path += "/" + file
 
-	const { data, error } = await supabaseClient.storage.from(bucket).createSignedUrl(path, 10)
+	const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
 	if (error) {
 		console.error("Signed URL for " + bucket + " to " + path + " failed: " + error.message)
 		return false
