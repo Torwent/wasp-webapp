@@ -1,3 +1,12 @@
+## [0.6.14](https://github.com/Torwent/wasp-webapp/compare/v0.6.13...v0.6.14) (2023-06-19)
+
+
+### Bug Fixes
+
+* typo ([5324be6](https://github.com/Torwent/wasp-webapp/commit/5324be632e1e20cb0620c38ec3c665fbc40a3ae1))
+
+
+
 ## [0.6.13](https://github.com/Torwent/wasp-webapp/compare/v0.6.12...v0.6.13) (2023-06-19)
 
 
@@ -33,15 +42,6 @@
 ### Bug Fixes
 
 * head tags are now fully reactive ([a589946](https://github.com/Torwent/wasp-webapp/commit/a5899467c8cc1a9ca263d11b1182b03af18bcbff))
-
-
-
-## [0.6.9](https://github.com/Torwent/wasp-webapp/compare/v0.6.8...v0.6.9) (2023-06-18)
-
-
-### Bug Fixes
-
-* roles are now refreshed with the site initial load ([7bb40dd](https://github.com/Torwent/wasp-webapp/commit/7bb40dd7aeef021839fd130746b1d7e751a35ae1))
 
 
 
