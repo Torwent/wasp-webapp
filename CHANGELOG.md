@@ -1,3 +1,12 @@
+## [0.6.15](https://github.com/Torwent/wasp-webapp/compare/v0.6.14...v0.6.15) (2023-06-19)
+
+
+### Bug Fixes
+
+* test fix request handler ([588b7e1](https://github.com/Torwent/wasp-webapp/commit/588b7e164b72e14da8944c6e4934ba7b693a6442))
+
+
+
 ## [0.6.14](https://github.com/Torwent/wasp-webapp/compare/v0.6.13...v0.6.14) (2023-06-19)
 
 
@@ -33,15 +42,6 @@
 ### Bug Fixes
 
 * more meta tags tweaks for better discord embeds ([11f8d62](https://github.com/Torwent/wasp-webapp/commit/11f8d62c5e123be2f9cbfef089f1d207988aa5ad))
-
-
-
-## [0.6.10](https://github.com/Torwent/wasp-webapp/compare/v0.6.9...v0.6.10) (2023-06-18)
-
-
-### Bug Fixes
-
-* head tags are now fully reactive ([a589946](https://github.com/Torwent/wasp-webapp/commit/a5899467c8cc1a9ca263d11b1182b03af18bcbff))
 
 
 
