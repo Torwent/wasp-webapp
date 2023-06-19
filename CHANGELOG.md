@@ -1,12 +1,3 @@
-## [0.6.12](https://github.com/Torwent/wasp-webapp/compare/v0.6.11...v0.6.12) (2023-06-18)
-
-
-### Bug Fixes
-
-* remove typo! oops! ([2409204](https://github.com/Torwent/wasp-webapp/commit/24092044578a982e1886a07d297a39cc335e90b3))
-
-
-
 ## [0.6.11](https://github.com/Torwent/wasp-webapp/compare/v0.6.10...v0.6.11) (2023-06-18)
 
 
@@ -40,6 +31,15 @@
 ### Bug Fixes
 
 * **script forms:** proper file input coloring on validation ([e420ed8](https://github.com/Torwent/wasp-webapp/commit/e420ed8fccf62b4b227428e7518d8ab4e3070eea))
+
+
+
+## [0.6.7](https://github.com/Torwent/wasp-webapp/compare/v0.6.6...v0.6.7) (2023-06-15)
+
+
+### Bug Fixes
+
+* read notes ([f6220fe](https://github.com/Torwent/wasp-webapp/commit/f6220fe865efdd57519733acebc1234692559ce5))
 
 
 
