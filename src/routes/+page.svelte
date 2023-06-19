@@ -25,7 +25,7 @@
 </script>
 
 <svelte:head>
-	<title>{headTitle}</title>
+	<title>{headTitle}</title>W
 	<meta name="description" content={headDescription} />
 	<meta name="keywords" content={headKeywords} />
 	<meta name="author" content={headAuthor} />
