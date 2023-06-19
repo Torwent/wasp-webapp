@@ -1,12 +1,3 @@
-## [0.6.11](https://github.com/Torwent/wasp-webapp/compare/v0.6.10...v0.6.11) (2023-06-18)
-
-
-### Bug Fixes
-
-* more meta tags tweaks for better discord embeds ([11f8d62](https://github.com/Torwent/wasp-webapp/commit/11f8d62c5e123be2f9cbfef089f1d207988aa5ad))
-
-
-
 ## [0.6.10](https://github.com/Torwent/wasp-webapp/compare/v0.6.9...v0.6.10) (2023-06-18)
 
 
@@ -40,6 +31,15 @@
 ### Bug Fixes
 
 * read notes ([f6220fe](https://github.com/Torwent/wasp-webapp/commit/f6220fe865efdd57519733acebc1234692559ce5))
+
+
+
+## [0.6.6](https://github.com/Torwent/wasp-webapp/compare/v0.6.5...v0.6.6) (2023-06-14)
+
+
+### Bug Fixes
+
+* read notes ([b5fb877](https://github.com/Torwent/wasp-webapp/commit/b5fb87764e807013ce8c0a0a8f8c46ff74a29d46))
 
 
 
