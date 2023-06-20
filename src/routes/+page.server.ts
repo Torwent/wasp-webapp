@@ -7,7 +7,7 @@ export const actions = {
 		const provider = url.searchParams.get("provider") as Provider
 
 		if (provider) {
-			const { data, error: err } = await supabaseServer.auth.signInWithOAuth({
+			const { data, error } = await supabaseServer.auth.signInWithOAuth({
 				provider: provider,
 				options: {
 					redirectTo: url.origin + "/auth/callback",
@@ -15,8 +15,8 @@ export const actions = {
 				}
 			})
 
-			if (err) {
-				console.error("Login failed: " + err)
+			if (error) {
+				console.error("Login failed: " + error.message)
 				return fail(400, { message: "Something went wrong logging you in!" })
 			}
 
@@ -25,18 +25,13 @@ export const actions = {
 		return
 	},
 
-	logout: async ({ locals: { supabaseServer }, cookies }) => {
-		const { error: err } = await supabaseServer.auth.signOut()
-		if (err) {
-			console.error("Logout failed: " + err)
+	logout: async ({ locals: { supabaseServer } }) => {
+		const { error } = await supabaseServer.auth.signOut()
+		if (error) {
+			console.error("Logout failed: " + error.message)
 			return fail(400, { message: "Something went wrong logging you out!" })
 		}
 
-		cookies.delete("sveltekit-access-token")
-		cookies.delete("sveltekit-refresh-token")
-
-		cookies.delete("sb-access-token")
-		cookies.delete("sb-refresh-token")
 		return { success: true }
 	},
 
