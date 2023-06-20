@@ -7,7 +7,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
 	const route = event.url
 
-	const code = route.searchParams.get("code")
 	const warningDismissed = event.cookies.get("warningDismissed")
 
 	event.locals.supabaseServer = createSupabaseServerClient({
