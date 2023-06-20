@@ -32,8 +32,5 @@ export const load = async ({ fetch, data, depends }) => {
 		return data[0] as unknown as Profile
 	}
 
-	console.log("server server session: ", data.session?.user.id)
-	console.log("server client session: ", session?.user.id)
-
 	return { supabaseClient, session, serverSession: data.session, profile: getProfile() }
 }
