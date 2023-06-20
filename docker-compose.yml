@@ -13,10 +13,10 @@ services:
         ADMIN_PASS: $ADMIN_PASS
     restart: unless-stopped
     networks:
-      - wasp-proxy
+      - hive
     env_file:
       - .env
 
 networks:
-  wasp-proxy:
+  hive:
     external: true
