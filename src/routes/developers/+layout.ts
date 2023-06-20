@@ -9,7 +9,7 @@ async function getDevelopers(
 	if (search === "") {
 		return await supabase
 			.from("developers")
-			.select("real_name, username, description, github, paypal_id, content", {
+			.select("id, real_name, username, description, github, paypal_id, content", {
 				count: "exact"
 			})
 			.order("username", { ascending: true })
@@ -18,10 +18,10 @@ async function getDevelopers(
 
 	return await supabase
 		.from("developers")
-		.select("real_name, username, description, github, paypal_id, content", {
+		.select("id, real_name, username, description, github, paypal_id, content", {
 			count: "exact"
 		})
-		.ilike("search_devs", "%" + search + "%")
+		.ilike("search_developers", "%" + search + "%")
 }
 
 export const load = async ({ url, parent, depends }) => {

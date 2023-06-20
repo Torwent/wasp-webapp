@@ -21,7 +21,7 @@ export const actions = {
 			return setError(form, null, msg)
 		}
 
-		if (canEdit(profile, form.data.id)) {
+		if (!canEdit(profile, form.data.id)) {
 			const msg = "You can't edit another developer profile."
 			console.error(msg)
 			return setError(form, null, msg)

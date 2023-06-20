@@ -28,8 +28,8 @@
 	import type { AuthChangeEvent, Session } from "@supabase/supabase-js"
 	export let data
 
-	let { supabaseClient, session, serverSession, profile } = data
-	$: ({ supabaseClient, session, serverSession, profile } = data)
+	let { supabaseClient, session, profile } = data
+	$: ({ supabaseClient, session, profile } = data)
 
 	onMount(() => {
 		const {
