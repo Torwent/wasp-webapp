@@ -41,18 +41,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return data[0] as unknown as Profile
 	}
 
-	const profile = await event.locals.getProfile()
-
-	if (profile) {
-		try {
-			await event.fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
-				method: "GET"
-			})
-		} catch (error) {
-			console.error(error)
-		}
-	}
-
 	event.locals.warningDismissed = warningDismissed === "true"
 
 	const response = await resolve(event, {
