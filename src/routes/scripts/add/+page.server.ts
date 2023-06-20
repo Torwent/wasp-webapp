@@ -1,12 +1,11 @@
 import { superValidate, setError } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
-import { scriptSchema, type ScriptPublic, type Script } from "$lib/backend/types"
+import { scriptSchema, type ScriptPublic } from "$lib/backend/types"
 import { filesSchema } from "$lib/backend/types.server"
 import { uploadScript } from "$lib/backend/data.server"
 import { encodeSEO } from "$lib/utils"
 import { getScript } from "$lib/backend/data"
 import { updateProfileRoles } from "$lib/backend/auth.server.js"
-import type { SupabaseClient } from "@supabase/supabase-js"
 
 export const load = async (event) => {
 	const form = superValidate(event, scriptSchema)

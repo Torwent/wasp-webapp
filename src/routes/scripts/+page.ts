@@ -75,7 +75,7 @@ export const load = async ({ url, parent, depends }) => {
 		finish
 	)
 	if (error) {
-		console.error(error)
+		console.error("SELECT scripts_public failed: ", error.message)
 		throw redirect(303, "/scripts")
 	}
 

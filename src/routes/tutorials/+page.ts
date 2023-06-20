@@ -1,6 +1,7 @@
 import { redirect } from "@sveltejs/kit"
 import { browser } from "$app/environment"
 import { encodeSEO } from "$lib/utils"
+import type { Post } from "$lib/backend/types"
 
 export const load = async ({ url, depends, parent }) => {
 	const parentPromise = parent()
@@ -31,7 +32,7 @@ export const load = async ({ url, depends, parent }) => {
 	if (level > -1) {
 		postsData = supabaseClient
 			.from("tutorials")
-			.select("id, created_at, user_id, author, title, description, content, level", {
+			.select("id, user_id, author, title, description, content, level", {
 				count: "exact"
 			})
 			.eq("level", level)
@@ -39,7 +40,7 @@ export const load = async ({ url, depends, parent }) => {
 	} else if (search === "") {
 		postsData = supabaseClient
 			.from("tutorials")
-			.select("id, created_at, user_id, author, title, description, content, level", {
+			.select("id, user_id, author, title, description, content, level", {
 				count: "exact"
 			})
 			.order("level", { ascending: ascending })
@@ -47,7 +48,7 @@ export const load = async ({ url, depends, parent }) => {
 	} else {
 		postsData = supabaseClient
 			.from("tutorials")
-			.select("id, created_at, user_id, author, title, description, content, level", {
+			.select("id, user_id, author, title, description, content, level", {
 				count: "exact"
 			})
 			.ilike("search_tutorials", "%" + search.replaceAll("%", "") + "%")
@@ -56,11 +57,11 @@ export const load = async ({ url, depends, parent }) => {
 	const { data, count, error } = await postsData
 
 	if (error) {
-		console.error("tutorials SELECT failed: " + error.message)
+		console.error("SELECT tutorials failed: " + error.message)
 		throw redirect(303, "/tutorials")
 	}
 
-	const posts = data
+	const posts = data as unknown as Post[]
 
 	if (!browser && posts.length === 1)
 		throw redirect(303, "/tutorials/" + encodeSEO(posts[0].title + " by " + posts[0].author))
