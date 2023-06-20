@@ -18,7 +18,8 @@ interface FormFiles {
 
 export const actions = {
 	default: async ({ request, locals }) => {
-		const profile = await locals.getProfile()
+		const { supabaseServer, getProfile } = locals
+		const profile = await getProfile()
 		const formData = await request.formData()
 
 		let files: FormFiles = { cover: undefined, banner: undefined, script: undefined }
@@ -45,7 +46,7 @@ export const actions = {
 
 		if (!form.valid) return fail(400, { form })
 
-		let script = await getScriptUUID(form.data.id)
+		let script = form.data.id ? await getScriptUUID(supabaseServer, form.data.id) : null
 		if (!script) {
 			const msg = "That script does not exist!"
 			console.error(msg)
@@ -86,7 +87,7 @@ export const actions = {
 		if (!validFiles.success) return fail(400, { form })
 
 		const { error } = await updateScript(
-			locals.supabase,
+			supabaseServer,
 			script,
 			validFiles.data.script,
 			validFiles.data.cover,

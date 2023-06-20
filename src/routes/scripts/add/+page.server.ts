@@ -13,18 +13,10 @@ export const load = async (event) => {
 	return { form }
 }
 
-async function getScripts(supabase: SupabaseClient) {
-	const { data } = await supabase.from("scripts_public").select(
-		`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-      				scripts_protected (author, assets_path, author_id, assets_alt, revision),
-	  				stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
-	)
-	return data as unknown as Script[]
-}
-
 export const actions = {
 	default: async ({ request, locals }) => {
-		const profile = await locals.getProfile()
+		const { supabaseServer, getProfile } = locals
+		const profile = await getProfile()
 		const formData = await request.formData()
 
 		const files = {
@@ -49,7 +41,7 @@ export const actions = {
 
 		const url = encodeSEO(form.data.title + " by " + profile.username)
 
-		const tmp = await getScript(locals.supabaseServer, url)
+		const tmp = await getScript(supabaseServer, url)
 		if (tmp) {
 			const msg = "A script with that name by you already exists! Choose a different name."
 			console.error(msg)
@@ -80,7 +72,7 @@ export const actions = {
 		}
 
 		const { error } = await uploadScript(
-			locals.supabaseServer,
+			supabaseServer,
 			script,
 			validFiles.data.script,
 			validFiles.data.cover,
