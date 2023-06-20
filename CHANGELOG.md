@@ -1,3 +1,12 @@
+## [0.6.17](https://github.com/Torwent/wasp-webapp/compare/v0.6.16...v0.6.17) (2023-06-20)
+
+
+### Bug Fixes
+
+* remove /setup caching ([3f1466d](https://github.com/Torwent/wasp-webapp/commit/3f1466d67ec3ed1360b65d2f390552aa058b9326))
+
+
+
 ## [0.6.16](https://github.com/Torwent/wasp-webapp/compare/v0.6.15...v0.6.16) (2023-06-20)
 
 
@@ -33,15 +42,6 @@
 * Revert "chore(release): v0.6.11 [skip ci]" ([41bf712](https://github.com/Torwent/wasp-webapp/commit/41bf7121b439d7710fd7099cb9aee501062c05a3))
 * Revert "fix: remove typo! oops!" ([4282f1a](https://github.com/Torwent/wasp-webapp/commit/4282f1a6a378c5f95477feafb0ad42d7c8593ce8))
 * Revert "chore(release): v0.6.12 [skip ci]" ([80a0924](https://github.com/Torwent/wasp-webapp/commit/80a092482b234b2805e9fd1e2b070bf465f7612d))
-
-
-
-## [0.6.12](https://github.com/Torwent/wasp-webapp/compare/v0.6.11...v0.6.12) (2023-06-18)
-
-
-### Bug Fixes
-
-* remove typo! oops! ([2409204](https://github.com/Torwent/wasp-webapp/commit/24092044578a982e1886a07d297a39cc335e90b3))
 
 
 
