@@ -31,8 +31,8 @@
 	let { supabaseClient, session, serverSession, profile } = data
 	$: ({ supabaseClient, session, serverSession, profile } = data)
 
-	$: console.log("client server: ", serverSession?.user.id)
-	$: console.log("client client: ", session?.user.id)
+	$: console.log("server server: ", serverSession?.user.id)
+	$: console.log("server client: ", session?.user.id)
 
 	onMount(() => {
 		const {
