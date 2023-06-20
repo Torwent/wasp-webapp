@@ -11,9 +11,18 @@ export const load = async ({ fetch, data, depends }) => {
 		serverSession: data.session
 	})
 
-	const {
+	let {
 		data: { session }
 	} = await supabaseClient.auth.getSession()
+
+	if (data.session && !session) {
+		await supabaseClient.auth.setSession(data.session)
+		const {
+			data: { session: tmp }
+		} = await supabaseClient.auth.getSession()
+
+		session = tmp
+	}
 
 	const getProfile = async () => {
 		if (!session) return null

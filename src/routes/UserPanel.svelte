@@ -25,8 +25,6 @@
 	$: if (profile) src = profile.avatar_url
 	$: if (!profile) src = "https://api.dicebear.com/6.x/bottts/svg?seed=" + randomString()
 
-	//formaction="/?/login&provider=discord"
-
 	const handleSignIn = async () => {
 		const { data, error } = await supabaseClient.auth.signInWithOAuth({
 			provider: "discord",
