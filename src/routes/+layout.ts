@@ -1,20 +1,30 @@
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
-import { createSupabaseLoadClient } from "@supabase/auth-helpers-sveltekit"
+import { SupabaseClient, createClient } from "@supabase/supabase-js"
 
-export const load = async ({ fetch, data }) => {
-	/* const didLogout = url.searchParams.has("/logout")
-	if (didLogout) await data.supabase.auth.signOut() */
+let supabase: SupabaseClient | null
 
-	const supabaseClient = createSupabaseLoadClient({
-		supabaseUrl: PUBLIC_SUPABASE_URL,
-		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-		event: { fetch },
-		serverSession: data.session
-	})
+const getSupabase = (
+	fetch: (input: URL | RequestInfo, init?: RequestInit | undefined) => Promise<Response>
+) => {
+	if (!supabase)
+		supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+			global: { fetch: fetch.bind(globalThis) },
+			auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true }
+		})
+	return supabase
+}
+
+export const load = async ({ fetch, data, depends }) => {
+	depends("supabase:auth")
+	const supabaseClient = getSupabase(fetch)
+
+	if (data.session) {
+		await supabaseClient.auth.setSession(data.session)
+	} else await supabaseClient.auth.signOut()
 
 	const {
 		data: { session }
 	} = await supabaseClient.auth.getSession()
 
-	return { supabaseClient, session, profile: data.profile }
+	return { supabaseClient, session, serverSession: data.session, profile: data.profile }
 }

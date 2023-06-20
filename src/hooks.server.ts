@@ -1,17 +1,34 @@
 import type { Profile } from "$lib/backend/types"
-import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import type { Handle } from "@sveltejs/kit"
+import { SupabaseClient, createClient } from "@supabase/supabase-js"
+
+let supabase: SupabaseClient | null
+
+async function getSupabase(
+	fetch: (input: URL | RequestInfo, init?: RequestInit | undefined) => Promise<Response>
+) {
+	if (!supabase)
+		supabase = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+			global: { fetch: fetch.bind(globalThis) },
+			auth: {
+				autoRefreshToken: true,
+				persistSession: false,
+				detectSessionInUrl: true,
+				flowType: "pkce"
+			}
+		})
+	return supabase
+}
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
 	const route = event.url
 
-	event.locals.supabaseServer = createSupabaseServerClient({
-		supabaseUrl: PUBLIC_SUPABASE_URL,
-		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-		event
-	})
+	const code = route.searchParams.get("code")
+	const warningDismissed = event.cookies.get("warningDismissed")
+
+	event.locals.supabaseServer = await getSupabase(event.fetch)
 
 	event.locals.getSession = async () => {
 		const {
@@ -38,8 +55,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return data[0] as unknown as Profile
 	}
 
-	let warning = event.cookies.get("warningDismissed")
-	event.locals.warningDismissed = warning === "true"
+	event.locals.warningDismissed = warningDismissed === "true"
 
 	const response = await resolve(event, {
 		filterSerializedResponseHeaders(name) {
@@ -50,6 +66,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const loadTime = performance.now() - start
 	if (loadTime < 3000) console.log(`🚀 ${route} took ${loadTime.toFixed(2)} ms to load!`)
 	else console.log(`🐌 ${route} took ${loadTime.toFixed(2)} ms to load!`)
+
+	if (typeof code === "string") {
+		console.log(code)
+		await event.locals.supabaseServer.auth.signOut()
+		const { data, error } = await event.locals.supabaseServer.auth.exchangeCodeForSession(code)
+		console.log("error: ", error)
+		console.log("msg: ", data)
+	}
 
 	return response
 }

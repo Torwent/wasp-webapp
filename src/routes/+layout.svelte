@@ -28,14 +28,21 @@
 	import type { AuthChangeEvent, Session } from "@supabase/supabase-js"
 	export let data
 
-	$: ({ supabaseClient, session, profile } = data)
+	$: ({ supabaseClient, session, serverSession, profile } = data)
+
+	$: console.log("client server: ", serverSession?.user.id)
+	$: console.log("client client: ", session?.user.id)
 
 	onMount(async () => {
 		const {
 			data: { subscription }
 		} = supabaseClient.auth.onAuthStateChange(
 			(_event: AuthChangeEvent, _session: Session | null) => {
-				if (_session?.expires_at !== session?.expires_at) {
+				console.log(session)
+				document.cookie = `sveltekit-refresh-token=${session?.refresh_token};max-age=${session?.expires_in};path="/"`
+				document.cookie = `sveltekit-access-token=${session?.access_token};max-age=${session?.expires_in};path="/"`
+
+				if (session && _session?.expires_at !== session?.expires_at) {
 					invalidate("supabase:auth")
 				}
 			}

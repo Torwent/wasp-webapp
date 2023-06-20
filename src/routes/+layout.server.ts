@@ -1,4 +1,3 @@
-export const load = async ({ locals: { getSession, getProfile }, depends }) => {
-	depends("supabase:auth")
+export const load = async ({ locals: { getSession, getProfile } }) => {
 	return { session: getSession(), profile: getProfile() }
 }

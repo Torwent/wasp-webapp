@@ -6,7 +6,6 @@ import type { Profile } from "./types"
 const credentials = { email: ADMIN_USER, password: ADMIN_PASS }
 const options = { auth: { autoRefreshToken: true, persistSession: false } }
 
-//export const supabaseServer = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, options)
 export const supabaseAdmin = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, options)
 
 export let adminLoggedIn: boolean = false //login cache.
