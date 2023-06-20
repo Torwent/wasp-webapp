@@ -21,7 +21,7 @@
 			else url.searchParams.delete(k)
 		}
 		history.replaceState({}, "", url)
-		invalidate("developers:devs")
+		invalidate("supabase:developers")
 	}
 
 	const { range } = data
@@ -68,8 +68,11 @@
 
 <main>
 	<header class="text-center py-8">
-		<h3>Welcome to the DevBlog.</h3>
-		<p>Here you can find guides, tutorials and feature annoucements.</p>
+		<h3>Welcome to the Developers section.</h3>
+		<p>
+			Here you can find information about the developers involved directly or indirectly with
+			WaspScripts.
+		</p>
 	</header>
 
 	<div class="py-6">

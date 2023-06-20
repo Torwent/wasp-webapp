@@ -31,11 +31,11 @@
 		if (loading) return
 
 		history.replaceState({}, "", $page.url)
-		invalidate("stats:total")
+		invalidate("supabase:stats")
 	}
 
 	function rerunLoad() {
-		invalidate("stats:total")
+		invalidate("supabase:stats")
 		setTimeout(rerunLoad, 5000)
 	}
 

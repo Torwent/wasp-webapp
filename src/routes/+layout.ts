@@ -1,8 +1,36 @@
-import { supabaseClient } from "$lib/backend/auth"
-export const load = async ({ url, data }) => {
-	//const didLogin = url.searchParams.has("/login")
-	const didLogout = url.searchParams.has("/logout")
-	if (didLogout) await supabaseClient.auth.signOut()
+import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
+import type { Profile } from "$lib/backend/types"
+import { createSupabaseLoadClient } from "@supabase/auth-helpers-sveltekit"
 
-	return data
+export const load = async ({ fetch, data, depends }) => {
+	depends("supabase:auth")
+	const supabaseClient = createSupabaseLoadClient({
+		supabaseUrl: PUBLIC_SUPABASE_URL,
+		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
+		event: { fetch },
+		serverSession: data.session
+	})
+
+	const {
+		data: { session }
+	} = await supabaseClient.auth.getSession()
+
+	const getProfile = async () => {
+		if (!session) return null
+
+		const id = session.user.id
+		const { data, error } = await supabaseClient
+			.from("profiles_public")
+			.select(
+				`id, discord_id, username, avatar_url,
+      		profiles_protected (developer, premium, vip, tester, scripter, moderator, administrator),
+			profiles_private (dismissed_warning)`
+			)
+			.eq("id", id)
+
+		if (error) return null
+		return data[0] as unknown as Profile
+	}
+
+	return { supabaseClient, session, serverSession: data.session, profile: getProfile() }
 }

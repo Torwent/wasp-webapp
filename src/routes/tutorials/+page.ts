@@ -1,9 +1,9 @@
 import { redirect } from "@sveltejs/kit"
-import { supabaseHelper } from "$lib/backend/auth"
 import { browser } from "$app/environment"
 import { encodeSEO } from "$lib/utils"
 
 export const load = async ({ url, depends, parent }) => {
+	const parentPromise = parent()
 	depends("tutorials:posts")
 
 	const pageStr = url.searchParams.get("page") || "-1"
@@ -27,8 +27,9 @@ export const load = async ({ url, depends, parent }) => {
 
 	let postsData
 
+	const { supabaseClient } = await parentPromise
 	if (level > -1) {
-		postsData = supabaseHelper
+		postsData = supabaseClient
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
@@ -36,7 +37,7 @@ export const load = async ({ url, depends, parent }) => {
 			.eq("level", level)
 			.range(start, finish)
 	} else if (search === "") {
-		postsData = supabaseHelper
+		postsData = supabaseClient
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"
@@ -44,7 +45,7 @@ export const load = async ({ url, depends, parent }) => {
 			.order("level", { ascending: ascending })
 			.range(start, finish)
 	} else {
-		postsData = supabaseHelper
+		postsData = supabaseClient
 			.from("tutorials")
 			.select("id, created_at, user_id, author, title, description, content, level", {
 				count: "exact"

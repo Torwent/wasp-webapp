@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { fade } from "svelte/transition"
 	import { modalStore, type ModalSettings } from "@skeletonlabs/skeleton"
-	import { canDownload } from "$lib/backend/data.js"
+	import { canDownload } from "$lib/backend/data"
 	import { page } from "$app/stores"
 
 	export let data

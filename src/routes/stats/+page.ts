@@ -1,9 +1,9 @@
-import { supabaseHelper } from "$lib/backend/auth"
 import type { Stat } from "$lib/backend/types"
 import { UUID_V4_REGEX } from "$lib/utils"
 
-export const load = async ({ url, depends }) => {
-	depends("stats:total")
+export const load = async ({ url, depends, parent }) => {
+	const parentPromise = parent()
+	depends("supabase:stats")
 
 	const order = url.searchParams.get("order") || "experience"
 	const ascending = url.searchParams.get("ascending")?.toLowerCase() === "true"
@@ -28,9 +28,10 @@ export const load = async ({ url, depends }) => {
 
 	let promises = []
 
+	const { supabaseClient } = await parentPromise
 	if (search === "") {
 		promises.push(
-			supabaseHelper
+			supabaseClient
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
 				.or("experience.gt.0,gold.gt.0")
@@ -39,21 +40,21 @@ export const load = async ({ url, depends }) => {
 		)
 	} else if (UUID_V4_REGEX.test(search)) {
 		promises.push(
-			supabaseHelper
+			supabaseClient
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
 				.eq("userID", search)
 		)
 	} else {
 		promises.push(
-			supabaseHelper
+			supabaseClient
 				.from("stats")
 				.select("username, experience, gold, levels, runtime", { count: "exact" })
 				.ilike("username", "%" + search.replaceAll("%", "") + "%")
 		)
 	}
 
-	promises.push(supabaseHelper.rpc("get_stats_total"))
+	promises.push(supabaseClient.rpc("get_stats_total"))
 
 	promises = await Promise.all(promises)
 

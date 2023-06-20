@@ -26,9 +26,9 @@
 			<nav>
 				<span class="mb-6 text-sm font-semibold uppercase">Special thanks:</span>
 				<ul>
-					<li><a href="/devs/Slacky">Jarl Holta</a></li>
-					<li><a href="/devs/Olly">Olly</a></li>
-					<li><a href="/devs">Many more devs...</a></li>
+					<li><a href="/developers/Slacky">Jarl Holta</a></li>
+					<li><a href="/developers/Olly">Olly</a></li>
+					<li><a href="/developers">Many more devs...</a></li>
 				</ul>
 			</nav>
 			<nav>

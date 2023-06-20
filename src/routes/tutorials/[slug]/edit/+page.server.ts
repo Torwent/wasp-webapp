@@ -14,7 +14,7 @@ export const actions = {
 
 		if (!form.valid || !form.data.id) return fail(400, { form })
 
-		const { error } = await locals.supabase
+		const { error } = await locals.supabaseServer
 			.from("tutorials")
 			.update(form.data)
 			.eq("id", form.data.id)

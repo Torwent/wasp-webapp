@@ -24,34 +24,32 @@
 	import { browser } from "$app/environment"
 	import { invalidate } from "$app/navigation"
 	import { onMount } from "svelte"
-	import { supabaseClient, supabaseHelper } from "$lib/backend/auth"
 	import { API_URL } from "$lib/utils"
+	import type { AuthChangeEvent, Session } from "@supabase/supabase-js"
 	export let data
 
-	$: ({ profile, session } = data)
+	let { supabaseClient, session, serverSession, profile } = data
+	$: ({ supabaseClient, session, serverSession, profile } = data)
 
-	onMount(async () => {
+	onMount(() => {
 		const {
-			data: { subscription: helperSubscription }
-		} = supabaseHelper.auth.onAuthStateChange(async (_event, _session) => {
-			if (_session?.expires_at !== session?.expires_at) invalidate("supabase:auth")
-		})
-
-		const {
-			data: { subscription: clientSubscription }
-		} = supabaseClient.auth.onAuthStateChange(async (_event, _session) => {
-			if (_session?.expires_at !== session?.expires_at) invalidate("supabase:auth")
-		})
+			data: { subscription }
+		} = supabaseClient.auth.onAuthStateChange(
+			(_event: AuthChangeEvent, _session: Session | null) => {
+				if (_session?.expires_at !== session?.expires_at) {
+					invalidate("supabase:auth")
+				}
+			}
+		)
 
 		if (profile) {
-			await fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
+			fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
 				method: "GET"
 			}).catch((error) => console.error(error))
 		}
 
 		return () => {
-			helperSubscription.unsubscribe()
-			clientSubscription.unsubscribe()
+			subscription.unsubscribe()
 		}
 	})
 </script>
@@ -60,7 +58,7 @@
 	<Modal regionBody="overflow-y-scroll max-h-96" />
 {/if}
 <!-- App Shell -->
-<AppShell regionPage="relative hide-scrollbar" slotPageHeader="sticky top-0 z-10">
+<AppShell regionPage="relative" slotPageHeader="sticky top-0 z-10">
 	<svelte:fragment slot="pageHeader">
 		<div
 			class="backdrop-blur transition-colors duration-500 border-b dark:border-surface-50/[0.06]

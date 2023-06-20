@@ -7,6 +7,7 @@
 	import { pad } from "$lib/utils"
 	import { slide } from "svelte/transition"
 	import { ChevronDown, FileArchive } from "lucide-svelte"
+	import { page } from "$app/stores"
 
 	export let profile: Profile
 
@@ -76,25 +77,21 @@
 	}
 
 	async function downloadAndZip() {
-		let scripts = await getScripts()
-
-		if (!scripts) {
-			console.error("Couldn't read scripts from the database.")
-			return false
-		}
+		let scripts = await getScripts($page.data.supabaseClient)
 
 		scripts = scripts.filter((script) => {
-			if (ALL_ZIPS[0].match(zipName))
+			console.log(zipName, " and ", ALL_ZIPS)
+			if (ALL_ZIPS[0] === zipName)
 				return script.categories.includes("Official") && script.categories.includes("Premium")
-			else if (ALL_ZIPS[1].match(zipName))
+			else if (ALL_ZIPS[1] === zipName)
 				return script.categories.includes("Official") && script.categories.includes("Free")
-			else if (ALL_ZIPS[2].match(zipName)) return script.categories.includes("Official")
-			else if (ALL_ZIPS[3].match(zipName))
+			else if (ALL_ZIPS[2] === zipName) return script.categories.includes("Official")
+			else if (ALL_ZIPS[3] === zipName)
 				return script.categories.includes("Community") && script.categories.includes("Premium")
-			else if (ALL_ZIPS[4].match(zipName))
+			else if (ALL_ZIPS[4] === zipName)
 				return script.categories.includes("Community") && script.categories.includes("Free")
-			else if (ALL_ZIPS[5].match(zipName)) return script.categories.includes("Premium")
-			else if (ALL_ZIPS[6].match(zipName)) return script.categories.includes("Free")
+			else if (ALL_ZIPS[5] === zipName) return script.categories.includes("Premium")
+			else if (ALL_ZIPS[6] === zipName) return script.categories.includes("Free")
 			else return true
 		})
 
@@ -107,6 +104,7 @@
 			promises.push(
 				new Promise<string | false>(async (resolve) => {
 					const result = await getSignedURL(
+						$page.data.supabaseClient,
 						"scripts",
 						script.id + "/" + pad(script.scripts_protected.revision, 9),
 						"script.simba"

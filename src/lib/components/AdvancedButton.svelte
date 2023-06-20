@@ -6,6 +6,7 @@
 	import type { Script } from "$lib/backend/types"
 	import { browser } from "$app/environment"
 	import { ChevronDown, FileDown } from "lucide-svelte"
+	import { page } from "$app/stores"
 
 	export let script: Script
 	export let rev = script.scripts_protected.revision
@@ -13,7 +14,12 @@
 	const revisions = Array.from({ length: rev }, (_, i) => i + 1).reverse()
 
 	async function download() {
-		const url = await getSignedURL("scripts", script.id + "/" + pad(rev, 9), "script.simba")
+		const url = await getSignedURL(
+			$page.data.supabaseClient,
+			"scripts",
+			script.id + "/" + pad(rev, 9),
+			"script.simba"
+		)
 		if (!url || !browser) return
 
 		const response = await fetch(url)
