@@ -1,25 +1,8 @@
-import { invalidate } from "$app/navigation"
 import { API_URL } from "$lib/utils"
 import type { Provider } from "@supabase/supabase-js"
 import { fail, redirect } from "@sveltejs/kit"
 
 export const actions = {
-	set_session: async ({ locals: { supabaseServer }, cookies }) => {
-		const access_token = cookies.get("sveltekit-access-token")
-		const refresh_token = cookies.get("sveltekit-refresh-token")
-		const sveltekit_access_token = access_token === "undefined" ? undefined : access_token
-		const sveltekit_refresh_token = refresh_token === "undefined" ? undefined : refresh_token
-
-		if (sveltekit_access_token && sveltekit_refresh_token) {
-			await supabaseServer.auth.setSession({
-				access_token: sveltekit_access_token,
-				refresh_token: sveltekit_refresh_token
-			})
-		} else await supabaseServer.auth.signOut()
-
-		return
-	},
-
 	login: async ({ locals: { supabaseServer }, url }) => {
 		const provider = url.searchParams.get("provider") as Provider
 
@@ -27,7 +10,7 @@ export const actions = {
 			const { data, error: err } = await supabaseServer.auth.signInWithOAuth({
 				provider: provider,
 				options: {
-					redirectTo: url.origin,
+					redirectTo: url.origin + "/auth/callback",
 					scopes: "identify email guilds guilds.members.read"
 				}
 			})

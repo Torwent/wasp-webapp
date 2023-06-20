@@ -28,28 +28,25 @@
 	import type { AuthChangeEvent, Session } from "@supabase/supabase-js"
 	export let data
 
+	let { supabaseClient, session, serverSession, profile } = data
 	$: ({ supabaseClient, session, serverSession, profile } = data)
 
 	$: console.log("client server: ", serverSession?.user.id)
 	$: console.log("client client: ", session?.user.id)
 
-	onMount(async () => {
+	onMount(() => {
 		const {
 			data: { subscription }
 		} = supabaseClient.auth.onAuthStateChange(
-			(_event: AuthChangeEvent, _session: Session | null) => {
-				console.log(session)
-				document.cookie = `sveltekit-refresh-token=${session?.refresh_token};max-age=${session?.expires_in};path="/"`
-				document.cookie = `sveltekit-access-token=${session?.access_token};max-age=${session?.expires_in};path="/"`
-
-				if (session && _session?.expires_at !== session?.expires_at) {
+			(event: AuthChangeEvent, _session: Session | null) => {
+				if (_session?.expires_at !== session?.expires_at) {
 					invalidate("supabase:auth")
 				}
 			}
 		)
 
 		if (profile) {
-			await fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
+			fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
 				method: "GET"
 			}).catch((error) => console.error(error))
 		}
