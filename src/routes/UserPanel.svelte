@@ -31,7 +31,7 @@
 		const { data, error } = await supabaseClient.auth.signInWithOAuth({
 			provider: "discord",
 			options: {
-				redirectTo: $page.url.origin + "/auth/callback",
+				redirectTo: $page.url.origin,
 				scopes: "identify email guilds guilds.members.read"
 			}
 		})

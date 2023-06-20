@@ -38,7 +38,7 @@
 		const {
 			data: { subscription }
 		} = supabaseClient.auth.onAuthStateChange(
-			(event: AuthChangeEvent, _session: Session | null) => {
+			(_event: AuthChangeEvent, _session: Session | null) => {
 				if (_session?.expires_at !== session?.expires_at) {
 					invalidate("supabase:auth")
 				}
