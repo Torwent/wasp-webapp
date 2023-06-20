@@ -9,8 +9,8 @@
 
 	export let large: boolean
 
-	let { supabaseClient, profile } = $page.data
-	$: ({ supabaseClient, profile } = $page.data)
+	let { profile } = $page.data
+	$: ({ profile } = $page.data)
 
 	let src = profile
 		? profile.avatar_url
@@ -24,18 +24,6 @@
 
 	$: if (profile) src = profile.avatar_url
 	$: if (!profile) src = "https://api.dicebear.com/6.x/bottts/svg?seed=" + randomString()
-
-	const handleSignIn = async () => {
-		const { data, error } = await supabaseClient.auth.signInWithOAuth({
-			provider: "discord",
-			options: {
-				redirectTo: $page.url.origin,
-				scopes: "identify email guilds guilds.members.read"
-			}
-		})
-
-		if (error) console.error("Sign in failed: " + error.message)
-	}
 </script>
 
 {#if large && profile}
@@ -114,7 +102,7 @@
 				name="Login"
 				aria-label="Logins"
 				class="btn variant-filled-secondary"
-				on:click={handleSignIn}
+				formaction="/?/login&provider=discord"
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-4 h-4">
 					<path

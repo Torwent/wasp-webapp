@@ -11,18 +11,9 @@ export const load = async ({ fetch, data, depends }) => {
 		serverSession: data.session
 	})
 
-	let {
+	const {
 		data: { session }
 	} = await supabaseClient.auth.getSession()
-
-	if (data.session && !session) {
-		await supabaseClient.auth.setSession(data.session)
-		const {
-			data: { session: tmp }
-		} = await supabaseClient.auth.getSession()
-
-		session = tmp
-	}
 
 	const getProfile = async () => {
 		if (!session) return null
@@ -41,8 +32,8 @@ export const load = async ({ fetch, data, depends }) => {
 		return data[0] as unknown as Profile
 	}
 
-	console.log("server server: ", data.session?.user.id)
-	console.log("server client: ", session?.user.id)
+	console.log("server server session: ", data.session?.user.id)
+	console.log("server client session: ", session?.user.id)
 
 	return { supabaseClient, session, serverSession: data.session, profile: getProfile() }
 }
