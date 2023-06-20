@@ -28,7 +28,7 @@ export interface Profile extends ProfilePublic {
 }
 
 export interface Developer {
-	id?: string
+	id: string
 	real_name: string
 	username: string
 	description: string
@@ -271,7 +271,7 @@ export const profileSchema = z.object({
 })
 
 export const developerSchema = z.object({
-	id: z.string().uuid("ID must be a valid UUIDv4.").optional(),
+	id: z.string().uuid("ID must be a valid UUIDv4."),
 	realname: z
 		.string()
 		.min(2, "If your name really has less than 2 characters contact Torwent.")

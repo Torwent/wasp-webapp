@@ -80,7 +80,6 @@
 		let scripts = await getScripts($page.data.supabaseClient)
 
 		scripts = scripts.filter((script) => {
-			console.log(zipName, " and ", ALL_ZIPS)
 			if (ALL_ZIPS[0] === zipName)
 				return script.categories.includes("Official") && script.categories.includes("Premium")
 			else if (ALL_ZIPS[1] === zipName)

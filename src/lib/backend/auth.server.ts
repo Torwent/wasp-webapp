@@ -61,3 +61,34 @@ export async function updateProfileRoles(profile: Profile) {
 	}
 	return true
 }
+
+export async function createDevProfile(profile: Profile) {
+	if (!adminLoggedIn) {
+		await login(false)
+		if (!adminLoggedIn) return false
+	}
+
+	const { data } = await supabaseAdmin.from("developers").select("id").eq("id", profile.id)
+
+	if (data) {
+		console.log("Developer " + profile.id + " already have a dev profile.")
+		return
+	}
+
+	const { error } = await supabaseAdmin.rpc("set_user_roles", {
+		user_id: profile.id,
+		param_developer: profile.profiles_protected.developer,
+		param_premium: profile.profiles_protected.premium,
+		param_vip: profile.profiles_protected.vip,
+		param_tester: profile.profiles_protected.tester,
+		param_scripter: profile.profiles_protected.scripter,
+		param_moderator: profile.profiles_protected.moderator,
+		param_administrator: profile.profiles_protected.administrator
+	})
+
+	if (error) {
+		console.error(error)
+		return false
+	}
+	return true
+}

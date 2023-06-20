@@ -14,6 +14,7 @@
 	export let data
 
 	let { developer } = data
+
 	let show: boolean = false
 	let isFocused: boolean = true
 
@@ -127,9 +128,7 @@
 			<FormInput title="PaypalID" bind:value={developer.paypal_id} bind:error={$errors.paypal_id} />
 
 			<div class="flex justify-between">
-				<a href="./">
-					<button class="btn variant-filled-secondary">Back</button>
-				</a>
+				<a href="./" class="btn variant-filled-secondary">Back</a>
 
 				<button type="submit" class="btn variant-filled-secondary">Submit</button>
 			</div>

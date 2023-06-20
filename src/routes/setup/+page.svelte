@@ -112,6 +112,17 @@
 						</a>
 					</div>
 
+					<iframe
+						width="560"
+						height="315"
+						class="mx-auto my-12"
+						src="https://www.youtube.com/embed/UIotrmSpeds"
+						title="Simba and WaspScripts Setup"
+						frameborder="0"
+						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+						allowfullscreen
+					/>
+
 					<p class="text-center pb-24">
 						For a manual instalation guide for {currentOS.OS} you can go
 						<a
