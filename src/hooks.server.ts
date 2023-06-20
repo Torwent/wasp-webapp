@@ -2,6 +2,7 @@ import type { Handle } from "@sveltejs/kit"
 import type { Profile } from "$lib/backend/types"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit"
+import { API_URL } from "$lib/utils"
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
@@ -38,6 +39,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 		if (error) return null
 		return data[0] as unknown as Profile
+	}
+
+	const profile = await event.locals.getProfile()
+
+	if (profile) {
+		try {
+			await event.fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
+				method: "GET"
+			})
+		} catch (error) {
+			console.error(error)
+		}
 	}
 
 	event.locals.warningDismissed = warningDismissed === "true"

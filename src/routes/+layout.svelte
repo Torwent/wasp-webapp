@@ -24,7 +24,6 @@
 	import { browser } from "$app/environment"
 	import { invalidate } from "$app/navigation"
 	import { onMount } from "svelte"
-	import { API_URL } from "$lib/utils"
 	import type { AuthChangeEvent, Session } from "@supabase/supabase-js"
 	export let data
 
@@ -41,12 +40,6 @@
 				}
 			}
 		)
-
-		if (profile) {
-			fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
-				method: "GET"
-			}).catch((error) => console.error(error))
-		}
 
 		return () => {
 			subscription.unsubscribe()
