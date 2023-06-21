@@ -60,6 +60,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			return name === "content-range"
 		}
 	})
+	response.headers.delete("link")
 
 	const loadTime = performance.now() - start
 	if (loadTime < 3000) console.log(`🚀 ${route} took ${loadTime.toFixed(2)} ms to load!`)
