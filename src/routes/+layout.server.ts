@@ -1,3 +1,3 @@
-export const load = async ({ locals: { getSession, getProfile } }) => {
-	return { session: getSession(), profile: getProfile() }
+export const load = async ({ locals: { getSession } }) => {
+	return { session: getSession() }
 }
