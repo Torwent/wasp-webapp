@@ -3,16 +3,16 @@ import { pad } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
 
 function updateID(str: string, id: string) {
-	const regex = /{\$UNDEF SCRIPT_ID}{\$DEFINE SCRIPT_ID := '(.*?)'}/
-	const replace = "{$UNDEF SCRIPT_ID}{$DEFINE SCRIPT_ID := '" + id + "'}"
+	const regex = /{\$DEFINE SCRIPT_ID := '(.*?)'}/
+	const replace = "{$DEFINE SCRIPT_ID := '" + id + "'}"
 	str = str.match(regex) ? str.replace(regex, replace) : replace.concat("\n").concat(str)
 
 	return str
 }
 
 function updateRevision(str: string, rev: number) {
-	const regex = /{\$UNDEF SCRIPT_REVISION}{\$DEFINE SCRIPT_REVISION := '(.*?)'}/
-	const replace = "{$UNDEF SCRIPT_REVISION}{$DEFINE SCRIPT_REVISION := '" + rev.toString() + "'}"
+	const regex = /{\$DEFINE SCRIPT_REVISION := '(.*?)'}/
+	const replace = "{$DEFINE SCRIPT_REVISION := '" + rev.toString() + "'}"
 	str = str.match(regex) ? str.replace(regex, replace) : replace.concat("\n").concat(str)
 
 	return str
