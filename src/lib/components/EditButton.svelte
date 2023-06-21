@@ -8,8 +8,6 @@
 
 {#if canEdit(profile, author_id)}
 	<div class="my-8 grid place-items-center">
-		<a href="{$page.url.pathname}/edit">
-			<button class="btn variant-filled-tertiary">Edit</button>
-		</a>
+		<a href="{$page.url.pathname}/edit" class="btn variant-filled-tertiary">Edit</a>
 	</div>
 {/if}

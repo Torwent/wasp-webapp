@@ -77,9 +77,9 @@
 	</article>
 
 	<div class="flex justify-between">
-		<a href="./">
-			<button class="btn variant-filled-secondary">Back</button>
-		</a>
+		<div class="my-8 grid place-items-center">
+			<a href="./" class="btn variant-filled-secondary">Back</a>
+		</div>
 
 		<EditButton author_id={developer.id} />
 	</div>
