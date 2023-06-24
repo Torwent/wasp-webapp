@@ -9,12 +9,12 @@
 
 	const { developer } = data
 
-	const headTitle = developer.username + " - WaspScripts"
+	const headTitle = developer.profiles_public.username + " - WaspScripts"
 	const headDescription = developer.description
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Developer, " +
-		developer.username
-	const headAuthor = developer.username
+		developer.profiles_public.username
+	const headAuthor = developer.profiles_public.username
 	const headImage =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
@@ -51,8 +51,8 @@
 		<div class="flex my-auto">
 			<header>
 				<h3 class="font-bold text-2xl">
-					{#if developer.real_name && developer.real_name != ""} {developer.real_name} / {/if}
-					{developer.username}
+					{#if developer.realname && developer.realname != ""} {developer.realname} / {/if}
+					{developer.profiles_public.username}
 				</h3>
 			</header>
 		</div>
@@ -64,7 +64,7 @@
 			</a>
 			{#if developer.paypal_id && developer.paypal_id != ""}
 				<div class="w-full mx-auto">
-					<PayPal paypal_id={developer.paypal_id} username={developer.username} />
+					<PayPal paypal_id={developer.paypal_id} username={developer.profiles_public.username} />
 				</div>
 			{/if}
 		</div>
@@ -73,7 +73,7 @@
 	<article
 		class="prose dark:prose-invert py-6 border-t-2 border-stone-300 dark:border-stone-800 mx-auto"
 	>
-		<Markdown src={developer.content} />
+		<Markdown src={developer.content || ""} />
 	</article>
 
 	<div class="flex justify-between">

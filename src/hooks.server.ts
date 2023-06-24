@@ -1,8 +1,8 @@
 import type { Handle } from "@sveltejs/kit"
-import type { Profile } from "$lib/backend/types"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit"
 import { API_URL } from "$lib/utils"
+import type { Profile } from "$lib/types/collection"
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
@@ -36,9 +36,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 			profiles_private (dismissed_warning)`
 			)
 			.eq("id", id)
+			.returns<Profile[]>()
 
-		if (error) return null
-		return data[0] as unknown as Profile
+		if (error || data.length < 1) return null
+		return data[0]
 	}
 
 	const profile = await event.locals.getProfile()

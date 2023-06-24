@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import { ADMIN_USER, ADMIN_PASS } from "$env/static/private"
-import type { Profile } from "./types"
+import type { Profile } from "$lib/types/collection"
 
 const credentials = { email: ADMIN_USER, password: ADMIN_PASS }
 const options = { auth: { autoRefreshToken: true, persistSession: false } }
@@ -56,7 +56,7 @@ export async function updateProfileRoles(profile: Profile) {
 	})
 
 	if (error) {
-		console.error(error)
+		console.error("set_user_roles UPDATE failed: " + error.message)
 		return false
 	}
 	return true

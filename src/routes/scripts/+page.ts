@@ -1,6 +1,6 @@
 import { browser } from "$app/environment"
 import { addToolTips, getCheckBoxes } from "$lib/backend/data"
-import type { Script } from "$lib/backend/types"
+import type { Script } from "$lib/types/collection"
 import { encodeSEO } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { redirect } from "@sveltejs/kit"
@@ -14,34 +14,24 @@ async function getScripts(
 	start: number,
 	finish: number
 ) {
-	if (search === "") {
-		return await supabase
-			.from("scripts_public")
-			.select(
-				`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-      				scripts_protected (author, assets_path, author_id, assets_alt, revision),
-	  				stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`,
-				{
-					count: "exact"
-				}
-			)
-			.contains("categories", categories)
-			.contains("subcategories", subcategories)
-			.order("title", { ascending: ascending })
-			.range(start, finish)
-	}
-
-	return await supabase
+	let query = supabase
 		.from("scripts_public")
 		.select(
 			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-      				scripts_protected (author, assets_path, author_id, assets_alt, revision),
-	  				stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`,
+			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public (username)),
+			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`,
 			{ count: "exact" }
 		)
 		.contains("categories", categories)
 		.contains("subcategories", subcategories)
-		.ilike("search_script", "%" + search + "%")
+
+	if (search === "") {
+		query = query.order("title", { ascending: ascending }).range(start, finish)
+	} else {
+		query = query.ilike("search_script", "%" + search + "%")
+	}
+
+	return await query.returns<Script>()
 }
 
 export const load = async ({ url, parent, depends }) => {
@@ -75,7 +65,7 @@ export const load = async ({ url, parent, depends }) => {
 		finish
 	)
 	if (error) {
-		console.error("SELECT scripts_public failed: ", error.message)
+		console.error("SELECT scripts_public failed: " + error.message)
 		throw redirect(303, "/scripts")
 	}
 
@@ -92,7 +82,8 @@ export const load = async ({ url, parent, depends }) => {
 	if (!browser && scripts.length === 1)
 		throw redirect(
 			303,
-			"/scripts/" + encodeSEO(scripts[0].title + " by " + scripts[0].scripts_protected.author)
+			"/scripts/" +
+				encodeSEO(scripts[0].title + " by " + scripts[0].scripts_protected.profiles_public.username)
 		)
 
 	return {

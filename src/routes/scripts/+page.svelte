@@ -2,17 +2,18 @@
 	import { fade, slide } from "svelte/transition"
 	import ScriptCard from "./ScriptCard.svelte"
 	import { AppShell } from "@skeletonlabs/skeleton"
-	import type { CheckboxType, IScriptCard } from "$lib/backend/types"
 	import { ChevronRight } from "lucide-svelte"
 	import { page } from "$app/stores"
 	import { invalidate } from "$app/navigation"
 	import { browser } from "$app/environment"
 	import Paginator from "$lib/components/Paginator.svelte"
 	import { onMount } from "svelte"
+	import type { CheckboxType, IScriptCard } from "$lib/types/collection"
 
 	export let data
-
-	const { profile, checkboxes, range } = data
+	const { checkboxes, range } = data
+	let { profile } = data
+	$: ({ profile } = data)
 
 	let count = 0
 	$: count = (data.count as number) || 0

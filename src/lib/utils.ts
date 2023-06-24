@@ -2,6 +2,9 @@ export const API_URL = "https://api.waspscripts.com"
 export const UUID_V4_REGEX =
 	/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89AB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/i
 
+export const MB_SIZE = 100000
+export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg"]
+
 export const loadError = (page: string = "") => {
 	if (page == null) page = "page"
 	return {
@@ -44,7 +47,7 @@ export const validateIp = (input: string) => {
 	return input.match(ipv4) || input.match(ipv6)
 }
 
-export async function convertTime(t: number): Promise<string> {
+export function convertTime(t: number): string {
 	let years,
 		days,
 		hours,
@@ -78,7 +81,7 @@ export async function convertTime(t: number): Promise<string> {
 	return result
 }
 
-export async function formatRSNumber(n: number): Promise<string> {
+export function formatRSNumber(n: number): string {
 	let i: number = 0
 	let f: number = n
 	let arr: string[] = ["", "K", "M", "B", "T"]

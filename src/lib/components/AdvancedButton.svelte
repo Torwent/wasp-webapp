@@ -3,17 +3,20 @@
 	import { slide } from "svelte/transition"
 	import { getSignedURL } from "$lib/backend/data"
 	import { pad } from "$lib/utils"
-	import type { Script } from "$lib/backend/types"
+
 	import { browser } from "$app/environment"
 	import { ChevronDown, FileDown } from "lucide-svelte"
 	import { page } from "$app/stores"
+	import type { ScriptPublic } from "$lib/types/collection"
 
-	export let script: Script
-	export let rev = script.scripts_protected.revision
+	export let script: ScriptPublic
+	export let rev: number
+	export let noDownload: boolean = false
 
 	const revisions = Array.from({ length: rev }, (_, i) => i + 1).reverse()
 
 	async function download() {
+		if (noDownload) return
 		const url = await getSignedURL(
 			$page.data.supabaseClient,
 			"scripts",
@@ -43,6 +46,8 @@
 
 <div class="btn-group text-black fill-black">
 	<button
+		name={script.title}
+		aria-label="Download {script.title} revision {rev}"
 		class="variant-filled-primary hover:variant-filled-primary uppercase"
 		on:click|preventDefault={download}
 	>
@@ -50,6 +55,8 @@
 		<span class="border-0">{script.title}</span>
 	</button>
 	<button
+		name="Revisions"
+		aria-label="Open the revisions list"
 		class="variant-filled-secondary hover:variant-filled-secondary uppercase"
 		use:popup={popupSettings}
 	>
@@ -58,7 +65,7 @@
 </div>
 
 <div
-	class="bg-surface-800"
+	class="z-10 bg-surface-800"
 	data-popup="revisionsDropDown"
 	in:slide={{ duration: 700 }}
 	out:slide={{ duration: 300 }}

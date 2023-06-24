@@ -2,7 +2,7 @@
 	import { browser } from "$app/environment"
 	import { goto } from "$app/navigation"
 	import Markdown from "$lib/Markdown.svelte"
-	import { canDownload, updateWarning } from "$lib/backend/data"
+	import { canDownload, canEdit, updateWarning } from "$lib/backend/data"
 	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
 	import ZipDownload from "$lib/components/ZIPDownload.svelte"
 
@@ -16,10 +16,14 @@
 	} from "@skeletonlabs/skeleton"
 	import { fade } from "svelte/transition"
 	import { page } from "$app/stores"
+	import ScriptHeader from "../ScriptHeader.svelte"
+	import ScriptArticle from "../ScriptArticle.svelte"
+	import StatsHeader from "../StatsHeader.svelte"
 
 	export let data
 
 	let { script, dismissed, profile } = data
+	$: ({ script, dismissed, profile } = data)
 
 	function warningDismissed(r: boolean) {
 		if (r) {
@@ -75,7 +79,7 @@
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, " +
 		script.subcategories
-	const headAuthor = script.scripts_protected.author
+	const headAuthor = script.scripts_protected.profiles_public.username
 	const headImage = script?.scripts_protected.assets_path + "banner.jpg"
 </script>
 
@@ -103,88 +107,56 @@
 </svelte:head>
 
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
-	<div class="absolute inset-0 container min-w-full h-96 mx-0 flex flex-col">
+	<ScriptHeader title={script.title} username={script.scripts_protected.profiles_public.username}>
 		<img
 			class="z-0 absolute object-cover h-full w-full"
 			src={script?.scripts_protected.assets_path + "banner.jpg"}
 			alt={script?.scripts_protected.assets_alt}
 		/>
-		<!-- Title and Description Hover Effect -->
-		<header class="left-0 mt-auto z-[1] text-center h-32 text-primary-500 text-shadow">
-			<div
-				class="absolute mx-0 h-32 w-full opacity-100 bg-gradient-to-t from-white/20 via-white-800/20
-				 dark:from-black/60 dark:via-gray-800/20 to-transparent"
-			/>
-			<h2 class="mx-8 mb-4 font-bold text-4xl">{script.title}</h2>
-			<h3 class="font-semibold leading-normal mb-4">{script.description}</h3>
-		</header>
-	</div>
+	</ScriptHeader>
 
-	<div class="container mt-80 mx-auto mb-6 max-w-2xl flex-grow">
-		{#if !script.published}
-			<div class="text-center my-4">
-				<h4 class="text-secondary-500 mx-auto font-bold">Hidden</h4>
-			</div>
-		{/if}
-		{#if script.stats_scripts.experience || script.stats_scripts.gold || script.stats_scripts.runtime}
-			<header class="text-center">
-				{#if script.stats_scripts.experience}
-					<h3>
-						Total Experience Gained:
-						{#await formatRSNumber(script.stats_scripts.experience)}...{:then value}{value}{/await}
-					</h3>
-				{/if}
-				{#if script.stats_scripts.gold}
-					<h3>
-						Total Gold Gained:
-						{#await formatRSNumber(script.stats_scripts.gold)}...{:then value}{value}{/await}
-					</h3>
-				{/if}
-				{#if script.stats_scripts.runtime}
-					<h3>
-						Total Runtime:
-						{#await convertTime(script.stats_scripts.runtime)}...{:then value}{value}{/await}
-					</h3>
-				{/if}
-			</header>
-		{/if}
+	<div class="container mt-80 mx-auto mb-6 max-w-lg md:max-w-2xl flex-grow">
+		<header class="my-8">
+			<h3 class="text-center text-secondary-500 text-shadow drop-shadow-2xl">
+				{script.description}
+			</h3>
+
+			{#if !script.published && canEdit(profile, script.scripts_protected.author_id)}
+				<h4 class="my-4 text-center text-error-500 text-shadow drop-shadow-2xl">Unpublished</h4>
+			{/if}
+		</header>
+
+		<StatsHeader
+			experience={script.stats_scripts.experience}
+			gold={script.stats_scripts.gold}
+			runtime={script.stats_scripts.runtime}
+		/>
 
 		{#if profile}
 			<div class="text-center">
 				{#if canDownloadScript()}
-					<div class="py-12">
-						<AdvancedButton {script} />
+					<div class="py-12 grid justify-center justify-items-center gap-8">
+						<AdvancedButton {script} rev={script.scripts_protected.revision} />
+						<ZipDownload bind:profile />
+						<EditButton author_id={script.scripts_protected.author_id} />
 					</div>
 
-					<h5 class="pt-6">
+					<h4 class="pt-4">
 						You should move this script to
 						<b class="text-primary-500">/Simba/Scripts/</b>
 						and place it in the respective folder.
-					</h5>
+					</h4>
 				{:else}
-					<h3 class="py-2">This is a premium script and you are not premium.</h3>
-					<h4>
+					<h4 class="py-2">This is a premium script and you are not premium.</h4>
+					<h5>
 						To be able to download this script join
 						<a href="/premium" class="font-semibold text-primary-500 hover:underline">Premium</a>
 						!
-					</h4>
+					</h5>
 				{/if}
-
-				<h4 class="mt-24 mb-4">To download several scripts as a zip click the following button:</h4>
-				<ZipDownload bind:profile />
-
-				<EditButton author_id={script.scripts_protected.author_id} />
 			</div>
 		{/if}
 
-		<header class="text-center my-6 text-primary-500">
-			<span class="text-lg">Description:</span>
-		</header>
-
-		<div class="variant-ghost-surface max-h-[50rem] overflow-auto">
-			<article class="py-6 m-auto prose dark:prose-invert">
-				<Markdown src={script.content} />
-			</article>
-		</div>
+		<ScriptArticle content={script.content} />
 	</div>
 </div>

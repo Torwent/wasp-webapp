@@ -10,10 +10,9 @@ export const load = async ({ parent }) => {
 		console.error(error)
 		throw redirect(303, "./")
 	}
-	const devs = data
 
-	if (!browser && devs.length === 1)
-		throw redirect(303, "/developers/" + encodeSEO(devs[0].username))
+	if (!browser && data.length === 1)
+		throw redirect(303, "/developers/" + encodeSEO(data[0].profiles_public.username))
 
-	return { devs, count, range }
+	return { developers: data, count, range }
 }

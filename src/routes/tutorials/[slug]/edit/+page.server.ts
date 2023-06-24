@@ -1,6 +1,8 @@
 import { setError, superValidate } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
-import { postSchema } from "$lib/backend/types"
+import { postSchema } from "$lib/backend/schemas"
+import { encodeSEO } from "$lib/utils"
+import type { TutorialWithAuthor } from "$lib/types/collection.js"
 
 export const load = async (event) => {
 	const form = superValidate(event, postSchema)
@@ -14,16 +16,21 @@ export const actions = {
 
 		if (!form.valid || !form.data.id) return fail(400, { form })
 
-		const { error } = await locals.supabaseServer
+		const { data, error } = await locals.supabaseServer
 			.from("tutorials")
 			.update(form.data)
 			.eq("id", form.data.id)
+			.select()
+			.returns<TutorialWithAuthor[]>()
 
 		if (error) {
 			console.error("tutorials UPDATE failed: " + error.message)
 			return setError(form, null, error.message)
 		}
 
-		throw redirect(303, "./")
+		throw redirect(
+			303,
+			"/tutorials/" + encodeSEO(data[0].title + " by " + data[0].profiles_public.username)
+		)
 	}
 }

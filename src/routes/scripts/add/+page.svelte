@@ -1,10 +1,9 @@
 <script lang="ts">
 	import { superForm } from "sveltekit-superforms/client"
 	import { FileDropzone, focusTrap } from "@skeletonlabs/skeleton"
-	import { convertTime, cropString, formatRSNumber } from "$lib/utils.js"
+	import { cropString } from "$lib/utils"
 	import { fade, slide } from "svelte/transition"
-	import Markdown from "$lib/Markdown.svelte"
-	import { scriptSchema, type IScriptCard } from "$lib/backend/types.js"
+	import { scriptSchema } from "$lib/backend/schemas"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
 	import MultiSelect from "$lib/components/forms/MultiSelect.svelte"
@@ -12,9 +11,18 @@
 	import ScriptCardBase from "../ScriptCardBase.svelte"
 	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
+	import type { IScriptCard } from "$lib/types/collection"
+	import ScriptHeader from "../ScriptHeader.svelte"
+	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
+	import ZipDownload from "$lib/components/ZIPDownload.svelte"
+	import ScriptArticle from "../ScriptArticle.svelte"
+	import StatsHeader from "../StatsHeader.svelte"
+	import { addToolTips } from "$lib/backend/data"
 
 	export let data
-	const { categories, subcategories } = data
+
+	let { categories, subcategories, profile } = data
+	$: ({ profile } = data)
 
 	const { form, errors, enhance, validate } = superForm(data.form, {
 		multipleSubmits: "prevent",
@@ -52,14 +60,24 @@
 		max_xp: 0,
 		min_gp: 0,
 		max_gp: 0,
+		id: "",
+		search_script: "",
+		updated_at: "",
 		scripts_protected: {
-			author: data.profile ? data.profile.username : "undefined",
+			assets_alt: "",
 			assets_path: "",
 			author_id: "",
-			assets_alt: "",
-			revision: 1
-		}
+			created_at: null,
+			id: "",
+			revision: 0,
+			profiles_public: {
+				username: profile?.username || ""
+			}
+		},
+		emojiTooltips: []
 	}
+
+	$: addToolTips(script, categories, subcategories)
 
 	$: if ($form.categories) validate("categories")
 	$: if ($form.subcategories) validate("subcategories")
@@ -168,47 +186,44 @@
 <div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
 	{#if showScriptPage}
 		<div in:slide={{ duration: 300, delay: 300 }} out:slide={{ duration: 300 }}>
-			<div class="absolute inset-0 container min-w-full h-96 mx-0 flex flex-col">
+			<ScriptHeader title={$form.title} hasLink={false}>
 				<img
 					bind:this={bannerElement}
 					class="z-0 absolute object-cover h-full w-full"
 					src={defaultBanner}
 					alt="Asset is missing!"
 				/>
-				<!-- Title and Description Hover Effect -->
-				<header class="left-0 mt-auto z-[1] text-center h-32 text-primary-500 text-shadow">
-					<div
-						class="absolute mx-0 h-32 w-full opacity-100 bg-gradient-to-t from-white/20 via-white-800/20
-					dark:from-black/60 dark:via-gray-800/20 to-transparent"
-					/>
-					<h2 class="mx-8 mb-4 font-bold text-4xl">{$form.title}</h2>
-					<h5 class="font-semibold leading-normal mb-4">{$form.description}</h5>
-				</header>
-			</div>
+			</ScriptHeader>
 
 			<div class="container mt-80 mx-auto mb-6 max-w-2xl flex-grow">
-				<header class="text-center">
-					<h3>
-						Total Experience Gained:
-						{#await formatRSNumber(2500000)}...{:then value}{value}{/await}
-					</h3>
-
-					<h3>
-						Total Gold Gained:
-						{#await formatRSNumber(3450000)}...{:then value}{value}{/await}
-					</h3>
-					<h3>
-						Total Runtime:
-						{#await convertTime(24 * 60 * 55 * 15)}...{:then value}{value}{/await}
+				<header class="my-8">
+					<h3 class="text-center text-secondary-500 text-shadow drop-shadow-2xl">
+						{$form.description}
 					</h3>
 				</header>
 
-				<h5 class="text-primary-500 text-center my-6">Description:</h5>
-				<div class="variant-ghost-surface max-h-[50rem] overflow-auto">
-					<article class="py-6 m-auto prose dark:prose-invert">
-						<Markdown src={$form.content} />
-					</article>
-				</div>
+				<StatsHeader
+					experience={Math.random() * 1000000}
+					gold={Math.random() * 1000000}
+					runtime={Math.random() * 1000000000}
+				/>
+
+				{#if profile}
+					<div class="text-center">
+						<div class="py-12 grid justify-center justify-items-center gap-8">
+							<AdvancedButton {script} noDownload={true} rev={5} />
+							<ZipDownload bind:profile noDownload={true} />
+						</div>
+
+						<h4 class="pt-4">
+							You should move this script to
+							<b class="text-primary-500">/Simba/Scripts/</b>
+							and place it in the respective folder.
+						</h4>
+					</div>
+				{/if}
+
+				<ScriptArticle content={$form.content} />
 			</div>
 		</div>
 	{/if}
@@ -260,7 +275,7 @@
 	{/if}
 
 	<div class="container my-8 mx-auto mb-6 max-w-2x flex flex-col">
-		<div class="btn-group variant-filled-secondary mx-auto">
+		<div class="btn-group-vertical md:btn-group variant-filled-secondary mx-auto">
 			<button
 				on:click={() => {
 					showScriptPage = !showScriptPage
@@ -290,7 +305,7 @@
 			</button>
 		</div>
 
-		<article class="variant-ringed-secondary p-8 my-8 mx-auto w-3/4">
+		<article class="variant-ringed-secondary p-8 my-8 mx-auto xs:w-4/5 md:w-4/5 lg:w-3/4">
 			{#if $errors._errors && $errors._errors.length > 0}
 				{#each $errors._errors as error}
 					<div class="flex justify-center">{error}</div>
@@ -386,11 +401,12 @@
 
 				<FormInput title="Title" bind:value={$form.title} bind:error={$errors.title} />
 
-				<FormInput
+				<FormTextarea
 					title="Description"
 					extraTitle=" (recommended 60-80 characters)"
 					bind:value={$form.description}
 					bind:error={$errors.description}
+					h={"h-18"}
 				/>
 
 				<MultiSelect
@@ -407,7 +423,12 @@
 					entries={subcategories}
 				/>
 
-				<FormTextarea title="Content" bind:value={$form.content} bind:error={$errors.content} />
+				<FormTextarea
+					title="Content"
+					bind:value={$form.content}
+					bind:error={$errors.content}
+					h={"h-64"}
+				/>
 
 				<div class="flex flex-col text-sm mt-8 mb-2">
 					<h5 class="text-center">Stats limits (every 5 minutes)</h5>

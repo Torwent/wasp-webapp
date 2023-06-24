@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { popup } from "@skeletonlabs/skeleton"
 	import type { PopupSettings } from "@skeletonlabs/skeleton"
-	import type { IScriptCard } from "$lib/backend/types"
 	import { cropString } from "$lib/utils"
 	import { onMount } from "svelte"
 	import { browser } from "$app/environment"
+	import type { EmojiTooltip, IScriptCard } from "$lib/types/collection"
 	export let script: IScriptCard
 
 	export let imgElement: HTMLImageElement | undefined = browser ? new Image() : undefined
@@ -28,6 +28,8 @@
 	let imgLink: string = getCover(script.scripts_protected.assets_path)
 	$: imgLink = getCover(script.scripts_protected.assets_path)
 
+	let tooltips: EmojiTooltip[] = script.emojiTooltips
+	$: tooltips = script.emojiTooltips
 	onMount(async () => {
 		const response = await fetch(imgLink)
 		if (response.status != 200) imgLink = defaultCover
@@ -50,33 +52,33 @@
 			<h5 class="font-semibold text-primary-700 dark:text-primary-500 whitespace-nowrap">
 				{script.title}
 			</h5>
-			<span class="dark:text-surface-200 text-surface-600 text-xs whitespace-nowrap">
-				by {script.scripts_protected.author}
+			<span class="dark:text-surface-200 text-xs whitespace-nowrap text-secondary-500">
+				by
+				<a
+					href="/developers/{script.scripts_protected.profiles_public.username}"
+					class="permalink text-secondary-500 decoration-secondary-500"
+				>
+					{script.scripts_protected.profiles_public.username}
+				</a>
 				{#if !script.published}<small class="text-secondary-500">Hidden</small>{/if}
 			</span>
 		</header>
-		<article class="h-20 mt-4 dark:text-surface-300 text-surface-600 text-sm break-all">
+		<article class="h-20 mt-4 dark:text-surface-300 text-surface-600 text-sm break-words">
 			{cropString(script.description, 80)}
 		</article>
 	</section>
 	<footer class="card-footer flex h-8 w-full justify-end">
-		{#if script.emojiTooltips != null}
-			{#each script.emojiTooltips as tooltip, i}
-				<button use:popup={getPopup(script.id + "-hover-" + i.toString())}>
-					{tooltip.icon}
-				</button>
-				<div
-					class="card variant-filled-secondary p-2"
-					data-popup={script.id + "-hover-" + i.toString()}
-				>
-					{tooltip.tooltip}
-					<div class="arrow variant-filled-secondary" />
-				</div>
-			{/each}
-		{:else}
-			{#each Array(10) as _i}
-				<div class="placeholder-circle w-4 mx-1" />
-			{/each}
-		{/if}
+		{#each tooltips as tooltip, i}
+			<button use:popup={getPopup(script.id + "-hover-" + i.toString())}>
+				{tooltip.icon}
+			</button>
+			<div
+				class="card variant-filled-secondary p-2"
+				data-popup={script.id + "-hover-" + i.toString()}
+			>
+				{tooltip.tooltip}
+				<div class="arrow variant-filled-secondary" />
+			</div>
+		{/each}
 	</footer>
 </div>

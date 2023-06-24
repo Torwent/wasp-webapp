@@ -47,14 +47,14 @@
 		<li>
 			<button
 				class="block py-2 px-3 ml-0 leading-tight text-stone-500 bg-white rounded-l-lg border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
+				name="Previous"
+				aria-label="Go to the previous page"
 				on:click={() => {
 					pageNumber -= 1
 					if (pageNumber <= 0) pageNumber = 1
 					replaceQuery({ page: pageNumber.toString() })
 				}}
 			>
-				<span class="sr-only">Previous</span>
-
 				<ChevronLeft class="w-5 h-5" />
 			</button>
 		</li>
@@ -132,13 +132,14 @@
 		<li>
 			<button
 				class="block py-2 px-3 leading-tight text-stone-500 bg-white rounded-r-lg border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
+				name="Next"
+				aria-label="Go to the next page"
 				on:click={() => {
 					pageNumber += 1
 					if (pageNumber >= totalPages) pageNumber = totalPages
 					replaceQuery({ page: pageNumber.toString() })
 				}}
 			>
-				<span class="sr-only">Next</span>
 				<ChevronRight class="w-5 h-5" />
 			</button>
 		</li>

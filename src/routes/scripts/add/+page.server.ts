@@ -1,11 +1,12 @@
 import { superValidate, setError } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
-import { scriptSchema, type ScriptPublic } from "$lib/backend/types"
-import { filesSchema } from "$lib/backend/types.server"
+import { scriptSchema } from "$lib/backend/schemas"
+import { filesSchema } from "$lib/backend/schemas.server"
 import { uploadScript } from "$lib/backend/data.server"
 import { encodeSEO } from "$lib/utils"
 import { getScript } from "$lib/backend/data"
 import { updateProfileRoles } from "$lib/backend/auth.server.js"
+import type { ScriptPublic } from "$lib/types/collection.js"
 
 export const load = async (event) => {
 	const form = superValidate(event, scriptSchema)
@@ -67,7 +68,10 @@ export const actions = {
 			min_xp: form.data.min_xp,
 			max_xp: form.data.max_xp,
 			min_gp: form.data.min_gp,
-			max_gp: form.data.max_gp
+			max_gp: form.data.max_gp,
+			id: "",
+			updated_at: "",
+			search_script: null
 		}
 
 		const { error } = await uploadScript(

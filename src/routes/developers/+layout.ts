@@ -1,3 +1,4 @@
+import type { DeveloperWithUsername } from "$lib/types/collection"
 import type { SupabaseClient } from "@supabase/supabase-js"
 
 async function getDevelopers(
@@ -6,22 +7,21 @@ async function getDevelopers(
 	start: number,
 	finish: number
 ) {
+	let query = supabase.from("developers").select(
+		`id, realname, description, github, paypal_id,
+				content, profiles_public (username)`,
+		{ count: "exact" }
+	)
+
 	if (search === "") {
-		return await supabase
-			.from("developers")
-			.select("id, real_name, username, description, github, paypal_id, content", {
-				count: "exact"
-			})
-			.order("username", { ascending: true })
+		query = query
+			.order("username", { foreignTable: "profiles_public", ascending: true })
 			.range(start, finish)
+	} else {
+		query = query.ilike("search_developers", "%" + search + "%")
 	}
 
-	return await supabase
-		.from("developers")
-		.select("id, real_name, username, description, github, paypal_id, content", {
-			count: "exact"
-		})
-		.ilike("search_developers", "%" + search + "%")
+	return await query.returns<DeveloperWithUsername[]>()
 }
 
 export const load = async ({ url, parent, depends }) => {

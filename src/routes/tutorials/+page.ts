@@ -1,11 +1,11 @@
 import { redirect } from "@sveltejs/kit"
 import { browser } from "$app/environment"
 import { encodeSEO } from "$lib/utils"
-import type { Post } from "$lib/backend/types"
+import type { TutorialWithAuthor } from "$lib/types/collection"
 
 export const load = async ({ url, depends, parent }) => {
 	const parentPromise = parent()
-	depends("tutorials:posts")
+	depends("supabase:tutorials")
 
 	const pageStr = url.searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
@@ -29,42 +29,32 @@ export const load = async ({ url, depends, parent }) => {
 	let postsData
 
 	const { supabaseClient } = await parentPromise
+	let query = supabaseClient
+		.from("tutorials")
+		.select("id, user_id, title, description, content, level, profiles_public(username)", {
+			count: "exact"
+		})
+
 	if (level > -1) {
-		postsData = supabaseClient
-			.from("tutorials")
-			.select("id, user_id, author, title, description, content, level", {
-				count: "exact"
-			})
-			.eq("level", level)
-			.range(start, finish)
+		query = query.eq("level", level).range(start, finish)
 	} else if (search === "") {
-		postsData = supabaseClient
-			.from("tutorials")
-			.select("id, user_id, author, title, description, content, level", {
-				count: "exact"
-			})
-			.order("level", { ascending: ascending })
-			.range(start, finish)
+		query = query.order("level", { ascending: ascending }).range(start, finish)
 	} else {
-		postsData = supabaseClient
-			.from("tutorials")
-			.select("id, user_id, author, title, description, content, level", {
-				count: "exact"
-			})
-			.ilike("search_tutorials", "%" + search.replaceAll("%", "") + "%")
+		query = query.ilike("search_tutorials", "%" + search.replaceAll("%", "") + "%")
 	}
 
-	const { data, count, error } = await postsData
+	const { data, count, error } = await query.returns<TutorialWithAuthor[]>()
 
 	if (error) {
 		console.error("SELECT tutorials failed: " + error.message)
 		throw redirect(303, "/tutorials")
 	}
 
-	const posts = data as unknown as Post[]
+	if (!browser && count === 1)
+		throw redirect(
+			303,
+			"/tutorials/" + encodeSEO(data[0].title + " by " + data[0].profiles_public.username)
+		)
 
-	if (!browser && posts.length === 1)
-		throw redirect(303, "/tutorials/" + encodeSEO(posts[0].title + " by " + posts[0].author))
-
-	return { posts, count, range }
+	return { tutorials: data, count, range }
 }

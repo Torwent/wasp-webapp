@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Profile } from "$lib/backend/types"
+	import type { Profile } from "$lib/types/collection"
 
 	export let profile: Profile
 </script>

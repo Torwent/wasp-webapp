@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit"
 import { encodeSEO } from "$lib/utils"
-import type { Post } from "$lib/backend/types"
+import type { TutorialWithAuthor } from "$lib/types/collection"
 
 export const load = async ({ params, data, parent }) => {
 	const parentPromise = parent()
@@ -11,8 +11,11 @@ export const load = async ({ params, data, parent }) => {
 	const { supabaseClient } = await parentPromise
 	const { data: tutorials, error } = await supabaseClient
 		.from("tutorials")
-		.select("id, created_at, user_id, author, title, description, content, level")
+		.select(
+			"id, created_at, user_id, title, description, content, level, profiles_public (username)"
+		)
 		.order("title", { ascending: true })
+		.returns<TutorialWithAuthor[]>()
 
 	if (error) {
 		console.error("tutorials SELECT failed: " + error.message)
@@ -27,8 +30,8 @@ export const load = async ({ params, data, parent }) => {
 	const { form } = data
 
 	for (let i = 0; i < tutorials.length; i++) {
-		if (slug === encodeSEO(tutorials[i].title + " by " + tutorials[i].author))
-			return { post: tutorials[i] as Post, form }
+		if (slug === encodeSEO(tutorials[i].title + " by " + tutorials[i].profiles_public.username))
+			return { tutorial: tutorials[i], form }
 	}
 	throw redirect(300, "./")
 }

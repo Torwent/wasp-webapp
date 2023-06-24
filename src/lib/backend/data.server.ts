@@ -1,4 +1,4 @@
-import type { Script, ScriptPublic } from "./types"
+import type { Script, ScriptPublic } from "$lib/types/collection"
 import { pad } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
 
@@ -65,7 +65,11 @@ export async function uploadScript(
 		max_gp: script.max_gp
 	}
 
-	const { data, error } = await supabase.from("scripts_public").insert(publicData).select()
+	const { data, error } = await supabase
+		.from("scripts_public")
+		.insert(publicData)
+		.select()
+		.returns<ScriptPublic[]>()
 	if (error) {
 		console.error("scripts_public INSERT failed: " + error.message)
 		return { error: error.message }
@@ -96,7 +100,7 @@ export async function updateScript(
 		"📜 Updating ",
 		script.title,
 		" by ",
-		script.scripts_protected.author,
+		script.scripts_protected.profiles_public.username,
 		" id: ",
 		script.id
 	)

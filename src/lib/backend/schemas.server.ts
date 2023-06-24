@@ -1,8 +1,6 @@
 import { z } from "zod"
 import Jimp from "jimp"
-
-const MB_SIZE = 100000
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg"]
+import { ACCEPTED_IMAGE_TYPES, MB_SIZE } from "$lib/utils"
 
 async function checkServerImageDimensions(
 	file: File,

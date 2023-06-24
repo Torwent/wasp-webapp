@@ -10,7 +10,7 @@ export const actions = {
 			const { data, error } = await supabaseServer.auth.signInWithOAuth({
 				provider: provider,
 				options: {
-					redirectTo: url.origin + "/auth/callback",
+					redirectTo: url.origin + "/api/auth/callback",
 					scopes: "identify email guilds guilds.members.read"
 				}
 			})

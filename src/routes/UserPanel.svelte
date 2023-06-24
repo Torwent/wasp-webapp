@@ -100,7 +100,7 @@
 		<div class="p-4">
 			<button
 				name="Login"
-				aria-label="Logins"
+				aria-label="Login to your account"
 				class="btn variant-filled-secondary"
 				formaction="/?/login&provider=discord"
 			>

@@ -1,137 +1,6 @@
 import { z } from "zod"
 import { browser } from "$app/environment"
-
-interface ProfilePublic {
-	id: string
-	discord_id: string
-	username: string
-	avatar_url: string
-}
-
-interface ProfileProtected {
-	developer: boolean
-	premium: boolean
-	vip: boolean
-	tester: boolean
-	scripter: boolean
-	moderator: boolean
-	administrator: boolean
-}
-
-interface ProfilePrivate {
-	dismissed_warning: boolean
-}
-
-export interface Profile extends ProfilePublic {
-	profiles_protected: ProfileProtected
-	profiles_private: ProfilePrivate
-}
-
-export interface Developer {
-	id: string
-	real_name: string
-	username: string
-	description: string
-	content: string
-	github: string
-	paypal_id: string
-}
-
-export interface Category {
-	name: string
-	emoji: string
-}
-
-export interface SubCategory extends Category {
-	category: string
-}
-
-export interface FAQEntry {
-	id: number
-	title: string
-	content: string
-}
-
-export interface Stat {
-	username: string
-	experience: number
-	gold: number
-	levels: number
-	runtime: number
-}
-
-export interface EmojiTooltip {
-	icon: string
-	tooltip: string
-}
-
-export interface ScriptPublic {
-	id?: string
-	title: string
-	description: string
-	content: string
-	categories: string[]
-	subcategories: string[]
-	published: true | false
-	min_xp: number
-	max_xp: number
-	min_gp: number
-	max_gp: number
-	emojiTooltips?: EmojiTooltip[]
-}
-
-interface ScriptProtected {
-	author: string
-	assets_path: string
-	author_id: string
-	assets_alt: string
-	revision: number
-}
-
-interface ScriptStats {
-	experience: number
-	gold: number
-	levels: number
-	runtime: number
-	total_unique_users: number
-	total_current_users: number
-	total_monthly_users: number
-}
-
-export interface IScriptCard extends ScriptPublic {
-	scripts_protected: ScriptProtected
-}
-
-export interface Script extends ScriptPublic {
-	scripts_protected: ScriptProtected
-	stats_scripts: ScriptStats
-}
-
-export interface PostStatic {
-	id: number
-	user_id: string
-	author: string
-}
-
-export interface PostData {
-	title: string
-	description: string
-	content: string
-	level: number
-}
-
-export interface Post extends PostStatic, PostData {}
-
-export interface CheckboxType {
-	id: number
-	name: string
-	emoji: string
-	main: boolean
-	checked: boolean
-}
-
-const MB_SIZE = 100000
-const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg"]
+import { ACCEPTED_IMAGE_TYPES, MB_SIZE } from "$lib/utils"
 
 async function checkClientImageDimensions(file: any, w: number, h: number): Promise<boolean> {
 	if (!browser) return false
@@ -271,24 +140,28 @@ export const profileSchema = z.object({
 })
 
 export const developerSchema = z.object({
-	id: z.string().uuid("ID must be a valid UUIDv4.").optional(),
+	id: z.string().uuid("ID must be a valid UUIDv4."),
 	realname: z
 		.string()
 		.min(2, "If your name really has less than 2 characters contact Torwent.")
-		.optional(),
+		.nullable(),
 	username: z.string().min(3, "That username is too short!").max(16, "That username is too large!"),
 	description: z
 		.string()
 		.min(6, "Must be more than 6 characters long.")
 		.max(32, "Must be less than 32 characters long.")
-		.includes(" ", { message: "This should be a sentence or at least a couple of words." }),
-	github: z.string().startsWith("https://github.com/", "This should be a github user profile."),
+		.includes(" ", { message: "This should be a sentence or at least a couple of words." })
+		.nullable(),
+	github: z
+		.string()
+		.startsWith("https://github.com/", "This should be a github user profile.")
+		.nullable(),
 	paypal_id: z
 		.string()
 		.length(
 			13,
 			"The paypal ID seems to have the wrong length. If you put the correct ID please contact Torwent."
 		)
-		.optional(),
-	content: z.string().includes(" ", { message: "This should be a couple of words." })
+		.nullable(),
+	content: z.string().includes(" ", { message: "This should be a couple of words." }).nullable()
 })

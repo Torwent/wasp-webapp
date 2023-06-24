@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import { developerSchema } from "$lib/backend/types"
+	import { developerSchema } from "$lib/backend/schemas"
 	import { focusTrap } from "@skeletonlabs/skeleton"
 	import { superForm } from "sveltekit-superforms/client"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
@@ -26,19 +26,19 @@
 	})
 
 	$form.id = developer.id
-	$: $form.realname = developer.real_name
-	$: $form.username = developer.username
+	$: $form.realname = developer.realname
+	$: $form.username = developer.profiles_public.username
 	$: $form.description = developer.description
 	$: $form.content = developer.content
 	$: $form.github = developer.github
 	$: $form.paypal_id = developer.paypal_id
 
-	const headTitle = "Edit " + developer.username + " - WaspScripts"
-	const headDescription = "Edit " + developer.username + " developer page."
+	const headTitle = "Edit " + developer.profiles_public.username + " - WaspScripts"
+	const headDescription = "Edit " + developer.profiles_public.username + " developer page."
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour, Bot, Wasp, Scripts, Simba, Developer, " +
-		developer.username
-	const headAuthor = developer.username
+		developer.profiles_public.username
+	const headAuthor = developer.profiles_public.username
 	const headImage =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
@@ -77,8 +77,8 @@
 				<div class="flex my-auto">
 					<header>
 						<h3 class="font-bold text-2xl">
-							{#if developer.real_name && developer.real_name != ""} {developer.real_name} / {/if}
-							{developer.username}
+							{#if developer.realname && developer.realname != ""} {developer.realname} / {/if}
+							{developer.profiles_public.username}
 						</h3>
 					</header>
 				</div>
@@ -90,7 +90,10 @@
 					</a>
 					{#if developer.paypal_id && developer.paypal_id != ""}
 						<div class="w-full mx-auto">
-							<PayPal paypal_id={developer.paypal_id} username={developer.username} />
+							<PayPal
+								paypal_id={developer.paypal_id}
+								username={developer.profiles_public.username}
+							/>
 						</div>
 					{/if}
 				</div>
@@ -99,7 +102,7 @@
 			<article
 				class="prose dark:prose-invert py-6 border-t-2 border-stone-300 dark:border-stone-800 mx-auto"
 			>
-				<Markdown src={developer.content} />
+				<Markdown src={developer.content || ""} />
 			</article>
 		</div>
 	{/if}
@@ -112,8 +115,12 @@
 		</div>
 
 		<form method="POST" use:focusTrap={isFocused} use:enhance>
-			<FormInput title="Name" bind:value={developer.real_name} bind:error={$errors.realname} />
-			<FormInput title="Username" bind:value={developer.username} bind:error={$errors.username} />
+			<FormInput title="Name" bind:value={developer.realname} bind:error={$errors.realname} />
+			<FormInput
+				title="Username"
+				bind:value={developer.profiles_public.username}
+				bind:error={$errors.username}
+			/>
 
 			<FormInput
 				title="Description"
@@ -121,7 +128,12 @@
 				bind:error={$errors.description}
 			/>
 
-			<FormTextarea title="Content" bind:value={developer.content} bind:error={$errors.content} />
+			<FormTextarea
+				title="Content"
+				bind:value={developer.content}
+				bind:error={$errors.content}
+				h={"h-64"}
+			/>
 
 			<FormInput title="GitHub" bind:value={developer.github} bind:error={$errors.github} />
 			<FormInput title="PaypalID" bind:value={developer.paypal_id} bind:error={$errors.paypal_id} />

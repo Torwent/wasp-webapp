@@ -1,4 +1,4 @@
-import { profileSchema } from "$lib/backend/types"
+import { profileSchema } from "$lib/backend/schemas"
 import { fail } from "@sveltejs/kit"
 import { setError, superValidate } from "sveltekit-superforms/server"
 

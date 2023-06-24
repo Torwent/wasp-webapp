@@ -1,14 +1,14 @@
 <!-- Based on https://svelte.dev/repl/c7094fb1004b440482d2a88f4d1d7ef5?version=3.14.0 -->
 <script lang="ts">
 	import { page } from "$app/stores"
-	import type { Category } from "$lib/backend/types"
+	import type { Category, SubCategory } from "$lib/types/collection"
 	import { ChevronDown, X } from "lucide-svelte"
 	import { fly } from "svelte/transition"
 	export let title: string
 	export let value: string[]
 	export let error: Record<number, string[]> | undefined
 	export let placeholder = ""
-	export let entries: Category[]
+	export let entries: Category[] | SubCategory[]
 
 	function checkErrors(err: Record<number, string[]> | undefined) {
 		if (!err) return false

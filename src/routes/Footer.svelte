@@ -42,14 +42,27 @@
 	</header>
 	<footer class="sm:flex sm:items-center sm:justify-between p-8 sm:p-12">
 		<span class="text-sm sm:text-center">
-			© 2022 <a href={$page.url.origin}>WaspScripts™</a>
-			. All Rights Reserved.
+			This webapp is open source! Checkout <a
+				class="permalink text-secondary-500"
+				href="https://github.com/torwent/web-app"
+			>
+				WaspScripts source code
+			</a>
+			!
 		</span>
 		<div class="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
-			<a href="https://github.com/torwent" aria-label="Navigate to GitHub">
+			<a
+				href="https://github.com/torwent"
+				aria-label="Navigate to GitHub"
+				class="permalink text-secondary-500"
+			>
 				<Github />
 			</a>
-			<a href="https://waspscripts.com" aria-label="Navigate to main site">
+			<a
+				href="https://waspscripts.com"
+				aria-label="Navigate to main site"
+				class="permalink text-secondary-500"
+			>
 				<Globe />
 			</a>
 		</div>

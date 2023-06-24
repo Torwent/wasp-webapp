@@ -1,7 +1,8 @@
 import { setError, superValidate } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
-import { postSchema } from "$lib/backend/types"
+import { postSchema } from "$lib/backend/schemas"
 import { encodeSEO } from "$lib/utils"
+import type { TutorialWithAuthor } from "$lib/types/collection.js"
 
 export const load = async (event) => {
 	const form = superValidate(event, postSchema)
@@ -30,6 +31,7 @@ export const actions = {
 			.select("id, created_at, user_id, author, title, description, content, level")
 			.eq("title", form.data.title)
 			.eq("user_id", profile.id)
+			.returns<TutorialWithAuthor[]>()
 
 		if (data && data.length > 0) {
 			const msg = "A post with that name by you already exists! Choose a different title."
@@ -37,14 +39,17 @@ export const actions = {
 			return setError(form, null, msg)
 		}
 
-		const { error } = await locals.supabaseServer.from("tutorials").insert(form.data)
+		const { data: tutorial, error } = await locals.supabaseServer
+			.from("tutorials")
+			.insert(form.data)
+			.returns<TutorialWithAuthor[]>()
 
 		if (error) {
 			console.error("tutorials INSERT failed: " + error.message)
 			return setError(form, null, error.message)
 		}
 
-		const url = encodeSEO(form.data.title + " by " + profile.username)
+		const url = encodeSEO(tutorial[0].title + " by " + profile.username)
 		throw redirect(303, "./" + url)
 	}
 }

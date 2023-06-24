@@ -5,7 +5,7 @@
 	import { onMount } from "svelte"
 
 	import { fade } from "svelte/transition"
-	import type { Stat } from "$lib/backend/types"
+	import type { Stats } from "$lib/types/collection"
 	import { convertTime, formatRSNumber } from "$lib/utils"
 	import Paginator from "$lib/components/Paginator.svelte"
 
@@ -16,9 +16,9 @@
 
 	let search = decodeURIComponent($page.url.searchParams.get("search") || "").trim()
 	let ascending = $page.url.searchParams.get("ascending")?.toLowerCase() === "true"
-	let headers: (keyof Stat)[] = ["username", "experience", "gold", "levels", "runtime"]
-	let selectedHeader: keyof Stat =
-		($page.url.searchParams.get("order") as keyof Stat) || "experience"
+	let headers: (keyof Stats)[] = ["username", "experience", "gold", "levels", "runtime"]
+	let selectedHeader: keyof Stats =
+		($page.url.searchParams.get("order") as keyof Stats) || "experience"
 	let loading = true
 
 	function replaceQuery(values: Record<string, string>) {
@@ -39,7 +39,7 @@
 		setTimeout(rerunLoad, 5000)
 	}
 
-	function sortBy(header: keyof Stat) {
+	function sortBy(header: keyof Stats) {
 		search = ""
 		ascending = selectedHeader === header ? !ascending : false
 		selectedHeader = header
@@ -106,12 +106,12 @@
 		<h5 class="py-4 px-6 font-bold text-center whitespace-nowrap">
 			Total experience:
 			<span class="py-4 pr-6">
-				{#await formatRSNumber(data.total.experience)}...{:then value}{value}{/await}
+				{formatRSNumber(data.total.experience || 0)}
 			</span>
 			<wbr />
 			Total gold:
 			<span class="py-4 pr-6">
-				{#await formatRSNumber(data.total.gold)}... {:then value}{value} {/await}
+				{formatRSNumber(data.total.gold || 0)}
 			</span>
 			<wbr />
 			Total levels:
@@ -119,7 +119,7 @@
 			<wbr />
 			Total runtime:
 			<span class="py-4 pr-6">
-				{#await convertTime(data.total.runtime)}...{:then value} {value} {/await}
+				{convertTime(data.total.runtime || 0)}
 			</span>
 		</h5>
 	</header>
@@ -178,26 +178,14 @@
 						{/if}
 					</th>
 					<td class="py-4 px-6 w-64">
-						{#await formatRSNumber(entry.experience)}
-							...
-						{:then value}
-							{value}
-						{/await}
+						{formatRSNumber(entry.experience || 0)}
 					</td>
 					<td class="py-4 px-6 w-64">
-						{#await formatRSNumber(entry.gold)}
-							...
-						{:then value}
-							{value}
-						{/await}
+						{formatRSNumber(entry.gold || 0)}
 					</td>
 					<td class="py-4 px-6 w-64">{entry.levels}</td>
 					<td class="py-4 px-6 w-64">
-						{#await convertTime(entry.runtime)}
-							...
-						{:then value}
-							{value}
-						{/await}
+						{convertTime(entry.runtime || 0)}
 					</td>
 				</tr>
 			{/each}

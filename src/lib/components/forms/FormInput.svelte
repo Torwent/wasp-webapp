@@ -1,9 +1,12 @@
 <script lang="ts">
 	export let title: string
 	export let extraTitle: string = ""
-	export let value: string | number
+	export let value: string | number | null
 	export let error: string[] | undefined
 	export let type: string = "text"
+
+	if (type === "text" && !value) value = ""
+	else if (type === "number" && !value) value = 0
 
 	function typeAction(e: HTMLInputElement) {
 		e.type = type

@@ -1,15 +1,19 @@
 <script lang="ts">
 	export let title: string
-	export let value: string
+	export let extraTitle: string = ""
+	export let value: string | null | undefined
 	export let error: string[] | undefined
+	export let h: string
+
+	if (!value) value = ""
 </script>
 
 <label for={title.toLowerCase()} class="label my-2">
-	<span>{title}:</span>
+	<span>{title + extraTitle}:</span>
 	<textarea
 		id={title.toLowerCase()}
 		name={title.toLowerCase()}
-		class="textarea h-64"
+		class="textarea {h}"
 		class:input-error={error}
 		bind:value
 	/>

@@ -3,13 +3,15 @@
 	import JsZip from "jszip"
 	import { saveAs } from "file-saver"
 	import { canDownload, getScripts, getSignedURL } from "$lib/backend/data"
-	import type { Profile, Script } from "$lib/backend/types"
+	import type { Profile } from "$lib/types/collection"
 	import { pad } from "$lib/utils"
 	import { slide } from "svelte/transition"
 	import { ChevronDown, FileArchive } from "lucide-svelte"
 	import { page } from "$app/stores"
+	import type { Script } from "$lib/types/collection"
 
 	export let profile: Profile
+	export let noDownload: boolean = false
 
 	const ALL_ZIPS = [
 		"wasp-premium.zip",
@@ -78,6 +80,7 @@
 
 	async function downloadAndZip() {
 		let scripts = await getScripts($page.data.supabaseClient)
+		if (!scripts) return console.error("Failed to retrieve scripts information!")
 
 		scripts = scripts.filter((script) => {
 			console.log(zipName, " and ", ALL_ZIPS)
@@ -122,6 +125,7 @@
 	}
 
 	const download = async () => {
+		if (noDownload) return
 		const start = performance.now()
 		progress = 0
 		await downloadAndZip()
@@ -131,6 +135,8 @@
 
 <div class="btn-group text-black fill-black">
 	<button
+		name={zipName}
+		aria-label="Download {zipName}"
 		class="variant-filled-primary hover:variant-filled-primary uppercase"
 		on:click|preventDefault={download}
 	>
@@ -138,6 +144,8 @@
 		<span class="border-0">{zipName}</span>
 	</button>
 	<button
+		name="Zips"
+		aria-label="Open the zips list"
 		class="variant-filled-secondary hover:variant-filled-secondary uppercase"
 		use:popup={popupSettings}
 	>
@@ -146,7 +154,7 @@
 </div>
 
 <div
-	class="bg-surface-800"
+	class="z-10 bg-surface-800"
 	data-popup="zipDropDown"
 	in:slide={{ duration: 700 }}
 	out:slide={{ duration: 300 }}

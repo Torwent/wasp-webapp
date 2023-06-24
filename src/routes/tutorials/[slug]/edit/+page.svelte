@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import { postSchema } from "$lib/backend/types"
+	import { postSchema } from "$lib/backend/schemas.js"
 	import { focusTrap } from "@skeletonlabs/skeleton"
 	import { superForm } from "sveltekit-superforms/client"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
@@ -10,6 +10,9 @@
 	import { page } from "$app/stores"
 
 	export let data
+
+	let { tutorial } = data
+	$: ({ tutorial } = data)
 
 	let show: boolean = false
 	let isFocused: boolean = true
@@ -22,18 +25,18 @@
 		validators: postSchema
 	})
 
-	$form.id = data.post.id
-	$form.title = data.post.title
-	$form.description = data.post.description
-	$form.content = data.post.content
-	$form.level = data.post.level
+	$form.id = tutorial.id
+	$form.title = tutorial.title
+	$form.description = tutorial.description
+	$form.content = tutorial.content
+	$form.level = tutorial.level
 
-	const headTitle = "Edit " + data.post.title + " - WaspScripts"
-	const headDescription = "Edit " + data.post.title + " in WaspScripts."
+	const headTitle = "Edit " + tutorial.title + " - WaspScripts"
+	const headDescription = "Edit " + tutorial.title + " in WaspScripts."
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide, " +
-		data.post.author
-	const headAuthor = data.post.author
+		tutorial.profiles_public.username
+	const headAuthor = tutorial.profiles_public.username
 	const headImage =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
@@ -95,7 +98,12 @@
 				bind:error={$errors.description}
 			/>
 
-			<FormTextarea title="Content" bind:value={$form.content} bind:error={$errors.content} />
+			<FormTextarea
+				title="Content"
+				bind:value={$form.content}
+				bind:error={$errors.content}
+				h={"h-64"}
+			/>
 
 			<TutorialLevel bind:value={$form.level} bind:error={$errors.level} />
 

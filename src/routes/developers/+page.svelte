@@ -24,8 +24,10 @@
 		invalidate("supabase:developers")
 	}
 
-	const { range } = data
+	let { range, developers } = data
 	let count = 0
+
+	$: ({ range, developers } = data)
 	$: count = (data.count as number) || 0
 
 	onMount(() => replaceQuery({ search: search }))
@@ -92,11 +94,9 @@
 	</div>
 
 	<div class="mx-auto max-w-2xl flex-grow">
-		{#if data.devs}
-			{#each data.devs as developer}
-				<DevCard bind:developer />
-			{/each}
-		{/if}
+		{#each developers as developer}
+			<DevCard bind:developer />
+		{/each}
 	</div>
 
 	<Paginator srcData={"developers:devs"} bind:currentPage {range} bind:count />

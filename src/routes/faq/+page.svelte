@@ -5,13 +5,10 @@
 
 	export let data
 
-	import type { FAQEntry } from "$lib/backend/types.js"
 	import { page } from "$app/stores"
 
-	const { questions, errors } = data
-
-	const questionsData = questions.data as FAQEntry[]
-	const errorsData = errors.data as FAQEntry[]
+	let { questions, errors } = data
+	$: ({ questions, errors } = data)
 
 	const headTitle = "FAQs and Errors - WaspScripts"
 	const headDescription = "Need help botting osrs? See if what you are looking for is in this list."
@@ -53,8 +50,8 @@
 		<h2>Welcome to the Frequently Asked Questions and Common Errors section.</h2>
 	</header>
 
-	<DropDown title="❓ Frequently Asked Questions" entries={questionsData} />
-	<DropDown title="⚠️ Common Errors" entries={errorsData} />
+	<DropDown title="❓ Frequently Asked Questions" entries={questions} />
+	<DropDown title="⚠️ Common Errors" entries={errors} />
 
 	<header class="py-12 text-center">
 		<p class="py-6">

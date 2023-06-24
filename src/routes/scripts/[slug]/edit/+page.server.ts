@@ -1,9 +1,10 @@
 import { superValidate, setError } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
-import { scriptSchema } from "$lib/backend/types"
+import { scriptSchema } from "$lib/backend/schemas"
 import { canEdit, getScriptUUID } from "$lib/backend/data"
-import { filesEditSchema } from "$lib/backend/types.server"
+import { filesEditSchema } from "$lib/backend/schemas.server"
 import { updateScript } from "$lib/backend/data.server"
+import { encodeSEO } from "$lib/utils"
 
 export const load = async (event) => {
 	const form = superValidate(event, scriptSchema)
@@ -99,6 +100,10 @@ export const actions = {
 			return setError(form, null, error)
 		}
 
-		throw redirect(303, "./")
+		throw redirect(
+			303,
+			"/scripts/" +
+				encodeSEO(script.title + " by " + script.scripts_protected.profiles_public.username)
+		)
 	}
 }

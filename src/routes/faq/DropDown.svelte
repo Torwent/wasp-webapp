@@ -2,15 +2,15 @@
 	import { slide } from "svelte/transition"
 	import DropDownEntry from "./DropDownEntry.svelte"
 	import { search } from "$lib/utils"
-	import type { FAQEntry } from "$lib/backend/types"
 	import { ChevronsDownUp, ChevronsUpDown } from "lucide-svelte"
+	import type { ErrorEntry, FAQEntry } from "$lib/types/collection"
 	export let title: string
-	export let entries: FAQEntry[]
+	export let entries: FAQEntry[] | ErrorEntry[]
 
 	let show = false
 
 	let searchQuery = "",
-		filteredEntries: FAQEntry[] = [],
+		filteredEntries: FAQEntry[] | ErrorEntry[] = [],
 		placeholderText = "Search..."
 
 	const handleSearch = () => {

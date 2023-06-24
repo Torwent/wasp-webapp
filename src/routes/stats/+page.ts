@@ -1,5 +1,6 @@
-import type { Stat } from "$lib/backend/types"
+import type { Stats } from "$lib/types/collection.js"
 import { UUID_V4_REGEX } from "$lib/utils"
+import { redirect } from "@sveltejs/kit"
 
 export const load = async ({ url, depends, parent }) => {
 	const parentPromise = parent()
@@ -16,85 +17,57 @@ export const load = async ({ url, depends, parent }) => {
 	const start = (page - 1) * range
 	const finish = start + range
 
-	let total: Stat = {
+	let total: Stats = {
 		username: "Total",
 		experience: 0,
 		gold: 0,
 		levels: 0,
-		runtime: 0
+		runtime: 0,
+		password: "",
+		updated_at: null,
+		userID: ""
 	}
 
 	const totalEntries = 10
-
-	let promises = []
-
 	const { supabaseClient } = await parentPromise
+
+	let query = supabaseClient
+		.from("stats")
+		.select("username, experience, gold, levels, runtime", { count: "exact" })
+
 	if (search === "") {
-		promises.push(
-			supabaseClient
-				.from("stats")
-				.select("username, experience, gold, levels, runtime", { count: "exact" })
-				.or("experience.gt.0,gold.gt.0")
-				.order(order, { ascending: ascending })
-				.range(start, finish)
-		)
+		query
+			.or("experience.gt.0,gold.gt.0")
+			.range(start, finish)
+			.order(order, { ascending: ascending, foreignTable: "", nullsFirst: false })
 	} else if (UUID_V4_REGEX.test(search)) {
-		promises.push(
-			supabaseClient
-				.from("stats")
-				.select("username, experience, gold, levels, runtime", { count: "exact" })
-				.eq("userID", search)
-		)
+		query.eq("userID", search)
 	} else {
-		promises.push(
-			supabaseClient
-				.from("stats")
-				.select("username, experience, gold, levels, runtime", { count: "exact" })
-				.ilike("username", "%" + search.replaceAll("%", "") + "%")
-		)
+		query.ilike("username", "%" + search.replaceAll("%", "") + "%")
 	}
 
-	promises.push(supabaseClient.rpc("get_stats_total"))
-
-	promises = await Promise.all(promises)
+	const promises = await Promise.all([
+		query.returns<Stats[]>(),
+		supabaseClient.rpc("get_stats_total").returns<Stats[]>()
+	])
 
 	const { data, count, error } = promises[0]
 	const { data: tData, error: tError } = promises[1]
 
 	if (error) {
-		const response = {
-			total: total,
-			stats: [],
-			totalEntries: totalEntries,
-			range: range,
-			status: 500,
-			error: new Error(
-				`The server failed to fetch data from the database. This is not an issue on your side! Error message:\n\n${error.message}`
-			)
-		}
-		return response
+		console.error("stats SELECT failed: " + error.message)
+		throw redirect(303, "/")
 	}
 
 	if (tError) {
-		const response = {
-			total: total,
-			stats: [],
-			totalEntries: totalEntries,
-			range: range,
-			status: 500,
-			error: new Error(
-				`The server failed to fetch total data from the database. This is not an issue on your side! Error message:\n\n${tError.message}`
-			)
-		}
-		return response
+		console.error("stats SELECT failed: " + tError.message)
+		throw redirect(303, "/")
 	}
 
-	const totalData = tData[0] as Stat
+	total.experience = tData[0].experience || 0
+	total.gold = tData[0].gold || 0
+	total.levels = tData[0].levels || 0
+	total.runtime = tData[0].runtime || 0
 
-	total.experience += totalData.experience
-	total.gold += totalData.gold
-	total.levels += totalData.levels
-	total.runtime += totalData.runtime
-
-	return { total: total, stats: data, count: count || totalEntries, range: range }
+	return { total, stats: data, count: count || totalEntries, range: range }
 }

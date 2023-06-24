@@ -3,10 +3,15 @@
 	import { page } from "$app/stores"
 	import { onMount } from "svelte"
 	import { browser } from "$app/environment"
-	import PostCard from "./PostCard.svelte"
+	import TutorialCard from "./TutorialCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
 	import { ArrowDownAZ, ArrowUpZA } from "lucide-svelte"
 	export let data
+
+	const { range } = data
+
+	let { tutorials } = data
+	$: ({ tutorials } = data)
 
 	const pageStr = $page.url.searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
@@ -20,8 +25,6 @@
 		Number(levelStr) < -1 || Number(levelStr) > 2 || Number.isNaN(Number(levelStr))
 			? -1
 			: Number(levelStr)
-
-	const { range } = data
 
 	let count = 0
 	$: count = (data.count as number) || 0
@@ -37,7 +40,7 @@
 		if (loading) return
 
 		history.replaceState({}, "", $page.url)
-		invalidate("tutorials:posts")
+		invalidate("supabase:tutorials")
 	}
 
 	function sort() {
@@ -90,8 +93,8 @@
 
 <main>
 	<header class="text-center py-8">
-		<h3>Welcome to the DevBlog.</h3>
-		<p>Here you can find guides, tutorials and feature annoucements.</p>
+		<h3>Welcome to the Tutorials section.</h3>
+		<p>Here you can find guides and tutorials to learn how to bot!</p>
 	</header>
 
 	<div class="py-6">
@@ -149,11 +152,9 @@
 	</div>
 
 	<div class="mx-auto max-w-2xl flex-grow">
-		{#if data.posts}
-			{#each data.posts as post}
-				<PostCard bind:post />
-			{/each}
-		{/if}
+		{#each tutorials as tutorial}
+			<TutorialCard bind:tutorial />
+		{/each}
 	</div>
 
 	<Paginator srcData={"tutorials:posts"} bind:currentPage {range} bind:count />

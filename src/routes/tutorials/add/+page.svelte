@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import { postSchema } from "$lib/backend/types"
+	import { postSchema } from "$lib/backend/schemas.js"
 	import { focusTrap } from "@skeletonlabs/skeleton"
 	import { superForm } from "sveltekit-superforms/client"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
@@ -86,7 +86,12 @@
 				bind:error={$errors.description}
 			/>
 
-			<FormTextarea title="Content" bind:value={$form.content} bind:error={$errors.content} />
+			<FormTextarea
+				title="Content"
+				bind:value={$form.content}
+				bind:error={$errors.content}
+				h={"h-64"}
+			/>
 
 			<TutorialLevel bind:value={$form.level} bind:error={$errors.level} />
 
