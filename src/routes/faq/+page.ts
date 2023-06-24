@@ -1,4 +1,4 @@
-import type { ErrorEntry, FAQEntry } from "$lib/types/collection.js"
+import type { ErrorEntry, FAQEntry } from "$lib/types/collection"
 import { redirect } from "@sveltejs/kit"
 
 export const load = async ({ parent }) => {

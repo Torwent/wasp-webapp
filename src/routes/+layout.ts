@@ -28,9 +28,10 @@ export const load = async ({ fetch, data, depends }) => {
 			profiles_private (dismissed_warning)`
 			)
 			.eq("id", id)
+			.returns<Profile[]>()
 
-		if (error) return null
-		return data[0] as unknown as Profile
+		if (error || data.length === 0) return null
+		return data[0]
 	}
 
 	return { supabaseClient, session, profile: getProfile() }

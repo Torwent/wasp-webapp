@@ -1,13 +1,11 @@
 <script lang="ts">
 	import { browser } from "$app/environment"
 	import { goto } from "$app/navigation"
-	import Markdown from "$lib/Markdown.svelte"
 	import { canDownload, canEdit, updateWarning } from "$lib/backend/data"
 	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
 	import ZipDownload from "$lib/components/ZIPDownload.svelte"
 
 	import EditButton from "$lib/components/EditButton.svelte"
-	import { convertTime, formatRSNumber } from "$lib/utils"
 	import {
 		modalStore,
 		type ModalSettings,

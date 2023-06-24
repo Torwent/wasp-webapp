@@ -1,6 +1,6 @@
 import { redirect } from "@sveltejs/kit"
 import { encodeSEO } from "$lib/utils"
-import type { TutorialWithAuthor } from "$lib/types/collection.js"
+import type { TutorialWithAuthor } from "$lib/types/collection"
 
 export const load = async ({ params, parent }) => {
 	const parentPromise = parent()

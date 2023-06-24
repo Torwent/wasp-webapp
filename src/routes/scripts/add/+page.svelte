@@ -8,7 +8,6 @@
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
 	import MultiSelect from "$lib/components/forms/MultiSelect.svelte"
 	import { FileCode, ImagePlus } from "lucide-svelte"
-	import ScriptCardBase from "../ScriptCardBase.svelte"
 	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
 	import type { IScriptCard } from "$lib/types/collection"
@@ -18,6 +17,7 @@
 	import ScriptArticle from "../ScriptArticle.svelte"
 	import StatsHeader from "../StatsHeader.svelte"
 	import { addToolTips } from "$lib/backend/data"
+	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
 
 	export let data
 

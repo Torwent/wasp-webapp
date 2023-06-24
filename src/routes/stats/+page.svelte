@@ -192,5 +192,5 @@
 		</tbody>
 	</table>
 
-	<Paginator srcData={"tutorials:posts"} bind:currentPage {range} bind:count />
+	<Paginator srcData={"supabase:stats"} bind:currentPage {range} bind:count />
 </main>

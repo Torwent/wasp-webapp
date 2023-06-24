@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { fade, slide } from "svelte/transition"
-	import ScriptCard from "./ScriptCard.svelte"
 	import { AppShell } from "@skeletonlabs/skeleton"
 	import { ChevronRight } from "lucide-svelte"
 	import { page } from "$app/stores"
@@ -9,11 +8,12 @@
 	import Paginator from "$lib/components/Paginator.svelte"
 	import { onMount } from "svelte"
 	import type { CheckboxType, IScriptCard } from "$lib/types/collection"
+	import ScriptCard from "$lib/components/ScriptCard.svelte"
 
 	export let data
 	const { checkboxes, range } = data
-	let { profile } = data
-	$: ({ profile } = data)
+	let { profile, scripts } = data
+	$: ({ profile, scripts } = data)
 
 	let count = 0
 	$: count = (data.count as number) || 0
@@ -169,34 +169,11 @@
 			<div
 				class="grid gap-8 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 justify-center justify-items-center"
 			>
-				{#if data.scripts}
-					{#each data.scripts as script}
-						{#if canSeeScript(script)}
-							<ScriptCard {script} />
-						{/if}
-					{/each}
-				{:else}
-					{#each Array(10) as _i}
-						<div class="card w-[300px]">
-							<header class="group h-[200px] p-0">
-								<div class="placeholder h-full" />
-							</header>
-							<section class="p-4">
-								<header class="h-6"><div class="placeholder w-full h-full m-0" /></header>
-								<article class="h-20 mt-4">
-									<div class="placeholder w-full h-full m-0" />
-								</article>
-							</section>
-							<footer class="card-footer flex h-8 w-full justify-end">
-								{#each Array(10) as i}
-									<div class="placeholder-circle w-4 mx-1" />
-								{/each}
-							</footer>
-						</div>
-					{/each}
-				{/if}
+				{#each scripts as script}
+					<ScriptCard {script} />
+				{/each}
 			</div>
 		</div>
-		<Paginator srcData={"tutorials:posts"} bind:currentPage {range} bind:count />
+		<Paginator srcData={"supabase:scripts"} bind:currentPage {range} bind:count />
 	</main>
 </AppShell>

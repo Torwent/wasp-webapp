@@ -157,5 +157,5 @@
 		{/each}
 	</div>
 
-	<Paginator srcData={"tutorials:posts"} bind:currentPage {range} bind:count />
+	<Paginator srcData={"supabase:tutorials"} bind:currentPage {range} bind:count />
 </main>

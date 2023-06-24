@@ -22,6 +22,7 @@ async function getScripts(
 			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`,
 			{ count: "exact" }
 		)
+		.eq("published", true)
 		.contains("categories", categories)
 		.contains("subcategories", subcategories)
 
@@ -31,7 +32,7 @@ async function getScripts(
 		query = query.ilike("search_script", "%" + search + "%")
 	}
 
-	return await query.returns<Script>()
+	return await query.returns<Script[]>()
 }
 
 export const load = async ({ url, parent, depends }) => {
@@ -69,25 +70,23 @@ export const load = async ({ url, parent, depends }) => {
 		throw redirect(303, "/scripts")
 	}
 
-	const scripts = data as unknown as Script[]
-
 	await new Promise<void>((resolve) => {
-		scripts.forEach(async (script, index, array) => {
+		data.forEach(async (script, index, array) => {
 			await addToolTips(script, categories, subcategories)
 
 			if (index === array.length - 1) resolve()
 		})
 	})
 
-	if (!browser && scripts.length === 1)
+	if (!browser && data.length === 1)
 		throw redirect(
 			303,
 			"/scripts/" +
-				encodeSEO(scripts[0].title + " by " + scripts[0].scripts_protected.profiles_public.username)
+				encodeSEO(data[0].title + " by " + data[0].scripts_protected.profiles_public.username)
 		)
 
 	return {
-		scripts,
+		scripts: data,
 		checkboxes: getCheckBoxes(categories, subcategories),
 		count,
 		range

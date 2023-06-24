@@ -60,7 +60,7 @@
 				>
 					{script.scripts_protected.profiles_public.username}
 				</a>
-				{#if !script.published}<small class="text-secondary-500">Hidden</small>{/if}
+				{#if !script.published}<small class="text-error-500">Unpublished</small>{/if}
 			</span>
 		</header>
 		<article class="h-20 mt-4 dark:text-surface-300 text-surface-600 text-sm break-words">

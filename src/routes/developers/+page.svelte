@@ -99,5 +99,5 @@
 		{/each}
 	</div>
 
-	<Paginator srcData={"developers:devs"} bind:currentPage {range} bind:count />
+	<Paginator srcData={"supabase:developers"} bind:currentPage {range} bind:count />
 </main>

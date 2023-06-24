@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import { postSchema } from "$lib/backend/schemas.js"
+	import { postSchema } from "$lib/backend/schemas"
 	import { focusTrap } from "@skeletonlabs/skeleton"
 	import { superForm } from "sveltekit-superforms/client"
 	import FormInput from "$lib/components/forms/FormInput.svelte"

@@ -2,7 +2,7 @@
 	import { fade } from "svelte/transition"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
 	import { redirect } from "@sveltejs/kit"
-	import { profileSchema } from "$lib/backend/schemas.js"
+	import { profileSchema } from "$lib/backend/schemas"
 	import { superForm } from "sveltekit-superforms/client"
 	import { focusTrap } from "@skeletonlabs/skeleton"
 	import FormInput from "$lib/components/forms/FormInput.svelte"

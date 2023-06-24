@@ -1,4 +1,4 @@
-import type { Stats } from "$lib/types/collection.js"
+import type { Stats } from "$lib/types/collection"
 import { UUID_V4_REGEX } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
 

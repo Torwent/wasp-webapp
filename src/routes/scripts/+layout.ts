@@ -1,4 +1,4 @@
-import type { Category, SubCategory } from "$lib/types/collection.js"
+import type { Category, SubCategory } from "$lib/types/collection"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { redirect } from "@sveltejs/kit"
 
