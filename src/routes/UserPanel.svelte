@@ -38,6 +38,7 @@
 			cursor="cursor-pointer"
 			class={large ? "hidden md:block" : ""}
 			initials="WS"
+			loading="lazy"
 		/>
 	{:else}
 		<div class="placeholder-circle w-12 animate-pulse" />

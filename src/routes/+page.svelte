@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Discord from "$lib/components/Discord.svelte"
 	import CanvasAnimation from "./CanvasAnimation.svelte"
-	import { fade } from "svelte/transition"
 	import { convertTime, formatRSNumber } from "$lib/utils"
 	import { invalidate } from "$app/navigation"
 	import { browser } from "$app/environment"
@@ -47,11 +46,7 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main
-	class="container my-6 mx-auto flex-grow max-w-2xl"
-	in:fade={{ duration: 300, delay: 300 }}
-	out:fade={{ duration: 300 }}
->
+<main class="container my-6 mx-auto flex-grow max-w-2xl">
 	<header>
 		<h1 class="text-2xl font-bold text-center md:text-3xl py-12">
 			<div class="py-4">WaspScripts</div>
@@ -66,19 +61,11 @@
 	<header>
 		<h2 class="pt-6 px-6 font-bold whitespace-nowrap text-center">
 			Total Experience Earned:
-			{#await formatRSNumber(data.total.experience)}
-				<span class="py-4 pr-6">...</span>
-			{:then value}
-				<span class="py-4 pr-6">{value}</span>
-			{/await}
+			{formatRSNumber(data.total.experience || 0)}
 		</h2>
 		<h2 class="px-6 font-bold whitespace-nowrap text-center">
 			Total Gold Earned:
-			{#await formatRSNumber(data.total.gold)}
-				<span class="py-4 pr-6">...</span>
-			{:then value}
-				<span class="py-4 pr-6">{value}</span>
-			{/await}
+			{formatRSNumber(data.total.gold || 0)}
 		</h2>
 		<h2 class="px-6 font-bold whitespace-nowrap text-center">
 			Total Levels Earned:
@@ -86,11 +73,7 @@
 		</h2>
 		<h2 class="pb-4 px-6 font-bold whitespace-nowrap text-center">
 			Total Runtime:
-			{#await convertTime(data.total.runtime)}
-				<span class="py-4 pr-6">...</span>
-			{:then value}
-				<span class="py-4 pr-6">{value}</span>
-			{/await}
+			{convertTime(data.total.runtime || 0)}
 		</h2>
 	</header>
 

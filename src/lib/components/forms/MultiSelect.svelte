@@ -3,7 +3,6 @@
 	import { page } from "$app/stores"
 	import type { Category, SubCategory } from "$lib/types/collection"
 	import { ChevronDown, X } from "lucide-svelte"
-	import { fly } from "svelte/transition"
 	export let title: string
 	export let value: string[]
 	export let error: Record<number, string[]> | undefined
@@ -126,10 +125,7 @@
 		{/if}
 
 		{#if showOptions}
-			<ul
-				transition:fly={{ duration: 200, y: 5 }}
-				on:mousedown|preventDefault={handleOptionMousedown}
-			>
+			<ul on:mousedown|preventDefault={handleOptionMousedown}>
 				{#each entries as entry}
 					<li
 						class="p-2 cursor-pointer {value.includes(entry.name)

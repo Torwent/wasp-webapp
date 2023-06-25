@@ -1,15 +1,12 @@
 <script lang="ts">
 	import type { TutorialWithAuthor } from "$lib/types/collection"
 	import { encodeSEO } from "$lib/utils"
-	import { fly } from "svelte/transition"
 	export let tutorial: TutorialWithAuthor
 
 	$: link = "/tutorials/" + encodeSEO(tutorial.title + " by " + tutorial.profiles_public.username)
 </script>
 
 <div
-	in:fly={{ duration: 600, delay: 900, x: 500 }}
-	out:fly={{ duration: 600, x: -500 }}
 	class="rounded-md variant-ghost-surface m-4 shadow-none hover:shadow-sm {tutorial.level === 0
 		? 'ring-sky-400 dark:ring-sky-500 shadow-sky-500'
 		: tutorial.level === 1

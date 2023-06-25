@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
 	import { Github } from "lucide-svelte"
-	import { fade } from "svelte/transition"
 	import PayPal from "./PayPal.svelte"
 	import EditButton from "$lib/components/EditButton.svelte"
 	import { page } from "$app/stores"
@@ -85,11 +84,7 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<div
-	class="container mx-auto my-6 max-w-2xl flex-grow"
-	in:fade={{ duration: 300, delay: 300 }}
-	out:fade={{ duration: 300 }}
->
+<div class="container mx-auto my-6 max-w-2xl flex-grow">
 	<div class="flex justify-between">
 		<div class="flex my-auto">
 			<header>
@@ -130,11 +125,7 @@
 	</div>
 </div>
 
-<main
-	class="my-8 container mt-8 mx-auto flex-grow w-[95%] max-h-full"
-	in:fade={{ duration: 300, delay: 300 }}
-	out:fade={{ duration: 300 }}
->
+<main class="my-8 container mt-8 mx-auto flex-grow w-[95%] max-h-full">
 	<div>
 		<div class="py-6 flex flex-col text-sm mb-2 max-w-2xl m-auto">
 			<input

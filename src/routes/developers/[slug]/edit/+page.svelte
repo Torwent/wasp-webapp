@@ -5,7 +5,6 @@
 	import { superForm } from "sveltekit-superforms/client"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
-	import { slide } from "svelte/transition"
 	import PayPal from "../PayPal.svelte"
 	import { Github } from "lucide-svelte"
 	import { canEdit } from "$lib/backend/data"
@@ -68,11 +67,7 @@
 
 <div class="container mx-auto my-6 max-w-2xl flex-grow">
 	{#if show}
-		<div
-			class="container mx-auto my-6 max-w-2xl flex-grow"
-			in:slide={{ duration: 300, delay: 300 }}
-			out:slide={{ duration: 300 }}
-		>
+		<div class="container mx-auto my-6 max-w-2xl flex-grow">
 			<div class="flex justify-between">
 				<div class="flex my-auto">
 					<header>

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fade } from "svelte/transition"
 	import { modalStore, type ModalSettings } from "@skeletonlabs/skeleton"
 	import { canDownload } from "$lib/backend/data"
 	import { page } from "$app/stores"
@@ -83,11 +82,7 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main
-	class="container mx-auto my-6 max-w-5xl flex-grow text-center"
-	in:fade={{ duration: 300, delay: 300 }}
-	out:fade={{ duration: 300 }}
->
+<main class="container mx-auto my-6 max-w-5xl flex-grow text-center">
 	{#if profile && canDownload(profile)}
 		<header class="py-8">
 			<h2 class="my-4">Thank you for having joined WaspScripts!</h2>

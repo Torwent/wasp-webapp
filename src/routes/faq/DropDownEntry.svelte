@@ -27,8 +27,8 @@
 </button>
 {#if show}
 	<article
-		in:slide={{ duration: 300 }}
-		out:slide={{ duration: 300 }}
+		in:slide={{ duration: 200 }}
+		out:slide={{ duration: 150 }}
 		class="prose dark:prose-invert p-6 bg-stone-300 dark:bg-surface-800 max-w-full"
 	>
 		<Markdown src={entry.content} />

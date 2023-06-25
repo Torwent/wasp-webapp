@@ -9,7 +9,7 @@ async function getDevelopers(
 ) {
 	let query = supabase.from("developers").select(
 		`id, realname, description, github, paypal_id,
-				content, profiles_public (username)`,
+				content, profiles_public (username, avatar_url)`,
 		{ count: "exact" }
 	)
 

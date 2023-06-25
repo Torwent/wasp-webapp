@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fade } from "svelte/transition"
 	import DropDown from "./DropDown.svelte"
 	import Discord from "$lib/components/Discord.svelte"
 
@@ -41,11 +40,7 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main
-	class="pb-16 container mx-auto my-6 max-w-2xl flex-grow"
-	in:fade={{ duration: 300, delay: 300 }}
-	out:fade={{ duration: 300 }}
->
+<main class="pb-16 container mx-auto my-6 max-w-2xl flex-grow">
 	<header class="py-12 text-center">
 		<h2>Welcome to the Frequently Asked Questions and Common Errors section.</h2>
 	</header>

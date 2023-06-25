@@ -39,7 +39,7 @@ async function getScripts(
 		.from("scripts_public")
 		.select(
 			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-			scripts_protected!inner (assets_path, author_id, assets_alt, revision, profiles_public (username)),
+			scripts_protected!inner (assets_path, author_id, assets_alt, revision, profiles_public (username, avatar_url)),
 			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`,
 			{ count: "exact" }
 		)
@@ -74,19 +74,12 @@ export const load = async ({ url, params, parent, depends }) => {
 	const start = (page - 1) * range
 	const finish = start + range
 
-	const { supabaseClient, developersData } = await parentPromise
-
 	const { slug } = params
-
-	const { data, error } = developersData
-	if (error) {
-		console.error(error)
-		throw redirect(303, "./" + slug)
-	}
+	const { supabaseClient } = await parentPromise
 
 	const developer = UUID_V4_REGEX.test(slug)
-		? await getDeveloperUUID(slug, data)
-		: await getDeveloper(slug, data)
+		? await getDeveloperUUID(supabaseClient, slug)
+		: await getDeveloper(supabaseClient, slug)
 
 	if (!developer) throw redirect(300, "./")
 

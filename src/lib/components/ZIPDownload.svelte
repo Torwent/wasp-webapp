@@ -156,7 +156,7 @@
 <div
 	class="z-10 bg-surface-800"
 	data-popup="zipDropDown"
-	in:slide={{ duration: 700 }}
+	in:slide={{ duration: 300 }}
 	out:slide={{ duration: 300 }}
 >
 	<div class="arrow bg-surface-800" />

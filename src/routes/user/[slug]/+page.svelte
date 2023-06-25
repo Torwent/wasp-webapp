@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fade } from "svelte/transition"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
 	import { redirect } from "@sveltejs/kit"
 	import { profileSchema } from "$lib/backend/schemas"
@@ -59,11 +58,7 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<div
-	class="container mx-auto my-6 max-w-2xl flex-grow"
-	in:fade={{ duration: 300, delay: 300 }}
-	out:fade={{ duration: 300 }}
->
+<div class="container mx-auto my-6 max-w-2xl flex-grow">
 	<h3 class="mb-4 font-bold text-3xl">Username: {profile.username}</h3>
 	<h4 class="font-semibold leading-normal mb-4">ID: {profile.id}</h4>
 

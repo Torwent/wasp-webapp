@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from "svelte"
-	import { fade } from "svelte/transition"
 	import { page } from "$app/stores"
 
 	let checkedOS: boolean = false
@@ -89,13 +88,9 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<div
-	class="container mx-auto my-6 max-w-2xl flex-grow"
-	in:fade={{ duration: 300, delay: 300 }}
-	out:fade={{ duration: 300 }}
->
+<div class="container mx-auto my-6 max-w-2xl flex-grow">
 	{#if checkedOS}
-		<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+		<div>
 			<header>
 				<h1 class="text-xl py-16 text-center text-primary-500 dark:text-primary-100 md:text-3xl">
 					{currentOS.OS} OS detected!
@@ -122,6 +117,7 @@
 						frameborder="0"
 						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
 						allowfullscreen
+						loading="lazy"
 					/>
 
 					<p class="text-center pb-24">
@@ -185,7 +181,7 @@
 			</p>
 		</div>
 	{:else}
-		<header in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+		<header>
 			<h1 class="text-xl py-16 text-center text-primary-500 dark:text-primary-100 md:text-3xl">
 				Checking your operating system...
 			</h1>

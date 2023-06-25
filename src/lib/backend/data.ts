@@ -103,7 +103,7 @@ export async function getScripts(supabase: SupabaseClient) {
 		.from("scripts_public")
 		.select(
 			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username)),
+			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
 			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
 		)
 		.order("title", { ascending: true })
@@ -127,22 +127,58 @@ export async function getScript(supabase: SupabaseClient, path: string) {
 }
 
 export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {
-	const scripts = await getScripts(supabase)
-	if (!scripts) return null
-	for (let i = 0; i < scripts.length; i++) if (uuid === scripts[i].id) return scripts[i]
-	return null
+	const { data, error } = await supabase
+		.from("scripts_public")
+		.select(
+			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
+			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
+			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
+		)
+		.eq("id", uuid)
+		.returns<Script[]>()
+	if (error) {
+		console.error("scripts_public SELECT failed: " + error.message)
+		return null
+	}
+	return data[0]
 }
 
-export async function getDeveloper(path: string, developers: DeveloperWithUsername[]) {
+async function getDevelopers(supabase: SupabaseClient) {
+	const { data, error } = await supabase
+		.from("developers")
+		.select(
+			`id, realname, description, github, paypal_id, content, profiles_public (username, avatar_url)`
+		)
+		.order("username", { foreignTable: "profiles_public", ascending: true })
+		.returns<DeveloperWithUsername[]>()
+
+	if (error) console.error("scripts_public SELECT failed: " + error.message)
+	return data
+}
+
+export async function getDeveloper(supabase: SupabaseClient, path: string) {
+	const developers = await getDevelopers(supabase)
+	if (!developers) return null
 	for (let i = 0; i < developers.length; i++)
 		if (path.toLowerCase() === encodeSEO(developers[i].profiles_public.username))
 			return developers[i]
 	return null
 }
 
-export async function getDeveloperUUID(uuid: string, developers: DeveloperWithUsername[]) {
-	for (let i = 0; i < developers.length; i++) if (uuid === developers[i].id) return developers[i]
-	return null
+export async function getDeveloperUUID(supabase: SupabaseClient, uuid: string) {
+	const { data, error } = await supabase
+		.from("developers")
+		.select(
+			`id, realname, description, github, paypal_id, content, profiles_public (username, avatar_url)`
+		)
+		.eq("id", uuid)
+		.returns<DeveloperWithUsername[]>()
+
+	if (error) {
+		console.error("scripts_public SELECT failed: " + error.message)
+		return null
+	}
+	return data[0]
 }
 
 export async function getSignedURL(

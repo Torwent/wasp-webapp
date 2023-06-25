@@ -7,7 +7,7 @@ const website = "https://waspscripts.com"
 const loadScripts = async (supabase: SupabaseClient) => {
 	const { data, error } = await supabase
 		.from("scripts_public")
-		.select(`title,	scripts_protected ( profiles_public (username) )`)
+		.select(`title,	scripts_protected ( profiles_public (username, avatar_url) )`)
 		.order("title", { ascending: true })
 		.returns<IScriptCard[]>()
 
@@ -28,7 +28,7 @@ const loadScripts = async (supabase: SupabaseClient) => {
 const loadTutorials = async (supabase: SupabaseClient) => {
 	const { data, error } = await supabase
 		.from("tutorials")
-		.select("title, profiles_public (username)")
+		.select("title, profiles_public (username, avatar_url)")
 		.returns<TutorialWithAuthor[]>()
 
 	if (error) return console.error("tutorials SELECT failed: " + error.message)
@@ -44,7 +44,7 @@ const loadTutorials = async (supabase: SupabaseClient) => {
 const loadDevelopers = async (supabase: SupabaseClient) => {
 	const { data, error } = await supabase
 		.from("developers")
-		.select("profiles_public (username)")
+		.select("profiles_public (username, avatar_url)")
 		.returns<DeveloperWithUsername[]>()
 
 	if (error) return console.error("developers SELECT failed: " + error.message)

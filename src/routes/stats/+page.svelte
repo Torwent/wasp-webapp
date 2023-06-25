@@ -3,8 +3,6 @@
 	import { page } from "$app/stores"
 	import { browser } from "$app/environment"
 	import { onMount } from "svelte"
-
-	import { fade } from "svelte/transition"
 	import type { Stats } from "$lib/types/collection"
 	import { convertTime, formatRSNumber } from "$lib/utils"
 	import Paginator from "$lib/components/Paginator.svelte"
@@ -97,11 +95,7 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main
-	class="overflow-x-auto relative shadow-md sm:rounded-lg my-4 mx-12 md:mx-16 lg:mx-24"
-	in:fade={{ duration: 300, delay: 300 }}
-	out:fade={{ duration: 300 }}
->
+<main class="overflow-x-auto relative shadow-md sm:rounded-lg my-4 mx-12 md:mx-16 lg:mx-24">
 	<header class="">
 		<h5 class="py-4 px-6 font-bold text-center whitespace-nowrap">
 			Total experience:

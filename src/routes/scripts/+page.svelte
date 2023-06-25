@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { fade, slide } from "svelte/transition"
 	import { AppShell } from "@skeletonlabs/skeleton"
 	import { ChevronRight } from "lucide-svelte"
 	import { page } from "$app/stores"
@@ -103,8 +102,6 @@
 		<div
 			class="flex h-screen border-r dark:border-stone-800 sticky bottom-0 min-h-full overflow-y-scroll
 				   no-scrollbar font-semibold text-sm"
-			in:slide={{ duration: 600, delay: 600, axis: "x" }}
-			out:slide={{ duration: 300, axis: "x" }}
 		>
 			<div class="sm:grid w-60 justify-center my-4" class:hidden={!show}>
 				{#each checkboxes as checkbox}
@@ -146,11 +143,7 @@
 		</div>
 	</svelte:fragment>
 
-	<main
-		class="container mt-8 mx-auto flex-grow w-[95%] max-h-screen overflow-y-visible"
-		in:fade={{ duration: 300, delay: 300 }}
-		out:fade={{ duration: 300 }}
-	>
+	<main class="container mt-8 mx-auto flex-grow w-[95%] max-h-screen overflow-y-visible">
 		<div>
 			{#if profile && profile.profiles_protected.developer}
 				<a href="/scripts/add" class="block mx-auto w-fit">

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import { fade } from "svelte/transition"
 	import EditButton from "$lib/components/EditButton.svelte"
 	import { page } from "$app/stores"
 	export let data
@@ -40,11 +39,7 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main
-	class="container mx-auto my-6 max-w-4xl flex-grow"
-	in:fade={{ duration: 300, delay: 300 }}
-	out:fade={{ duration: 300 }}
->
+<main class="container mx-auto my-6 max-w-4xl flex-grow">
 	<EditButton author_id={tutorial.user_id} />
 	<h2 class="text-center mb-4 font-bold text-3xl">{tutorial.title}</h2>
 	<h3 class="text-center font-semibold leading-normal mb-4">{tutorial.description}</h3>

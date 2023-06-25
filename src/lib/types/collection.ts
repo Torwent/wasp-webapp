@@ -5,7 +5,10 @@ export type ProfileProtected = Database["public"]["Tables"]["profiles_protected"
 export type ProfilePrivate = Database["public"]["Tables"]["profiles_private"]["Row"]
 
 type ProfilePublicUsername = {
-	profiles_public: { username: Database["public"]["Tables"]["profiles_public"]["Row"]["username"] }
+	profiles_public: {
+		username: Database["public"]["Tables"]["profiles_public"]["Row"]["username"]
+		avatar_url: Database["public"]["Tables"]["profiles_public"]["Row"]["avatar_url"]
+	}
 }
 
 export interface Profile extends ProfilePublic {

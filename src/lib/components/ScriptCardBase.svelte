@@ -36,28 +36,24 @@
 	})
 </script>
 
-<div
-	class="card w-[300px] shadow-sm hover:shadow-md hover:shadow-black/20 hover:-translate-y-2 duration-300"
->
+<div class="card w-[300px] shadow-sm card-hover">
 	<header class="group h-[200px] p-0">
 		<img
 			bind:this={imgElement}
 			src={imgLink}
 			alt={script.scripts_protected.assets_alt}
 			class="rounded-t"
+			loading="lazy"
 		/>
 	</header>
 	<section class="p-4">
 		<header class="h-12">
-			<h5 class="font-semibold text-primary-700 dark:text-primary-500 whitespace-nowrap">
+			<h5 class="font-semibold text-primary-600 dark:text-primary-500 whitespace-nowrap">
 				{script.title}
 			</h5>
-			<span class="dark:text-surface-200 text-xs whitespace-nowrap text-secondary-500">
+			<span class="text-xs whitespace-nowrap text-primary-600 dark:text-secondary-500 drop-shadow">
 				by
-				<a
-					href="/developers/{script.scripts_protected.profiles_public.username}"
-					class="permalink text-secondary-500 decoration-secondary-500"
-				>
+				<a href="/developers/{script.scripts_protected.profiles_public.username}" class="permalink">
 					{script.scripts_protected.profiles_public.username}
 				</a>
 				{#if !script.published}<small class="text-error-500">Unpublished</small>{/if}

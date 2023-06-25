@@ -31,9 +31,12 @@ export const load = async ({ url, depends, parent }) => {
 	const { supabaseClient } = await parentPromise
 	let query = supabaseClient
 		.from("tutorials")
-		.select("id, user_id, title, description, content, level, profiles_public(username)", {
-			count: "exact"
-		})
+		.select(
+			"id, user_id, title, description, content, level, profiles_public(username, avatar_url)",
+			{
+				count: "exact"
+			}
+		)
 
 	if (level > -1) {
 		query = query.eq("level", level).range(start, finish)

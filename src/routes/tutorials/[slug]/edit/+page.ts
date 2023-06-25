@@ -12,7 +12,7 @@ export const load = async ({ params, data, parent }) => {
 	const { data: tutorials, error } = await supabaseClient
 		.from("tutorials")
 		.select(
-			"id, created_at, user_id, title, description, content, level, profiles_public (username)"
+			"id, created_at, user_id, title, description, content, level, profiles_public (username, avatar_url)"
 		)
 		.order("title", { ascending: true })
 		.returns<TutorialWithAuthor[]>()

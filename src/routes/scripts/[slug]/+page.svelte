@@ -12,7 +12,6 @@
 		type ToastSettings,
 		toastStore
 	} from "@skeletonlabs/skeleton"
-	import { fade } from "svelte/transition"
 	import { page } from "$app/stores"
 	import ScriptHeader from "../ScriptHeader.svelte"
 	import ScriptArticle from "../ScriptArticle.svelte"
@@ -104,12 +103,13 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+<div>
 	<ScriptHeader title={script.title} username={script.scripts_protected.profiles_public.username}>
 		<img
 			class="z-0 absolute object-cover h-full w-full"
 			src={script?.scripts_protected.assets_path + "banner.jpg"}
 			alt={script?.scripts_protected.assets_alt}
+			loading="lazy"
 		/>
 	</ScriptHeader>
 

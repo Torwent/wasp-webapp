@@ -2,7 +2,6 @@
 	import { superForm } from "sveltekit-superforms/client"
 	import { FileDropzone, focusTrap } from "@skeletonlabs/skeleton"
 	import { cropString } from "$lib/utils"
-	import { fade, slide } from "svelte/transition"
 	import { scriptSchema } from "$lib/backend/schemas"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
@@ -166,9 +165,9 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<div in:fade={{ duration: 300, delay: 300 }} out:fade={{ duration: 300 }}>
+<div>
 	{#if showScriptPage}
-		<div in:slide={{ duration: 300, delay: 300 }} out:slide={{ duration: 300 }}>
+		<div>
 			<ScriptHeader
 				title={$form.title}
 				username={script.scripts_protected.profiles_public.username}
@@ -178,7 +177,8 @@
 					bind:this={bannerElement}
 					class="z-0 absolute object-cover h-full w-full"
 					src={defaultBanner}
-					alt="Asset is missing!"
+					alt="{script.title} header image"
+					loading="lazy"
 				/>
 			</ScriptHeader>
 
@@ -216,11 +216,7 @@
 	{/if}
 
 	{#if showScriptCard}
-		<div
-			in:slide={{ duration: 300, delay: 300 }}
-			out:slide={{ duration: 300 }}
-			class="max-w-2x m-8"
-		>
+		<div class="max-w-2x m-8">
 			<div class="grid grid-cols-1 justify-items-center">
 				<ScriptCardBase bind:script bind:imgElement={coverElement} />
 			</div>
@@ -228,17 +224,18 @@
 	{/if}
 
 	{#if showSearchResult}
-		<div
-			in:slide={{ duration: 300, delay: 300 }}
-			out:slide={{ duration: 300 }}
-			class="max-w-2x m-8"
-		>
+		<div class="max-w-2x m-8">
 			<div class="text-left w-[36rem] bg-zinc-200 dark:bg-zinc-900 rounded-md mx-auto p-8">
 				<div class="flex">
 					<div
 						class="h-8 w-8 my-auto mr-3 rounded-full bg-white overflow-clip grid justify-center content-center"
 					>
-						<img src="/favicon.png" alt="WS" class="h-5 align-middle" />
+						<img
+							src="/favicon.png"
+							alt="WaspScripts Logo"
+							class="h-5 align-middle"
+							loading="lazy"
+						/>
 					</div>
 					<div class="block">
 						<span class="block">WaspScripts</span>

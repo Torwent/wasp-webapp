@@ -44,7 +44,7 @@
 		{/if}
 	</button>
 	{#if show}
-		<div in:slide={{ duration: 700 }} out:slide={{ duration: 300 }}>
+		<div in:slide={{ duration: 200 }} out:slide={{ duration: 150 }}>
 			<div>
 				<form class="form" on:submit|preventDefault={handleSearch}>
 					<div class="flex flex-col text-sm">
