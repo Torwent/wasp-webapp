@@ -83,7 +83,7 @@
 			<div class="max-w-2xl mx-auto justify-center md:flex md:space-x-5 mb-2">
 				<div class="w-full flex flex-col text-sm mb-2">
 					<input
-						type="search"
+						type="text"
 						placeholder="Search username, name, info, ..."
 						class="input"
 						bind:value={search}

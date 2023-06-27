@@ -129,7 +129,7 @@
 	<div>
 		<div class="py-6 flex flex-col text-sm mb-2 max-w-2xl m-auto">
 			<input
-				type="search"
+				type="text"
 				placeholder="Search script id, name, categories, author,..."
 				class="input"
 				bind:value={search}

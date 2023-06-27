@@ -48,43 +48,43 @@
 
 <main class="container my-6 mx-auto flex-grow max-w-2xl">
 	<header>
-		<h1 class="text-2xl font-bold text-center md:text-3xl py-12">
+		<h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-center py-12">
 			<div class="py-4">WaspScripts</div>
 			<div>
 				100%
 				<span class="bg-clip-text animate-character text-transparent inline-block">color</span>
-				, 100% open source.
+				100% open source.
 			</div>
 		</h1>
 	</header>
 
-	<header>
-		<h2 class="pt-6 px-6 font-bold whitespace-nowrap text-center">
+	<header class="text-lg sm:text-xl md:text-2xl">
+		<h2 class="mt-6 mx-6 font-bold whitespace-nowrap text-center">
 			Total Experience Earned:
 			{formatRSNumber(data.total.experience || 0)}
 		</h2>
-		<h2 class="px-6 font-bold whitespace-nowrap text-center">
+		<h2 class="mx-6 font-bold whitespace-nowrap text-center">
 			Total Gold Earned:
 			{formatRSNumber(data.total.gold || 0)}
 		</h2>
-		<h2 class="px-6 font-bold whitespace-nowrap text-center">
+		<h2 class="mx-6 font-bold whitespace-nowrap text-center">
 			Total Levels Earned:
 			<span class="py-4 pr-6">{data.total.levels}</span>
 		</h2>
-		<h2 class="pb-4 px-6 font-bold whitespace-nowrap text-center">
+		<h2 class="mb-4 mx-6 font-bold whitespace-nowrap text-center">
 			Total Runtime:
 			{convertTime(data.total.runtime || 0)}
 		</h2>
 	</header>
 
-	<p class="py-12 text-center">
+	<p class="my-12 text-center">
 		WaspScripts is a collection of open source color scripts written for Simba on top of SRL and
 		WaspLib.
 		<br />
 		If you are new to Simba and don't know what it is, Simba is just the oldest color botting program
 		still around, it's ancestor, SCAR dates back to RuneScape Classic.
 	</p>
-	<p class="text-center py-6">
+	<p class="text-center my-6">
 		For more information, help and/or questions look through the
 		<a href="/faq" class="decoration-transparent" aria-label="Open frequently asked questions page">
 			FAQ
@@ -94,7 +94,7 @@
 
 	<Discord />
 
-	<div class="py-6">
+	<div class="my-6">
 		<header>
 			<h2 class="text-2xl font-bold text-center md:text-3xl py-16">
 				<span>Advanced mouse movements and click patterns</span>

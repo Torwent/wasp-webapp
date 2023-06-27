@@ -118,19 +118,12 @@
 		</h5>
 	</header>
 
-	<div class="flex flex-col text-sm mb-2">
-		<input
-			type="search"
-			placeholder="Search UUID or username..."
-			class="appearance-none shadow-sm border border-gray-200 p-2 focus:outline-none focus:border-gray-500 rounded-lg text-black"
-			bind:value={search}
-		/>
+	<div class="mx-auto lg:w-[80%] flex flex-col mb-2">
+		<input type="text" placeholder="Search UUID or username..." class="input" bind:value={search} />
 	</div>
 
 	<table class="w-full text-sm text-left text-stone-500 dark:text-stone-400">
-		<thead
-			class="text-xs text-stone-700 uppercase bg-stone-50 dark:bg-stone-700 dark:text-stone-400"
-		>
+		<thead class="text-xs text-secondary-500 uppercase bg-stone-50 dark:bg-stone-700">
 			<tr>
 				{#each headers as header}
 					<th scope="col" class="py-3 px-6" on:click={() => sortBy(header)}>
