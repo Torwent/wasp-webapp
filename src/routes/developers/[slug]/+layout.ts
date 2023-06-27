@@ -2,7 +2,7 @@ import { addToolTips, getDeveloper, getDeveloperUUID } from "$lib/backend/data"
 import type { Category, Script, SubCategory } from "$lib/types/collection"
 import { UUID_V4_REGEX } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
-import { redirect } from "@sveltejs/kit"
+import { error, redirect } from "@sveltejs/kit"
 
 async function getCategories(supabase: SupabaseClient) {
 	const { data, error } = await supabase
@@ -61,27 +61,26 @@ async function getScripts(
 	return { data, count: count ? count : 0 }
 }
 
-export const load = async ({ url, params, parent, depends }) => {
+export const load = async ({ url: { searchParams }, params: { slug }, parent, depends }) => {
 	const parentPromise = parent()
 	depends("supabase:developer")
 
-	const pageStr = url.searchParams.get("page") || "-1"
+	const pageStr = searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
-	const search = decodeURIComponent(url.searchParams.get("search") || "").trim()
+	const search = decodeURIComponent(searchParams.get("search") || "").trim()
 
 	const range = 5
 	const start = (page - 1) * range
 	const finish = start + range
 
-	const { slug } = params
 	const { supabaseClient } = await parentPromise
 
 	const developer = UUID_V4_REGEX.test(slug)
 		? await getDeveloperUUID(supabaseClient, slug)
 		: await getDeveloper(supabaseClient, slug)
 
-	if (!developer) throw redirect(300, "./")
+	if (!developer) throw error(404, "Developer not found!")
 
 	const promises = await Promise.all([
 		getScripts(supabaseClient, developer.id, search, start, finish),

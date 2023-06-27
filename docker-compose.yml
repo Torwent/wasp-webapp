@@ -2,15 +2,12 @@ version: "3.9"
 
 services:
   webapp:
-    container_name: "webapp-dev"
+    container_name: "webapp"
     build:
       context: .
       args:
         PUBLIC_SUPABASE_URL: $PUBLIC_SUPABASE_URL
         PUBLIC_SUPABASE_ANON_KEY: $PUBLIC_SUPABASE_ANON_KEY
-        PUBLIC_SUPER_USER_ID: $PUBLIC_SUPER_USER_ID
-        ADMIN_USER: $ADMIN_USER
-        ADMIN_PASS: $ADMIN_PASS
     restart: unless-stopped
     networks:
       - hive

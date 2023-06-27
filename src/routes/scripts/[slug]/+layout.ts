@@ -1,14 +1,25 @@
 import { getScript, getScriptUUID } from "$lib/backend/data"
 import { UUID_V4_REGEX } from "$lib/utils"
-import { redirect } from "@sveltejs/kit"
+import { error, redirect } from "@sveltejs/kit"
 
 export const load = async ({ params, parent }) => {
 	const { supabaseClient, categories, subcategories } = await parent()
-	const { slug } = params
+	let { slug } = params
 
-	const script = UUID_V4_REGEX.test(slug)
+	const isUUID = UUID_V4_REGEX.test(slug)
+	const isSEOFormated = slug.includes("-by-")
+
+	if (!isUUID && !isSEOFormated) {
+		slug = slug.split("&").pop() || ""
+		const isOldFormat = UUID_V4_REGEX.test(slug)
+
+		if (!isOldFormat) throw error(404, "Script not found!")
+		throw redirect(301, "/scripts/" + slug)
+	}
+
+	const script = isUUID
 		? await getScriptUUID(supabaseClient, slug)
 		: await getScript(supabaseClient, slug)
-	if (!script) throw redirect(300, "/scripts")
+	if (!script) throw error(404, "Script not found!")
 	return { script, categories, subcategories }
 }

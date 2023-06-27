@@ -1,14 +1,20 @@
-import { redirect } from "@sveltejs/kit"
+import { error } from "@sveltejs/kit"
 import { encodeSEO } from "$lib/utils"
 import type { TutorialWithAuthor } from "$lib/types/collection"
 
 export const load = async ({ params, parent }) => {
 	const parentPromise = parent()
-	let { slug } = params
-	if (slug == null) throw redirect(300, "./")
+	const { slug } = params
+
+	const isSEOFormated = slug.includes("-by-")
+	if (!isSEOFormated) {
+		if (slug.includes("%20"))
+			throw error(410, { message: "This page was probably renamed! Search it in the tutorials." })
+		throw error(404, { message: "Tutorial not found!" })
+	}
 
 	const { supabaseClient } = await parentPromise
-	const { data, error } = await supabaseClient
+	const { data, error: err } = await supabaseClient
 		.from("tutorials")
 		.select(
 			"id, created_at, user_id, title, description, content, level, profiles_public (username, avatar_url)"
@@ -16,14 +22,20 @@ export const load = async ({ params, parent }) => {
 		.order("title", { ascending: true })
 		.returns<TutorialWithAuthor[]>()
 
-	if (error) {
-		console.error("tutorials SELECT failed: " + error.message)
-		throw redirect(300, "./")
-	}
+	if (err)
+		throw error(
+			500,
+			`Server error - tutorials SELECT failed!
+		Error code: ${err.code}
+		Error hint: ${err.hint}
+		Error details: ${err.details}
+		Error hint: ${err.message}
+		`
+		)
 
 	for (let i = 0; i < data.length; i++) {
 		if (slug === encodeSEO(data[i].title + " by " + data[i].profiles_public.username))
 			return { tutorial: data[i] }
 	}
-	throw redirect(300, "./")
+	throw error(404, "Tutorial not found!")
 }
