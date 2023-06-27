@@ -8,9 +8,9 @@ export const load = async ({ params, parent }) => {
 
 	const isSEOFormated = slug.includes("-by-")
 	if (!isSEOFormated) {
-		if (slug.includes("%20"))
-			throw error(410, { message: "This page was probably renamed! Search it in the tutorials." })
-		throw error(404, { message: "Tutorial not found!" })
+		if (slug.includes(" "))
+			throw error(410, "This page was either renamed or never existed! Search it in the tutorials.")
+		throw error(404, "Tutorial not found!")
 	}
 
 	const { supabaseClient } = await parentPromise
@@ -25,7 +25,7 @@ export const load = async ({ params, parent }) => {
 	if (err)
 		throw error(
 			500,
-			`Server error - tutorials SELECT failed!
+			`Server error, this is probably not an issure on your end! - SELECT tutorials failed!
 		Error code: ${err.code}
 		Error hint: ${err.hint}
 		Error details: ${err.details}

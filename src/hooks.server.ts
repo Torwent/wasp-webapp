@@ -1,4 +1,4 @@
-import { redirect, type Handle } from "@sveltejs/kit"
+import type { Handle } from "@sveltejs/kit"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit"
 import { API_URL } from "$lib/utils"
@@ -62,7 +62,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	})
 
-	if (response.status == 404) throw redirect(303, "/")
+	//if (response.status == 404) throw redirect(303, "/")
 	response.headers.delete("link")
 
 	const loadTime = performance.now() - start
