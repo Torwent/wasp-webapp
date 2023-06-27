@@ -1,7 +1,7 @@
 version: "3.9"
 
 services:
-  webapp:
+  webapp-dev:
     container_name: "webapp-dev"
     build:
       context: .
