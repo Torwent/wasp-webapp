@@ -1,8 +1,8 @@
 version: "3.9"
 
 services:
-  webapp-dev:
-    container_name: "webapp-dev"
+  webapp:
+    container_name: "webapp"
     build:
       context: .
       args:
