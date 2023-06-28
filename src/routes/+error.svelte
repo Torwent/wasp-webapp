@@ -1,6 +1,4 @@
 <script lang="ts">
-	import Markdown from "$lib/Markdown.svelte"
-	import EditButton from "$lib/components/EditButton.svelte"
 	import { page } from "$app/stores"
 
 	const headTitle = "Page not found - WaspScripts"
@@ -36,18 +34,18 @@
 </svelte:head>
 
 <main class="container mx-auto my-6 max-w-4xl flex-grow text-center">
-	<header class="my-8">
-		<h3>An error has occurred while loading the page.</h3>
-	</header>
+	<div class="card variant-outline-error py-8 my-8">
+		<header class="my-8">
+			<h3>An error has occurred while loading the page.</h3>
+		</header>
 
-	<div class="my-8">
-		<h4 class="my-2">Error code: {$page.status}</h4>
-		<p>
-			Error message: {$page.error?.message}
-		</p>
+		<div class="my-8">
+			<h4 class="my-2">Error code: {$page.status}</h4>
+			<p>{$page.error?.message}</p>
+		</div>
+
+		<a href="./">
+			<button class="btn variant-filled-secondary">Back</button>
+		</a>
 	</div>
-
-	<a href="./">
-		<button class="btn variant-filled-secondary">Back</button>
-	</a>
 </main>
