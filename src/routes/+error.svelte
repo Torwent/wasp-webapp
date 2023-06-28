@@ -45,7 +45,7 @@
 		</div>
 
 		<a href="./">
-			<button class="btn variant-filled-secondary">Back</button>
+			<button class="btn variant-filled-error">Back</button>
 		</a>
 	</div>
 </main>
