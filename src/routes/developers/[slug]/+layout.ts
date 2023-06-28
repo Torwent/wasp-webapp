@@ -2,29 +2,39 @@ import { addToolTips, getDeveloper, getDeveloperUUID } from "$lib/backend/data"
 import type { Category, Script, SubCategory } from "$lib/types/collection"
 import { UUID_V4_REGEX } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
-import { error, redirect } from "@sveltejs/kit"
+import { error } from "@sveltejs/kit"
 
 async function getCategories(supabase: SupabaseClient) {
-	const { data, error } = await supabase
+	const { data, error: err } = await supabase
 		.from("scripts_categories")
 		.select("name, emoji")
 		.returns<Category[]>()
-	if (error) {
-		console.error("SELECT scripts_categories failed: " + error.message)
-		throw redirect(303, "/")
-	}
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT scripts_categories failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 	return data
 }
 
 async function getSubCategories(supabase: SupabaseClient) {
-	const { data, error } = await supabase
+	const { data, error: err } = await supabase
 		.from("scripts_subcategories")
 		.select("category, name, emoji")
 		.returns<SubCategory[]>()
-	if (error) {
-		console.error("SELECT scripts_categories failed: " + error.message)
-		throw redirect(303, "/")
-	}
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT scripts_subcategories failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 	return data
 }
 
@@ -49,14 +59,17 @@ async function getScripts(
 
 	if (search !== "") query = query.ilike("search_script", "%" + search + "%")
 
-	const { data, error, count } = await query.returns<Script[]>()
+	const { data, error: err, count } = await query.returns<Script[]>()
 
-	if (error) {
-		console.error(
-			"script_public SELECT failed with author_id: " + developerID + " error: " + error.message
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT scripts_subcategories failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
 		)
-		return { data: [], count: count ? count : 0 }
-	}
 
 	return { data, count: count ? count : 0 }
 }
@@ -64,6 +77,7 @@ async function getScripts(
 export const load = async ({ url: { searchParams }, params: { slug }, parent, depends }) => {
 	const parentPromise = parent()
 	depends("supabase:developer")
+	if (slug.includes(" ")) throw error(404, "Developer not found!")
 
 	const pageStr = searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)

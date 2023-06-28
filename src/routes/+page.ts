@@ -1,4 +1,5 @@
 import type { Stats } from "$lib/types/collection"
+import { error } from "@sveltejs/kit"
 
 export const load = async ({ depends, parent }) => {
 	const parentPromise = parent()
@@ -15,19 +16,17 @@ export const load = async ({ depends, parent }) => {
 	}
 
 	const { supabaseClient } = await parentPromise
-	const { data, error } = await supabaseClient.rpc("get_stats_total").returns<Stats[]>()
+	const { data, error: err } = await supabaseClient.rpc("get_stats_total").returns<Stats[]>()
 
-	if (error) {
-		console.error("get_stats_total SELECT failed: " + error.message)
-		const response = {
-			total: total,
-			status: 500,
-			error: new Error(
-				`The server failed to fetch data from the database. This is not an issue on your side! Error message:\n\n${error.message}`
-			)
-		}
-		return response
-	}
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT get_stats_total postgres function failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 
 	total.experience = data[0].experience
 	total.gold = data[0].gold

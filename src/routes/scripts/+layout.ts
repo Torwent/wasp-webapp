@@ -11,11 +11,10 @@ async function getCategories(supabase: SupabaseClient) {
 		throw error(
 			500,
 			`Server error, this is probably not an issure on your end! - SELECT scripts_categories failed
-		Error code: ${err.code}
-		Error hint: ${err.hint}
-		Error details: ${err.details}
-		Error hint: ${err.message}
-		`
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
 		)
 	return data
 }
@@ -29,11 +28,10 @@ async function getSubCategories(supabase: SupabaseClient) {
 		throw error(
 			500,
 			`Server error, this is probably not an issure on your end! - SELECT scripts_subcategories failed
-		Error code: ${err.code}
-		Error hint: ${err.hint}
-		Error details: ${err.details}
-		Error hint: ${err.message}
-		`
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
 		)
 	return data
 }

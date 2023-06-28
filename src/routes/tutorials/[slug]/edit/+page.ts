@@ -1,4 +1,4 @@
-import { error, redirect } from "@sveltejs/kit"
+import { error } from "@sveltejs/kit"
 import { encodeSEO } from "$lib/utils"
 import type { TutorialWithAuthor } from "$lib/types/collection"
 
@@ -26,11 +26,10 @@ export const load = async ({ params, data, parent }) => {
 		throw error(
 			500,
 			`Server error, this is probably not an issure on your end! - SELECT tutorials failed!
-		Error code: ${err.code}
-		Error hint: ${err.hint}
-		Error details: ${err.details}
-		Error hint: ${err.message}
-		`
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
 		)
 
 	if (!data)

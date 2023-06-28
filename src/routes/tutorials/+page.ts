@@ -1,4 +1,4 @@
-import { redirect } from "@sveltejs/kit"
+import { error, redirect } from "@sveltejs/kit"
 import { browser } from "$app/environment"
 import { encodeSEO } from "$lib/utils"
 import type { TutorialWithAuthor } from "$lib/types/collection"
@@ -26,8 +26,6 @@ export const load = async ({ url, depends, parent }) => {
 	const start = (page - 1) * range
 	const finish = start + range
 
-	let postsData
-
 	const { supabaseClient } = await parentPromise
 	let query = supabaseClient
 		.from("tutorials")
@@ -46,12 +44,17 @@ export const load = async ({ url, depends, parent }) => {
 		query = query.ilike("search_tutorials", "%" + search.replaceAll("%", "") + "%")
 	}
 
-	const { data, count, error } = await query.returns<TutorialWithAuthor[]>()
+	const { data, count, error: err } = await query.returns<TutorialWithAuthor[]>()
 
-	if (error) {
-		console.error("SELECT tutorials failed: " + error.message)
-		throw redirect(303, "/tutorials")
-	}
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT tutorials failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 
 	if (!browser && count === 1)
 		throw redirect(

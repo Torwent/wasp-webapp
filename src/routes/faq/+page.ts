@@ -1,5 +1,5 @@
 import type { ErrorEntry, FAQEntry } from "$lib/types/collection"
-import { redirect } from "@sveltejs/kit"
+import { error } from "@sveltejs/kit"
 
 export const load = async ({ parent }) => {
 	const { supabaseClient } = await parent()
@@ -10,14 +10,24 @@ export const load = async ({ parent }) => {
 
 	const questions = promises[0]
 	const errors = promises[1]
-	if (questions.error) {
-		console.error("faq_questions SELECT failed: ", questions.error.message)
-		throw redirect(303, "./")
-	}
+	if (questions.error)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT faq_questions failed
+			Error code: ${questions.error.code}
+			Error hint: ${questions.error.hint}
+			Error details: ${questions.error.details}
+			Error hint: ${questions.error.message}`
+		)
 
-	if (errors.error) {
-		console.error("faq_questions SELECT failed: ", errors.error.message)
-		throw redirect(303, "./")
-	}
+	if (errors.error)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT faq_errors failed
+			Error code: ${errors.error.code}
+			Error hint: ${errors.error.hint}
+			Error details: ${errors.error.details}`
+		)
+
 	return { questions: questions.data, errors: errors.data }
 }

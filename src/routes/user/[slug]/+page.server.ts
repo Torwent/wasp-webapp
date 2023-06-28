@@ -8,8 +8,8 @@ export const load = async (event) => {
 }
 
 export const actions = {
-	default: async ({ request, locals }) => {
-		const profile = await locals.getProfile()
+	default: async ({ request, locals: { getProfile, supabaseServer } }) => {
+		const profile = await getProfile()
 		const formData = await request.formData()
 
 		if (formData.get("email") == "") formData.delete("email")
@@ -25,7 +25,7 @@ export const actions = {
 
 		if (!form.valid) return fail(400, { form })
 
-		const { error } = await locals.supabaseServer.auth.updateUser(form.data)
+		const { error } = await supabaseServer.auth.updateUser(form.data)
 		if (error) {
 			console.error("User data UPDATE failed: " + error.message)
 			return setError(form, null, error.message)
