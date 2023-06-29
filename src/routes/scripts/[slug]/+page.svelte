@@ -16,11 +16,20 @@
 	import ScriptHeader from "../ScriptHeader.svelte"
 	import ScriptArticle from "../ScriptArticle.svelte"
 	import StatsHeader from "../StatsHeader.svelte"
+	import { encodeSEO } from "$lib/utils"
 
 	export let data
 
 	let { script, dismissed, profile } = data
 	$: ({ script, dismissed, profile } = data)
+	$: if (browser)
+		if (!$page.url.pathname.includes("-by-"))
+			history.replaceState(
+				{},
+				"",
+				"/scripts/" +
+					encodeSEO(script.title + " by " + script.scripts_protected.profiles_public.username)
+			)
 
 	function warningDismissed(r: boolean) {
 		if (r) {

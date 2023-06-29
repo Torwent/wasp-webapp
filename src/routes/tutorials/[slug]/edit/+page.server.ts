@@ -10,13 +10,13 @@ export const load = async (event) => {
 }
 
 export const actions = {
-	default: async ({ request, locals }) => {
+	default: async ({ request, locals: { supabaseServer } }) => {
 		const formData = await request.formData()
 		const form = await superValidate(formData, postSchema)
 
 		if (!form.valid || !form.data.id) return fail(400, { form })
 
-		const { data, error } = await locals.supabaseServer
+		const { data, error } = await supabaseServer
 			.from("tutorials")
 			.update(form.data)
 			.eq("id", form.data.id)

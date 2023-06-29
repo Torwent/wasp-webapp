@@ -1,6 +1,6 @@
 import type { Stats } from "$lib/types/collection"
 import { UUID_V4_REGEX } from "$lib/utils"
-import { redirect } from "@sveltejs/kit"
+import { error, redirect } from "@sveltejs/kit"
 
 export const load = async ({ url, depends, parent }) => {
 	const parentPromise = parent()
@@ -51,18 +51,28 @@ export const load = async ({ url, depends, parent }) => {
 		supabaseClient.rpc("get_stats_total").returns<Stats[]>()
 	])
 
-	const { data, count, error } = promises[0]
+	const { data, count, error: err } = promises[0]
 	const { data: tData, error: tError } = promises[1]
 
-	if (error) {
-		console.error("stats SELECT failed: " + error.message)
-		throw redirect(303, "/")
-	}
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT stats failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 
-	if (tError) {
-		console.error("stats SELECT failed: " + tError.message)
-		throw redirect(303, "/")
-	}
+	if (tError)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT get_stats_total postgres function failed
+			Error code: ${tError.code}
+			Error hint: ${tError.hint}
+			Error details: ${tError.details}
+			Error hint: ${tError.message}`
+		)
 
 	total.experience = tData[0].experience || 0
 	total.gold = tData[0].gold || 0

@@ -3,7 +3,7 @@ import { addToolTips, getCheckBoxes } from "$lib/backend/data"
 import type { Script } from "$lib/types/collection"
 import { encodeSEO } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
-import { redirect } from "@sveltejs/kit"
+import { error, redirect } from "@sveltejs/kit"
 
 async function getScripts(
 	supabase: SupabaseClient,
@@ -56,7 +56,11 @@ export const load = async ({ url, parent, depends }) => {
 
 	const { supabaseClient, categories, subcategories } = await parentPromise
 
-	const { data, error, count } = await getScripts(
+	const {
+		data,
+		error: err,
+		count
+	} = await getScripts(
 		supabaseClient,
 		search,
 		categoriesFilter,
@@ -65,10 +69,15 @@ export const load = async ({ url, parent, depends }) => {
 		start,
 		finish
 	)
-	if (error) {
-		console.error("SELECT scripts_public failed: " + error.message)
-		throw redirect(303, "/scripts")
-	}
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT scripts failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 
 	await new Promise<void>((resolve) => {
 		data.forEach(async (script, index, array) => {

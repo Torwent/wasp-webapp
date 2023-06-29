@@ -1,3 +1,3 @@
-export const load = async ({ locals }) => {
-	return { dismissed: locals.warningDismissed }
+export const load = async ({ locals: { warningDismissed } }) => {
+	return { dismissed: warningDismissed }
 }

@@ -6,7 +6,7 @@
 	import { browser } from "$app/environment"
 	import Paginator from "$lib/components/Paginator.svelte"
 	import { onMount } from "svelte"
-	import type { CheckboxType, IScriptCard } from "$lib/types/collection"
+	import type { CheckboxType } from "$lib/types/collection"
 	import ScriptCard from "$lib/components/ScriptCard.svelte"
 
 	export let data
@@ -47,14 +47,6 @@
 
 		history.replaceState({}, "", $page.url)
 		invalidate("supabase:scripts")
-	}
-
-	function canSeeScript(script: IScriptCard) {
-		if (script.published) return true
-		if (!profile) return false
-		if (profile.profiles_protected.administrator) return true
-		if (profile.profiles_protected.moderator) return true
-		return script.scripts_protected.author_id === profile.id
 	}
 
 	onMount(() => (loading = false))

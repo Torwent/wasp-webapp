@@ -1,6 +1,7 @@
 import type { Script, ScriptPublic } from "$lib/types/collection"
 import { pad } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
+import { error } from "@sveltejs/kit"
 
 function updateID(str: string, id: string) {
 	const regex = /{\$DEFINE SCRIPT_ID := '(.*?)'}/
@@ -152,10 +153,15 @@ export async function getSignedURLServer(
 ) {
 	path += "/" + file
 
-	const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
-	if (error) {
-		console.error("Signed URL for " + bucket + " to " + path + " failed: " + error.message)
-		return false
-	}
+	const { data, error: err } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
+	if (err)
+		throw error(
+			401,
+			`Server error, this is probably not an issure on your end! - Get sign url for ${bucket} to ${bucket} failed!
+			Error name: ${err.name}
+			Error message: ${err.message}
+			Error cause: ${err.cause}
+			Error stack: ${err.stack}`
+		)
 	return data.signedUrl
 }

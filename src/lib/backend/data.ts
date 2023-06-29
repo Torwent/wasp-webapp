@@ -10,6 +10,7 @@ import type {
 	Script,
 	Profile
 } from "$lib/types/collection"
+import { error } from "@sveltejs/kit"
 
 export async function updateWarning(supabase: SupabaseClient) {
 	const {
@@ -18,15 +19,20 @@ export async function updateWarning(supabase: SupabaseClient) {
 
 	if (!user) return false
 
-	const { error } = await supabase
+	const { error: err } = await supabase
 		.from("profiles_private")
 		.update({ dismissed_warning: true })
 		.eq("id", user.id)
 
-	if (error) {
-		console.error("profiles_private UPDATE failed: " + error.message)
-		return false
-	}
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - UPDATE profiles_private failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 }
 
 export async function getCheckBoxes(categories: Category[], subcategories: SubCategory[]) {
@@ -99,7 +105,7 @@ export async function addToolTips(
 }
 
 export async function getScripts(supabase: SupabaseClient) {
-	const { data, error } = await supabase
+	const { data, error: err } = await supabase
 		.from("scripts_public")
 		.select(
 			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
@@ -108,7 +114,15 @@ export async function getScripts(supabase: SupabaseClient) {
 		)
 		.order("title", { ascending: true })
 		.returns<Script[]>()
-	if (error) console.error("scripts_public SELECT failed: " + error.message)
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT scripts_public failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 	return data
 }
 
@@ -127,7 +141,7 @@ export async function getScript(supabase: SupabaseClient, path: string) {
 }
 
 export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {
-	const { data, error } = await supabase
+	const { data, error: err } = await supabase
 		.from("scripts_public")
 		.select(
 			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
@@ -136,15 +150,20 @@ export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {
 		)
 		.eq("id", uuid)
 		.returns<Script[]>()
-	if (error) {
-		console.error("scripts_public SELECT failed: " + error.message)
-		return null
-	}
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT scripts_public failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 	return data[0]
 }
 
 async function getDevelopers(supabase: SupabaseClient) {
-	const { data, error } = await supabase
+	const { data, error: err } = await supabase
 		.from("developers")
 		.select(
 			`id, realname, description, github, paypal_id, content, profiles_public (username, avatar_url)`
@@ -152,7 +171,15 @@ async function getDevelopers(supabase: SupabaseClient) {
 		.order("username", { foreignTable: "profiles_public", ascending: true })
 		.returns<DeveloperWithUsername[]>()
 
-	if (error) console.error("scripts_public SELECT failed: " + error.message)
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT developers failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 	return data
 }
 
@@ -166,7 +193,7 @@ export async function getDeveloper(supabase: SupabaseClient, path: string) {
 }
 
 export async function getDeveloperUUID(supabase: SupabaseClient, uuid: string) {
-	const { data, error } = await supabase
+	const { data, error: err } = await supabase
 		.from("developers")
 		.select(
 			`id, realname, description, github, paypal_id, content, profiles_public (username, avatar_url)`
@@ -174,10 +201,15 @@ export async function getDeveloperUUID(supabase: SupabaseClient, uuid: string) {
 		.eq("id", uuid)
 		.returns<DeveloperWithUsername[]>()
 
-	if (error) {
-		console.error("scripts_public SELECT failed: " + error.message)
-		return null
-	}
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT developers failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 	return data[0]
 }
 
@@ -189,11 +221,17 @@ export async function getSignedURL(
 ) {
 	path += "/" + file
 
-	const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
-	if (error) {
-		console.error("Signed URL for " + bucket + " to " + path + " failed: " + error.message)
-		return false
-	}
+	const { data, error: err } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
+
+	if (err)
+		throw error(
+			401,
+			`Server error, this is probably not an issure on your end! - Get sign url for ${bucket} to ${bucket} failed!
+			Error name: ${err.name}
+			Error message: ${err.message}
+			Error cause: ${err.cause}
+			Error stack: ${err.stack}`
+		)
 	return data.signedUrl
 }
 

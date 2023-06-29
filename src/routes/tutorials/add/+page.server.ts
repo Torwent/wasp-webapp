@@ -39,7 +39,7 @@ export const actions = {
 			return setError(form, null, msg)
 		}
 
-		const { data: tutorial, error } = await locals.supabaseServer
+		const { data: tutorial, error } = await supabaseServer
 			.from("tutorials")
 			.insert(form.data)
 			.returns<TutorialWithAuthor[]>()
