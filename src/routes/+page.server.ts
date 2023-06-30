@@ -3,14 +3,14 @@ import type { Provider } from "@supabase/supabase-js"
 import { fail, redirect } from "@sveltejs/kit"
 
 export const actions = {
-	login: async ({ locals: { supabaseServer }, url }) => {
-		const provider = url.searchParams.get("provider") as Provider
+	login: async ({ locals: { supabaseServer }, url: { origin, searchParams } }) => {
+		const provider = searchParams.get("provider") as Provider
 
 		if (provider) {
 			const { data, error } = await supabaseServer.auth.signInWithOAuth({
 				provider: provider,
 				options: {
-					redirectTo: url.origin + "/api/auth/callback",
+					redirectTo: origin + "/api/auth/callback/",
 					scopes: "identify email guilds guilds.members.read"
 				}
 			})
