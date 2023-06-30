@@ -14,7 +14,8 @@ export const actions = {
 		const formData = await request.formData()
 		const form = await superValidate(formData, postSchema)
 
-		if (!form.valid || !form.data.id) return fail(400, { form })
+		if (!form.valid || form.data.id === null || form.data.id === undefined)
+			return fail(400, { form })
 
 		const { data, error } = await supabaseServer
 			.from("tutorials")
