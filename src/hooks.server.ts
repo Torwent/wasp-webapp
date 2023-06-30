@@ -6,29 +6,29 @@ import type { Profile } from "$lib/types/collection"
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
-	const route = event.url
+	const { url, cookies, locals } = event
 
-	const warningDismissed = event.cookies.get("warningDismissed")
+	const warningDismissed = cookies.get("warningDismissed")
 
-	event.locals.supabaseServer = createSupabaseServerClient({
+	locals.supabaseServer = createSupabaseServerClient({
 		supabaseUrl: PUBLIC_SUPABASE_URL,
 		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
 		event
 	})
 
-	event.locals.getSession = async () => {
+	locals.getSession = async () => {
 		const {
 			data: { session }
-		} = await event.locals.supabaseServer.auth.getSession()
+		} = await locals.supabaseServer.auth.getSession()
 		return session
 	}
 
-	event.locals.getProfile = async () => {
-		const session = await event.locals.getSession()
+	locals.getProfile = async () => {
+		const session = await locals.getSession()
 		if (!session) return null
 
 		const id = session.user.id
-		const { data, error } = await event.locals.supabaseServer
+		const { data, error } = await locals.supabaseServer
 			.from("profiles_public")
 			.select(
 				`id, discord_id, username, avatar_url,
@@ -42,7 +42,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return data[0]
 	}
 
-	const profile = await event.locals.getProfile()
+	const profile = await locals.getProfile()
 
 	if (profile) {
 		try {
@@ -54,7 +54,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	event.locals.warningDismissed = warningDismissed === "true"
+	locals.warningDismissed = warningDismissed === "true"
 
 	const response = await resolve(event, {
 		filterSerializedResponseHeaders(name) {
@@ -66,8 +66,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 	response.headers.delete("link")
 
 	const loadTime = performance.now() - start
-	if (loadTime < 3000) console.log(`🚀 ${route} took ${loadTime.toFixed(2)} ms to load!`)
-	else console.log(`🐌 ${route} took ${loadTime.toFixed(2)} ms to load!`)
+	if (loadTime < 3000) console.log(`🚀 ${url} took ${loadTime.toFixed(2)} ms to load!`)
+	else console.log(`🐌 ${url} took ${loadTime.toFixed(2)} ms to load!`)
 
 	return response
 }
