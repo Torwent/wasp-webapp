@@ -17,7 +17,7 @@ export const load = async ({ params, data, parent }) => {
 	const { data: tutorials, error: err } = await supabaseClient
 		.from("tutorials")
 		.select(
-			"id, created_at, user_id, title, description, content, level, profiles_public (username,src/routes/tutorials/[slug]/+error.svelte avatar_url)"
+			"id, created_at, user_id, title, description, content, level, profiles_public (username, avatar_url)"
 		)
 		.order("title", { ascending: true })
 		.returns<TutorialWithAuthor[]>()
