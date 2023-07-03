@@ -18,10 +18,11 @@ interface FormFiles {
 }
 
 export const actions = {
-	default: async ({ request, locals }) => {
-		const { supabaseServer, getProfile } = locals
-		const profile = await getProfile()
-		const formData = await request.formData()
+	default: async ({ request, locals: { supabaseServer, getProfile } }) => {
+		const promises = await Promise.all([getProfile(), request.formData()])
+
+		const profile = promises[0]
+		const formData = promises[1]
 
 		let files: FormFiles = { cover: undefined, banner: undefined, script: undefined }
 

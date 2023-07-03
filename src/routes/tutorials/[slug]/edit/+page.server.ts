@@ -14,12 +14,18 @@ export const actions = {
 		const formData = await request.formData()
 		const form = await superValidate(formData, postSchema)
 
-		if (!form.valid || form.data.id === null || form.data.id === undefined)
-			return fail(400, { form })
+		if (!form.valid) return fail(400, { form })
+
+		let formUpdateData = {
+			title: form.data.title,
+			description: form.data.description,
+			content: form.data.content,
+			level: form.data.level
+		}
 
 		const { data, error } = await supabaseServer
 			.from("tutorials")
-			.update(form.data)
+			.update(formUpdateData)
 			.eq("id", form.data.id)
 			.select()
 			.returns<TutorialWithAuthor[]>()
@@ -29,9 +35,6 @@ export const actions = {
 			return setError(form, null, error.message)
 		}
 
-		throw redirect(
-			303,
-			"/tutorials/" + encodeSEO(data[0].title + " by " + data[0].profiles_public.username)
-		)
+		throw redirect(303, "/tutorials/" + data[0].url)
 	}
 }

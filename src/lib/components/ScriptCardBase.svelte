@@ -4,7 +4,7 @@
 	import { cropString } from "$lib/utils"
 	import { onMount } from "svelte"
 	import { browser } from "$app/environment"
-	import type { EmojiTooltip, IScriptCard } from "$lib/types/collection"
+	import type { IScriptCard } from "$lib/types/collection"
 	export let script: IScriptCard
 
 	export let imgElement: HTMLImageElement | undefined = browser ? new Image() : undefined
@@ -28,8 +28,6 @@
 	let imgLink: string = getCover(script.scripts_protected.assets_path)
 	$: imgLink = getCover(script.scripts_protected.assets_path)
 
-	let tooltips: EmojiTooltip[] = script.emojiTooltips
-	$: tooltips = script.emojiTooltips
 	onMount(async () => {
 		const response = await fetch(imgLink)
 		if (response.status != 200) imgLink = defaultCover
@@ -64,15 +62,15 @@
 		</article>
 	</section>
 	<footer class="card-footer flex h-8 w-full justify-end">
-		{#each tooltips as tooltip, i}
+		{#each script.tooltip_emojis as emoji, i}
 			<button use:popup={getPopup(script.id + "-hover-" + i.toString())}>
-				{tooltip.icon}
+				{emoji}
 			</button>
 			<div
 				class="card variant-filled-secondary p-2"
 				data-popup={script.id + "-hover-" + i.toString()}
 			>
-				{tooltip.tooltip}
+				{script.tooltip_names[i]}
 				<div class="arrow variant-filled-secondary" />
 			</div>
 		{/each}

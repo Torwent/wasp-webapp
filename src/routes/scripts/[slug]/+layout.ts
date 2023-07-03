@@ -17,9 +17,11 @@ export const load = async ({ params, parent }) => {
 		throw redirect(301, "/scripts/" + slug)
 	}
 
-	const script = isUUID
-		? await getScriptUUID(supabaseClient, slug)
-		: await getScript(supabaseClient, slug)
-	if (!script) throw error(404, "Script not found!")
-	return { script, categories, subcategories }
+	return {
+		script: isUUID
+			? await getScriptUUID(supabaseClient, slug)
+			: await getScript(supabaseClient, slug),
+		categories,
+		subcategories
+	}
 }

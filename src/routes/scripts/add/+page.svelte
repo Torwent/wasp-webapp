@@ -74,7 +74,12 @@
 				avatar_url: profile?.avatar_url || ""
 			}
 		},
-		emojiTooltips: []
+		emojiTooltips: [],
+		fts: undefined,
+		search: "",
+		tooltip_emojis: [],
+		tooltip_names: [],
+		url: ""
 	}
 
 	$: addToolTips(script, categories, subcategories)

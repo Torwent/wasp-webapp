@@ -19,7 +19,7 @@ export const load = async ({ params, parent }) => {
 		.select(
 			"id, created_at, user_id, title, description, content, level, profiles_public (username, avatar_url)"
 		)
-		.order("title", { ascending: true })
+		.eq("url", slug)
 		.returns<TutorialWithAuthor[]>()
 
 	if (err)
@@ -32,9 +32,6 @@ export const load = async ({ params, parent }) => {
 			Error hint: ${err.message}`
 		)
 
-	for (let i = 0; i < data.length; i++) {
-		if (slug === encodeSEO(data[i].title + " by " + data[i].profiles_public.username))
-			return { tutorial: data[i] }
-	}
-	throw error(404, "Tutorial not found!")
+	if (data.length === 0) throw error(404, "Tutorial not found!")
+	return { tutorial: data[0] }
 }

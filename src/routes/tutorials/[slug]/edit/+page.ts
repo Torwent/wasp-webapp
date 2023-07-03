@@ -19,7 +19,7 @@ export const load = async ({ params, data, parent }) => {
 		.select(
 			"id, created_at, user_id, title, description, content, level, profiles_public (username, avatar_url)"
 		)
-		.order("title", { ascending: true })
+		.eq("url", slug)
 		.returns<TutorialWithAuthor[]>()
 
 	if (err)
@@ -32,17 +32,6 @@ export const load = async ({ params, data, parent }) => {
 			Error hint: ${err.message}`
 		)
 
-	if (!data)
-		throw error(
-			500,
-			"Server error, this is probably not an issure on your end! - Data fetch returned empty!"
-		)
-
-	const { form } = data
-
-	for (let i = 0; i < tutorials.length; i++) {
-		if (slug === encodeSEO(tutorials[i].title + " by " + tutorials[i].profiles_public.username))
-			return { tutorial: tutorials[i], form }
-	}
-	throw error(404, "Tutorial not found!")
+	if (tutorials.length === 0) throw error(404, "Tutorial not found!")
+	return { tutorial: tutorials[0], form: data.form }
 }

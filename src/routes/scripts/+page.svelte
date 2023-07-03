@@ -15,7 +15,7 @@
 	$: ({ profile, scripts } = data)
 
 	let count = 0
-	$: count = (data.count as number) || 0
+	$: count = (scripts.count as number) || 0
 
 	const pageStr = $page.url.searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
@@ -154,7 +154,7 @@
 			<div
 				class="grid gap-8 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 justify-center justify-items-center"
 			>
-				{#each scripts as script}
+				{#each scripts.data as script}
 					<ScriptCard {script} />
 				{/each}
 			</div>

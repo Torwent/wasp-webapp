@@ -13,10 +13,11 @@ export const load = async (event) => {
 }
 
 export const actions = {
-	default: async ({ request, locals }) => {
-		const { supabaseServer, getProfile } = locals
-		const profile = await getProfile()
-		const formData = await request.formData()
+	default: async ({ request, locals: { supabaseServer, getProfile } }) => {
+		const promises = await Promise.all([getProfile(), request.formData()])
+
+		const profile = promises[0]
+		const formData = promises[1]
 
 		const files = {
 			cover: formData.get("cover"),
@@ -70,7 +71,12 @@ export const actions = {
 			max_gp: form.data.max_gp,
 			id: "",
 			updated_at: "",
-			search_script: null
+			search_script: null,
+			fts: undefined,
+			search: "",
+			tooltip_emojis: [],
+			tooltip_names: [],
+			url: ""
 		}
 
 		const { error } = await uploadScript(

@@ -9,13 +9,11 @@ export const load = async (event) => {
 }
 
 export const actions = {
-	default: async ({ request, locals }) => {
-		const { supabaseServer, getProfile } = locals
+	default: async ({ request, locals: { supabaseServer, getProfile } }) => {
+		const setup = await Promise.all([getProfile(), request.formData()])
+		const profile = setup[0]
 
-		const profile = await getProfile()
-		const formData = await request.formData()
-
-		const form = await superValidate(formData, developerSchema)
+		const form = await superValidate(setup[1], developerSchema)
 
 		if (!profile) {
 			const msg = "You need to login to edit a developer."

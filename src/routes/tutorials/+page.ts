@@ -2,6 +2,50 @@ import { error, redirect } from "@sveltejs/kit"
 import { browser } from "$app/environment"
 import { encodeSEO } from "$lib/utils"
 import type { TutorialWithAuthor } from "$lib/types/collection"
+import type { SupabaseClient } from "@supabase/supabase-js"
+
+async function getTutorials(
+	supabase: SupabaseClient,
+	level: number,
+	search: string,
+	start: number,
+	finish: number,
+	ascending: boolean
+) {
+	let query = supabase
+		.from("tutorials")
+		.select(
+			"id, user_id, title, description, content, level, profiles_public(username, avatar_url)",
+			{ count: "exact" }
+		)
+
+	if (level > -1) {
+		query = query.eq("level", level).range(start, finish)
+	} else if (search === "") {
+		query = query.order("level", { ascending: ascending }).range(start, finish)
+	} else {
+		query = query.ilike("search", "%" + search.replaceAll("%", "") + "%")
+	}
+
+	const { data, count, error: err } = await query.returns<TutorialWithAuthor[]>()
+
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT tutorials failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
+
+	if (!browser && count === 1)
+		throw redirect(
+			303,
+			"/tutorials/" + encodeSEO(data[0].title + " by " + data[0].profiles_public.username)
+		)
+	return { data, count }
+}
 
 export const load = async ({ url, depends, parent }) => {
 	const parentPromise = parent()
@@ -27,40 +71,6 @@ export const load = async ({ url, depends, parent }) => {
 	const finish = start + range
 
 	const { supabaseClient } = await parentPromise
-	let query = supabaseClient
-		.from("tutorials")
-		.select(
-			"id, user_id, title, description, content, level, profiles_public(username, avatar_url)",
-			{
-				count: "exact"
-			}
-		)
 
-	if (level > -1) {
-		query = query.eq("level", level).range(start, finish)
-	} else if (search === "") {
-		query = query.order("level", { ascending: ascending }).range(start, finish)
-	} else {
-		query = query.ilike("search_tutorials", "%" + search.replaceAll("%", "") + "%")
-	}
-
-	const { data, count, error: err } = await query.returns<TutorialWithAuthor[]>()
-
-	if (err)
-		throw error(
-			500,
-			`Server error, this is probably not an issure on your end! - SELECT tutorials failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
-		)
-
-	if (!browser && count === 1)
-		throw redirect(
-			303,
-			"/tutorials/" + encodeSEO(data[0].title + " by " + data[0].profiles_public.username)
-		)
-
-	return { tutorials: data, count, range }
+	return { tutorials: getTutorials(supabaseClient, level, search, start, finish, ascending), range }
 }

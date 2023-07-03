@@ -3,7 +3,7 @@ export type Json =
   | number
   | boolean
   | null
-  | { [key: string]: Json }
+  | { [key: string]: Json | undefined }
   | Json[]
 
 export interface Database {
@@ -38,27 +38,36 @@ export interface Database {
         Row: {
           content: string | null
           description: string | null
+          fts: unknown
           github: string | null
           id: string
           paypal_id: string | null
           realname: string | null
+          search: string
+          url: string
           search_developers: string | null
         }
         Insert: {
           content?: string | null
           description?: string | null
+          fts?: unknown
           github?: string | null
           id: string
           paypal_id?: string | null
           realname?: string | null
+          search: string
+          url: string
         }
         Update: {
           content?: string | null
           description?: string | null
+          fts?: unknown
           github?: string | null
           id?: string
           paypal_id?: string | null
           realname?: string | null
+          search?: string
+          url?: string
         }
         Relationships: [
           {
@@ -331,44 +340,59 @@ export interface Database {
           categories: string[]
           content: string
           description: string
+          fts: unknown
           id: string
           max_gp: number
           max_xp: number
           min_gp: number
           min_xp: number
           published: boolean
+          search: string
           subcategories: string[]
           title: string
+          tooltip_emojis: string[]
+          tooltip_names: string[]
           updated_at: string
+          url: string
           search_script: string | null
         }
         Insert: {
           categories: string[]
           content: string
           description: string
+          fts?: unknown
           id?: string
           max_gp?: number
           max_xp?: number
           min_gp?: number
           min_xp?: number
           published?: boolean
+          search: string
           subcategories: string[]
           title: string
+          tooltip_emojis: string[]
+          tooltip_names: string[]
           updated_at?: string
+          url: string
         }
         Update: {
           categories?: string[]
           content?: string
           description?: string
+          fts?: unknown
           id?: string
           max_gp?: number
           max_xp?: number
           min_gp?: number
           min_xp?: number
           published?: boolean
+          search?: string
           subcategories?: string[]
           title?: string
+          tooltip_emojis?: string[]
+          tooltip_names?: string[]
           updated_at?: string
+          url?: string
         }
         Relationships: []
       }
@@ -487,9 +511,12 @@ export interface Database {
           content: string
           created_at: string
           description: string
-          id: number
+          fts: unknown
+          id: string
           level: number
+          search: string
           title: string
+          url: string
           user_id: string
           search_tutorials: string | null
         }
@@ -497,18 +524,24 @@ export interface Database {
           content: string
           created_at?: string
           description: string
-          id?: number
+          fts?: unknown
+          id?: string
           level?: number
+          search: string
           title: string
-          user_id: string
+          url: string
+          user_id?: string
         }
         Update: {
           content?: string
           created_at?: string
           description?: string
-          id?: number
+          fts?: unknown
+          id?: string
           level?: number
+          search?: string
           title?: string
+          url?: string
           user_id?: string
         }
         Relationships: [
@@ -550,6 +583,12 @@ export interface Database {
         }
         Returns: unknown
       }
+      encode_seo: {
+        Args: {
+          url: string
+        }
+        Returns: string
+      }
       fix_categories:
         | {
             Args: {
@@ -564,12 +603,33 @@ export interface Database {
             }
             Returns: unknown
           }
+      generate_search_vector: {
+        Args: {
+          id: string
+          data: string[]
+        }
+        Returns: unknown
+      }
       get_assets_path: {
         Args: {
           id: string
         }
         Returns: string
       }
+      get_common_words:
+        | {
+            Args: {
+              text_array: string[]
+            }
+            Returns: unknown
+          }
+        | {
+            Args: {
+              text_array: string[]
+              limit_val: number
+            }
+            Returns: unknown
+          }
       get_discord_id: {
         Args: {
           user_id: string
@@ -596,6 +656,20 @@ export interface Database {
           levels: number
           runtime: number
         }[]
+      }
+      get_tooltips_emojis: {
+        Args: {
+          categories_str: string[]
+          subcategories_str: string[]
+        }
+        Returns: unknown
+      }
+      get_tooltips_names: {
+        Args: {
+          categories_str: string[]
+          subcategories_str: string[]
+        }
+        Returns: unknown
       }
       get_user_id: {
         Args: {
@@ -634,6 +708,10 @@ export interface Database {
             }
             Returns: boolean
           }
+      is_dashboard: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
       is_owner: {
         Args: {
           id: string

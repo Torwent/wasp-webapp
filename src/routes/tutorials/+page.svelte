@@ -27,7 +27,7 @@
 			: Number(levelStr)
 
 	let count = 0
-	$: count = (data.count as number) || 0
+	$: count = (tutorials.count as number) || 0
 	let loading = true
 
 	function replaceQuery(values: Record<string, string>) {
@@ -152,7 +152,7 @@
 	</div>
 
 	<div class="mx-auto max-w-2xl flex-grow">
-		{#each tutorials as tutorial}
+		{#each tutorials.data as tutorial}
 			<TutorialCard bind:tutorial />
 		{/each}
 	</div>

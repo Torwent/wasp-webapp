@@ -18,7 +18,7 @@ async function getDevelopers(
 			.order("username", { foreignTable: "profiles_public", ascending: true })
 			.range(start, finish)
 	} else {
-		query = query.ilike("search_developers", "%" + search + "%")
+		query = query.ilike("search", "%" + search + "%")
 	}
 
 	return await query.returns<DeveloperWithUsername[]>()

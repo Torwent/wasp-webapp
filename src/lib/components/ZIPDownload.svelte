@@ -83,10 +83,14 @@
 		if (!scripts) return console.error("Failed to retrieve scripts information!")
 
 		scripts = scripts.filter((script) => {
-			console.log(zipName, " and ", ALL_ZIPS)
-			if (ALL_ZIPS[0] === zipName)
+			if (ALL_ZIPS[0] === zipName) {
+				console.log(
+					script,
+					" ",
+					script.categories.includes("Official") && script.categories.includes("Premium")
+				)
 				return script.categories.includes("Official") && script.categories.includes("Premium")
-			else if (ALL_ZIPS[1] === zipName)
+			} else if (ALL_ZIPS[1] === zipName)
 				return script.categories.includes("Official") && script.categories.includes("Free")
 			else if (ALL_ZIPS[2] === zipName) return script.categories.includes("Official")
 			else if (ALL_ZIPS[3] === zipName)

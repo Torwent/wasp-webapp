@@ -16,20 +16,16 @@
 	import ScriptHeader from "../ScriptHeader.svelte"
 	import ScriptArticle from "../ScriptArticle.svelte"
 	import StatsHeader from "../StatsHeader.svelte"
-	import { encodeSEO } from "$lib/utils"
+	import { onMount } from "svelte"
 
 	export let data
 
 	let { script, dismissed, profile } = data
 	$: ({ script, dismissed, profile } = data)
-	$: if (browser)
-		if (!$page.url.pathname.includes("-by-"))
-			history.replaceState(
-				{},
-				"",
-				"/scripts/" +
-					encodeSEO(script.title + " by " + script.scripts_protected.profiles_public.username)
-			)
+
+	onMount(() => {
+		if (!$page.url.pathname.includes("-by-")) history.replaceState({}, "", "/scripts/" + script.url)
+	})
 
 	function warningDismissed(r: boolean) {
 		if (r) {

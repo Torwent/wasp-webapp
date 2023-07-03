@@ -109,7 +109,7 @@ export const scriptSchema = z
 	)
 
 export const postSchema = z.object({
-	id: z.number().int("ID must be greater than 0.").optional(),
+	id: z.string().uuid("ID must be a valid UUID.").optional(),
 	title: z
 		.string()
 		.min(4, "Must be more than 3 characters long.")

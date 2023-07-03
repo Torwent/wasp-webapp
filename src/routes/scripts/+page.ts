@@ -1,7 +1,6 @@
 import { browser } from "$app/environment"
-import { addToolTips, getCheckBoxes } from "$lib/backend/data"
+import { getCheckBoxes } from "$lib/backend/data"
 import type { Script } from "$lib/types/collection"
-import { encodeSEO } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { error, redirect } from "@sveltejs/kit"
 
@@ -17,7 +16,8 @@ async function getScripts(
 	let query = supabase
 		.from("scripts_public")
 		.select(
-			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
+			`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
+			tooltip_emojis, tooltip_names,
 			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public (username, avatar_url)),
 			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`,
 			{ count: "exact" }
@@ -29,10 +29,24 @@ async function getScripts(
 	if (search === "") {
 		query = query.order("title", { ascending: ascending }).range(start, finish)
 	} else {
-		query = query.ilike("search_script", "%" + search + "%")
+		query = query.ilike("search", "%" + search + "%")
 	}
 
-	return await query.returns<Script[]>()
+	const { data, error: err, count } = await query.returns<Script[]>()
+
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT scripts failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
+
+	if (!browser && data.length === 1) throw redirect(303, "/scripts/" + data[0].url)
+
+	return { data, count }
 }
 
 export const load = async ({ url, parent, depends }) => {
@@ -56,48 +70,17 @@ export const load = async ({ url, parent, depends }) => {
 
 	const { supabaseClient, categories, subcategories } = await parentPromise
 
-	const {
-		data,
-		error: err,
-		count
-	} = await getScripts(
-		supabaseClient,
-		search,
-		categoriesFilter,
-		subcategoriesFilter,
-		ascending,
-		start,
-		finish
-	)
-	if (err)
-		throw error(
-			500,
-			`Server error, this is probably not an issure on your end! - SELECT scripts failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
-		)
-
-	await new Promise<void>((resolve) => {
-		data.forEach(async (script, index, array) => {
-			await addToolTips(script, categories, subcategories)
-
-			if (index === array.length - 1) resolve()
-		})
-	})
-
-	if (!browser && data.length === 1)
-		throw redirect(
-			303,
-			"/scripts/" +
-				encodeSEO(data[0].title + " by " + data[0].scripts_protected.profiles_public.username)
-		)
-
 	return {
-		scripts: data,
+		scripts: getScripts(
+			supabaseClient,
+			search,
+			categoriesFilter,
+			subcategoriesFilter,
+			ascending,
+			start,
+			finish
+		),
 		checkboxes: getCheckBoxes(categories, subcategories),
-		count,
 		range
 	}
 }

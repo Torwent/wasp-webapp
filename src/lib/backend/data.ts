@@ -126,25 +126,35 @@ export async function getScripts(supabase: SupabaseClient) {
 	return data
 }
 
-export async function getScript(supabase: SupabaseClient, path: string) {
-	const scripts = await getScripts(supabase)
-	if (!scripts) return null
-
-	for (let i = 0; i < scripts.length; i++)
-		if (
-			path ===
-			encodeSEO(scripts[i].title + " by " + scripts[i].scripts_protected.profiles_public.username)
+export async function getScript(supabase: SupabaseClient, slug: string) {
+	const { data, error: err } = await supabase
+		.from("scripts_public")
+		.select(
+			`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
+			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
+			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
 		)
-			return scripts[i]
+		.eq("url", slug)
+		.returns<Script[]>()
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT scripts_public failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 
-	return null
+	if (data.length === 0) throw error(404, "That script doesn't exist.")
+	return data[0]
 }
 
 export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {
 	const { data, error: err } = await supabase
 		.from("scripts_public")
 		.select(
-			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
+			`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
 			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
 			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
 		)
@@ -159,16 +169,18 @@ export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {
 			Error details: ${err.details}
 			Error hint: ${err.message}`
 		)
+
+	if (data.length === 0) throw error(404, "That script doesn't exist.")
 	return data[0]
 }
 
-async function getDevelopers(supabase: SupabaseClient) {
+export async function getDeveloper(supabase: SupabaseClient, slug: string) {
 	const { data, error: err } = await supabase
 		.from("developers")
 		.select(
 			`id, realname, description, github, paypal_id, content, profiles_public (username, avatar_url)`
 		)
-		.order("username", { foreignTable: "profiles_public", ascending: true })
+		.eq("url", slug)
 		.returns<DeveloperWithUsername[]>()
 
 	if (err)
@@ -180,16 +192,7 @@ async function getDevelopers(supabase: SupabaseClient) {
 			Error details: ${err.details}
 			Error hint: ${err.message}`
 		)
-	return data
-}
-
-export async function getDeveloper(supabase: SupabaseClient, path: string) {
-	const developers = await getDevelopers(supabase)
-	if (!developers) return null
-	for (let i = 0; i < developers.length; i++)
-		if (path.toLowerCase() === encodeSEO(developers[i].profiles_public.username))
-			return developers[i]
-	return null
+	return data[0]
 }
 
 export async function getDeveloperUUID(supabase: SupabaseClient, uuid: string) {
