@@ -5,8 +5,8 @@
 	import { onMount } from "svelte"
 	import { browser } from "$app/environment"
 	import type { IScriptCard } from "$lib/types/collection"
-	export let script: IScriptCard
 
+	export let script: IScriptCard
 	export let imgElement: HTMLImageElement | undefined = browser ? new Image() : undefined
 
 	const defaultCover =
@@ -27,6 +27,7 @@
 
 	let imgLink: string = getCover(script.scripts_protected.assets_path)
 	$: imgLink = getCover(script.scripts_protected.assets_path)
+	$: script = script
 
 	onMount(async () => {
 		const response = await fetch(imgLink)

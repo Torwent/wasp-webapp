@@ -21,7 +21,7 @@ export const actions = {
 		if (!profile) {
 			const msg = "You need to login to add a script."
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		const { data } = await supabaseServer
@@ -34,7 +34,7 @@ export const actions = {
 		if (data && data.length > 0) {
 			const msg = "A post with that name by you already exists! Choose a different title."
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		const { data: tutorial, error: err } = await supabaseServer
@@ -52,7 +52,7 @@ export const actions = {
 
 		if (err) {
 			console.error("tutorials INSERT failed: " + err.message)
-			return setError(form, null, err.message)
+			return setError(form, "", err.message)
 		}
 
 		throw redirect(303, "./" + tutorial[0].url)

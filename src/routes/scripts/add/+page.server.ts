@@ -34,7 +34,7 @@ export const actions = {
 		if (!profile) {
 			const msg = "You need to login to add a script."
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		if (!form.valid) return fail(400, { form })
@@ -45,7 +45,7 @@ export const actions = {
 		if (tmp) {
 			const msg = "A script with that name by you already exists! Choose a different name."
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		let validFiles
@@ -53,7 +53,7 @@ export const actions = {
 			validFiles = await filesSchema.safeParseAsync(files)
 		} catch (error) {
 			console.error(error)
-			return setError(form, null, "The files your sent are not valid!")
+			return setError(form, "", "The files your sent are not valid!")
 		}
 
 		if (!validFiles.success) return fail(400, { form })
@@ -89,7 +89,7 @@ export const actions = {
 
 		if (error) {
 			console.error(error)
-			return setError(form, null, error)
+			return setError(form, "", error)
 		}
 
 		throw redirect(303, "./" + url)

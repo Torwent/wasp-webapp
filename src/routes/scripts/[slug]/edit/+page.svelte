@@ -16,12 +16,11 @@
 	import ScriptArticle from "../../ScriptArticle.svelte"
 	import StatsHeader from "../../StatsHeader.svelte"
 	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
+	import { addToolTips } from "$lib/backend/data"
 
 	export let data
 
 	const { categories, subcategories } = data
-
-	if (!categories || !subcategories) throw redirect(303, "./")
 
 	let { script, profile } = data
 	$: ({ script, profile } = data)
@@ -67,6 +66,12 @@
 	$: if ($form.subcategories) validate("subcategories")
 	$: if ($form.min_xp) validate("min_xp")
 	$: if ($form.max_xp) validate("max_xp")
+
+	$: {
+		script.categories = $form.categories
+		script.subcategories = $form.subcategories
+		addToolTips(script, categories, subcategories)
+	}
 
 	function onChangeCover(e: Event): void {
 		if (coverFiles.length === 0) {

@@ -1,4 +1,3 @@
-import { encodeSEO } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import type {
 	Category,
@@ -64,17 +63,13 @@ export async function getCheckBoxes(categories: Category[], subcategories: SubCa
 	return result
 }
 
-async function getAllCategories(categories: Category[], subcategories: SubCategory[]) {
-	return [...categories, ...subcategories]
-}
-
-async function getToolTips(
+function getToolTips(
 	categoriesStr: string[],
 	subcategoriesStr: string[],
 	categories: Category[],
 	subcategories: SubCategory[]
 ) {
-	const allCategories = await getAllCategories(categories, subcategories)
+	const allCategories = [...categories, ...subcategories]
 
 	let result: EmojiTooltip[] = []
 	const scriptCategories = [...categoriesStr, ...subcategoriesStr]
@@ -82,7 +77,7 @@ async function getToolTips(
 	for (let c of scriptCategories) {
 		for (let c2 of allCategories) {
 			if (c === c2.name) {
-				result.push({ tooltip: c2.name, icon: c2.emoji })
+				result.push({ name: c2.name, emoji: c2.emoji })
 				break
 			}
 		}
@@ -91,17 +86,20 @@ async function getToolTips(
 	return result
 }
 
-export async function addToolTips(
+export function addToolTips(
 	script: IScriptCard,
 	categories: Category[],
 	subcategories: SubCategory[]
 ) {
-	script.emojiTooltips = await getToolTips(
-		script.categories,
-		script.subcategories,
-		categories,
-		subcategories
-	)
+	const tooltips = getToolTips(script.categories, script.subcategories, categories, subcategories)
+
+	script.tooltip_emojis = []
+	script.tooltip_names = []
+
+	tooltips.forEach((tooltip) => {
+		script.tooltip_emojis.push(tooltip.emoji)
+		script.tooltip_names.push(tooltip.name)
+	})
 }
 
 export async function getScripts(supabase: SupabaseClient) {
@@ -131,6 +129,7 @@ export async function getScript(supabase: SupabaseClient, slug: string) {
 		.from("scripts_public")
 		.select(
 			`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
+			tooltip_emojis, tooltip_names,
 			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
 			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
 		)
@@ -155,6 +154,7 @@ export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {
 		.from("scripts_public")
 		.select(
 			`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
+			tooltip_emojis, tooltip_names,
 			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
 			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
 		)

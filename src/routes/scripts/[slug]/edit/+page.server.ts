@@ -43,7 +43,7 @@ export const actions = {
 		if (!profile) {
 			const msg = "You need to login to edit a script."
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		if (!form.valid) return fail(400, { form })
@@ -52,19 +52,19 @@ export const actions = {
 		if (!script) {
 			const msg = "That script does not exist!"
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		if (script.categories.includes("Official") && !profile.profiles_protected.administrator) {
 			const msg = "You cannot edit an official script!"
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		if (!canEdit(profile, script.scripts_protected.author_id)) {
 			const msg = "That script does not belong to you!"
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		script.title = form.data.title
@@ -83,7 +83,7 @@ export const actions = {
 			validFiles = await filesEditSchema.safeParseAsync(files)
 		} catch (error) {
 			console.error(error)
-			return setError(form, null, "The files your sent are not valid!")
+			return setError(form, "", "The files your sent are not valid!")
 		}
 
 		if (!validFiles.success) return fail(400, { form })
@@ -98,7 +98,7 @@ export const actions = {
 
 		if (error) {
 			console.error(error)
-			return setError(form, null, error)
+			return setError(form, "", error)
 		}
 
 		throw redirect(

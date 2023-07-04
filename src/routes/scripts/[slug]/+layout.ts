@@ -18,9 +18,7 @@ export const load = async ({ params, parent }) => {
 	}
 
 	return {
-		script: isUUID
-			? await getScriptUUID(supabaseClient, slug)
-			: await getScript(supabaseClient, slug),
+		script: isUUID ? getScriptUUID(supabaseClient, slug) : getScript(supabaseClient, slug),
 		categories,
 		subcategories
 	}

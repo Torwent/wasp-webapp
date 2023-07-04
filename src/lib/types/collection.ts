@@ -31,8 +31,8 @@ export type Category = Database["public"]["Tables"]["scripts_categories"]["Row"]
 export type SubCategory = Database["public"]["Tables"]["scripts_subcategories"]["Row"]
 
 export interface EmojiTooltip {
-	icon: string
-	tooltip: string
+	emoji: string
+	name: string
 }
 
 export interface CheckboxType {
@@ -51,7 +51,6 @@ export type ScriptStats = Database["public"]["Tables"]["stats_scripts"]["Row"]
 
 export interface IScriptCard extends ScriptPublic {
 	scripts_protected: ScriptsProtectedWithUsername
-	emojiTooltips: EmojiTooltip[]
 }
 
 export interface Script extends IScriptCard {

@@ -18,13 +18,13 @@ export const actions = {
 		if (!profile) {
 			const msg = "You need to login to edit a developer."
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		if (!canEdit(profile, form.data.id)) {
 			const msg = "You can't edit another developer profile."
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		if (!form.valid) return fail(400, { form })
@@ -50,12 +50,12 @@ export const actions = {
 
 		if (promises[0].error) {
 			console.error(promises[0].error)
-			return setError(form, null, promises[0].error.message)
+			return setError(form, "", promises[0].error.message)
 		}
 
 		if (promises[1].error) {
 			console.error(promises[1].error)
-			return setError(form, null, promises[1].error.message)
+			return setError(form, "", promises[1].error.message)
 		}
 
 		throw redirect(303, "/developers/" + form.data.username)

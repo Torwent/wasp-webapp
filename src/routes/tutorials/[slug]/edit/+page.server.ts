@@ -32,7 +32,7 @@ export const actions = {
 
 		if (error) {
 			console.error("tutorials UPDATE failed: " + error.message)
-			return setError(form, null, error.message)
+			return setError(form, "", error.message)
 		}
 
 		throw redirect(303, "/tutorials/" + data[0].url)

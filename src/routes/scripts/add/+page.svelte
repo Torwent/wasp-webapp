@@ -74,7 +74,6 @@
 				avatar_url: profile?.avatar_url || ""
 			}
 		},
-		emojiTooltips: [],
 		fts: undefined,
 		search: "",
 		tooltip_emojis: [],
@@ -88,6 +87,12 @@
 	$: if ($form.subcategories) validate("subcategories")
 	$: if ($form.min_xp) validate("min_xp")
 	$: if ($form.max_xp) validate("max_xp")
+
+	$: {
+		script.categories = $form.categories
+		script.subcategories = $form.subcategories
+		addToolTips(script, categories, subcategories)
+	}
 
 	function onChangeCover(e: Event): void {
 		if (coverFiles.length === 0) {
