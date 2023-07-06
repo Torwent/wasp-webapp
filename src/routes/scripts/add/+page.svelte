@@ -407,13 +407,13 @@
 					</FileDropzone>
 				</label>
 
-				<FormInput title="Title" bind:value={$form.title} bind:error={$errors.title} />
+				<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
 
 				<FormTextarea
 					title="Description"
 					extraTitle=" (recommended 60-80 characters)"
 					bind:value={$form.description}
-					bind:error={$errors.description}
+					bind:errors={$errors.description}
 					h={"h-18"}
 				/>
 
