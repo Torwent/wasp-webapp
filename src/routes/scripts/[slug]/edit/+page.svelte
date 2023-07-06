@@ -7,7 +7,6 @@
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
 	import MultiSelect from "$lib/components/forms/MultiSelect.svelte"
 	import { FileCode, ImagePlus } from "lucide-svelte"
-	import { redirect } from "@sveltejs/kit"
 	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
 	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
@@ -62,8 +61,8 @@
 
 	let isFocused: boolean = true
 
-	$: if ($form.categories) validate("categories")
-	$: if ($form.subcategories) validate("subcategories")
+	$: if ($form.categories) validate()
+	$: if ($form.subcategories) validate()
 	$: if ($form.min_xp) validate("min_xp")
 	$: if ($form.max_xp) validate("max_xp")
 
@@ -295,11 +294,6 @@
 		</div>
 
 		<article class="variant-ringed-secondary p-8 my-8 mx-auto xs:w-4/5 md:w-4/5 lg:w-3/4">
-			{#if $errors._errors && $errors._errors.length > 0}
-				{#each $errors._errors as error}
-					<div class="flex justify-center">{error}</div>
-				{/each}
-			{/if}
 			<header class="text-center my-8">
 				<h3>Update Script</h3>
 			</header>
@@ -555,6 +549,14 @@
 							bind:checked={script.published}
 						/>
 					</label>
+				</div>
+
+				<div class="my-8">
+					{#if $errors._errors && $errors._errors.length > 0}
+						{#each $errors._errors as error}
+							<div class="flex justify-center text-error-500">{error}</div>
+						{/each}
+					{/if}
 				</div>
 
 				<div class="flex justify-between">

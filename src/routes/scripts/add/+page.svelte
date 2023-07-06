@@ -83,10 +83,16 @@
 
 	$: addToolTips(script, categories, subcategories)
 
-	$: if ($form.categories) validate("categories")
-	$: if ($form.subcategories) validate("subcategories")
-	$: if ($form.min_xp) validate("min_xp")
-	$: if ($form.max_xp) validate("max_xp")
+	$: if (
+		$form.categories ||
+		$form.subcategories ||
+		$form.min_xp ||
+		$form.max_xp ||
+		$form.min_gp ||
+		$form.max_gp
+	)
+		validate()
+	$: console.log($errors._errors)
 
 	$: {
 		script.categories = $form.categories
@@ -313,11 +319,6 @@
 		</div>
 
 		<article class="variant-ringed-secondary p-8 my-8 mx-auto xs:w-4/5 md:w-4/5 lg:w-3/4">
-			{#if $errors._errors && $errors._errors.length > 0}
-				{#each $errors._errors as error}
-					<div class="flex justify-center">{error}</div>
-				{/each}
-			{/if}
 			<header class="text-center my-8">
 				<h3>Update Script</h3>
 			</header>
@@ -556,6 +557,14 @@
 						</svelte:fragment>
 					</FileDropzone>
 				</label>
+
+				<div class="my-8">
+					{#if $errors._errors && $errors._errors.length > 0}
+						{#each $errors._errors as error}
+							<div class="flex justify-center text-error-500">{error}</div>
+						{/each}
+					{/if}
+				</div>
 
 				<div class="flex justify-between">
 					<a href="./">
