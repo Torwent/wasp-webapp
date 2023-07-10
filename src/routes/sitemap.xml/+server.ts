@@ -15,7 +15,7 @@ const loadScripts = async (supabase: SupabaseClient) => {
 
 	const scriptData = data
 
-	let result: string[] = []
+	const result: string[] = []
 	scriptData.forEach((script) => {
 		result.push(
 			encodeSEO(script.title + " by " + script.scripts_protected.profiles_public.username)
@@ -33,7 +33,7 @@ const loadTutorials = async (supabase: SupabaseClient) => {
 
 	if (error) return console.error("tutorials SELECT failed: " + error.message)
 
-	let result: string[] = []
+	const result: string[] = []
 	data.forEach((tutorial) => {
 		result.push(encodeSEO(tutorial.title + " by " + tutorial.profiles_public.username))
 	})
@@ -49,7 +49,7 @@ const loadDevelopers = async (supabase: SupabaseClient) => {
 
 	if (error) return console.error("developers SELECT failed: " + error.message)
 
-	let result: string[] = []
+	const result: string[] = []
 	data.forEach((developer) => {
 		result.push(encodeSEO(developer.profiles_public.username))
 	})
@@ -67,8 +67,7 @@ const buildLoc = async (supabase: SupabaseClient, loc: string) => {
 		data = (await loadDevelopers(supabase)) || []
 	}
 
-	let result: string = ""
-
+	let result = ""
 	data.forEach((el) => {
 		result += `
       <url>

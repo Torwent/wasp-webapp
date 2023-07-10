@@ -4,7 +4,7 @@ import { error } from "@sveltejs/kit"
 export const load = async ({ depends, parent }) => {
 	const parentPromise = parent()
 	depends("supabase:stats_total")
-	let total: Stats = {
+	const total: Stats = {
 		username: "Total",
 		experience: 0,
 		gold: 0,

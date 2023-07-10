@@ -1,5 +1,4 @@
 import { error } from "@sveltejs/kit"
-import { encodeSEO } from "$lib/utils"
 import type { TutorialWithAuthor } from "$lib/types/collection"
 
 export const load = async ({ params, parent }) => {

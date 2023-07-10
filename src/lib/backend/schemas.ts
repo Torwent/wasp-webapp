@@ -7,8 +7,8 @@ async function checkClientImageDimensions(file: any, w: number, h: number): Prom
 	if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) return false
 
 	return new Promise((resolve) => {
-		let reader = new FileReader()
-		let img = new Image()
+		const reader = new FileReader()
+		const img = new Image()
 
 		reader.onload = function () {
 			img.src = reader.result as string

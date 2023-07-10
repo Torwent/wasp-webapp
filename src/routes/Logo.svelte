@@ -74,5 +74,5 @@
 			</g>
 		</g>
 	</svg>
-	<span class="font-bold text-lg"> WaspScripts </span>
+	<span class="font-bold text-lg">WaspScripts</span>
 </div>

@@ -1,6 +1,6 @@
 import type { Stats } from "$lib/types/collection"
 import { UUID_V4_REGEX } from "$lib/utils"
-import { error, redirect } from "@sveltejs/kit"
+import { error } from "@sveltejs/kit"
 
 export const load = async ({ url, depends, parent }) => {
 	const parentPromise = parent()
@@ -17,7 +17,7 @@ export const load = async ({ url, depends, parent }) => {
 	const start = (page - 1) * range
 	const finish = start + range
 
-	let total: Stats = {
+	const total: Stats = {
 		username: "Total",
 		experience: 0,
 		gold: 0,
@@ -31,7 +31,7 @@ export const load = async ({ url, depends, parent }) => {
 	const totalEntries = 10
 	const { supabaseClient } = await parentPromise
 
-	let query = supabaseClient
+	const query = supabaseClient
 		.from("stats")
 		.select("username, experience, gold, levels, runtime", { count: "exact" })
 

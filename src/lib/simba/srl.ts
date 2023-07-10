@@ -18,7 +18,7 @@ export interface TBox {
 }
 
 function distToLineEx(p: TPoint, sA: TPoint, sB: TPoint) {
-	let result = { nearest: { x: sA.x, y: sA.y }, result: 0 }
+	const result = { nearest: { x: sA.x, y: sA.y }, result: 0 }
 
 	const dx = sB.x - sA.x
 	const dy = sB.y - sA.y
@@ -45,7 +45,7 @@ function distToLineEx(p: TPoint, sA: TPoint, sB: TPoint) {
 }
 
 function nearestEdgeTo(p: TPoint, rect: TRectangle) {
-	let result = distToLineEx(p, rect.Top, rect.Left)
+	const result = distToLineEx(p, rect.Top, rect.Left)
 
 	let finalResult = result.nearest
 	let best = result.result

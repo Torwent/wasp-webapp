@@ -35,10 +35,10 @@ export async function updateWarning(supabase: SupabaseClient) {
 }
 
 export async function getCheckBoxes(categories: Category[], subcategories: SubCategory[]) {
-	let result: CheckboxType[] = []
+	const result: CheckboxType[] = []
 	let id = 0
 
-	for (let category of categories) {
+	for (const category of categories) {
 		result.push({
 			id: id++,
 			name: category.name,
@@ -47,7 +47,7 @@ export async function getCheckBoxes(categories: Category[], subcategories: SubCa
 			checked: false
 		})
 
-		for (let subcategory of subcategories) {
+		for (const subcategory of subcategories) {
 			if (category.name === subcategory.category) {
 				result.push({
 					id: id++,
@@ -71,11 +71,11 @@ function getToolTips(
 ) {
 	const allCategories = [...categories, ...subcategories]
 
-	let result: EmojiTooltip[] = []
+	const result: EmojiTooltip[] = []
 	const scriptCategories = [...categoriesStr, ...subcategoriesStr]
 
-	for (let c of scriptCategories) {
-		for (let c2 of allCategories) {
+	for (const c of scriptCategories) {
+		for (const c2 of allCategories) {
 			if (c === c2.name) {
 				result.push({ name: c2.name, emoji: c2.emoji })
 				break
@@ -145,7 +145,7 @@ export async function getScript(supabase: SupabaseClient, slug: string) {
 			Error hint: ${err.message}`
 		)
 
-	if (data.length === 0) throw error(404, "That script doesn't exist.")
+	if (data.length === 0) return null
 	return data[0]
 }
 

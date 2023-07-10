@@ -18,27 +18,27 @@ interface FormFiles {
 }
 
 export const actions = {
-	default: async ({ request, locals: { supabaseServer, getProfile } }) => {
-		const promises = await Promise.all([getProfile(), request.formData()])
+	default: async ({ request: { formData }, locals: { supabaseServer, getProfile } }) => {
+		const promises = await Promise.all([getProfile(), formData()])
 
 		const profile = promises[0]
-		const formData = promises[1]
+		const data = promises[1]
 
-		let files: FormFiles = { cover: undefined, banner: undefined, script: undefined }
+		const files: FormFiles = { cover: undefined, banner: undefined, script: undefined }
 
-		const coverFile = formData.get("cover") as File
-		const bannerFile = formData.get("banner") as File
-		const scriptFile = formData.get("script") as File
+		const coverFile = data.get("cover") as File
+		const bannerFile = data.get("banner") as File
+		const scriptFile = data.get("script") as File
 
 		if (coverFile.size > 0) files.cover = coverFile
 		if (bannerFile.size > 0) files.banner = bannerFile
 		if (scriptFile.size > 0) files.script = scriptFile
 
-		formData.delete("cover")
-		formData.delete("banner")
-		formData.delete("script")
+		data.delete("cover")
+		data.delete("banner")
+		data.delete("script")
 
-		const form = await superValidate(formData, scriptSchema)
+		const form = await superValidate(data, scriptSchema)
 
 		if (!profile) {
 			const msg = "You need to login to edit a script."
@@ -48,7 +48,7 @@ export const actions = {
 
 		if (!form.valid) return fail(400, { form })
 
-		let script = form.data.id ? await getScriptUUID(supabaseServer, form.data.id) : null
+		const script = form.data.id ? await getScriptUUID(supabaseServer, form.data.id) : null
 		if (!script) {
 			const msg = "That script does not exist!"
 			console.error(msg)
@@ -76,7 +76,7 @@ export const actions = {
 		script.max_xp = form.data.max_xp
 		script.min_gp = form.data.min_gp
 		script.max_gp = form.data.max_gp
-		script.published = formData.has("published")
+		script.published = data.has("published")
 
 		let validFiles
 		try {

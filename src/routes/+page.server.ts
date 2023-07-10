@@ -1,28 +1,10 @@
+import { doLogin } from "$lib/backend/data.server"
 import { API_URL } from "$lib/utils"
-import type { Provider } from "@supabase/supabase-js"
-import { fail, redirect } from "@sveltejs/kit"
+import { error, fail } from "@sveltejs/kit"
 
 export const actions = {
 	login: async ({ locals: { supabaseServer }, url: { origin, searchParams } }) => {
-		const provider = searchParams.get("provider") as Provider
-
-		if (provider) {
-			const { data, error } = await supabaseServer.auth.signInWithOAuth({
-				provider: provider,
-				options: {
-					redirectTo: origin + "/api/auth/callback/",
-					scopes: "identify email guilds guilds.members.read"
-				}
-			})
-
-			if (error) {
-				console.error("Login failed: " + error.message)
-				return fail(400, { message: "Something went wrong logging you in!" })
-			}
-
-			throw redirect(303, data.url)
-		}
-		return
+		await doLogin(supabaseServer, origin, searchParams)
 	},
 
 	logout: async ({ locals: { supabaseServer } }) => {

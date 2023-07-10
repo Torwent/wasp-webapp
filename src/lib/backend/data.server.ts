@@ -1,7 +1,34 @@
 import type { Script, ScriptPublic } from "$lib/types/collection"
 import { pad } from "$lib/utils"
-import type { SupabaseClient } from "@supabase/supabase-js"
-import { error } from "@sveltejs/kit"
+import type { Provider, SupabaseClient } from "@supabase/supabase-js"
+import { error, redirect } from "@sveltejs/kit"
+
+export async function doLogin(
+	supabase: SupabaseClient,
+	origin: string,
+	searchParams: URLSearchParams
+) {
+	const provider = searchParams.get("provider") as Provider
+
+	if (provider) {
+		const { data, error: err } = await supabase.auth.signInWithOAuth({
+			provider: provider,
+			options: {
+				redirectTo: origin + "/api/auth/callback/",
+				scopes: "identify email guilds guilds.members.read"
+			}
+		})
+
+		if (err) {
+			console.error("Login failed: " + err.message)
+			throw error(400, { message: "Something went wrong logging you in!" })
+		}
+
+		throw redirect(303, data.url)
+	}
+
+	throw error(403, "Failed to login! Provider not specified!")
+}
 
 function updateID(str: string, id: string) {
 	const regex = /{\$DEFINE SCRIPT_ID := '(.*?)'}/

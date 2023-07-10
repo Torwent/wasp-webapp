@@ -1,7 +1,6 @@
 import { setError, superValidate } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
 import { postSchema } from "$lib/backend/schemas"
-import { encodeSEO } from "$lib/utils"
 import type { TutorialWithAuthor } from "$lib/types/collection"
 
 export const load = async (event) => {
@@ -16,7 +15,7 @@ export const actions = {
 
 		if (!form.valid) return fail(400, { form })
 
-		let formUpdateData = {
+		const formUpdateData = {
 			title: form.data.title,
 			description: form.data.description,
 			content: form.data.content,

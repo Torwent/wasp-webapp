@@ -1,7 +1,6 @@
 import { setError, superValidate } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
 import { postSchema } from "$lib/backend/schemas"
-import { encodeSEO } from "$lib/utils"
 import type { TutorialWithAuthor } from "$lib/types/collection"
 
 export const load = async (event) => {
@@ -10,8 +9,8 @@ export const load = async (event) => {
 }
 
 export const actions = {
-	default: async ({ request, locals: { getProfile, supabaseServer } }) => {
-		const promises = await Promise.all([getProfile(), request.formData()])
+	default: async ({ request: { formData }, locals: { getProfile, supabaseServer } }) => {
+		const promises = await Promise.all([getProfile(), formData()])
 		const profile = promises[0]
 
 		const form = await superValidate(promises[1], postSchema)

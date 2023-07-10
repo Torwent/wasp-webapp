@@ -5,8 +5,8 @@ function strokeRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: numb
 }
 
 function drawGametabs(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D) {
-	let tabsX1 = canvas.width - 241
-	let tabsY1 = canvas.height - 335
+	const tabsX1 = canvas.width - 241
+	const tabsY1 = canvas.height - 335
 	strokeRect(context, tabsX1, tabsY1, 240, 334)
 
 	for (let i = 0; i < 7; i++) {

@@ -1,6 +1,6 @@
 import { error, redirect } from "@sveltejs/kit"
 
-export const GET = async ({ request, url: { searchParams }, locals: { supabaseServer } }) => {
+export const GET = async ({ url: { searchParams }, locals: { supabaseServer } }) => {
 	console.log("Logging in")
 
 	const code = searchParams.get("code")
