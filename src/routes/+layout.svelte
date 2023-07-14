@@ -51,7 +51,7 @@
 	<Modal regionBody="overflow-y-scroll max-h-96" />
 {/if}
 <!-- App Shell -->
-<AppShell regionPage="relative" slotPageHeader="sticky top-0 z-10">
+<AppShell regionPage="relative" slotPageHeader="sticky top-0 z-10" slotPageFooter="grid">
 	<svelte:fragment slot="pageHeader">
 		<div
 			class="backdrop-blur transition-colors duration-500 border-b dark:border-surface-50/[0.06]

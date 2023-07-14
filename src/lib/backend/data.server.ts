@@ -110,9 +110,11 @@ export async function uploadScript(
 	//rename all scripts to script so we can always fetch them later regardless of name changes.
 	const path = script.id + "/" + pad(1, 9) + "/script.simba"
 
-	uploadFile(supabase, "scripts", path, scriptFile)
-	uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
-	uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+	await Promise.all([
+		uploadFile(supabase, "scripts", path, scriptFile),
+		uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile),
+		uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+	])
 
 	return { error: undefined }
 }
@@ -152,22 +154,26 @@ export async function updateScript(
 		return { error: error.message }
 	}
 
+	const promises = []
+
 	if (scriptFile) {
 		const revision = script.scripts_protected.revision + 1
 		console.log("Updating script revision to ", revision)
 		scriptFile = await updateScriptFile(scriptFile, script.id as string, revision)
 		const path = script.id + "/" + pad(revision, 9) + "/script.simba"
-		uploadFile(supabase, "scripts", path, scriptFile)
+		promises.push(uploadFile(supabase, "scripts", path, scriptFile))
 	}
 
 	if (coverFile) {
 		console.log("Updating script cover")
-		uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
+		promises.push(uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile))
 	}
 	if (bannerFile) {
 		console.log("Updating script banner")
-		uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+		promises.push(uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile))
 	}
+
+	if (promises.length > 0) await Promise.all(promises)
 
 	return { error: undefined }
 }
