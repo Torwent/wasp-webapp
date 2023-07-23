@@ -165,3 +165,12 @@ export const developerSchema = z.object({
 		.nullable(),
 	content: z.string().includes(" ", { message: "This should be a couple of words." }).nullable()
 })
+
+export const premiumSchema = z.object({
+	plan: z.string(),
+	code: z
+		.string()
+		.min(6, "Must be more than 6 characters long.")
+		.max(12, "Must be less than 12 characters long.")
+		.optional()
+})

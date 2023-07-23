@@ -44,7 +44,7 @@
 			<p>{$page.error?.message}</p>
 		</div>
 
-		<a href="./">
+		<a href={$page.url.href}>
 			<button class="btn variant-filled-error">Back</button>
 		</a>
 	</div>

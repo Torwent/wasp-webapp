@@ -1,11 +1,35 @@
 <script lang="ts">
 	import { modalStore, type ModalSettings } from "@skeletonlabs/skeleton"
-	import { canDownload } from "$lib/backend/data"
 	import { page } from "$app/stores"
-
+	import { superForm } from "sveltekit-superforms/client"
+	import { premiumSchema } from "$lib/backend/schemas.js"
 	export let data
 
-	$: ({ profile } = data)
+	let { profile, prices, subscription, scripts } = data
+	$: ({ profile, prices, subscription, scripts } = data)
+
+	function getDays(start_date: number) {
+		let future = new Date(start_date)
+		future.setMonth(future.getMonth() + 3)
+		let now = Date.now()
+		return Math.ceil((future.getTime() - now) / (1000 * 3600 * 24))
+	}
+
+	const { form, errors, enhance } = superForm(data.form, {
+		dataType: "json",
+		multipleSubmits: "prevent",
+		clearOnSubmit: "errors",
+		taintedMessage: null,
+		validators: premiumSchema
+	})
+
+	const plans = prices
+	type Plan = (typeof plans)[number]
+
+	let plan: Plan = plans[0]
+
+	$: $form.plan = plan.id
+	$: if ($form.code === "") $form.code = undefined
 
 	const confirm: ModalSettings = {
 		type: "alert",
@@ -82,82 +106,270 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main class="container mx-auto my-6 max-w-5xl flex-grow text-center">
-	{#if profile && canDownload(profile)}
-		<header class="py-8">
-			<h2 class="my-4">Thank you for having joined WaspScripts!</h2>
-			<h3>
-				You already have the
-				{#if profile.profiles_protected.administrator}
-					<span class="text-orange-500">Administrator</span>
-				{:else if profile.profiles_protected.moderator}
-					<span class="text-purple-500">Moderator</span>
-				{:else if profile.profiles_protected.scripter}
-					<span class="text-teal-500">Scripter</span>
-				{:else if profile.profiles_protected.tester}
-					<span class="text-green-500">Tester</span>
-				{:else if profile.profiles_protected.vip}
-					<span class="text-red-500">VIP</span>
-				{:else if profile.profiles_protected.premium}
-					<span class="text-orange-500">Premium</span>
-				{/if}
-				Role.
-				{#if !profile.profiles_protected.vip || profile.profiles_protected.premium}
-					You already have access to every script and you don't need to buy
-					<span class="text-orange-500 dark:text-orange-400">Premium</span>
+<main class="flex">
+	{#if profile?.profiles_protected.premium && profile?.profiles_protected.subscription_external}
+		<div class="my-8 mx-auto text-center">
+			<p class="py-4">
+				The shop is handled by <a href="https://upgrade.chat/waspscripts">upgrade.chat</a>
+				for now.
+			</p>
+
+			<a href="https://upgrade.chat/waspscripts">
+				<button class="btn variant-filled-secondary">Upgrade.Chat</button>
+			</a>
+
+			<p class="py-4">
+				If you need to manage your subscription you can do so by visiting your upgrade.chat profile:
+			</p>
+
+			<a href="https://upgrade.chat/profile">
+				<button class="btn variant-filled-secondary">Profile</button>
+			</a>
+
+			<p class="py-4">
+				If you are having issues with your roles not appearing:
+				<br />
+				Go to that last page and click to "reprocess".
+				<br />
+				Hover your profile on the top right corner and make sure the roles are not there.
+				<br />
+				<br />
+				If after that they are still missing, you can contact me at
+				<a href="mailto: support@waspscripts.com" class="font-semibold hover:underline">
+					support@waspscripts.com
+				</a>
+				or better yet, via
+				<a
+					href="https://discord.gg/YMYUahmww9"
+					class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
+				>
+					discord
+				</a>
+				.
+			</p>
+		</div>
+	{:else if !subscription}
+		<form
+			method="POST"
+			class="md:flex w-4/5 variant-ghost-surface mx-auto my-24 rounded-md"
+			action="?/checkout"
+			use:enhance
+		>
+			<div
+				class="grid h-fit w-2/3 mx-auto content-between border-b-2 md:border-r-2 border-surface-500"
+			>
+				<div class="grid m-8 text-center">
+					<h4 class="mt-4">Choose a pricing plan:</h4>
+					<div class="my-4 btn-group-vertical md:btn-group variant-ghost justify-evenly">
+						{#each plans as p}
+							{#if p.recurring}
+								{@const price = p.recurring.interval}
+								<button
+									class="w-full"
+									class:variant-glass-primary={plan === p}
+									on:click|preventDefault={() => (plan = p)}
+								>
+									{price.slice(0)[0].toUpperCase() + price.slice(1) + "ly"}
+								</button>
+							{/if}
+						{/each}
+					</div>
+					<div>
+						<h5>Access to {scripts} premium scripts regularly updated and maintained.</h5>
+						<p class="my-4">
+							Get <span class="font-bold text-yellow-500">Premium*</span>
+							{#if plan.recurring?.interval === "week"}
+								role instantly and
+								<span class="font-bold text-red-500">VIP**</span>
+								role after 12 consecutive weeks subscribed.
+							{:else if plan.recurring?.interval === "month"}
+								role instantly and
+								<span class="font-bold text-red-500">VIP**</span>
+								role after 3 consecutive months subscribed.
+							{:else if plan.recurring?.interval === "year"}
+								and
+								<span class="font-bold text-red-500">VIP**</span>
+								role instantly.
+							{/if}
+						</p>
+						<p class="text-xs">
+							Canceling the subscription will remove both roles when the next payment is due.
+						</p>
+					</div>
+				</div>
+
+				<p class="text-xs text-left items-end m-4">
+					<span class="font-bold text-yellow-500">*Premium</span>
+					gives you access to all
+					<a href="/scripts?categories=Premium">premium scripts</a>
+					.
 					<br />
-					But of course, I appreciate it if you do!
+					<span class="font-bold text-red-500">**VIP</span>
+					if mostly cosmetic but gives you early access to scripts under development posted on Discord.
+				</p>
+			</div>
+			<div class="grid mx-auto w-2/3 md:w-1/3 content-between">
+				<div class="grid m-8 text-center h-full content-center">
+					{#if plan.recurring}
+						<header class="card-header">
+							<h3>
+								{plan.recurring.interval.slice(0)[0].toUpperCase() +
+									plan.recurring.interval.slice(1) +
+									"ly"} plan
+							</h3>
+						</header>
+
+						{#if plan.unit_amount}
+							<section class="p-4">
+								{new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(
+									plan.unit_amount / 100
+								)} per {plan.recurring.interval}
+							</section>
+						{/if}
+					{/if}
+					<input
+						type="text"
+						placeholder="Discount code"
+						class="input"
+						class:input-error={$errors.code}
+						bind:value={$form.code}
+					/>
+					{#if $errors.code}
+						{#each $errors.code as err}
+							<small class="text-error-500">{err}</small>
+						{/each}
+					{:else}
+						<div class="m-0 h-5" />
+					{/if}
+				</div>
+
+				<button
+					class="m-4 btn variant-filled-secondary flex"
+					name="Checkout"
+					aria-label="Go to checkout"
+				>
+					Checkout
+				</button>
+			</div>
+		</form>
+	{:else}
+		<form
+			method="POST"
+			class="md:flex w-4/5 variant-ghost-surface mx-auto my-24 rounded-md"
+			use:enhance
+		>
+			<div class="grid h-full w-2/3 mx-auto content-between md:border-r-2 border-surface-500">
+				<div class="grid m-8 text-center">
+					<h4 class="my-4">Subscription information</h4>
+
+					<div class="w-full flex content-end">
+						<div class="mx-auto">
+							Start date: {new Date(subscription.start_date * 1000).toLocaleString("pt-PT")}
+						</div>
+						<div class="mx-auto">
+							Period end: {new Date(subscription.current_period_end * 1000).toLocaleString("pt-PT")}
+						</div>
+					</div>
+					<div class="w-full flex content-end">
+						<div class="mx-auto">
+							<span class="font-bold text-yellow-500">*Premium</span>
+							active
+						</div>
+						<div class="mx-auto">
+							{#if profile && profile.profiles_protected.vip}
+								<span class="font-bold text-red-500">**VIP</span>
+								active
+							{:else}
+								{getDays(subscription.start_date * 1000)} days left for
+								<span class="font-bold text-red-500">**VIP</span>
+							{/if}
+						</div>
+					</div>
+					{#if subscription.cancel_at_period_end}
+						<span class="my-8 text-error-500">Will be canceled at period end</span>
+					{:else}
+						<div class="h-6 w-full my-8" />
+					{/if}
+				</div>
+
+				<p class="text-xs text-left items-end m-4">
+					<span class="font-bold text-yellow-500">*Premium</span>
+					gives you access to all
+					<a href="/scripts?categories=Premium">premium scripts</a>
+					.
+					<br />
+					<span class="font-bold text-red-500">**VIP</span>
+					if mostly cosmetic but gives you early access to scripts under development posted on Discord.
+				</p>
+			</div>
+			<div class="grid mx-auto w-2/3 md:w-1/3 content-between">
+				<div class="grid m-8 text-center h-full content-center">
+					{#if plan.recurring}
+						{@const currentPlan = subscription.items.data[0].plan}
+						{@const price =
+							currentPlan.interval.slice(0)[0].toUpperCase() + currentPlan.interval.slice(1) + "ly"}
+						<header class="card-header">
+							<h3>{price} plan</h3>
+						</header>
+
+						{#if currentPlan.amount}
+							<section class="p-4">
+								{new Intl.NumberFormat("pt-PT", {
+									style: "currency",
+									currency: currentPlan.currency
+								}).format(currentPlan.amount / 100)} per {currentPlan.interval}
+							</section>
+						{/if}
+					{/if}
+
+					{#if $errors.code}
+						{#each $errors.code as err}
+							<small class="text-error-500">{err}</small>
+						{/each}
+					{:else}
+						<div class="m-0 h-5" />
+					{/if}
+				</div>
+
+				{#if subscription.cancel_at_period_end}
+					<button
+						class="m-4 btn variant-filled-success flex"
+						name="Re-enable"
+						aria-label="Re-enable subscription"
+						formaction="?/reenable"
+					>
+						Re-enable
+					</button>
+				{:else}
+					<button
+						class="m-4 btn variant-filled-error flex"
+						name="Cancel"
+						aria-label="Cancel subscription"
+						formaction="?/cancel"
+					>
+						Cancel
+					</button>
 				{/if}
-			</h3>
-		</header>
+			</div>
+		</form>
 	{/if}
-	<p class="py-4">
-		The shop is handled by <a href="https://upgrade.chat/waspscripts">upgrade.chat</a>
-		for now.
-	</p>
-
-	<a href="https://upgrade.chat/waspscripts">
-		<button class="btn variant-filled-secondary">Upgrade.Chat</button>
-	</a>
-
-	<p class="py-4">
-		If you need to manage your subscription you can do so by visiting your upgrade.chat profile:
-	</p>
-
-	<a href="https://upgrade.chat/profile">
-		<button class="btn variant-filled-secondary">Profile</button>
-	</a>
-
-	<p class="py-4">
-		If you are having issues with your roles not appearing:
-		<br />
-		Go to that last page and click to "reprocess".
-		<br />
-		Hover your profile on the top right corner and make sure the roles are not there.
-		<br />
-		<br />
-		If after that they are still missing, you can contact me at
-		<a href="mailto: torwent@waspscripts.com" class="font-semibold hover:underline">
-			torwent@waspscripts.com
-		</a>
-		or better yet, via
-		<a
-			href="https://discord.gg/YMYUahmww9"
-			class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
-		>
-			discord
-		</a>
-		.
-	</p>
-
-	<h4 class="py-8">
-		Please read the
-		<button
-			class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
-			on:click={handleClick}
-		>
-			terms and condictions
-		</button>
-		before making any purchase.
-	</h4>
 </main>
+
+<h5 class="my-8 text-center">
+	Please read the
+	<button
+		class="font-semibold text-amber-500 dark:text-amber-200 hover:underline"
+		on:click={handleClick}
+	>
+		terms and condictions
+	</button>
+	before making any purchase.
+</h5>
+<p class="my-8 mx-auto text-center">
+	If you have any issues please contact <a
+		href="mailto: support@waspscripts.com"
+		class="font-semibold hover:underline"
+	>
+		support@waspscripts.com
+	</a>
+</p>

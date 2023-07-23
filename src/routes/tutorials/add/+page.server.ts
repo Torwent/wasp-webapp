@@ -9,8 +9,8 @@ export const load = async (event) => {
 }
 
 export const actions = {
-	default: async ({ request: { formData }, locals: { getProfile, supabaseServer } }) => {
-		const promises = await Promise.all([getProfile(), formData()])
+	default: async ({ request, locals: { getProfile, supabaseServer } }) => {
+		const promises = await Promise.all([getProfile(), request.formData()])
 		const profile = promises[0]
 
 		const form = await superValidate(promises[1], postSchema)

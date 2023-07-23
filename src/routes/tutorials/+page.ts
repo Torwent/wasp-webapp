@@ -20,9 +20,9 @@ async function getTutorials(
 		)
 
 	if (level > -1) {
-		query = query.eq("level", level).range(start, finish)
+		query = query.eq("level", level).order("order", { ascending: ascending }).range(start, finish)
 	} else if (search === "") {
-		query = query.order("level", { ascending: ascending }).range(start, finish)
+		query = query.order("order", { ascending: ascending }).range(start, finish)
 	} else {
 		query = query.ilike("search", "%" + search.replaceAll("%", "") + "%")
 	}

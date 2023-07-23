@@ -3,10 +3,13 @@ import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/publi
 import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit"
 import { API_URL } from "$lib/utils"
 import type { Profile } from "$lib/types/collection"
+import { updateProfileRoles } from "$lib/backend/supabase.server"
+import Stripe from "stripe"
+import { PRIVATE_STRIPE_KEY } from "$env/static/private"
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
-	const { url, cookies, locals } = event
+	const { url, cookies, locals, fetch } = event
 
 	const warningDismissed = cookies.get("warningDismissed")
 
@@ -30,14 +33,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 		const id = session.user.id
 		const { data, error } = await locals.supabaseServer
 			.from("profiles_public")
-			.select(
-				`id, discord_id, username, avatar_url,
-      		profiles_protected (developer, premium, vip, tester, scripter, moderator, administrator),
-			profiles_private (dismissed_warning)`
-			)
+			.select(`*, profiles_protected (*), profiles_private (*)`)
 			.eq("id", id)
 			.returns<Profile[]>()
-
 		if (error || data.length < 1) return null
 		return data[0]
 	}
@@ -45,16 +43,45 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const profile = await locals.getProfile()
 
 	if (profile) {
-		try {
-			await event.fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
+		if (profile.profiles_protected.subscription_external) {
+			await fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
 				method: "GET"
-			})
-		} catch (error) {
-			console.error(error)
+			}).catch((err) => console.error(err))
+		} else {
+			const startDate = profile.profiles_protected.subscription_start
+				? Date.parse(profile.profiles_protected.subscription_start)
+				: 0
+
+			const endDate = profile.profiles_protected.subscription_end
+				? Date.parse(profile.profiles_protected.subscription_end)
+				: 0
+
+			const now = Date.now()
+			if (endDate - now < 0) {
+				profile.profiles_protected.vip = false
+				profile.profiles_protected.premium = false
+				await updateProfileRoles(profile)
+			} else {
+				let needUpdate = false
+
+				if (endDate - startDate > 7889400000 && !profile.profiles_protected.vip) {
+					needUpdate = true
+					profile.profiles_protected.vip = true
+				}
+
+				if (!profile.profiles_protected.premium) {
+					needUpdate = true
+					profile.profiles_protected.premium = true
+				}
+
+				if (needUpdate) await updateProfileRoles(profile)
+			}
 		}
 	}
 
 	locals.warningDismissed = warningDismissed === "true"
+
+	locals.stripe = new Stripe(PRIVATE_STRIPE_KEY, { apiVersion: "2022-11-15" })
 
 	const response = await resolve(event, {
 		filterSerializedResponseHeaders(name) {

@@ -17,7 +17,7 @@ export const actions = {
 		return { success: true }
 	},
 
-	refresh: async ({ locals: { getProfile } }) => {
+	refresh: async ({ fetch, locals: { getProfile } }) => {
 		const profile = await getProfile()
 		if (!profile) return { success: false, message: "You are not logged in!" }
 

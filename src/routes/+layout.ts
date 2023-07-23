@@ -22,11 +22,7 @@ export const load = async ({ fetch, data, depends }) => {
 		const id = session.user.id
 		const { data, error } = await supabaseClient
 			.from("profiles_public")
-			.select(
-				`id, discord_id, username, avatar_url,
-      		profiles_protected (developer, premium, vip, tester, scripter, moderator, administrator),
-			profiles_private (dismissed_warning)`
-			)
+			.select(`*, profiles_protected (*), profiles_private (*)`)
 			.eq("id", id)
 			.returns<Profile[]>()
 

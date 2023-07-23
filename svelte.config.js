@@ -13,6 +13,8 @@ const config = {
 				"script-src": [
 					"self",
 					"https://enqlpchobniylwpsjcqc.supabase.co/",
+					"https://js.stripe.com/",
+					"sha256-NIGxH81XzlJ1MLZd3Miw/iZ1aTKLJT4aAbU5iVmRLTw=",
 					"unsafe-inline",
 					"sha256-PBmRLzA7Ofi7WtgbjS5vmS9t83AYv5oRRywasLtzZ9Y=", //dev
 					"sha256-k5HJr61/45h+hLBmZFy0IrJtHlGahgw6wXNW3ccZaAI=" //build

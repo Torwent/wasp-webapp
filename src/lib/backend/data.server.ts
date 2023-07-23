@@ -1,4 +1,4 @@
-import type { Script, ScriptPublic } from "$lib/types/collection"
+import type { Profile, Script, ScriptPublic } from "$lib/types/collection"
 import { pad } from "$lib/utils"
 import type { Provider, SupabaseClient } from "@supabase/supabase-js"
 import { error, redirect } from "@sveltejs/kit"
@@ -197,4 +197,14 @@ export async function getSignedURLServer(
 			Error stack: ${err.stack}`
 		)
 	return data.signedUrl
+}
+
+export async function getProfile(supabase: SupabaseClient, id: string) {
+	const { data, error } = await supabase
+		.from("profiles_public")
+		.select(`*, profiles_protected (*), profiles_private (*)`)
+		.eq("id", id)
+		.returns<Profile[]>()
+	if (error || data.length < 1) return null
+	return data[0]
 }
