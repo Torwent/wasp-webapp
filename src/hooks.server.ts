@@ -41,8 +41,21 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	const profile = await locals.getProfile()
+	locals.stripe = new Stripe(PRIVATE_STRIPE_KEY, { apiVersion: "2022-11-15" })
 
 	if (profile) {
+		let needUpdate = false
+		if (!profile.profiles_protected.customer_id) {
+			const customer = await locals.stripe.customers.create({
+				email: profile.profiles_private.email || undefined,
+				name: profile.id,
+				metadata: { id: profile.id, discord_id: profile.discord_id, username: profile.username }
+			})
+
+			profile.profiles_protected.customer_id = customer.id
+			needUpdate = true
+		}
+
 		if (profile.profiles_protected.subscription_external) {
 			await fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
 				method: "GET"
@@ -60,10 +73,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 			if (endDate - now < 0) {
 				profile.profiles_protected.vip = false
 				profile.profiles_protected.premium = false
-				await updateProfileRoles(profile)
+				needUpdate = true
 			} else {
-				let needUpdate = false
-
 				if (endDate - startDate > 7889400000 && !profile.profiles_protected.vip) {
 					needUpdate = true
 					profile.profiles_protected.vip = true
@@ -73,15 +84,12 @@ export const handle: Handle = async ({ event, resolve }) => {
 					needUpdate = true
 					profile.profiles_protected.premium = true
 				}
-
-				if (needUpdate) await updateProfileRoles(profile)
 			}
 		}
+		if (needUpdate) await updateProfileRoles(profile)
 	}
 
 	locals.warningDismissed = warningDismissed === "true"
-
-	locals.stripe = new Stripe(PRIVATE_STRIPE_KEY, { apiVersion: "2022-11-15" })
 
 	const response = await resolve(event, {
 		filterSerializedResponseHeaders(name) {

@@ -204,6 +204,7 @@ export interface Database {
         Row: {
           administrator: boolean
           cancel_at_period_end: boolean
+          customer_id: string | null
           developer: boolean
           id: string
           moderator: boolean
@@ -222,6 +223,7 @@ export interface Database {
         Insert: {
           administrator?: boolean
           cancel_at_period_end?: boolean
+          customer_id?: string | null
           developer?: boolean
           id: string
           moderator?: boolean
@@ -240,6 +242,7 @@ export interface Database {
         Update: {
           administrator?: boolean
           cancel_at_period_end?: boolean
+          customer_id?: string | null
           developer?: boolean
           id?: string
           moderator?: boolean
