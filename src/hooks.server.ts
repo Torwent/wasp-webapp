@@ -41,7 +41,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 	}
 
 	const profile = await locals.getProfile()
-	locals.stripe = new Stripe(PRIVATE_STRIPE_KEY, { apiVersion: "2022-11-15" })
+	locals.stripe = new Stripe(PRIVATE_STRIPE_KEY, { apiVersion: "2022-11-15", typescript: true })
 
 	if (profile) {
 		let needUpdate = false

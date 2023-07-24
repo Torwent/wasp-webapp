@@ -23,12 +23,9 @@
 		validators: premiumSchema
 	})
 
-	const plans = prices
-	type Plan = (typeof plans)[number]
+	let plan = prices[0]
 
-	let plan: Plan = plans[0]
-
-	$: $form.plan = plan.id
+	$: $form.plan = plan?.id || ""
 	$: if ($form.code === "") $form.code = undefined
 
 	const confirm: ModalSettings = {
@@ -161,7 +158,7 @@
 				<div class="grid m-8 text-center">
 					<h4 class="mt-4">Choose a pricing plan:</h4>
 					<div class="my-4 btn-group-vertical md:btn-group variant-ghost justify-evenly">
-						{#each plans as p}
+						{#each prices as p}
 							{#if p.recurring}
 								{@const price = p.recurring.interval}
 								<button
@@ -178,15 +175,15 @@
 						<h5>Access to {scripts} premium scripts regularly updated and maintained.</h5>
 						<p class="my-4">
 							Get <span class="font-bold text-yellow-500">Premium*</span>
-							{#if plan.recurring?.interval === "week"}
+							{#if plan?.recurring?.interval === "week"}
 								role instantly and
 								<span class="font-bold text-red-500">VIP**</span>
 								role after 12 consecutive weeks subscribed.
-							{:else if plan.recurring?.interval === "month"}
+							{:else if plan?.recurring?.interval === "month"}
 								role instantly and
 								<span class="font-bold text-red-500">VIP**</span>
 								role after 3 consecutive months subscribed.
-							{:else if plan.recurring?.interval === "year"}
+							{:else if plan?.recurring?.interval === "year"}
 								and
 								<span class="font-bold text-red-500">VIP**</span>
 								role instantly.
@@ -210,7 +207,7 @@
 			</div>
 			<div class="grid mx-auto w-2/3 md:w-1/3 content-between">
 				<div class="grid m-8 text-center h-full content-center">
-					{#if plan.recurring}
+					{#if plan?.recurring}
 						<header class="card-header">
 							<h3>
 								{plan.recurring.interval.slice(0)[0].toUpperCase() +
@@ -252,7 +249,7 @@
 				</button>
 			</div>
 		</form>
-	{:else}
+	{:else if subscription}
 		<form
 			method="POST"
 			class="md:flex w-4/5 variant-ghost-surface mx-auto my-24 rounded-md"
@@ -304,7 +301,7 @@
 			</div>
 			<div class="grid mx-auto w-2/3 md:w-1/3 content-between">
 				<div class="grid m-8 text-center h-full content-center">
-					{#if plan.recurring}
+					{#if subscription.items.data.length > 0}
 						{@const currentPlan = subscription.items.data[0].plan}
 						{@const price =
 							currentPlan.interval.slice(0)[0].toUpperCase() + currentPlan.interval.slice(1) + "ly"}

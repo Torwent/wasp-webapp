@@ -1,52 +1,51 @@
 import { doLogin } from "$lib/backend/data.server"
 import { premiumSchema } from "$lib/backend/schemas"
+import type { Profile } from "$lib/types/collection"
 import { error, redirect } from "@sveltejs/kit"
 import type Stripe from "stripe"
 import { superValidate } from "sveltekit-superforms/server"
 
-export const load = async (event) => {
-	const form = superValidate(event, premiumSchema)
-	const {
-		locals: { getProfile, stripe }
-	} = event
-	const product = await stripe.products.list({
-		limit: 1,
-		active: true
+async function getSubscription(stripe: Stripe, profilePromise: Promise<Profile | null>) {
+	const profile = await profilePromise
+
+	if (!profile || !profile.profiles_protected.customer_id) return null
+
+	const customer = await stripe.customers.retrieve(profile.profiles_protected.customer_id, {
+		expand: ["subscriptions"]
 	})
 
-	if (product.data.length === 0)
-		throw error(404, "Something went wrong retrieving products from stripe!")
+	if (!customer.deleted && customer.subscriptions) {
+		const subs = customer.subscriptions.data.filter((sub) => sub.status === "active")
 
-	const prices = stripe.prices.list({
-		product: product.data[0].id,
-		limit: 4,
-		active: true
-	})
-
-	let subscription: Stripe.Subscription | null = null
-	const profile = await getProfile()
-	if (profile && profile.profiles_protected.customer_id) {
-		const customer = await stripe.customers.retrieve(profile.profiles_protected.customer_id, {
-			expand: ["subscriptions"]
-		})
-
-		if (!customer.deleted && customer.subscriptions) {
-			const subs = customer.subscriptions.data.filter((sub) => sub.status === "active")
-
-			if (subs.length > 0) {
-				if (subs.length > 1) {
-					throw error(
-						403,
-						"You seem to have more than one subscription active. This should not happen, please contact support@waspscripts.com"
-					)
-				}
-
-				subscription = subs[0]
+		if (subs.length > 0) {
+			if (subs.length > 1) {
+				throw error(
+					403,
+					"You seem to have more than one subscription active. This should not happen, please contact support@waspscripts.com"
+				)
 			}
+
+			return subs[0]
 		}
 	}
+}
 
-	return { form, prices, subscription }
+async function getPrices(stripe: Stripe) {
+	const prices = await stripe.prices.list({
+		limit: 3,
+		active: true,
+		type: "recurring"
+	})
+
+	return prices.data
+}
+
+export const load = async (event) => {
+	return {
+		form: superValidate(event, premiumSchema),
+		prices: getPrices(event.locals.stripe),
+		subscription: getSubscription(event.locals.stripe, event.locals.getProfile())
+	}
 }
 
 export const actions = {

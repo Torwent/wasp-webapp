@@ -13,9 +13,6 @@ dependencies:
   '@floating-ui/dom':
     specifier: ^1.4.5
     version: 1.4.5
-  '@stripe/stripe-js':
-    specifier: ^1.54.1
-    version: 1.54.1
   '@supabase/supabase-js':
     specifier: ^2.26.0
     version: 2.26.0
@@ -947,10 +944,6 @@ packages:
       esm-env: 1.0.0
       svelte: 4.1.1
     dev: true
-
-  /@stripe/stripe-js@1.54.1:
-    resolution: {integrity: sha512-smEXPu1GKMcAj9g2luT16+oXfg2jAwyc68t2Dm5wdtYl3p8PqQaZEiI8tQmboaQAjgF8pIGma6byz1T1vgmpbA==}
-    dev: false
 
   /@supabase/auth-helpers-shared@0.4.1(@supabase/supabase-js@2.26.0):
     resolution: {integrity: sha512-IEDX9JzWkIjQiLUaP4Qy5YDiG0jFQatWfS+jw8cCQs6QfbNdEPd2Y3qonwGHnM90CZom9SvjuylBv2pFVAL7Lw==}
