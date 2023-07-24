@@ -25,23 +25,23 @@ export const load = async (event) => {
 
 	let subscription: Stripe.Subscription | null = null
 	const profile = await getProfile()
-	if (profile) {
-		const { data: customers } = await stripe.customers.search({
-			query: 'name: "' + profile.id + '"',
-			limit: 1,
-			expand: ["data.subscriptions"]
+	if (profile && profile.profiles_protected.customer_id) {
+		const customer = await stripe.customers.retrieve(profile.profiles_protected.customer_id, {
+			expand: ["subscriptions"]
 		})
-		if (customers.length > 0) {
-			const customer = customers[0]
-			if (customer.subscriptions && customer.subscriptions.data.length > 0) {
-				if (customer.subscriptions.data.length > 1)
+
+		if (!customer.deleted && customer.subscriptions) {
+			const subs = customer.subscriptions.data.filter((sub) => sub.status === "active")
+
+			if (subs.length > 0) {
+				if (subs.length > 1) {
 					throw error(
 						403,
 						"You seem to have more than one subscription active. This should not happen, please contact support@waspscripts.com"
 					)
+				}
 
-				if (customer.subscriptions.data[0].status === "active")
-					subscription = customer.subscriptions.data[0]
+				subscription = subs[0]
 			}
 		}
 	}
@@ -91,6 +91,7 @@ export const actions = {
 		if (session && session.url) throw redirect(303, session.url)
 		throw error(403, "Something went wrong!")
 	},
+
 	cancel: async ({
 		request,
 		locals: { supabaseServer, getSession, getProfile, stripe },
@@ -103,35 +104,44 @@ export const actions = {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
-		if (!profile?.profiles_protected.premium) {
+		if (!profile.profiles_protected.premium) {
 			throw error(403, "You are not premium!")
 		}
 
-		const { data: customers } = await stripe.customers.search({
-			query: 'name: "' + profile.id + '"',
-			limit: 1,
-			expand: ["data.subscriptions"]
+		if (!profile.profiles_protected.customer_id) {
+			throw error(
+				403,
+				"You premium and you don't have a customer id. This should not be possible! Please contact support@waspscripts.com"
+			)
+		}
+
+		const customer = await stripe.customers.retrieve(profile.profiles_protected.customer_id, {
+			expand: ["subscriptions"]
 		})
 
-		if (customers.length === 0 || customers.length > 1)
+		if (customer.deleted) {
 			throw error(
-				404,
-				"Something went wrong, your customer profile was not found. Please contact support@waspscripts.com"
+				403,
+				"That customer profile does not exist. Refresh the page, if the issue persists please contact support@waspscripts.com"
 			)
+		}
 
-		const customer = customers[0]
-		if (customer.subscriptions && customer.subscriptions.data.length > 0) {
-			if (customer.subscriptions.data.length > 1)
+		if (!customer.subscriptions) {
+			throw error(403, "You don't have any subscription to cancel.")
+		}
+
+		const subs = customer.subscriptions.data.filter((sub) => sub.status === "active")
+
+		if (subs.length > 0) {
+			if (subs.length > 1) {
 				throw error(
 					403,
 					"You seem to have more than one subscription active. This should not happen, please contact support@waspscripts.com"
 				)
-
-			if (customer.subscriptions.data[0].status === "active") {
-				let subscription = customer.subscriptions.data[0]
-				await stripe.subscriptions.update(subscription.id, { cancel_at_period_end: true })
-				throw redirect(303, "/premium")
 			}
+
+			await stripe.subscriptions.update(subs[0].id, { cancel_at_period_end: true })
+			throw redirect(303, "/premium")
 		}
 		throw error(403, "Something went wrong!")
 	},
@@ -147,36 +157,44 @@ export const actions = {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
-		if (!profile?.profiles_protected.premium) {
+		if (!profile.profiles_protected.premium) {
 			throw error(403, "You are not premium!")
 		}
 
-		const { data: customers } = await stripe.customers.search({
-			query: 'name: "' + profile.id + '"',
-			limit: 1,
-			expand: ["data.subscriptions"]
+		if (!profile.profiles_protected.customer_id) {
+			throw error(
+				403,
+				"You premium and you don't have a customer id. This should not be possible! Please contact support@waspscripts.com"
+			)
+		}
+
+		const customer = await stripe.customers.retrieve(profile.profiles_protected.customer_id, {
+			expand: ["subscriptions"]
 		})
 
-		if (customers.length === 0 || customers.length > 1)
+		if (customer.deleted) {
 			throw error(
-				404,
-				"Something went wrong, your customer profile was not found. Please contact support@waspscripts.com"
+				403,
+				"That customer profile does not exist. Refresh the page, if the issue persists please contact support@waspscripts.com"
 			)
+		}
 
-		const customer = customers[0]
+		if (!customer.subscriptions) {
+			throw error(403, "You don't have any subscription to cancel.")
+		}
 
-		if (customer.subscriptions && customer.subscriptions.data.length > 0) {
-			if (customer.subscriptions.data.length > 1)
+		const subs = customer.subscriptions.data.filter((sub) => sub.status === "active")
+
+		if (subs.length > 0) {
+			if (subs.length > 1) {
 				throw error(
 					403,
 					"You seem to have more than one subscription active. This should not happen, please contact support@waspscripts.com"
 				)
-
-			if (customer.subscriptions.data[0].status === "active") {
-				let subscription = customer.subscriptions.data[0]
-				await stripe.subscriptions.update(subscription.id, { cancel_at_period_end: false })
-				throw redirect(303, "/premium")
 			}
+
+			await stripe.subscriptions.update(subs[0].id, { cancel_at_period_end: false })
+			throw redirect(303, "/premium")
 		}
 		throw error(403, "Something went wrong!")
 	}
