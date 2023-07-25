@@ -16,7 +16,7 @@ export const load = async ({ fetch, data, depends }) => {
 		data: { session }
 	} = await supabaseClient.auth.getSession()
 
-	const getProfile = async () => {
+	async function getProfile() {
 		if (!session) return null
 
 		const id = session.user.id

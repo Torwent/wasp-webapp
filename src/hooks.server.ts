@@ -9,6 +9,7 @@ import { PRIVATE_STRIPE_KEY } from "$env/static/private"
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
+
 	const { url, cookies, locals, fetch } = event
 
 	const warningDismissed = cookies.get("warningDismissed")

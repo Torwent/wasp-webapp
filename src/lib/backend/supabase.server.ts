@@ -3,6 +3,7 @@ import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/publi
 import { ADMIN_USER, ADMIN_PASS } from "$env/static/private"
 import type { Profile } from "$lib/types/collection"
 import { error } from "@sveltejs/kit"
+import { invalidate } from "$app/navigation"
 
 const credentials = { email: ADMIN_USER, password: ADMIN_PASS }
 const options = { auth: { autoRefreshToken: true, persistSession: false } }

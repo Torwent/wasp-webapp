@@ -11,7 +11,6 @@ export const POST = async ({ request, locals: { stripe } }) => {
 	const { type, data } = (await request.json()) as Stripe.Event
 	const object = data.object as Stripe.Subscription
 
-	console.log(type)
 	if (object.object !== "subscription") return new Response()
 
 	const customer = await stripe.customers.retrieve(object.customer.toString())

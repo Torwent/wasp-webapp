@@ -24,11 +24,12 @@
 	import { browser } from "$app/environment"
 	import { invalidate } from "$app/navigation"
 	import { onMount } from "svelte"
-	import type { AuthChangeEvent, Session } from "@supabase/supabase-js"
+	import type { AuthChangeEvent, RealtimeChannel, Session } from "@supabase/supabase-js"
+	import type { ProfileProtected } from "$lib/types/collection"
 	export let data
 
-	let { supabaseClient, session } = data
-	$: ({ supabaseClient, session } = data)
+	let { supabaseClient, session, profile } = data
+	$: ({ supabaseClient, session, profile } = data)
 
 	onMount(() => {
 		const {
@@ -41,8 +42,28 @@
 			}
 		)
 
+		let profileProtectedSubscription: RealtimeChannel | null = null
+		if (session) {
+			supabaseClient
+				.channel("profiles_protected-changes")
+				.on(
+					"postgres_changes",
+					{
+						event: "UPDATE",
+						schema: "public",
+						table: "profiles_protected",
+						filter: "id=eq." + session.user.id
+					},
+					() => {
+						invalidate("supabase:auth")
+					}
+				)
+				.subscribe()
+		}
+
 		return () => {
 			subscription.unsubscribe()
+			if (profileProtectedSubscription) profileProtectedSubscription.unsubscribe()
 		}
 	})
 </script>
