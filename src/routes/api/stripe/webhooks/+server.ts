@@ -1,4 +1,4 @@
-import { getProfile, updateProfileRoles } from "$lib/backend/supabase.server"
+import { getProfile, updateProfileProtected } from "$lib/backend/supabase.server"
 import type Stripe from "stripe"
 
 export const GET = async ({ request }) => {
@@ -39,6 +39,6 @@ export const POST = async ({ request, locals: { stripe } }) => {
 		profile.profiles_protected.cancel_at_period_end = object.cancel_at_period_end
 	}
 
-	await updateProfileRoles(profile)
+	await updateProfileProtected(profile)
 	return new Response()
 }

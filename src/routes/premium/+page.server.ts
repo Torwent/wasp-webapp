@@ -1,51 +1,10 @@
 import { doLogin } from "$lib/backend/data.server"
 import { premiumSchema } from "$lib/backend/schemas"
-import type { Profile } from "$lib/types/collection"
 import { error, redirect } from "@sveltejs/kit"
-import type Stripe from "stripe"
 import { superValidate } from "sveltekit-superforms/server"
 
-async function getSubscription(stripe: Stripe, profilePromise: Promise<Profile | null>) {
-	const profile = await profilePromise
-
-	if (!profile || !profile.profiles_protected.customer_id) return null
-
-	const customer = await stripe.customers.retrieve(profile.profiles_protected.customer_id, {
-		expand: ["subscriptions"]
-	})
-
-	if (!customer.deleted && customer.subscriptions) {
-		const subs = customer.subscriptions.data.filter((sub) => sub.status === "active")
-
-		if (subs.length > 0) {
-			if (subs.length > 1) {
-				throw error(
-					403,
-					"You seem to have more than one subscription active. This should not happen, please contact support@waspscripts.com"
-				)
-			}
-
-			return subs[0]
-		}
-	}
-}
-
-async function getPrices(stripe: Stripe) {
-	const prices = await stripe.prices.list({
-		limit: 3,
-		active: true,
-		type: "recurring"
-	})
-
-	return prices.data
-}
-
 export const load = async (event) => {
-	return {
-		form: superValidate(event, premiumSchema),
-		prices: getPrices(event.locals.stripe),
-		subscription: getSubscription(event.locals.stripe, event.locals.getProfile())
-	}
+	return { form: superValidate(event, premiumSchema) }
 }
 
 export const actions = {

@@ -5,8 +5,8 @@
 	import { premiumSchema } from "$lib/backend/schemas.js"
 	export let data
 
-	let { profile, prices, subscription, scripts } = data
-	$: ({ profile, prices, subscription, scripts } = data)
+	let { profile, prices, scripts } = data
+	$: ({ profile, prices, scripts } = data)
 
 	function getDays(start_date: number) {
 		let future = new Date(start_date)
@@ -23,9 +23,9 @@
 		validators: premiumSchema
 	})
 
-	let plan = prices[0]
+	let plan = profile?.profiles_protected.price || prices[0]
 
-	$: $form.plan = plan?.id || ""
+	$: $form.plan = plan.id || ""
 	$: if ($form.code === "") $form.code = undefined
 
 	const confirm: ModalSettings = {
@@ -104,7 +104,109 @@
 </svelte:head>
 
 <main class="flex">
-	{#if profile?.profiles_protected.premium && profile?.profiles_protected.subscription_external}
+	{#if !profile || !profile.profiles_protected.premium}
+		<form
+			method="POST"
+			class="md:flex w-4/5 variant-ghost-surface mx-auto my-24 rounded-md"
+			action="?/checkout"
+			use:enhance
+		>
+			<div
+				class="grid h-fit w-2/3 mx-auto content-between border-b-2 md:border-r-2 border-surface-500"
+			>
+				<div class="grid m-8 text-center">
+					<h4 class="mt-4">Choose a pricing plan:</h4>
+					<div class="my-4 btn-group-vertical md:btn-group variant-ghost justify-evenly">
+						{#each prices as price}
+							{#if price.interval}
+								<button
+									class="w-full"
+									class:variant-glass-primary={plan === price}
+									on:click|preventDefault={() => (plan = price)}
+								>
+									{price.interval.slice(0)[0].toUpperCase() + price.interval.slice(1) + "ly"}
+								</button>
+							{/if}
+						{/each}
+					</div>
+					<div>
+						<h5>Access to {scripts} premium scripts regularly updated and maintained.</h5>
+						<p class="my-4">
+							Get <span class="font-bold text-yellow-500">Premium*</span>
+							{#if plan.interval === "week"}
+								role instantly and
+								<span class="font-bold text-red-500">VIP**</span>
+								role after 12 consecutive weeks subscribed.
+							{:else if plan.interval === "month"}
+								role instantly and
+								<span class="font-bold text-red-500">VIP**</span>
+								role after 3 consecutive months subscribed.
+							{:else if plan.interval === "year"}
+								and
+								<span class="font-bold text-red-500">VIP**</span>
+								role instantly.
+							{/if}
+						</p>
+						<p class="text-xs">
+							Canceling the subscription will remove both roles when the next payment is due.
+						</p>
+					</div>
+				</div>
+
+				<p class="text-xs text-left items-end m-4">
+					<span class="font-bold text-yellow-500">*Premium</span>
+					gives you access to all
+					<a href="/scripts?categories=Premium">premium scripts</a>
+					.
+					<br />
+					<span class="font-bold text-red-500">**VIP</span>
+					if mostly cosmetic but gives you early access to scripts under development posted on Discord.
+				</p>
+			</div>
+			<div class="grid mx-auto w-2/3 md:w-1/3 content-between">
+				<div class="grid m-8 text-center h-full content-center">
+					{#if plan.interval}
+						<header class="card-header">
+							<h3>
+								{plan.interval.slice(0)[0].toUpperCase() + plan.interval.slice(1) + "ly"} plan
+							</h3>
+						</header>
+
+						{#if plan.amount}
+							<section class="p-4">
+								{new Intl.NumberFormat("pt-PT", {
+									style: "currency",
+									currency: plan.currency
+								}).format(plan.amount / 100)} per {plan.interval}
+							</section>
+						{/if}
+					{/if}
+					<input
+						type="text"
+						placeholder="Discount code"
+						class="input"
+						class:input-error={$errors.code}
+						bind:value={$form.code}
+					/>
+					{#if $errors.code}
+						{#each $errors.code as err}
+							<small class="text-error-500">{err}</small>
+						{/each}
+					{:else}
+						<div class="m-0 h-5" />
+					{/if}
+				</div>
+
+				<button
+					class="m-4 btn variant-filled-secondary flex"
+					name="Checkout"
+					aria-label="Go to checkout"
+				>
+					Checkout
+				</button>
+			</div>
+		</form>
+	{:else if profile.profiles_protected.premium && profile.profiles_protected.subscription_external}
 		<div class="my-8 mx-auto text-center">
 			<p class="py-4">
 				The shop is handled by <a href="https://upgrade.chat/waspscripts">upgrade.chat</a>
@@ -145,111 +247,7 @@
 				.
 			</p>
 		</div>
-	{:else if !subscription}
-		<form
-			method="POST"
-			class="md:flex w-4/5 variant-ghost-surface mx-auto my-24 rounded-md"
-			action="?/checkout"
-			use:enhance
-		>
-			<div
-				class="grid h-fit w-2/3 mx-auto content-between border-b-2 md:border-r-2 border-surface-500"
-			>
-				<div class="grid m-8 text-center">
-					<h4 class="mt-4">Choose a pricing plan:</h4>
-					<div class="my-4 btn-group-vertical md:btn-group variant-ghost justify-evenly">
-						{#each prices as p}
-							{#if p.recurring}
-								{@const price = p.recurring.interval}
-								<button
-									class="w-full"
-									class:variant-glass-primary={plan === p}
-									on:click|preventDefault={() => (plan = p)}
-								>
-									{price.slice(0)[0].toUpperCase() + price.slice(1) + "ly"}
-								</button>
-							{/if}
-						{/each}
-					</div>
-					<div>
-						<h5>Access to {scripts} premium scripts regularly updated and maintained.</h5>
-						<p class="my-4">
-							Get <span class="font-bold text-yellow-500">Premium*</span>
-							{#if plan?.recurring?.interval === "week"}
-								role instantly and
-								<span class="font-bold text-red-500">VIP**</span>
-								role after 12 consecutive weeks subscribed.
-							{:else if plan?.recurring?.interval === "month"}
-								role instantly and
-								<span class="font-bold text-red-500">VIP**</span>
-								role after 3 consecutive months subscribed.
-							{:else if plan?.recurring?.interval === "year"}
-								and
-								<span class="font-bold text-red-500">VIP**</span>
-								role instantly.
-							{/if}
-						</p>
-						<p class="text-xs">
-							Canceling the subscription will remove both roles when the next payment is due.
-						</p>
-					</div>
-				</div>
-
-				<p class="text-xs text-left items-end m-4">
-					<span class="font-bold text-yellow-500">*Premium</span>
-					gives you access to all
-					<a href="/scripts?categories=Premium">premium scripts</a>
-					.
-					<br />
-					<span class="font-bold text-red-500">**VIP</span>
-					if mostly cosmetic but gives you early access to scripts under development posted on Discord.
-				</p>
-			</div>
-			<div class="grid mx-auto w-2/3 md:w-1/3 content-between">
-				<div class="grid m-8 text-center h-full content-center">
-					{#if plan?.recurring}
-						<header class="card-header">
-							<h3>
-								{plan.recurring.interval.slice(0)[0].toUpperCase() +
-									plan.recurring.interval.slice(1) +
-									"ly"} plan
-							</h3>
-						</header>
-
-						{#if plan.unit_amount}
-							<section class="p-4">
-								{new Intl.NumberFormat("pt-PT", { style: "currency", currency: "EUR" }).format(
-									plan.unit_amount / 100
-								)} per {plan.recurring.interval}
-							</section>
-						{/if}
-					{/if}
-					<input
-						type="text"
-						placeholder="Discount code"
-						class="input"
-						class:input-error={$errors.code}
-						bind:value={$form.code}
-					/>
-					{#if $errors.code}
-						{#each $errors.code as err}
-							<small class="text-error-500">{err}</small>
-						{/each}
-					{:else}
-						<div class="m-0 h-5" />
-					{/if}
-				</div>
-
-				<button
-					class="m-4 btn variant-filled-secondary flex"
-					name="Checkout"
-					aria-label="Go to checkout"
-				>
-					Checkout
-				</button>
-			</div>
-		</form>
-	{:else if subscription}
+	{:else if profile.profiles_protected.premium && !profile.profiles_protected.subscription_external}
 		<form
 			method="POST"
 			class="md:flex w-4/5 variant-ghost-surface mx-auto my-24 rounded-md"
@@ -258,34 +256,35 @@
 			<div class="grid h-full w-2/3 mx-auto content-between md:border-r-2 border-surface-500">
 				<div class="grid m-8 text-center">
 					<h4 class="my-4">Subscription information</h4>
-
-					<div class="w-full flex content-end">
-						<div class="mx-auto">
-							Start date: {new Date(subscription.start_date * 1000).toLocaleString("pt-PT")}
+					{#if profile.profiles_protected.subscription_start && profile.profiles_protected.subscription_end}
+						<div class="w-full flex content-end">
+							<div class="mx-auto">
+								Start date: {new Date(profile.profiles_protected.subscription_start).toLocaleString(
+									"pt-PT"
+								)}
+							</div>
+							<div class="mx-auto">
+								Period end: {new Date(profile.profiles_protected.subscription_end).toLocaleString(
+									"pt-PT"
+								)}
+							</div>
 						</div>
-						<div class="mx-auto">
-							Period end: {new Date(subscription.current_period_end * 1000).toLocaleString("pt-PT")}
-						</div>
-					</div>
-					<div class="w-full flex content-end">
-						<div class="mx-auto">
-							<span class="font-bold text-yellow-500">*Premium</span>
-							active
-						</div>
-						<div class="mx-auto">
-							{#if profile && profile.profiles_protected.vip}
-								<span class="font-bold text-red-500">**VIP</span>
+						<div class="w-full flex content-end">
+							<div class="mx-auto">
+								<span class="font-bold text-yellow-500">*Premium</span>
 								active
-							{:else}
-								{getDays(subscription.start_date * 1000)} days left for
-								<span class="font-bold text-red-500">**VIP</span>
-							{/if}
+							</div>
+							<div class="mx-auto">
+								{#if profile && profile.profiles_protected.vip}
+									<span class="font-bold text-red-500">**VIP</span>
+									active
+								{:else}
+									{getDays(Number(profile.profiles_protected.subscription_start))} days left for
+									<span class="font-bold text-red-500">**VIP</span>
+								{/if}
+							</div>
 						</div>
-					</div>
-					{#if subscription.cancel_at_period_end}
 						<span class="my-8 text-error-500">Will be canceled at period end</span>
-					{:else}
-						<div class="h-6 w-full my-8" />
 					{/if}
 				</div>
 
@@ -301,20 +300,18 @@
 			</div>
 			<div class="grid mx-auto w-2/3 md:w-1/3 content-between">
 				<div class="grid m-8 text-center h-full content-center">
-					{#if subscription.items.data.length > 0}
-						{@const currentPlan = subscription.items.data[0].plan}
-						{@const price =
-							currentPlan.interval.slice(0)[0].toUpperCase() + currentPlan.interval.slice(1) + "ly"}
+					{#if plan.interval}
+						{@const price = plan.interval.slice(0)[0].toUpperCase() + plan.interval.slice(1) + "ly"}
 						<header class="card-header">
 							<h3>{price} plan</h3>
 						</header>
 
-						{#if currentPlan.amount}
+						{#if plan.amount}
 							<section class="p-4">
 								{new Intl.NumberFormat("pt-PT", {
 									style: "currency",
-									currency: currentPlan.currency
-								}).format(currentPlan.amount / 100)} per {currentPlan.interval}
+									currency: plan.currency
+								}).format(plan.amount / 100)} per {plan.interval}
 							</section>
 						{/if}
 					{/if}
@@ -328,7 +325,7 @@
 					{/if}
 				</div>
 
-				{#if subscription.cancel_at_period_end}
+				{#if profile.profiles_protected.cancel_at_period_end}
 					<button
 						class="m-4 btn variant-filled-success flex"
 						name="Re-enable"

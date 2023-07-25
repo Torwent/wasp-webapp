@@ -3,7 +3,6 @@ import { UUID_V4_REGEX } from "$lib/utils"
 import { error } from "@sveltejs/kit"
 
 export const load = async ({ url, depends, parent }) => {
-	const parentPromise = parent()
 	depends("supabase:stats")
 
 	const order = url.searchParams.get("order") || "experience"
@@ -17,67 +16,68 @@ export const load = async ({ url, depends, parent }) => {
 	const start = (page - 1) * range
 	const finish = start + range
 
-	const total: Stats = {
-		username: "Total",
-		experience: 0,
-		gold: 0,
-		levels: 0,
-		runtime: 0,
-		password: "",
-		updated_at: null,
-		userID: ""
-	}
-
 	const totalEntries = 10
-	const { supabaseClient } = await parentPromise
 
-	const query = supabaseClient
-		.from("stats")
-		.select("username, experience, gold, levels, runtime", { count: "exact" })
+	async function getTotal() {
+		const { supabaseClient } = await parent()
 
-	if (search === "") {
-		query
-			.or("experience.gt.0,gold.gt.0")
-			.range(start, finish)
-			.order(order, { ascending: ascending, foreignTable: "", nullsFirst: false })
-	} else if (UUID_V4_REGEX.test(search)) {
-		query.eq("userID", search)
-	} else {
-		query.ilike("username", "%" + search.replaceAll("%", "") + "%")
-	}
+		const { data, error: err } = await supabaseClient.rpc("get_stats_total").returns<Stats[]>()
 
-	const promises = await Promise.all([
-		query.returns<Stats[]>(),
-		supabaseClient.rpc("get_stats_total").returns<Stats[]>()
-	])
-
-	const { data, count, error: err } = promises[0]
-	const { data: tData, error: tError } = promises[1]
-
-	if (err)
-		throw error(
-			500,
-			`Server error, this is probably not an issure on your end! - SELECT stats failed
+		if (err)
+			throw error(
+				500,
+				`Server error, this is probably not an issure on your end! - SELECT get_stats_total postgres function failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
 			Error hint: ${err.message}`
-		)
+			)
 
-	if (tError)
-		throw error(
-			500,
-			`Server error, this is probably not an issure on your end! - SELECT get_stats_total postgres function failed
-			Error code: ${tError.code}
-			Error hint: ${tError.hint}
-			Error details: ${tError.details}
-			Error hint: ${tError.message}`
-		)
+		const total: Stats = {
+			username: "Total",
+			experience: data[0].experience || 0,
+			gold: data[0].gold || 0,
+			levels: data[0].levels || 0,
+			runtime: data[0].runtime || 0,
+			password: "",
+			updated_at: null,
+			userID: ""
+		}
 
-	total.experience = tData[0].experience || 0
-	total.gold = tData[0].gold || 0
-	total.levels = tData[0].levels || 0
-	total.runtime = tData[0].runtime || 0
+		return total
+	}
 
-	return { total, stats: data, count: count || totalEntries, range: range }
+	async function getStats() {
+		const { supabaseClient } = await parent()
+
+		const query = supabaseClient
+			.from("stats")
+			.select("username, experience, gold, levels, runtime", { count: "exact" })
+
+		if (search === "") {
+			query
+				.or("experience.gt.0,gold.gt.0")
+				.range(start, finish)
+				.order(order, { ascending: ascending, foreignTable: "", nullsFirst: false })
+		} else if (UUID_V4_REGEX.test(search)) {
+			query.eq("userID", search)
+		} else {
+			query.ilike("username", "%" + search.replaceAll("%", "") + "%")
+		}
+
+		const { data, count, error: err } = await query.returns<Stats[]>()
+
+		if (err)
+			throw error(
+				500,
+				`Server error, this is probably not an issure on your end! - SELECT stats failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+			)
+
+		return { stats: data, count: count || totalEntries }
+	}
+	return { total: getTotal(), stats: getStats(), range: range }
 }

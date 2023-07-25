@@ -49,8 +49,8 @@
 
 	const { range } = data
 
-	let count = 0
-	$: count = (data.count as number) || 0
+	let { count } = data.stats
+	$: ({ count } = data.stats)
 
 	onMount(() => {
 		loading = false
@@ -150,7 +150,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each data.stats as entry}
+			{#each data.stats.stats as entry}
 				<tr
 					class="bg-white border-b dark:bg-stone-800 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-600"
 				>

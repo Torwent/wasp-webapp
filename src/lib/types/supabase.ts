@@ -172,6 +172,39 @@ export interface Database {
         }
         Relationships: []
       }
+      prices: {
+        Row: {
+          amount: number
+          created_at: string | null
+          currency: string
+          id: string
+          interval: string | null
+          recurring: boolean
+          stripe_id: string
+          stripe_product: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string | null
+          currency?: string
+          id?: string
+          interval?: string | null
+          recurring?: boolean
+          stripe_id?: string
+          stripe_product?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string | null
+          currency?: string
+          id?: string
+          interval?: string | null
+          recurring?: boolean
+          stripe_id?: string
+          stripe_product?: string
+        }
+        Relationships: []
+      }
       profiles_private: {
         Row: {
           dismissed_warning: boolean
@@ -209,6 +242,7 @@ export interface Database {
           id: string
           moderator: boolean
           premium: boolean
+          price_id: string | null
           scripter: boolean
           subscription_end: string | null
           subscription_external: boolean
@@ -228,6 +262,7 @@ export interface Database {
           id: string
           moderator?: boolean
           premium?: boolean
+          price_id?: string | null
           scripter?: boolean
           subscription_end?: string | null
           subscription_external?: boolean
@@ -247,6 +282,7 @@ export interface Database {
           id?: string
           moderator?: boolean
           premium?: boolean
+          price_id?: string | null
           scripter?: boolean
           subscription_end?: string | null
           subscription_external?: boolean
@@ -264,6 +300,12 @@ export interface Database {
             columns: ["id"]
             referencedRelation: "profiles_public"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_protected_price_id_fkey"
+            columns: ["price_id"]
+            referencedRelation: "prices"
+            referencedColumns: ["stripe_id"]
           }
         ]
       }

@@ -52,7 +52,7 @@ export async function getProfile(id: string) {
 	return data[0]
 }
 
-export async function updateProfileRoles(profile: Profile) {
+export async function updateProfileProtected(profile: Profile) {
 	if (!adminLoggedIn) {
 		await login(false)
 		if (!adminLoggedIn) return false

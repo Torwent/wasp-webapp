@@ -3,7 +3,7 @@ import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/publi
 import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit"
 import { API_URL } from "$lib/utils"
 import type { Profile } from "$lib/types/collection"
-import { updateProfileRoles } from "$lib/backend/supabase.server"
+import { updateProfileProtected } from "$lib/backend/supabase.server"
 import Stripe from "stripe"
 import { PRIVATE_STRIPE_KEY } from "$env/static/private"
 
@@ -26,30 +26,37 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return session
 	}
 
+	const session = await locals.getSession()
+
 	locals.getProfile = async () => {
-		const session = await locals.getSession()
 		if (!session) return null
 
 		const id = session.user.id
-		const { data, error } = await locals.supabaseServer
+		const { data, error: err } = await locals.supabaseServer
 			.from("profiles_public")
-			.select(`*, profiles_protected (*), profiles_private (*)`)
+			.select(`*, profiles_protected (*, prices (*)), profiles_private (*)`)
 			.eq("id", id)
 			.returns<Profile[]>()
-		if (error || data.length < 1) return null
+
+		if (err || data.length < 1) return null
+
 		return data[0]
 	}
 
 	const profile = await locals.getProfile()
 	locals.stripe = new Stripe(PRIVATE_STRIPE_KEY, { apiVersion: "2022-11-15", typescript: true })
 
-	if (profile) {
+	if (session && profile) {
 		let needUpdate = false
 		if (!profile.profiles_protected.customer_id) {
 			const customer = await locals.stripe.customers.create({
-				email: profile.profiles_private.email || undefined,
-				name: profile.id,
-				metadata: { id: profile.id, discord_id: profile.discord_id, username: profile.username }
+				email: session.user.email,
+				name: session.user.id,
+				metadata: {
+					id: session.user.id,
+					discord_id: profile.discord_id,
+					username: profile.username
+				}
 			})
 
 			profile.profiles_protected.customer_id = customer.id
@@ -86,7 +93,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 				}
 			}
 		}
-		if (needUpdate) await updateProfileRoles(profile)
+		if (needUpdate) await updateProfileProtected(profile)
 	}
 
 	locals.warningDismissed = warningDismissed === "true"

@@ -1,8 +1,14 @@
 import type { Database } from "$lib/types/supabase"
 
+export type Price = Database["public"]["Tables"]["prices"]["Row"]
+
 export type ProfilePublic = Database["public"]["Tables"]["profiles_public"]["Row"]
 export type ProfileProtected = Database["public"]["Tables"]["profiles_protected"]["Row"]
 export type ProfilePrivate = Database["public"]["Tables"]["profiles_private"]["Row"]
+
+export interface ProfileProtectedWithPrice extends ProfileProtected {
+	price: Price
+}
 
 type ProfilePublicUsername = {
 	profiles_public: {
@@ -12,7 +18,7 @@ type ProfilePublicUsername = {
 }
 
 export interface Profile extends ProfilePublic {
-	profiles_protected: ProfileProtected
+	profiles_protected: ProfileProtectedWithPrice
 	profiles_private: ProfilePrivate
 }
 

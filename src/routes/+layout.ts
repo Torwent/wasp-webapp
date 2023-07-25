@@ -22,7 +22,7 @@ export const load = async ({ fetch, data, depends }) => {
 		const id = session.user.id
 		const { data, error } = await supabaseClient
 			.from("profiles_public")
-			.select(`*, profiles_protected (*), profiles_private (*)`)
+			.select(`*, profiles_protected (*, prices (*)), profiles_private (*)`)
 			.eq("id", id)
 			.returns<Profile[]>()
 
