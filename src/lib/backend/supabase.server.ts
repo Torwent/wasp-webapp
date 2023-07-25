@@ -1,7 +1,7 @@
 import { createClient } from "@supabase/supabase-js"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import { ADMIN_USER, ADMIN_PASS } from "$env/static/private"
-import type { Profile } from "$lib/types/collection"
+import type { Profile, ProfileProtected } from "$lib/types/collection"
 import { error } from "@sveltejs/kit"
 import { invalidate } from "$app/navigation"
 
@@ -61,7 +61,22 @@ export async function updateProfileProtected(profile: Profile) {
 
 	const { error: err } = await supabaseAdmin
 		.from("profiles_protected")
-		.update(profile.profiles_protected)
+		.update({
+			cancel_at_period_end: profile.profiles_protected.cancel_at_period_end,
+			customer_id: profile.profiles_protected.customer_id,
+			developer: profile.profiles_protected.developer,
+			premium: profile.profiles_protected.premium,
+			price_id: profile.profiles_protected.price_id,
+			scripter: profile.profiles_protected.scripter,
+			subscription_end: profile.profiles_protected.subscription_end,
+			subscription_external: profile.profiles_protected.subscription_external,
+			subscription_id: profile.profiles_protected.subscription_id,
+			subscription_start: profile.profiles_protected.subscription_start,
+			tester: profile.profiles_protected.tester,
+			timeout: profile.profiles_protected.timeout,
+			unlocked_ips: profile.profiles_protected.unlocked_ips,
+			vip: profile.profiles_protected.vip
+		})
 		.eq("id", profile.id)
 
 	if (err) throw error(403, err)
