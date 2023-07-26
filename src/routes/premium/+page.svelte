@@ -25,7 +25,7 @@
 
 	let plan = profile?.profiles_protected.price || prices[0]
 
-	$: $form.plan = plan.id || ""
+	$: $form.plan = plan.stripe_id || prices[0].stripe_id
 	$: if ($form.code === "") $form.code = undefined
 
 	const confirm: ModalSettings = {

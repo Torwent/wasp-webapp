@@ -32,21 +32,32 @@ export const actions = {
 		}
 		const form = await superValidate(promises[2], premiumSchema)
 
-		const session = await stripe.checkout.sessions.create({
-			payment_method_types: ["card", "link"],
-			line_items: [{ price: form.data.plan, quantity: 1 }],
-			customer: profile.profiles_protected.customer_id,
-			customer_update: { address: "auto", shipping: "auto" },
-			mode: "subscription",
-			billing_address_collection: "auto",
-			success_url: origin + "/api/stripe/checkout/success?session_id={CHECKOUT_SESSION_ID}",
-			cancel_url: origin + "/api/stripe/checkout/cancel?session_id={CHECKOUT_SESSION_ID}",
-			automatic_tax: { enabled: true },
-			metadata: { id: profile.id, discord_id: profile.discord_id, username: profile.username },
-			payment_method_collection: "always"
-		})
+		if (form.data.plan === "")
+			throw error(
+				403,
+				"Something went wrong! Seems like no plan was selected? If this keeps occuring please contact support@waspscripts.com"
+			)
 
-		if (session && session.url) throw redirect(303, session.url)
+		try {
+			const session = await stripe.checkout.sessions.create({
+				payment_method_types: ["card", "link"],
+				line_items: [{ price: form.data.plan, quantity: 1 }],
+				customer: profile.profiles_protected.customer_id,
+				customer_update: { address: "auto", shipping: "auto" },
+				mode: "subscription",
+				billing_address_collection: "auto",
+				success_url: origin + "/api/stripe/checkout/success?session_id={CHECKOUT_SESSION_ID}",
+				cancel_url: origin + "/api/stripe/checkout/cancel?session_id={CHECKOUT_SESSION_ID}",
+				automatic_tax: { enabled: true },
+				metadata: { id: profile.id, discord_id: profile.discord_id, username: profile.username },
+				payment_method_collection: "always"
+			})
+
+			if (session && session.url) throw redirect(303, session.url)
+		} catch (err) {
+			throw error(403, "Something went wrong creating the checkout session: " + err)
+		}
+
 		throw error(403, "Something went wrong!")
 	},
 
