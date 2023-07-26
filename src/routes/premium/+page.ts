@@ -1,4 +1,4 @@
-import type { Price } from "$lib/types/collection"
+import type { Prices } from "$lib/types/collection"
 import { error } from "@sveltejs/kit"
 
 export const load = async ({ parent, data }) => {
@@ -33,7 +33,7 @@ export const load = async ({ parent, data }) => {
 			.select(`stripe_id, stripe_product, amount, currency, interval`)
 			.eq("stripe_product", "prod_OJdmhvyX05puAr")
 			.order("amount", { ascending: true })
-			.returns<Price[]>()
+			.returns<Prices[]>()
 
 		if (err) {
 			throw error(

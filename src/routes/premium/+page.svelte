@@ -23,7 +23,7 @@
 		validators: premiumSchema
 	})
 
-	let plan = profile?.profiles_protected.price || prices[0]
+	let plan = profile?.profiles_protected.prices || prices[0]
 
 	$: $form.plan = plan.stripe_id || prices[0].stripe_id
 	$: if ($form.code === "") $form.code = undefined
