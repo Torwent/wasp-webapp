@@ -1,7 +1,8 @@
 import { doLogin } from "$lib/backend/data.server"
 import { premiumSchema } from "$lib/backend/schemas"
 import { error, redirect } from "@sveltejs/kit"
-import { superValidate } from "sveltekit-superforms/server"
+import type Stripe from "stripe"
+import { setError, superValidate } from "sveltekit-superforms/server"
 
 export const load = async (event) => {
 	return { form: superValidate(event, premiumSchema) }
@@ -38,8 +39,9 @@ export const actions = {
 				"Something went wrong! Seems like no plan was selected? If this keeps occuring please contact support@waspscripts.com"
 			)
 
+		let session: Stripe.Checkout.Session
 		try {
-			const session = await stripe.checkout.sessions.create({
+			session = await stripe.checkout.sessions.create({
 				payment_method_types: ["card", "link"],
 				line_items: [{ price: form.data.plan, quantity: 1 }],
 				customer: profile.profiles_protected.customer_id,
@@ -52,12 +54,11 @@ export const actions = {
 				metadata: { id: profile.id, discord_id: profile.discord_id, username: profile.username },
 				payment_method_collection: "always"
 			})
-
-			if (session && session.url) throw redirect(303, session.url)
-		} catch (err) {
-			throw error(403, "Something went wrong creating the checkout session: " + err)
+		} catch (err: any) {
+			return setError(form, "", err)
 		}
 
+		if (session && session.url) throw redirect(303, session.url)
 		throw error(403, "Something went wrong!")
 	},
 

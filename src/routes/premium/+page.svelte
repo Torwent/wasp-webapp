@@ -349,6 +349,14 @@
 	{/if}
 </main>
 
+{#if $errors._errors}
+	<div class="my-8 text-center">
+		{#each $errors._errors as err}
+			<small class="text-error-500">{err}</small>
+		{/each}
+	</div>
+{/if}
+
 <h5 class="my-8 text-center">
 	Please read the
 	<button
