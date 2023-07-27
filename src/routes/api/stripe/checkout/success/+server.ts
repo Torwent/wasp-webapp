@@ -1,8 +1,9 @@
 import { error, redirect } from "@sveltejs/kit"
 import { updateProfileProtected } from "$lib/backend/supabase.server"
 import { getProfile } from "$lib/backend/data.server"
+import { API_URL } from "$lib/utils"
 
-export const GET = async ({ url: { searchParams }, locals: { supabaseServer, stripe } }) => {
+export const GET = async ({ fetch, url: { searchParams }, locals: { supabaseServer, stripe } }) => {
 	console.log("Checkout")
 	const sessionID = searchParams.get("session_id")
 
@@ -64,6 +65,9 @@ export const GET = async ({ url: { searchParams }, locals: { supabaseServer, str
 	}
 
 	await updateProfileProtected(profile)
+	await fetch(API_URL + "/discord/update/" + profile.discord_id, {
+		method: "GET"
+	}).catch((err) => console.error(err))
 
 	throw redirect(303, "/premium")
 }

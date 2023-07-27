@@ -95,6 +95,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 			}
 		}
 		if (needUpdate) await updateProfileProtected(profile)
+		if (!profile.profiles_protected.subscription_external)
+			await fetch(API_URL + "/discord/update/" + profile.discord_id, {
+				method: "GET"
+			}).catch((err) => console.error(err))
 	}
 
 	locals.warningDismissed = warningDismissed === "true"

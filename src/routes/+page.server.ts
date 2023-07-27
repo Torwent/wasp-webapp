@@ -21,9 +21,14 @@ export const actions = {
 		const profile = await getProfile()
 		if (!profile) return { success: false, message: "You are not logged in!" }
 
-		await fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
-			method: "GET"
-		}).catch((error) => console.error(error))
+		if (profile.profiles_protected.subscription_external)
+			await fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
+				method: "GET"
+			}).catch((error) => console.error(error))
+		else
+			await fetch(API_URL + "/discord/update/" + profile.discord_id, {
+				method: "GET"
+			}).catch((error) => console.error(error))
 
 		return { success: true }
 	}
