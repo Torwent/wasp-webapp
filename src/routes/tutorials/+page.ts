@@ -4,7 +4,6 @@ import { encodeSEO } from "$lib/utils"
 import type { TutorialWithAuthor } from "$lib/types/collection"
 
 export const load = async ({ url, depends, parent }) => {
-	const parentPromise = parent()
 	depends("supabase:tutorials")
 
 	const pageStr = url.searchParams.get("page") || "-1"
@@ -33,13 +32,18 @@ export const load = async ({ url, depends, parent }) => {
 		finish: number,
 		ascending: boolean
 	) {
-		const { supabaseClient } = await parentPromise
+		const { supabaseClient, profile } = await parent()
 		let query = supabaseClient
 			.from("tutorials")
-			.select(
-				"id, user_id, title, description, content, level, profiles_public(username, avatar_url)",
-				{ count: "exact" }
-			)
+			.select("*, profiles_public (*)", { count: "exact" })
+
+		if (
+			profile &&
+			!profile.profiles_protected.administrator &&
+			!profile.profiles_protected.moderator
+		) {
+			query = query.or("published.eq.true,user_id.eq." + profile.id)
+		}
 
 		if (level > -1) {
 			query = query.eq("level", level).order("order", { ascending: ascending }).range(start, finish)

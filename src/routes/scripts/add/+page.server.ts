@@ -8,8 +8,7 @@ import { getScript } from "$lib/backend/data"
 import type { ScriptPublic } from "$lib/types/collection"
 
 export const load = async (event) => {
-	const form = superValidate(event, scriptSchema)
-	return { form }
+	return { form: superValidate(event, scriptSchema) }
 }
 
 export const actions = {

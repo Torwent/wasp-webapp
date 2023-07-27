@@ -1,6 +1,6 @@
 <script lang="ts">
 	export let value: number
-	export let error: string[] | undefined
+	export let errors: string[] | undefined
 </script>
 
 <div>
@@ -30,8 +30,8 @@
 			Advanced tutorial
 		</button>
 	</div>
-	{#if error}
-		<small class="text-error-500">{error}</small>
+	{#if errors}
+		<small class="text-error-500">{errors}</small>
 	{:else}
 		<div class="m-0 h-5" />
 	{/if}

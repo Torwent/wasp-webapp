@@ -12,7 +12,9 @@ export const actions = {
 		const promises = await Promise.all([getProfile(), request.formData()])
 		const profile = promises[0]
 
-		const form = await superValidate(promises[1], postSchema)
+		const dataForm = promises[1]
+
+		const form = await superValidate(dataForm, postSchema)
 
 		if (!form.valid) return fail(400, { form })
 
@@ -24,7 +26,7 @@ export const actions = {
 
 		const { data } = await supabaseServer
 			.from("tutorials")
-			.select("id, created_at, user_id, author, title, description, content, level")
+			.select("*")
 			.eq("title", form.data.title)
 			.eq("user_id", profile.id)
 			.returns<TutorialWithAuthor[]>()
@@ -42,6 +44,8 @@ export const actions = {
 				description: form.data.description,
 				content: form.data.content,
 				level: form.data.level,
+				order: form.data.order,
+				published: dataForm.has("published"),
 				search: "",
 				url: ""
 			})

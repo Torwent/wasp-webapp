@@ -2,7 +2,6 @@ import { error } from "@sveltejs/kit"
 import type { TutorialWithAuthor } from "$lib/types/collection"
 
 export const load = async ({ params, data, parent }) => {
-	const parentPromise = parent()
 	const { slug } = params
 
 	const isSEOFormated = slug.includes("-by-")
@@ -13,12 +12,10 @@ export const load = async ({ params, data, parent }) => {
 	}
 
 	async function getTutorial() {
-		const { supabaseClient } = await parentPromise
+		const { supabaseClient } = await parent()
 		const { data: tutorials, error: err } = await supabaseClient
 			.from("tutorials")
-			.select(
-				"id, created_at, user_id, title, description, content, level, profiles_public (username, avatar_url)"
-			)
+			.select("*, profiles_public (*)")
 			.eq("url", slug)
 			.returns<TutorialWithAuthor[]>()
 

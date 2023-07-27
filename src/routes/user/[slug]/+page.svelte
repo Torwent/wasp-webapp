@@ -83,11 +83,11 @@
 			{/each}
 		{/if}
 
-		<FormInput title="Email" bind:value={email} bind:error={$errors.email} />
+		<FormInput title="Email" bind:value={email} bind:errors={$errors.email} />
 		<FormInput
 			title="Password"
 			bind:value={password}
-			bind:error={$errors.password}
+			bind:errors={$errors.password}
 			type={"password"}
 		/>
 

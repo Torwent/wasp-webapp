@@ -127,7 +127,12 @@ export const postSchema = z.object({
 		.number()
 		.int("Level has to be between 0 and 2")
 		.min(0, "Level has to be positive.")
-		.max(2, "Level has to be less than 3.")
+		.max(2, "Level has to be less than 3."),
+	order: z
+		.number()
+		.int("Order has to be a whole number.")
+		.min(0, "Order has to be positive.")
+		.max(1000, "Order has to be less than 1000.")
 })
 
 export const profileSchema = z.object({

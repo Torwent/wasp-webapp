@@ -110,28 +110,32 @@
 		</div>
 
 		<form method="POST" use:focusTrap={isFocused} use:enhance>
-			<FormInput title="Name" bind:value={developer.realname} bind:error={$errors.realname} />
+			<FormInput title="Name" bind:value={developer.realname} bind:errors={$errors.realname} />
 			<FormInput
 				title="Username"
 				bind:value={developer.profiles_public.username}
-				bind:error={$errors.username}
+				bind:errors={$errors.username}
 			/>
 
 			<FormInput
 				title="Description"
 				bind:value={developer.description}
-				bind:error={$errors.description}
+				bind:errors={$errors.description}
 			/>
 
 			<FormTextarea
 				title="Content"
 				bind:value={developer.content}
-				bind:error={$errors.content}
+				bind:errors={$errors.content}
 				h={"h-64"}
 			/>
 
-			<FormInput title="GitHub" bind:value={developer.github} bind:error={$errors.github} />
-			<FormInput title="PaypalID" bind:value={developer.paypal_id} bind:error={$errors.paypal_id} />
+			<FormInput title="GitHub" bind:value={developer.github} bind:errors={$errors.github} />
+			<FormInput
+				title="PaypalID"
+				bind:value={developer.paypal_id}
+				bind:errors={$errors.paypal_id}
+			/>
 
 			<div class="flex justify-between">
 				<a href="./" class="btn variant-filled-secondary">Back</a>

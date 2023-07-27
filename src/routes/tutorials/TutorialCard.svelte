@@ -17,6 +17,7 @@
 		<div class="flex flex-col p-3">
 			<div class="text-md font-semibold text-primary-500 text-shadow truncate">
 				{tutorial.title}
+				{#if !tutorial.published}<small class="text-error-500">Unpublished</small>{/if}
 			</div>
 
 			<small class="text-xs text-surface-400 truncate mt-1">

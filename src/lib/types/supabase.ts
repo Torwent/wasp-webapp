@@ -242,7 +242,7 @@ export interface Database {
           id: string
           moderator: boolean
           premium: boolean
-          price_id: string | null
+          price_id: string
           scripter: boolean
           subscription_end: string | null
           subscription_external: boolean
@@ -262,7 +262,7 @@ export interface Database {
           id: string
           moderator?: boolean
           premium?: boolean
-          price_id?: string | null
+          price_id?: string
           scripter?: boolean
           subscription_end?: string | null
           subscription_external?: boolean
@@ -282,7 +282,7 @@ export interface Database {
           id?: string
           moderator?: boolean
           premium?: boolean
-          price_id?: string | null
+          price_id?: string
           scripter?: boolean
           subscription_end?: string | null
           subscription_external?: boolean
@@ -526,12 +526,15 @@ export interface Database {
           experience: number
           gold: number | null
           levels: number
+          monthly_downloads: Json[]
           monthly_users: Json[]
+          previous_months_downloads: string[]
           runtime: number | null
           script_id: string
           total_current_users: number
           total_monthly_users: number
           total_unique_users: number
+          unique_downloads: string[]
           unique_users: string[]
         }
         Insert: {
@@ -539,12 +542,15 @@ export interface Database {
           experience?: number
           gold?: number | null
           levels?: number
+          monthly_downloads?: Json[]
           monthly_users?: Json[]
+          previous_months_downloads?: string[]
           runtime?: number | null
           script_id: string
           total_current_users?: number
           total_monthly_users?: number
           total_unique_users?: number
+          unique_downloads?: string[]
           unique_users?: string[]
         }
         Update: {
@@ -552,12 +558,15 @@ export interface Database {
           experience?: number
           gold?: number | null
           levels?: number
+          monthly_downloads?: Json[]
           monthly_users?: Json[]
+          previous_months_downloads?: string[]
           runtime?: number | null
           script_id?: string
           total_current_users?: number
           total_monthly_users?: number
           total_unique_users?: number
+          unique_downloads?: string[]
           unique_users?: string[]
         }
         Relationships: [
@@ -577,7 +586,8 @@ export interface Database {
           fts: unknown
           id: string
           level: number
-          order: number | null
+          order: number
+          published: boolean
           search: string
           title: string
           url: string
@@ -591,7 +601,8 @@ export interface Database {
           fts?: unknown
           id?: string
           level?: number
-          order?: number | null
+          order?: number
+          published?: boolean
           search: string
           title: string
           url: string
@@ -604,7 +615,8 @@ export interface Database {
           fts?: unknown
           id?: string
           level?: number
-          order?: number | null
+          order?: number
+          published?: boolean
           search?: string
           title?: string
           url?: string

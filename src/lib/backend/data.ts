@@ -145,7 +145,7 @@ export async function getScript(supabase: SupabaseClient, slug: string) {
 			Error hint: ${err.message}`
 		)
 
-	if (data.length === 0) return null
+	if (data.length === 0) throw error(404, "That script doesn't exist.")
 	return data[0]
 }
 

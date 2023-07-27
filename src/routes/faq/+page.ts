@@ -20,7 +20,7 @@ export const load = async ({ parent }) => {
 			Error hint: ${questions.error.message}`
 			)
 		}
-		return questions
+		return questions.data
 	}
 
 	async function getErrors() {

@@ -5,7 +5,7 @@
 	import { ChevronDown, X } from "lucide-svelte"
 	export let title: string
 	export let value: string[]
-	export let error: Record<number, string[]> | undefined
+	export let errors: Record<number, string[]> | undefined
 	export let placeholder = ""
 	export let entries: Category[] | SubCategory[]
 
@@ -59,7 +59,7 @@
 	})
 
 	const hadPremium = value.includes("Premium")
-	$: hasError = checkErrors(error)
+	$: hasError = checkErrors(errors)
 
 	$: ({ profile } = $page.data)
 
@@ -125,6 +125,7 @@
 		{/if}
 
 		{#if showOptions}
+			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			<ul on:mousedown|preventDefault={handleOptionMousedown}>
 				{#each entries as entry}
 					<li
@@ -140,10 +141,10 @@
 		{/if}
 	</div>
 	<div class="grid">
-		{#if error}
-			{#each Object.entries(error) as err, idx}
-				{#if err[1]}
-					<small class="text-error-500 mx-auto w-full">{err[1]}</small>
+		{#if errors}
+			{#each Object.entries(errors) as err, idx}
+				{#if err[idx]}
+					<small class="text-error-500 mx-auto w-full">{err[idx]}</small>
 				{/if}
 			{/each}
 		{/if}

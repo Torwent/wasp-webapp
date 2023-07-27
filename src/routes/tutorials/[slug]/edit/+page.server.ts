@@ -9,8 +9,8 @@ export const load = async (event) => {
 
 export const actions = {
 	default: async ({ request, locals: { supabaseServer } }) => {
-		const formData = await request.formData()
-		const form = await superValidate(formData, postSchema)
+		const dataForm = await request.formData()
+		const form = await superValidate(dataForm, postSchema)
 
 		if (!form.valid) return fail(400, { form })
 
@@ -18,7 +18,9 @@ export const actions = {
 			title: form.data.title,
 			description: form.data.description,
 			content: form.data.content,
-			level: form.data.level
+			level: form.data.level,
+			order: form.data.order,
+			published: dataForm.has("published")
 		}
 
 		const { data, error } = await supabaseServer

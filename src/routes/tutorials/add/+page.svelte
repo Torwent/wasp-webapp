@@ -11,6 +11,7 @@
 	export let data
 	let show: boolean = false
 	let isFocused: boolean = true
+	let published: boolean = false
 
 	const { form, errors, enhance } = superForm(data.form, {
 		multipleSubmits: "prevent",
@@ -73,22 +74,56 @@
 		</div>
 
 		<form method="POST" use:focusTrap={isFocused} use:enhance>
-			<FormInput title="Title" bind:value={$form.title} bind:error={$errors.title} />
+			<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
 
 			<FormInput
 				title="Description"
 				bind:value={$form.description}
-				bind:error={$errors.description}
+				bind:errors={$errors.description}
 			/>
 
 			<FormTextarea
 				title="Content"
 				bind:value={$form.content}
-				bind:error={$errors.content}
+				bind:errors={$errors.content}
 				h={"h-64"}
 			/>
 
-			<TutorialLevel bind:value={$form.level} bind:error={$errors.level} />
+			<TutorialLevel bind:value={$form.level} bind:errors={$errors.level} />
+
+			<label for="order" class="label my-2">
+				<span>Tutorial order:</span>
+				<input
+					type="number"
+					id="order"
+					name="order"
+					class="input h-10"
+					class:input-error={$errors.order}
+					bind:value={$form.order}
+				/>
+
+				{#if $errors.order}
+					<small class="text-error-500">{$errors.order}</small>
+				{:else}
+					<div class="m-0 h-5" />
+				{/if}
+			</label>
+
+			<div class="flex my-8">
+				<label
+					for="published"
+					class="form-check-label inline-block cursor-pointer dark:hover:text-primary-100 hover:text-primary-400"
+				>
+					Published
+					<input
+						type="checkbox"
+						id="published"
+						name="published"
+						class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-primary-500"
+						bind:checked={published}
+					/>
+				</label>
+			</div>
 
 			<div class="flex justify-between">
 				<a href="./">

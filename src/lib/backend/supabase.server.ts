@@ -1,9 +1,8 @@
 import { createClient } from "@supabase/supabase-js"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import { ADMIN_USER, ADMIN_PASS } from "$env/static/private"
-import type { Profile, ProfileProtected } from "$lib/types/collection"
+import type { Profile, UpdateScriptStats } from "$lib/types/collection"
 import { error } from "@sveltejs/kit"
-import { invalidate } from "$app/navigation"
 
 const credentials = { email: ADMIN_USER, password: ADMIN_PASS }
 const options = { auth: { autoRefreshToken: true, persistSession: false } }
@@ -80,5 +79,27 @@ export async function updateProfileProtected(profile: Profile) {
 		.eq("id", profile.id)
 
 	if (err) throw error(403, err)
+	return true
+}
+
+export async function updateStatsScripts(script: string, user: string) {
+	if (!adminLoggedIn) {
+		await login(false)
+		if (!adminLoggedIn) return false
+	}
+
+	const { data, error: err } = await supabaseAdmin
+		.from("stats_scripts")
+		.select("unique_downloads, monthly_downloads")
+		.eq("id", script)
+		.limit(1)
+		.returns<UpdateScriptStats[]>()
+
+	if (err) throw error(403, err)
+
+	let { unique_downloads, monthly_downloads, previous_months_downloads } = data[0]
+
+	if (!unique_downloads.includes(user)) unique_downloads.push(user)
+
 	return true
 }

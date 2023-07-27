@@ -384,34 +384,34 @@
 					</FileDropzone>
 				</label>
 
-				<FormInput title="Title" bind:value={$form.title} bind:error={$errors.title} />
+				<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
 
 				<FormTextarea
 					title="Description"
 					extraTitle=" (recommended 60-80 characters)"
 					bind:value={$form.description}
-					bind:error={$errors.description}
+					bind:errors={$errors.description}
 					h={"h-18"}
 				/>
 
 				<MultiSelect
 					title="Categories"
 					bind:value={$form.categories}
-					bind:error={$errors.categories}
+					bind:errors={$errors.categories}
 					entries={categories}
 				/>
 
 				<MultiSelect
 					title="Subcategories"
 					bind:value={$form.subcategories}
-					bind:error={$errors.subcategories}
+					bind:errors={$errors.subcategories}
 					entries={subcategories}
 				/>
 
 				<FormTextarea
 					title="Content"
 					bind:value={$form.content}
-					bind:error={$errors.content}
+					bind:errors={$errors.content}
 					h={"h-64"}
 				/>
 

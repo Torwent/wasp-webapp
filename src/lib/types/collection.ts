@@ -54,6 +54,11 @@ export type ScriptProtected = Database["public"]["Tables"]["scripts_protected"][
 export interface ScriptsProtectedWithUsername extends ScriptProtected, ProfilePublicUsername {}
 
 export type ScriptStats = Database["public"]["Tables"]["stats_scripts"]["Row"]
+export interface UpdateScriptStats {
+	unique_downloads: Database["public"]["Tables"]["stats_scripts"]["Row"]["unique_downloads"]
+	monthly_downloads: Database["public"]["Tables"]["stats_scripts"]["Row"]["monthly_downloads"]
+	previous_months_downloads: Database["public"]["Tables"]["stats_scripts"]["Row"]["previous_months_downloads"]
+}
 
 export interface IScriptCard extends ScriptPublic {
 	scripts_protected: ScriptsProtectedWithUsername

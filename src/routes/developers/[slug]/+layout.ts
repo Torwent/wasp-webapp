@@ -42,7 +42,6 @@ async function getScripts(
 }
 
 export const load = async ({ url: { searchParams }, params: { slug }, parent, depends }) => {
-	const parentPromise = parent()
 	depends("supabase:developer")
 	if (slug.includes(" ")) throw error(404, "Developer not found!")
 
@@ -55,7 +54,7 @@ export const load = async ({ url: { searchParams }, params: { slug }, parent, de
 	const start = (page - 1) * range
 	const finish = start + range
 
-	const { supabaseClient } = await parentPromise
+	const { supabaseClient } = await parent()
 	const developer = UUID_V4_REGEX.test(slug)
 		? await getDeveloperUUID(supabaseClient, slug)
 		: await getDeveloper(supabaseClient, slug.toLowerCase())

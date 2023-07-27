@@ -7,8 +7,7 @@ import { updateScript } from "$lib/backend/data.server"
 import { encodeSEO } from "$lib/utils"
 
 export const load = async (event) => {
-	const form = superValidate(event, scriptSchema)
-	return { form }
+	return { form: superValidate(event, scriptSchema) }
 }
 
 interface FormFiles {
