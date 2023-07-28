@@ -2,7 +2,6 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 import type {
 	Category,
 	SubCategory,
-	CheckboxType,
 	EmojiTooltip,
 	DeveloperWithUsername,
 	IScriptCard,
@@ -32,35 +31,6 @@ export async function updateWarning(supabase: SupabaseClient) {
 			Error details: ${err.details}
 			Error hint: ${err.message}`
 		)
-}
-
-export async function getCheckBoxes(categories: Category[], subcategories: SubCategory[]) {
-	const result: CheckboxType[] = []
-	let id = 0
-
-	for (const category of categories) {
-		result.push({
-			id: id++,
-			name: category.name,
-			emoji: category.emoji,
-			main: true,
-			checked: false
-		})
-
-		for (const subcategory of subcategories) {
-			if (category.name === subcategory.category) {
-				result.push({
-					id: id++,
-					name: subcategory.name,
-					emoji: subcategory.emoji,
-					main: false,
-					checked: false
-				})
-			}
-		}
-	}
-
-	return result
 }
 
 function getToolTips(

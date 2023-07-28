@@ -3,16 +3,30 @@
 	import CanvasAnimation from "./CanvasAnimation.svelte"
 	import { convertTime, formatRSNumber } from "$lib/utils"
 	import { invalidate } from "$app/navigation"
-	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
+	import { onMount } from "svelte"
 	export let data
 
-	function rerunLoad() {
-		if (browser) invalidate("supabase:stats_total")
-		setTimeout(rerunLoad, 5000)
-	}
+	const { supabaseClient } = data
+	let { total } = data
+	$: ({ total } = data)
 
-	rerunLoad()
+	onMount(() => {
+		const subscription = supabaseClient
+			.channel("home-stats-changed")
+			.on(
+				"postgres_changes",
+				{
+					event: "UPDATE",
+					schema: "public",
+					table: "stats_scripts"
+				},
+				() => invalidate("supabase:home_stats_total")
+			)
+			.subscribe()
+
+		return () => subscription.unsubscribe()
+	})
 
 	const headTitle = "WaspScripts"
 	const headDescription =
@@ -60,20 +74,16 @@
 
 	<header class="text-lg sm:text-xl md:text-2xl">
 		<h2 class="mt-6 mx-6 font-bold whitespace-nowrap text-center">
-			Total Experience Earned:
-			{formatRSNumber(data.total.experience || 0)}
+			Total Experience Earned: {formatRSNumber(total.experience)}
 		</h2>
 		<h2 class="mx-6 font-bold whitespace-nowrap text-center">
-			Total Gold Earned:
-			{formatRSNumber(data.total.gold || 0)}
+			Total Gold Earned: {formatRSNumber(total.gold)}
 		</h2>
 		<h2 class="mx-6 font-bold whitespace-nowrap text-center">
-			Total Levels Earned:
-			<span class="py-4 pr-6">{data.total.levels}</span>
+			Total Levels Earned: {total.levels}
 		</h2>
 		<h2 class="mb-4 mx-6 font-bold whitespace-nowrap text-center">
-			Total Runtime:
-			{convertTime(data.total.runtime || 0)}
+			Total Runtime: {convertTime(total.runtime)}
 		</h2>
 	</header>
 

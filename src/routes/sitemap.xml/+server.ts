@@ -82,9 +82,14 @@ const buildLoc = async (supabase: SupabaseClient, loc: string) => {
 }
 
 export const GET = async ({ locals: { supabaseServer } }) => {
-	const scripts = await buildLoc(supabaseServer, "scripts")
-	const tutorials = await buildLoc(supabaseServer, "tutorials")
-	const developers = await buildLoc(supabaseServer, "developers")
+	const promises = await Promise.all([
+		buildLoc(supabaseServer, "scripts"),
+		buildLoc(supabaseServer, "tutorials"),
+		buildLoc(supabaseServer, "developers")
+	])
+	const scripts = promises[0]
+	const tutorials = promises[1]
+	const developers = promises[2]
 
 	const headers = {
 		"Cache-Control": "max-age=0, s-maxage=3600",

@@ -1,9 +1,10 @@
 import { browser } from "$app/environment"
 import type { CheckboxType, Script } from "$lib/types/collection"
 import { error, redirect } from "@sveltejs/kit"
+import { get, writable } from "svelte/store"
+const checkboxesStore = writable<CheckboxType[] | null>(null)
 
-export const load = async ({ url, parent, depends }) => {
-	const parentPromise = parent()
+export const load = async ({ fetch, url, parent, depends }) => {
 	depends("supabase:scripts")
 
 	const pageStr = url.searchParams.get("page") || "-1"
@@ -22,7 +23,7 @@ export const load = async ({ url, parent, depends }) => {
 	const finish = start + range
 
 	async function getScripts(search: string, ascending: boolean, start: number, finish: number) {
-		const { supabaseClient } = await parentPromise
+		const { supabaseClient } = await parent()
 
 		let query = supabaseClient
 			.from("scripts_public")
@@ -61,31 +62,33 @@ export const load = async ({ url, parent, depends }) => {
 	}
 
 	async function getCheckBoxes() {
-		const { categories, subcategories } = await parentPromise
+		let result = get(checkboxesStore)
+		if (!result) {
+			result = []
+			let id = 0
+			const { categories, subcategories } = await parent()
+			for (const category of categories) {
+				result.push({
+					id: id++,
+					name: category.name,
+					emoji: category.emoji,
+					main: true,
+					checked: false
+				})
 
-		const result: CheckboxType[] = []
-		let id = 0
-
-		for (const category of categories) {
-			result.push({
-				id: id++,
-				name: category.name,
-				emoji: category.emoji,
-				main: true,
-				checked: false
-			})
-
-			for (const subcategory of subcategories) {
-				if (category.name === subcategory.category) {
-					result.push({
-						id: id++,
-						name: subcategory.name,
-						emoji: subcategory.emoji,
-						main: false,
-						checked: false
-					})
+				for (const subcategory of subcategories) {
+					if (category.name === subcategory.category) {
+						result.push({
+							id: id++,
+							name: subcategory.name,
+							emoji: subcategory.emoji,
+							main: false,
+							checked: false
+						})
+					}
 				}
 			}
+			checkboxesStore.set(result)
 		}
 
 		return result

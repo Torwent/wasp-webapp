@@ -5,19 +5,34 @@
 	import UserPanel from "./UserPanel.svelte"
 	export let large: boolean
 
-	const routeArray = ["Home", "Setup", "Scripts", "Stats", "Premium", "FAQ", "Tutorials"]
 	let showMenu = false
+
+	const routeArray = ["Home", "Setup", "Scripts", "Stats", "Premium", "FAQ", "Tutorials"] as const
+	let currentPage: (typeof routeArray)[number] = "Home"
 
 	function getLink(route: string): string {
 		return "/" + route.toLowerCase().replace("home", "")
 	}
 
-	function isActive(route: string, currentPath: string) {
-		const tmp = getLink(route).replaceAll("/", "")
-		return tmp === "" ? currentPath === "/" : currentPath.replaceAll("/", "").includes(tmp)
+	function setCurrentPage(currentPath: string) {
+		const path = currentPath.split("/")[1]
+
+		if (path.length === 0) {
+			currentPage = routeArray[0]
+			return
+		}
+
+		for (let i = 1; i < routeArray.length; i++) {
+			let route = routeArray[i]
+
+			if (route.toLowerCase().replace("home", "") === path) {
+				currentPage = route
+				return
+			}
+		}
 	}
 
-	$: active = (route: string) => isActive(route, $page.url.pathname)
+	$: setCurrentPage($page.url.pathname)
 </script>
 
 <nav class="transition-colors duration-500 font-semibold">
@@ -42,8 +57,8 @@
 				<a
 					href={getLink(route)}
 					class="dark:hover:text-primary-100 hover:text-primary-400 h-full flex place-items-center"
-					class:text-primary-500={active(route)}
-					class:dark:text-primary-400={active(route)}
+					class:text-primary-500={route === currentPage}
+					class:dark:text-primary-400={route === currentPage}
 					aria-label="Navigate to {route.toLowerCase()} page"
 					on:click={() => (showMenu = !showMenu)}
 				>
@@ -51,7 +66,7 @@
 						{#if !large}
 							{route}
 						{:else}
-							<Logo selected={active(route)} />
+							<Logo selected={route === currentPage} />
 						{/if}
 					{:else}
 						{route}

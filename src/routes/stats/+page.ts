@@ -12,7 +12,7 @@ export const load = async ({ url, depends, parent }) => {
 	const pageStr = url.searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
-	const range = 30
+	const range = 20
 	const start = (page - 1) * range
 	const finish = start + range
 

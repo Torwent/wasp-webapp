@@ -32,11 +32,6 @@
 		invalidate("supabase:stats")
 	}
 
-	function rerunLoad() {
-		invalidate("supabase:stats")
-		setTimeout(rerunLoad, 5000)
-	}
-
 	function sortBy(header: keyof Stats) {
 		search = ""
 		ascending = selectedHeader === header ? !ascending : false
@@ -47,14 +42,27 @@
 		})
 	}
 
-	const { range } = data
+	const { range, supabaseClient } = data
 
 	let { count } = data.stats
 	$: ({ count } = data.stats)
 
 	onMount(() => {
 		loading = false
-		rerunLoad()
+		const subscription = supabaseClient
+			.channel("stats-changed")
+			.on(
+				"postgres_changes",
+				{
+					event: "UPDATE",
+					schema: "public",
+					table: "stats_scripts"
+				},
+				() => invalidate("supabase:stats")
+			)
+			.subscribe()
+
+		return () => subscription.unsubscribe()
 	})
 
 	$: if (browser) replaceQuery({ search: search })
