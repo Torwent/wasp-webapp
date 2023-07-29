@@ -253,7 +253,7 @@
 			class="md:flex w-4/5 variant-ghost-surface mx-auto my-24 rounded-md"
 			use:enhance
 		>
-			<div class="grid h-full w-2/3 mx-auto content-between md:border-r-2 border-surface-500">
+			<div class="grid h-fit w-2/3 mx-auto content-between md:border-r-2 border-surface-500">
 				<div class="grid m-8 text-center">
 					<h4 class="my-4">Subscription information</h4>
 					{#if profile.profiles_protected.subscription_start && profile.profiles_protected.subscription_end}
