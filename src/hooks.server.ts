@@ -42,9 +42,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return data[0]
 	}
 
-	const profile = await locals.getProfile()
 	locals.stripe = new Stripe(PRIVATE_STRIPE_KEY, { apiVersion: "2022-11-15", typescript: true })
-
+	const profile = await locals.getProfile()
 	if (session && profile) {
 		let needUpdate = false
 		if (!profile.profiles_protected.customer_id) {
@@ -77,9 +76,15 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 			const now = Date.now()
 			if (endDate - now < 0) {
-				profile.profiles_protected.vip = false
-				profile.profiles_protected.premium = false
-				needUpdate = true
+				if (profile.profiles_protected.vip) {
+					profile.profiles_protected.vip = false
+					needUpdate = true
+				}
+
+				if (profile.profiles_protected.premium) {
+					profile.profiles_protected.premium = false
+					needUpdate = true
+				}
 			} else {
 				if (endDate - startDate > 7889400000 && !profile.profiles_protected.vip) {
 					needUpdate = true
