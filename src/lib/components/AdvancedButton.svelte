@@ -36,6 +36,9 @@
 		document.body.appendChild(anchor)
 		anchor.click()
 		window.URL.revokeObjectURL(blob)
+		await fetch("/api/script", { body: JSON.stringify({ id: script.id }), method: "POST" }).catch(
+			(error) => console.error(error)
+		)
 	}
 
 	let popupSettings: PopupSettings = {

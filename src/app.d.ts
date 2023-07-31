@@ -10,12 +10,10 @@ declare global {
 			getSession(): Promise<Session | null>
 			getProfile(): Promise<Profile | null>
 			stripe: Stripe
-			warningDismissed: boolean
 		}
 		interface PageData {
 			session: Session | null
 			profile: Profile | null
-			warningDismissed: boolean
 		}
 		// interface Error {}
 		// interface Platform {}

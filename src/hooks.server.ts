@@ -10,9 +10,7 @@ import { PRIVATE_STRIPE_KEY } from "$env/static/private"
 export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
 
-	const { url, cookies, locals, fetch } = event
-
-	const warningDismissed = cookies.get("warningDismissed")
+	const { url, locals, fetch } = event
 
 	locals.supabaseServer = createSupabaseServerClient({
 		supabaseUrl: PUBLIC_SUPABASE_URL,
@@ -100,8 +98,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 				method: "GET"
 			}).catch((err) => console.error(err))
 	}
-
-	locals.warningDismissed = warningDismissed === "true"
 
 	const response = await resolve(event, {
 		filterSerializedResponseHeaders(name) {

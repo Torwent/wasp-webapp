@@ -525,15 +525,17 @@ export interface Database {
           current_users: Json[]
           experience: number
           gold: number | null
-          levels: number
-          monthly_downloads: Json[]
+          levels: number | null
+          monthly_downloads: string[]
           monthly_users: Json[]
+          monthly_users_last_update: string
           previous_months_downloads: string[]
           runtime: number | null
           script_id: string
-          total_current_users: number
-          total_monthly_users: number
-          total_unique_users: number
+          total_current_users: number | null
+          total_monthly_downloads: number | null
+          total_monthly_users: number | null
+          total_unique_users: number | null
           unique_downloads: string[]
           unique_users: string[]
         }
@@ -541,15 +543,17 @@ export interface Database {
           current_users?: Json[]
           experience?: number
           gold?: number | null
-          levels?: number
-          monthly_downloads?: Json[]
+          levels?: number | null
+          monthly_downloads?: string[]
           monthly_users?: Json[]
+          monthly_users_last_update?: string
           previous_months_downloads?: string[]
           runtime?: number | null
           script_id: string
-          total_current_users?: number
-          total_monthly_users?: number
-          total_unique_users?: number
+          total_current_users?: number | null
+          total_monthly_downloads?: number | null
+          total_monthly_users?: number | null
+          total_unique_users?: number | null
           unique_downloads?: string[]
           unique_users?: string[]
         }
@@ -557,15 +561,17 @@ export interface Database {
           current_users?: Json[]
           experience?: number
           gold?: number | null
-          levels?: number
-          monthly_downloads?: Json[]
+          levels?: number | null
+          monthly_downloads?: string[]
           monthly_users?: Json[]
+          monthly_users_last_update?: string
           previous_months_downloads?: string[]
           runtime?: number | null
           script_id?: string
-          total_current_users?: number
-          total_monthly_users?: number
-          total_unique_users?: number
+          total_current_users?: number | null
+          total_monthly_downloads?: number | null
+          total_monthly_users?: number | null
+          total_unique_users?: number | null
           unique_downloads?: string[]
           unique_users?: string[]
         }
@@ -714,6 +720,12 @@ export interface Database {
         }
         Returns: string
       }
+      get_email: {
+        Args: {
+          id: string
+        }
+        Returns: string
+      }
       get_script_owner: {
         Args: {
           script_id: string
@@ -767,6 +779,12 @@ export interface Database {
             Returns: string
           }
       get_virtual_level: {
+        Args: {
+          experience: number
+        }
+        Returns: number
+      }
+      get_virtual_levels: {
         Args: {
           experience: number
         }

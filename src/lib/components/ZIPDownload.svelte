@@ -106,6 +106,7 @@
 
 		let urls: (string | false)[] = []
 		let promises = []
+		let scriptIds = []
 
 		for (let script of scripts) {
 			promises.push(
@@ -120,11 +121,15 @@
 					resolve(result)
 				})
 			)
+			scriptIds.push(script.id)
 		}
 
 		urls = await Promise.all(promises)
 
 		const { blobs, fileNames } = await downloadGroup(scripts, urls)
+		await fetch("/api/scripts", { body: JSON.stringify({ ids: scriptIds }), method: "POST" }).catch(
+			(error) => console.error(error)
+		)
 		return await exportZip(blobs, fileNames)
 	}
 

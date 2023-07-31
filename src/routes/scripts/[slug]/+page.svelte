@@ -30,7 +30,7 @@
 	function warningDismissed(r: boolean) {
 		if (r) {
 			updateWarning(data.supabaseClient)
-			if (browser) document.cookie = `warningDismissed=true;max-age=31536000;path="/"`
+			if (browser) document.cookie = `warning_dismissed=true;max-age=31536000;path="/"`
 		} else goto("/scripts")
 	}
 

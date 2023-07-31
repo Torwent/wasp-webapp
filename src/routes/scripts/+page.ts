@@ -4,7 +4,7 @@ import { error, redirect } from "@sveltejs/kit"
 import { get, writable } from "svelte/store"
 const checkboxesStore = writable<CheckboxType[] | null>(null)
 
-export const load = async ({ fetch, url, parent, depends }) => {
+export const load = async ({ url, parent, depends }) => {
 	depends("supabase:scripts")
 
 	const pageStr = url.searchParams.get("page") || "-1"

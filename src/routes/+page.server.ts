@@ -1,6 +1,6 @@
 import { doLogin } from "$lib/backend/data.server"
 import { API_URL } from "$lib/utils"
-import { error, fail } from "@sveltejs/kit"
+import { fail } from "@sveltejs/kit"
 
 export const actions = {
 	login: async ({ locals: { supabaseServer }, url: { origin, searchParams } }) => {

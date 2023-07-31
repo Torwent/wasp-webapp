@@ -91,15 +91,41 @@ export async function updateStatsScripts(script: string, user: string) {
 	const { data, error: err } = await supabaseAdmin
 		.from("stats_scripts")
 		.select("unique_downloads, monthly_downloads")
-		.eq("id", script)
+		.eq("script_id", script)
 		.limit(1)
 		.returns<UpdateScriptStats[]>()
 
 	if (err) throw error(403, err)
 
-	let { unique_downloads, monthly_downloads, previous_months_downloads } = data[0]
+	let { unique_downloads, monthly_downloads } = data[0]
+	let updated = false
+	if (!unique_downloads.includes(user)) {
+		unique_downloads.push(user)
+		updated = true
+	}
 
-	if (!unique_downloads.includes(user)) unique_downloads.push(user)
+	if (!monthly_downloads.includes(user)) {
+		monthly_downloads.push(user)
+		updated = true
+	}
+
+	if (updated) {
+		unique_downloads.push(user)
+		const { error: err } = await supabaseAdmin
+			.from("stats_scripts")
+			.update({ unique_downloads: unique_downloads, monthly_downloads: monthly_downloads })
+			.eq("script_id", script)
+
+		if (err)
+			throw error(
+				500,
+				`Server error, this is probably not an issure on your end! - UPDATE stats_scripts failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+			)
+	}
 
 	return true
 }
