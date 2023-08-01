@@ -20,12 +20,7 @@ export const load = async ({ params, parent }) => {
 		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
 			.from("scripts_public")
-			.select(
-				`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-			tooltip_emojis, tooltip_names,
-			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
-			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
-			)
+			.select(`*, scripts_protected (*, profiles_public(*)), stats_scripts (*)`)
 			.eq("url", slug)
 			.returns<Script[]>()
 		if (err)
@@ -46,12 +41,7 @@ export const load = async ({ params, parent }) => {
 		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
 			.from("scripts_public")
-			.select(
-				`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-			tooltip_emojis, tooltip_names,
-			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
-			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
-			)
+			.select(`*, scripts_protected (*, profiles_public(*)), stats_scripts (*)`)
 			.eq("id", uuid)
 			.returns<Script[]>()
 		if (err)

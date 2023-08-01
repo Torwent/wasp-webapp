@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { superForm } from "sveltekit-superforms/client"
 	import { FileDropzone, focusTrap } from "@skeletonlabs/skeleton"
-	import { cropString } from "$lib/utils"
+	import { cropString, replaceScriptContent } from "$lib/utils"
 	import { scriptSchema } from "$lib/backend/schemas"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
@@ -72,7 +72,8 @@
 			profiles_public: {
 				username: profile?.username || "",
 				avatar_url: profile?.avatar_url || ""
-			}
+			},
+			last_revision_date: new Date(Date.now()).toISOString()
 		},
 		fts: undefined,
 		search: "",
@@ -165,6 +166,7 @@
 
 	$: script.title = $form.title
 	$: script.description = $form.description
+	$: script.content = $form.content
 	$: script.categories = $form.categories
 	$: script.subcategories = $form.subcategories
 
@@ -239,7 +241,7 @@
 					</div>
 				{/if}
 
-				<ScriptArticle content={$form.content} />
+				<ScriptArticle content={replaceScriptContent(script)} />
 			</div>
 		</div>
 	{/if}

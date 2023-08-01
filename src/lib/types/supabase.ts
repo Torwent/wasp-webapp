@@ -365,6 +365,7 @@ export interface Database {
           author_id: string
           created_at: string | null
           id: string
+          last_revision_date: string
           revision: number
         }
         Insert: {
@@ -373,6 +374,7 @@ export interface Database {
           author_id: string
           created_at?: string | null
           id: string
+          last_revision_date?: string
           revision?: number
         }
         Update: {
@@ -381,6 +383,7 @@ export interface Database {
           author_id?: string
           created_at?: string | null
           id?: string
+          last_revision_date?: string
           revision?: number
         }
         Relationships: [

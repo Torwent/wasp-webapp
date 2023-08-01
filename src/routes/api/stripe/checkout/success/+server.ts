@@ -65,7 +65,7 @@ export const GET = async ({ fetch, url: { searchParams }, locals: { supabaseServ
 	}
 
 	await updateProfileProtected(profile)
-	await fetch(API_URL + "/discord/update/" + profile.discord_id, {
+	fetch(API_URL + "/discord/update/" + profile.discord_id, {
 		method: "GET"
 	}).catch((err) => console.error(err))
 

@@ -17,6 +17,7 @@
 	import ScriptArticle from "../ScriptArticle.svelte"
 	import StatsHeader from "../StatsHeader.svelte"
 	import { onMount } from "svelte"
+	import { replaceScriptContent } from "$lib/utils"
 
 	export let data
 
@@ -160,6 +161,6 @@
 			</div>
 		{/if}
 
-		<ScriptArticle content={script.content} />
+		<ScriptArticle content={replaceScriptContent(script)} />
 	</div>
 </div>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { superForm } from "sveltekit-superforms/client"
 	import { FileDropzone, focusTrap } from "@skeletonlabs/skeleton"
-	import { cropString } from "$lib/utils"
+	import { cropString, replaceScriptContent } from "$lib/utils"
 	import { scriptSchema } from "$lib/backend/schemas"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
@@ -65,6 +65,10 @@
 	$: if ($form.subcategories) validate()
 	$: if ($form.min_xp) validate("min_xp")
 	$: if ($form.max_xp) validate("max_xp")
+
+	$: script.title = $form.title
+	$: script.description = $form.description
+	$: script.content = $form.content
 
 	$: {
 		script.categories = $form.categories
@@ -214,7 +218,7 @@
 					</div>
 				{/if}
 
-				<ScriptArticle content={$form.content} />
+				<ScriptArticle content={replaceScriptContent(script)} />
 			</div>
 		</div>
 	{/if}

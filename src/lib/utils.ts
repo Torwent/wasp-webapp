@@ -1,3 +1,5 @@
+import type { IScriptCard } from "./types/collection"
+
 export const API_URL = "https://api.waspscripts.com" //http://localhost:8080
 export const UUID_V4_REGEX =
 	/^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89AB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/i
@@ -111,4 +113,76 @@ export function encodeSEO(url: string) {
 		.replace(/^-*/, "")
 		.replace(/-*$/, "")
 	return url
+}
+
+export function replaceScriptContent(script: IScriptCard) {
+	let str = script.content
+	let result = ""
+	let start = 0
+	let before = ""
+	let after = ""
+
+	for (let i = 0; i < str.length; i++) {
+		outer: if (str.substring(i, i + 2) === "{$") {
+			for (let j = i + 2; j < str.length; j++) {
+				const subStr = str.substring(j, j + 1)
+				if (subStr === "{" || subStr === " " || subStr === "$") break
+				if (subStr === "}") {
+					let value = str.substring(i + 2, j)
+
+					switch (value) {
+						case "id":
+							value = script.id
+							break
+
+						case "title":
+							value = script.title
+							break
+
+						case "description":
+							value = script.description
+							break
+
+						case "revision":
+							value = script.scripts_protected.revision.toString()
+							break
+
+						case "last_revision_date":
+							value = new Date(script.scripts_protected.last_revision_date).toLocaleString("pt-PT")
+							break
+
+						case "min_xp":
+							value = script.min_xp.toString()
+							break
+
+						case "max_xp":
+							value = script.max_xp.toString()
+							break
+
+						case "min_gp":
+							value = script.min_gp.toString()
+							break
+
+						case "max_gp":
+							value = script.max_gp.toString()
+							break
+
+						default:
+							i = j + 1
+							break outer
+					}
+
+					before = str.slice(start, i)
+					after = str.slice(j + 1)
+					start = j + 1
+					i = start
+					result += before + value
+					break outer
+				}
+			}
+		}
+	}
+	if (result !== "") result += after
+	else result = script.content
+	return result
 }
