@@ -9,7 +9,7 @@ declare global {
 			supabaseServer: SupabaseClient<Database>
 			getSession(): Promise<Session | null>
 			getProfile(): Promise<Profile | null>
-			stripe: Stripe
+			profile: Profile | null
 		}
 		interface PageData {
 			session: Session | null

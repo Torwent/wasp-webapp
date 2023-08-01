@@ -535,6 +535,7 @@ export interface Database {
           total_current_users: number | null
           total_monthly_downloads: number | null
           total_monthly_users: number | null
+          total_unique_downloads: number | null
           total_unique_users: number | null
           unique_downloads: string[]
           unique_users: string[]
@@ -553,6 +554,7 @@ export interface Database {
           total_current_users?: number | null
           total_monthly_downloads?: number | null
           total_monthly_users?: number | null
+          total_unique_downloads?: number | null
           total_unique_users?: number | null
           unique_downloads?: string[]
           unique_users?: string[]
@@ -571,6 +573,7 @@ export interface Database {
           total_current_users?: number | null
           total_monthly_downloads?: number | null
           total_monthly_users?: number | null
+          total_unique_downloads?: number | null
           total_unique_users?: number | null
           unique_downloads?: string[]
           unique_users?: string[]
@@ -726,6 +729,17 @@ export interface Database {
         }
         Returns: string
       }
+      get_profile:
+        | {
+            Args: {
+              user_id: string
+            }
+            Returns: Database["public"]["CompositeTypes"]["profile_data_type"]
+          }
+        | {
+            Args: Record<PropertyKey, never>
+            Returns: Database["public"]["CompositeTypes"]["profile_data_type"]
+          }
       get_script_owner: {
         Args: {
           script_id: string
@@ -912,7 +926,31 @@ export interface Database {
       [_ in never]: never
     }
     CompositeTypes: {
-      [_ in never]: never
+      profile_data_type: {
+        id: string
+        username: string
+        avatar_url: string
+        updated_at: string
+        discord_id: string
+        developer: boolean
+        premium: boolean
+        vip: boolean
+        tester: boolean
+        moderator: boolean
+        administrator: boolean
+        unlocked_ips: number
+        scripter: boolean
+        timeout: boolean
+        subscription_external: boolean
+        subscription_start: string
+        subscription_end: string
+        subscription_id: string
+        cancel_at_period_end: boolean
+        customer_id: string
+        price_id: string
+        dismissed_warning: boolean
+        email: string
+      }
     }
   }
   storage: {

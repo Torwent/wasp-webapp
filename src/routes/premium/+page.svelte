@@ -23,7 +23,7 @@
 		validators: premiumSchema
 	})
 
-	let plan = profile?.profiles_protected.prices || prices[0]
+	let plan = profile?.profiles_protected.prices ?? prices[0]
 
 	$: $form.plan = plan.stripe_id || prices[0].stripe_id
 	$: if ($form.code === "") $form.code = undefined
@@ -130,7 +130,16 @@
 						{/each}
 					</div>
 					<div>
-						<h5>Access to {scripts} premium scripts regularly updated and maintained.</h5>
+						<h5>
+							Access to
+							{#await scripts.total}
+								...
+							{:then total}
+								{total}
+							{/await}
+
+							premium scripts regularly updated and maintained.
+						</h5>
 						<p class="my-4">
 							Get <span class="font-bold text-yellow-500">Premium*</span>
 							{#if plan.interval === "week"}

@@ -1,9 +1,9 @@
 import { error, redirect } from "@sveltejs/kit"
-import { updateProfileProtected } from "$lib/backend/supabase.server"
+import { stripe, updateProfileProtected } from "$lib/backend/supabase.server"
 import { getProfile } from "$lib/backend/data.server"
 import { API_URL } from "$lib/utils"
 
-export const GET = async ({ fetch, url: { searchParams }, locals: { supabaseServer, stripe } }) => {
+export const GET = async ({ fetch, url: { searchParams }, locals: { supabaseServer } }) => {
 	console.log("Checkout")
 	const sessionID = searchParams.get("session_id")
 

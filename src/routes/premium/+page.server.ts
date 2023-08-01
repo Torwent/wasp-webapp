@@ -1,5 +1,6 @@
 import { doLogin } from "$lib/backend/data.server"
 import { premiumSchema } from "$lib/backend/schemas"
+import { stripe } from "$lib/backend/supabase.server"
 import { error, redirect } from "@sveltejs/kit"
 import type Stripe from "stripe"
 import { setError, superValidate } from "sveltekit-superforms/server"
@@ -11,7 +12,7 @@ export const load = async (event) => {
 export const actions = {
 	checkout: async ({
 		request,
-		locals: { supabaseServer, getSession, getProfile, stripe },
+		locals: { supabaseServer, getSession, getProfile },
 		url: { origin }
 	}) => {
 		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
@@ -64,7 +65,7 @@ export const actions = {
 
 	cancel: async ({
 		request,
-		locals: { supabaseServer, getSession, getProfile, stripe },
+		locals: { supabaseServer, getSession, getProfile },
 		url: { origin }
 	}) => {
 		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
@@ -117,7 +118,7 @@ export const actions = {
 	},
 	reenable: async ({
 		request,
-		locals: { supabaseServer, getSession, getProfile, stripe },
+		locals: { supabaseServer, getSession, getProfile },
 		url: { origin }
 	}) => {
 		const promises = await Promise.all([getSession(), getProfile(), request.formData()])

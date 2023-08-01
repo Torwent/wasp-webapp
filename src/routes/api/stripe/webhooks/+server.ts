@@ -1,4 +1,4 @@
-import { getProfile, updateProfileProtected } from "$lib/backend/supabase.server"
+import { getProfile, stripe, updateProfileProtected } from "$lib/backend/supabase.server"
 import type Stripe from "stripe"
 
 export const GET = async ({ request }) => {
@@ -7,7 +7,7 @@ export const GET = async ({ request }) => {
 	return new Response()
 }
 
-export const POST = async ({ request, locals: { stripe } }) => {
+export const POST = async ({ request }) => {
 	const { type, data } = (await request.json()) as Stripe.Event
 	const object = data.object as Stripe.Subscription
 

@@ -1,8 +1,9 @@
 import { createClient } from "@supabase/supabase-js"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
-import { ADMIN_USER, ADMIN_PASS } from "$env/static/private"
+import { ADMIN_USER, ADMIN_PASS, PRIVATE_STRIPE_KEY } from "$env/static/private"
 import type { Profile, UpdateScriptStats } from "$lib/types/collection"
 import { error } from "@sveltejs/kit"
+import Stripe from "stripe"
 
 const credentials = { email: ADMIN_USER, password: ADMIN_PASS }
 const options = { auth: { autoRefreshToken: true, persistSession: false } }
@@ -129,3 +130,5 @@ export async function updateStatsScripts(script: string, user: string) {
 
 	return true
 }
+
+export const stripe = new Stripe(PRIVATE_STRIPE_KEY, { apiVersion: "2022-11-15", typescript: true })

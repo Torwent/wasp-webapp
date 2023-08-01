@@ -3,7 +3,7 @@ import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/publi
 import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit"
 import { API_URL } from "$lib/utils"
 import type { Profile } from "$lib/types/collection"
-import { updateProfileProtected } from "$lib/backend/supabase.server"
+import { stripe, updateProfileProtected } from "$lib/backend/supabase.server"
 import Stripe from "stripe"
 import { PRIVATE_STRIPE_KEY } from "$env/static/private"
 
@@ -33,21 +33,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 		const id = session.user.id
 		const { data, error: err } = await locals.supabaseServer
 			.from("profiles_public")
-			.select(`*, profiles_protected (*, prices (*)), profiles_private (*)`)
+			.select(`*, profiles_protected!left (*, prices!left (*)), profiles_private!left (*)`)
 			.eq("id", id)
+			.limit(1)
+			.limit(1, { foreignTable: "profiles_protected" })
+			.limit(1, { foreignTable: "profiles_private" })
 			.returns<Profile[]>()
 
 		if (err || data.length < 1) return null
 
-		return data[0]
-	}
+		const profile = data[0]
 
-	locals.stripe = new Stripe(PRIVATE_STRIPE_KEY, { apiVersion: "2022-11-15", typescript: true })
-	const profile = await locals.getProfile()
-	if (session && profile) {
 		let needUpdate = false
 		if (!profile.profiles_protected.customer_id) {
-			const customer = await locals.stripe.customers.create({
+			const customer = await stripe.customers.create({
 				email: session.user.email,
 				name: session.user.id,
 				metadata: {
@@ -62,19 +61,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 
 		if (profile.profiles_protected.subscription_external) {
-			await fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
+			fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
 				method: "GET"
 			}).catch((err) => console.error(err))
 		} else {
-			const startDate = profile.profiles_protected.subscription_start
-				? Date.parse(profile.profiles_protected.subscription_start)
-				: 0
-
-			const endDate = profile.profiles_protected.subscription_end
-				? Date.parse(profile.profiles_protected.subscription_end)
-				: 0
-
+			const startDate = Date.parse(profile.profiles_protected.subscription_start ?? "0")
+			const endDate = Date.parse(profile.profiles_protected.subscription_end ?? "0")
 			const now = Date.now()
+
 			if (endDate - now < 0) {
 				if (profile.profiles_protected.vip) {
 					profile.profiles_protected.vip = false
@@ -86,7 +80,8 @@ export const handle: Handle = async ({ event, resolve }) => {
 					needUpdate = true
 				}
 			} else {
-				if (endDate - startDate > 7889400000 && !profile.profiles_protected.vip) {
+				const THREE_MONTHS = 7889400000
+				if (endDate - startDate > THREE_MONTHS && !profile.profiles_protected.vip) {
 					needUpdate = true
 					profile.profiles_protected.vip = true
 				}
@@ -97,11 +92,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 				}
 			}
 		}
-		if (needUpdate) await updateProfileProtected(profile)
+		const promises = []
+		if (needUpdate) promises.push(updateProfileProtected(profile))
 		if (!profile.profiles_protected.subscription_external)
-			await fetch(API_URL + "/discord/update/" + profile.discord_id, {
-				method: "GET"
-			}).catch((err) => console.error(err))
+			promises.push(
+				fetch(API_URL + "/discord/update/" + profile.discord_id, {
+					method: "GET"
+				}).catch((err) => console.error(err))
+			)
+
+		Promise.all(promises)
+
+		return profile
 	}
 
 	const response = await resolve(event, {
