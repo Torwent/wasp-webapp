@@ -1,5 +1,4 @@
 import { doLogin } from "$lib/backend/data.server"
-import { API_URL } from "$lib/utils"
 import { fail } from "@sveltejs/kit"
 
 export const actions = {
@@ -17,19 +16,9 @@ export const actions = {
 		return { success: true }
 	},
 
-	refresh: async ({ fetch, locals: { getProfile } }) => {
+	refresh: async ({ locals: { getProfile } }) => {
 		const profile = await getProfile()
 		if (!profile) return { success: false, message: "You are not logged in!" }
-
-		if (profile.profiles_protected.subscription_external)
-			await fetch(API_URL + "/discord/refresh/" + profile.discord_id, {
-				method: "GET"
-			}).catch((error) => console.error(error))
-		else
-			await fetch(API_URL + "/discord/update/" + profile.discord_id, {
-				method: "GET"
-			}).catch((error) => console.error(error))
-
 		return { success: true }
 	}
 }

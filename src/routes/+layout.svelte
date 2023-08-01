@@ -25,7 +25,6 @@
 	import { invalidate } from "$app/navigation"
 	import { onMount } from "svelte"
 	import type { AuthChangeEvent, RealtimeChannel, Session } from "@supabase/supabase-js"
-	import type { ProfileProtected } from "$lib/types/collection"
 	export let data
 
 	let { supabaseClient, session, profile } = data
