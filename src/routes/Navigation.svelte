@@ -3,6 +3,7 @@
 	import { LightSwitch } from "@skeletonlabs/skeleton"
 	import Logo from "./Logo.svelte"
 	import UserPanel from "./UserPanel.svelte"
+	import { goto } from "$app/navigation"
 	export let large: boolean
 
 	let showMenu = false
@@ -33,7 +34,66 @@
 	}
 
 	$: setCurrentPage($page.url.pathname)
+
+	function onKeyDown(e: KeyboardEvent) {
+		const inputFields = ["input", "textarea"]
+		if (inputFields.includes(window.document.activeElement?.localName ?? "")) return
+		switch (e.key) {
+			case "ArrowLeft" || "a" || "A":
+				for (let i = 0; i < routeArray.length; i++) {
+					if (currentPage === routeArray[i]) {
+						if (i <= 0) goto(getLink(routeArray[routeArray.length - 1]))
+						else goto(getLink(routeArray[i - 1]))
+					}
+				}
+				break
+			case "ArrowRight" || "d" || "D":
+				for (let i = 0; i < routeArray.length; i++) {
+					if (currentPage === routeArray[i]) {
+						if (i >= routeArray.length - 1) goto(getLink(routeArray[0]))
+						else goto(getLink(routeArray[i + 1]))
+					}
+				}
+				break
+		}
+	}
+
+	let touchX: number
+	let touchY: number
+	let touchTime: number
+
+	function onTouchStart(e: TouchEvent) {
+		touchX = e.touches[0].clientX
+		touchY = e.touches[0].clientY
+		touchTime = Date.now()
+	}
+
+	function onTouchEnd(e: TouchEvent) {
+		const { clientX, clientY } = e.changedTouches[0]
+
+		if (clientY <= touchY - 150 || clientY >= touchY + 150) return
+		if (clientX >= touchX - 20 && clientX <= touchX + 20) return
+		if (Date.now() - touchTime >= 1000) return
+
+		if (clientX < touchX) {
+			for (let i = 0; i < routeArray.length; i++) {
+				if (currentPage === routeArray[i]) {
+					if (i <= 0) goto(getLink(routeArray[routeArray.length - 1]))
+					else goto(getLink(routeArray[i - 1]))
+				}
+			}
+		} else {
+			for (let i = 0; i < routeArray.length; i++) {
+				if (currentPage === routeArray[i]) {
+					if (i >= routeArray.length - 1) goto(getLink(routeArray[0]))
+					else goto(getLink(routeArray[i + 1]))
+				}
+			}
+		}
+	}
 </script>
+
+<svelte:window on:keydown={onKeyDown} on:touchstart={onTouchStart} on:touchend={onTouchEnd} />
 
 <nav class="transition-colors duration-500 font-semibold">
 	{#if !large}
