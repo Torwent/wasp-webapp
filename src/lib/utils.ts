@@ -116,73 +116,33 @@ export function encodeSEO(url: string) {
 }
 
 export function replaceScriptContent(script: IScriptCard) {
-	let str = script.content
-	let result = ""
-	let start = 0
-	let before = ""
-	let after = ""
-
-	for (let i = 0; i < str.length; i++) {
-		outer: if (str.substring(i, i + 2) === "{$") {
-			for (let j = i + 2; j < str.length; j++) {
-				const subStr = str.substring(j, j + 1)
-				if (subStr === "{" || subStr === " " || subStr === "$") break
-				if (subStr === "}") {
-					let value = str.substring(i + 2, j)
-
-					switch (value) {
-						case "id":
-							value = script.id
-							break
-
-						case "title":
-							value = script.title
-							break
-
-						case "description":
-							value = script.description
-							break
-
-						case "revision":
-							value = script.scripts_protected.revision.toString()
-							break
-
-						case "last_revision_date":
-							value = new Date(script.scripts_protected.last_revision_date).toLocaleString("pt-PT")
-							break
-
-						case "min_xp":
-							value = script.min_xp.toString()
-							break
-
-						case "max_xp":
-							value = script.max_xp.toString()
-							break
-
-						case "min_gp":
-							value = script.min_gp.toString()
-							break
-
-						case "max_gp":
-							value = script.max_gp.toString()
-							break
-
-						default:
-							i = j + 1
-							break outer
-					}
-
-					before = str.slice(start, i)
-					after = str.slice(j + 1)
-					start = j + 1
-					i = start
-					result += before + value
-					break outer
-				}
-			}
-		}
+	const placeholders: { [key: string]: string } = {
+		id: script.id,
+		title: script.title,
+		description: script.description,
+		author: script.scripts_protected.profiles_public.username,
+		revision: script.scripts_protected.revision.toString(),
+		last_revision_full_date: new Date(script.scripts_protected.last_revision_date).toLocaleString(
+			"pt-PT"
+		),
+		last_revision_date: new Date(script.scripts_protected.last_revision_date).toLocaleString(
+			"pt-PT",
+			{ day: "2-digit", month: "2-digit", year: "numeric" }
+		),
+		last_revision_time: new Date(script.scripts_protected.last_revision_date).toLocaleString(
+			"pt-PT",
+			{ hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }
+		),
+		min_xp: script.min_xp.toString(),
+		max_xp: script.max_xp.toString(),
+		min_gp: script.min_gp.toString(),
+		max_gp: script.max_gp.toString()
 	}
-	if (result !== "") result += after
-	else result = script.content
+
+	const result = script.content.replace(/\{\$([^\{\}\s$]+)\}/g, (match, placeholder) => {
+		const value = placeholders[placeholder]
+		return value !== undefined ? value : match
+	})
+
 	return result
 }

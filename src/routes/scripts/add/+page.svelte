@@ -81,6 +81,37 @@
 		tooltip_names: [],
 		url: ""
 	}
+	$form.content = `### {$title} by {$author}
+
+Script ID: {$id}
+
+Latest revision: {$revision}
+
+Updated at: {$last_revision_full_date}
+
+Date updated at: {$last_revision_date}
+
+Time of update: {$last_revision_time}
+
+{$description}
+
+Can get {$min_xp}-{$max_xp} xp/h and {$min_gp}-{$max_gp} gp/h.
+
+#### Required Setup:
+- Item A visible in bank
+- Item B visible in bank
+
+#### Features:
+- Does this cool task
+- Supports X method
+- Supports Y method
+
+#### Known Issues:
+- Buggy at doing Z.
+
+#### Additional information:
+You need quest ABC completed to use this.
+`
 
 	$: addToolTips(script, categories, subcategories)
 
