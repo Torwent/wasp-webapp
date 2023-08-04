@@ -71,11 +71,11 @@
 	function onTouchEnd(e: TouchEvent) {
 		const { clientX, clientY } = e.changedTouches[0]
 
-		if (clientY <= touchY - 150 || clientY >= touchY + 150) return
-		if (clientX >= touchX - 20 && clientX <= touchX + 20) return
+		if (clientY <= touchY - 130 || clientY >= touchY + 130) return
+		if (clientX >= touchX - 40 && clientX <= touchX + 40) return
 		if (Date.now() - touchTime >= 1000) return
 
-		if (clientX < touchX) {
+		if (clientX > touchX) {
 			for (let i = 0; i < routeArray.length; i++) {
 				if (currentPage === routeArray[i]) {
 					if (i <= 0) goto(getLink(routeArray[routeArray.length - 1]))
