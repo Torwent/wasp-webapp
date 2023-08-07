@@ -15,27 +15,27 @@
 			<nav>
 				<span class="mb-6 text-sm font-semibold uppercase">Resources</span>
 				<ul>
-					<li><a href="/setup">Setup</a></li>
-					<li><a href="https://torwent.github.io/SRL-T">SRL-T Documentation</a></li>
-					<li><a href="https://torwent.github.io/WaspLib">WaspLib Documentation</a></li>
-					<li><a href="https://github.com/villavu/Simba">Simba repo</a></li>
-					<li><a href="https://github.com/villavu/SRL-Development">SRL repo</a></li>
-					<li><a href="https://github.com/Torwent/WaspLib">WaspLib repo</a></li>
+					<li><a href="/setup" target="_blank">Setup</a></li>
+					<li><a href="https://torwent.github.io/SRL-T target="_blank"" >SRL-T Documentation</a></li>
+					<li><a href="https://torwent.github.io/WaspLib" target="_blank">WaspLib Documentation</a></li>
+					<li><a href="https://github.com/villavu/Simba" target="_blank">Simba repo</a></li>
+					<li><a href="https://github.com/villavu/SRL-Development" target="_blank">SRL repo</a></li>
+					<li><a href="https://github.com/Torwent/WaspLib" target="_blank">WaspLib repo</a></li>
 				</ul>
 			</nav>
 			<nav>
 				<span class="mb-6 text-sm font-semibold uppercase">Special thanks:</span>
 				<ul>
-					<li><a href="/developers/Slacky">Jarl Holta</a></li>
-					<li><a href="/developers/Olly">Olly</a></li>
-					<li><a href="/developers">Many more devs...</a></li>
+					<li><a href="/developers/Slacky" target="_blank">Jarl Holta</a></li>
+					<li><a href="/developers/Olly" target="_blank">Olly</a></li>
+					<li><a href="/developers" target="_blank">Many more devs...</a></li>
 				</ul>
 			</nav>
 			<nav>
 				<span class="mb-6 text-sm font-semibold uppercase">Legal</span>
 				<ul>
-					<li><a href="/">Privacy Policy</a></li>
-					<li><a href="/">Terms &amp; Conditions</a></li>
+					<li><a href="/" target="_blank">Privacy Policy</a></li>
+					<li><a href="/" target="_blank">Terms &amp; Conditions</a></li>
 				</ul>
 			</nav>
 		</div>
@@ -45,6 +45,7 @@
 			This webapp is open source! Checkout <a
 				class="permalink text-secondary-500"
 				href="https://github.com/torwent/web-app"
+				target="_blank"
 			>
 				WaspScripts source code
 			</a>
@@ -54,6 +55,7 @@
 			<a
 				href="https://github.com/torwent"
 				aria-label="Navigate to GitHub"
+				target="_blank"
 				class="permalink text-secondary-500"
 			>
 				<Github />
@@ -62,6 +64,7 @@
 				href="https://waspscripts.com"
 				aria-label="Navigate to main site"
 				class="permalink text-secondary-500"
+				target="_blank"
 			>
 				<Globe />
 			</a>
