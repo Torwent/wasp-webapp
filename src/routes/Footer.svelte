@@ -16,7 +16,7 @@
 				<span class="mb-6 text-sm font-semibold uppercase">Resources</span>
 				<ul>
 					<li><a href="/setup" target="_blank">Setup</a></li>
-					<li><a href="https://torwent.github.io/SRL-T target="_blank"" >SRL-T Documentation</a></li>
+					<li><a href="https://torwent.github.io/SRL-T" target="_blank" >SRL-T Documentation</a></li>
 					<li><a href="https://torwent.github.io/WaspLib" target="_blank">WaspLib Documentation</a></li>
 					<li><a href="https://github.com/villavu/Simba" target="_blank">Simba repo</a></li>
 					<li><a href="https://github.com/villavu/SRL-Development" target="_blank">SRL repo</a></li>
