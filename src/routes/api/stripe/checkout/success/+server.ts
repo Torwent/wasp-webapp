@@ -7,7 +7,7 @@ export const GET = async ({ fetch, url: { searchParams }, locals: { supabaseServ
 	const sessionID = searchParams.get("session_id")
 
 	if (!sessionID) {
-		console.error("Checkout session id not found.")
+		console.error("Checkout session id not found. params: " + searchParams.toString())
 		throw error(
 			403,
 			"Something went wrong during checkout! If you got charged please send an email to support@waspscripts.com"
