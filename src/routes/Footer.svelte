@@ -16,11 +16,17 @@
 					<span class="mb-6 text-sm font-semibold uppercase">Resources</span>
 					<ul>
 						<li><a href="/setup">Setup</a></li>
-						<li><a href="https://torwent.github.io/SRL-T">SRL-T Documentation</a></li>
-						<li><a href="https://torwent.github.io/WaspLib">WaspLib Documentation</a></li>
-						<li><a href="https://github.com/villavu/Simba">Simba repo</a></li>
-						<li><a href="https://github.com/villavu/SRL-Development">SRL repo</a></li>
-						<li><a href="https://github.com/Torwent/WaspLib">WaspLib repo</a></li>
+						<li>
+							<a href="https://torwent.github.io/SRL-T" target="_blank">SRL-T Documentation</a>
+						</li>
+						<li>
+							<a href="https://torwent.github.io/WaspLib" target="_blank">WaspLib Documentation</a>
+						</li>
+						<li><a href="https://github.com/villavu/Simba" target="_blank">Simba repo</a></li>
+						<li>
+							<a href="https://github.com/villavu/SRL-Development" target="_blank">SRL repo</a>
+						</li>
+						<li><a href="https://github.com/Torwent/WaspLib" target="_blank">WaspLib repo</a></li>
 					</ul>
 				</nav>
 				<nav>
@@ -43,7 +49,11 @@
 		<footer class="sm:flex sm:items-center sm:justify-between p-8 sm:p-12">
 			<span class="text-sm sm:text-center">
 				This webapp is open source! Checkout
-				<a class="permalink text-secondary-500" href="https://github.com/torwent/wasp-webapp">
+				<a
+					class="permalink text-secondary-500"
+					href="https://github.com/torwent/wasp-webapp"
+					target="_blank"
+				>
 					WaspScripts source code
 				</a>
 				!
@@ -51,6 +61,7 @@
 			<div class="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
 				<a
 					href="https://github.com/torwent"
+					target="_blank"
 					aria-label="Navigate to GitHub"
 					class="permalink text-secondary-500"
 				>

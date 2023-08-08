@@ -59,6 +59,8 @@ export async function updateProfileProtected(profile: Profile) {
 		if (!adminLoggedIn) return false
 	}
 
+	console.log("Updating profile protected for user: ", profile.id)
+
 	const { error: err } = await supabaseAdmin
 		.from("profiles_protected")
 		.update({
