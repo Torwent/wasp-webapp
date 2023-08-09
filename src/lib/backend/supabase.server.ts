@@ -81,7 +81,10 @@ export async function updateProfileProtected(profile: Profile) {
 		})
 		.eq("id", profile.id)
 
-	if (err) throw error(403, err)
+	if (err) {
+		console.error(err)
+		throw error(403, err)
+	}
 	return true
 }
 
