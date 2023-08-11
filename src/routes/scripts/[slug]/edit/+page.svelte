@@ -401,14 +401,14 @@
 				<MultiSelect
 					title="Categories"
 					bind:value={$form.categories}
-					bind:errors={$errors.categories}
+					errors={$errors.categories?._errors}
 					entries={categories}
 				/>
 
 				<MultiSelect
 					title="Subcategories"
 					bind:value={$form.subcategories}
-					bind:errors={$errors.subcategories}
+					errors={$errors.subcategories?._errors}
 					entries={subcategories}
 				/>
 

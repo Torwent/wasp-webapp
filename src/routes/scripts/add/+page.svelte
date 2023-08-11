@@ -17,13 +17,14 @@
 	import StatsHeader from "../StatsHeader.svelte"
 	import { addToolTips } from "$lib/backend/data"
 	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
+	import { onMount } from "svelte"
 
 	export let data
 
 	let { categories, subcategories, profile } = data
 	$: ({ profile } = data)
 
-	const { form, errors, enhance, validate } = superForm(data.form, {
+	const { form, errors, enhance, validate, tainted } = superForm(data.form, {
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
@@ -200,6 +201,19 @@ You need quest ABC completed to use this.
 	$: script.content = $form.content
 	$: script.categories = $form.categories
 	$: script.subcategories = $form.subcategories
+
+	let mounted = false
+
+	function clearStartUpErrors() {
+		if (!$form.categories || !$form.subcategories) return
+		if ($form.categories.length !== 2 || $form.subcategories.length !== 0) return
+
+		$errors.categories = undefined
+		$errors.subcategories = undefined
+		$tainted = undefined
+		mounted = true
+	}
+	$: if (!mounted && ($form.categories || $form.subcategories)) clearStartUpErrors()
 
 	const headTitle = "WaspScripts - Add Script"
 	const headDescription = "Add a new script to WaspScripts."
@@ -453,14 +467,14 @@ You need quest ABC completed to use this.
 				<MultiSelect
 					title="Categories"
 					bind:value={$form.categories}
-					bind:errors={$errors.categories}
+					errors={$errors.categories?._errors}
 					entries={categories}
 				/>
 
 				<MultiSelect
 					title="Subcategories"
 					bind:value={$form.subcategories}
-					bind:errors={$errors.subcategories}
+					errors={$errors.subcategories?._errors}
 					entries={subcategories}
 				/>
 

@@ -5,17 +5,13 @@
 	import { ChevronDown, X } from "lucide-svelte"
 	export let title: string
 	export let value: string[]
-	export let errors: Record<number, string[]> | undefined
+	export let errors: string[] | undefined = undefined
 	export let placeholder = ""
 	export let entries: Category[] | SubCategory[]
 
-	function checkErrors(err: Record<number, string[]> | undefined) {
+	function checkErrors(err: string[] | undefined) {
 		if (!err) return false
-
-		for (const e of Object.entries(err)) {
-			if (e[1] != null) return true
-		}
-		return false
+		return err.length > 0
 	}
 
 	let input: HTMLInputElement
@@ -140,13 +136,11 @@
 			</ul>
 		{/if}
 	</div>
-	<div class="grid">
-		{#if errors}
-			{#each Object.entries(errors) as err, idx}
-				{#if err[idx]}
-					<small class="text-error-500 mx-auto w-full">{err[idx]}</small>
-				{/if}
+	{#if errors}
+		<div class="grid">
+			{#each errors as err}
+				<small class="text-error-500 mx-auto w-full">{err}</small>
 			{/each}
-		{/if}
-	</div>
+		</div>
+	{/if}
 </div>
