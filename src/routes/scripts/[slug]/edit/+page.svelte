@@ -27,7 +27,6 @@
 	const { form, errors, enhance, validate } = superForm(data.form, {
 		dataType: "form",
 		multipleSubmits: "prevent",
-		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
 		validators: scriptSchema
 	})

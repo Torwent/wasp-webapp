@@ -119,6 +119,29 @@ export async function getScript(supabase: SupabaseClient, slug: string) {
 	return data[0]
 }
 
+export async function scriptExists(supabase: SupabaseClient, slug: string) {
+	const { data, error: err } = await supabase
+		.from("scripts_public")
+		.select(
+			`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
+			tooltip_emojis, tooltip_names,
+			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
+			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
+		)
+		.eq("url", slug)
+		.returns<Script[]>()
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - SELECT scripts_public failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
+	return data.length > 0
+}
+
 export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {
 	const { data, error: err } = await supabase
 		.from("scripts_public")

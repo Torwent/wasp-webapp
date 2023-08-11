@@ -4,7 +4,7 @@ import { scriptSchema } from "$lib/backend/schemas"
 import { filesSchema } from "$lib/backend/schemas.server"
 import { uploadScript } from "$lib/backend/data.server"
 import { encodeSEO } from "$lib/utils"
-import { getScript } from "$lib/backend/data"
+import { scriptExists } from "$lib/backend/data"
 import type { ScriptPublic } from "$lib/types/collection"
 
 export const load = async (event) => {
@@ -40,7 +40,7 @@ export const actions = {
 
 		const url = encodeSEO(form.data.title + " by " + profile.username)
 
-		const tmp = await getScript(supabaseServer, url)
+		const tmp = await scriptExists(supabaseServer, url)
 		if (tmp) {
 			const msg = "A script with that name by you already exists! Choose a different name."
 			console.error(msg)
@@ -78,7 +78,7 @@ export const actions = {
 			url: ""
 		}
 
-		const { error } = await uploadScript(
+		const { error: err } = await uploadScript(
 			supabaseServer,
 			script,
 			validFiles.data.script,
@@ -86,9 +86,9 @@ export const actions = {
 			validFiles.data.banner
 		)
 
-		if (error) {
-			console.error(error)
-			return setError(form, "", error)
+		if (err) {
+			console.error(err)
+			return setError(form, "", err)
 		}
 
 		throw redirect(303, "./" + url)

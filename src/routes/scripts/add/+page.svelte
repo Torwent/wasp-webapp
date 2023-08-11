@@ -23,9 +23,8 @@
 	let { categories, subcategories, profile } = data
 	$: ({ profile } = data)
 
-	const { form, errors, enhance, validate, tainted } = superForm(data.form, {
+	const { form, errors, enhance, validate } = superForm(data.form, {
 		multipleSubmits: "prevent",
-		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
 		validators: scriptSchema
 	})
@@ -122,7 +121,8 @@ You need quest ABC completed to use this.
 		$form.max_xp ||
 		$form.min_gp ||
 		$form.max_gp
-	) validate()
+	)
+		validate()
 
 	$: {
 		script.categories = $form.categories
@@ -198,19 +198,6 @@ You need quest ABC completed to use this.
 	$: script.content = $form.content
 	$: script.categories = $form.categories
 	$: script.subcategories = $form.subcategories
-
-	let mounted = false
-
-	function clearStartUpErrors() {
-		if (!$form.categories || !$form.subcategories) return
-		if ($form.categories.length !== 2 || $form.subcategories.length !== 0) return
-
-		$errors.categories = undefined
-		$errors.subcategories = undefined
-		$tainted = undefined
-		mounted = true
-	}
-	$: if (!mounted && ($form.categories || $form.subcategories)) clearStartUpErrors()
 
 	const headTitle = "WaspScripts - Add Script"
 	const headDescription = "Add a new script to WaspScripts."
@@ -397,7 +384,7 @@ You need quest ABC completed to use this.
 							{#if coverStyle === 0}
 								<span>Must be exactly 300x200 pixels and JPG format.</span>
 							{:else if coverStyle === 1}
-								<span class="text-success-500">{$form.cover.name}</span>
+								<span class="text-success-500">{$form.cover?.name}</span>
 							{:else if $errors.cover && $errors.cover.length > 0}
 								{#each $errors.cover as error}
 									{#if error}
@@ -439,7 +426,7 @@ You need quest ABC completed to use this.
 							{#if bannerStyle === 0}
 								<span>Must be exactly 1920x768 pixels and JPG format.</span>
 							{:else if bannerStyle === 1}
-								<span class="text-success-500">{$form.banner.name}</span>
+								<span class="text-success-500">{$form.banner?.name}</span>
 							{:else if $errors.banner && $errors.banner.length > 0}
 								{#each $errors.banner as error}
 									{#if error}
