@@ -17,7 +17,6 @@
 	import StatsHeader from "../StatsHeader.svelte"
 	import { addToolTips } from "$lib/backend/data"
 	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
-	import { onMount } from "svelte"
 
 	export let data
 
@@ -123,9 +122,7 @@ You need quest ABC completed to use this.
 		$form.max_xp ||
 		$form.min_gp ||
 		$form.max_gp
-	)
-		validate()
-	$: console.log($errors._errors)
+	) validate()
 
 	$: {
 		script.categories = $form.categories

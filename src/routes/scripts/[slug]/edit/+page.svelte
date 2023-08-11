@@ -90,7 +90,6 @@
 				return
 			}
 			coverStyle = 1
-			console.log(coverStyle)
 			let reader = new FileReader()
 			reader.onload = function () {
 				if (!coverElement) coverElement = new Image()
