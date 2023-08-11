@@ -577,8 +577,8 @@ You need quest ABC completed to use this.
 							{#if scriptStyle === 0}
 								<span>Must be a Simba script file.</span>
 							{:else if scriptStyle === 1}
-								<span class="text-success-500">{$form.script.name}</span>
-							{:else if $errors.script && $errors.script.length > 0}
+								<span class="text-success-500">{$form.script?.name}</span>
+							{:else if $errors.script && $errors.script?.length > 0}
 								{#each $errors.script as error}
 									{#if error}
 										<small class="flex justify-center text-error-500">{error}</small>
