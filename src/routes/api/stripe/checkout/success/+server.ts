@@ -68,6 +68,7 @@ export const GET = async ({ fetch, url: { searchParams }, locals: { supabaseServ
 
 		const subscription = await stripe.subscriptions.retrieve(session.subscription.toString())
 
+		console.log("Checkout subscription data: ", subscription)
 		profile.profiles_protected.premium = true
 		profile.profiles_protected.subscription_external = false
 
