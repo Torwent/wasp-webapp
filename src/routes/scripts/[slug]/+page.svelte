@@ -17,7 +17,7 @@
 	import ScriptArticle from "../ScriptArticle.svelte"
 	import StatsHeader from "../StatsHeader.svelte"
 	import { onMount } from "svelte"
-	import { replaceScriptContent } from "$lib/utils"
+	import { formatRSNumber, replaceScriptContent } from "$lib/utils"
 
 	export let data
 
@@ -77,6 +77,9 @@
 
 	if (!profile) toastStore.trigger(t)
 
+	const authorButtons = ["none", "online list", "all time downloads", "monthly downloads"]
+	let selectedBtn = "none"
+
 	const headTitle = script.title + " - WaspScripts"
 	const headDescription = "RuneScape OSRS Color Bot - " + script.description
 	const headKeywords =
@@ -135,6 +138,78 @@
 			gold={script.stats_scripts.gold}
 			runtime={script.stats_scripts.runtime}
 		/>
+
+		{#if canEdit(profile, script.scripts_protected.author_id)}
+			<header class="text-center">
+				<div class="my-4 btn-group-vertical md:btn-group variant-ghost justify-evenly">
+					{#each authorButtons as btn, idx}
+						{#if idx > 0}
+							<button
+								class="w-full"
+								class:variant-glass-primary={selectedBtn === btn}
+								on:click={() => {
+									if (selectedBtn === btn) selectedBtn = authorButtons[0]
+									else selectedBtn = btn
+								}}
+							>
+								View {btn}
+							</button>
+						{/if}
+					{/each}
+				</div>
+
+				{#if selectedBtn === authorButtons[1]}
+					{#if script.stats_scripts.total_current_users}
+						<h4>
+							Currently online (simba uuids): {formatRSNumber(
+								script.stats_scripts.total_current_users
+							)}
+						</h4>
+
+						<div>
+							<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
+								{#each script.stats_scripts.current_users as user}
+									{#if user}
+										{Object.values(user)[0]}
+										<br />
+									{/if}
+								{/each}
+							</div>
+						</div>
+					{/if}
+				{:else if selectedBtn === authorButtons[2]}
+					{#if script.stats_scripts.total_unique_downloads}
+						<h4>
+							Total downloads: {formatRSNumber(script.stats_scripts.total_unique_downloads)}
+						</h4>
+
+						<div>
+							<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
+								{#each script.stats_scripts.unique_downloads as user}
+									{user}
+									<br />
+								{/each}
+							</div>
+						</div>
+					{/if}
+				{:else if selectedBtn === authorButtons[3]}
+					{#if script.stats_scripts.total_monthly_downloads}
+						<h4>
+							Total downloads: {formatRSNumber(script.stats_scripts.total_monthly_downloads)}
+						</h4>
+
+						<div>
+							<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
+								{#each script.stats_scripts.monthly_downloads as user}
+									{user}
+									<br />
+								{/each}
+							</div>
+						</div>
+					{/if}
+				{/if}
+			</header>
+		{/if}
 
 		{#if profile}
 			<div class="text-center">
