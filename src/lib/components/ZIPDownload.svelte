@@ -84,11 +84,6 @@
 
 		scripts = scripts.filter((script) => {
 			if (ALL_ZIPS[0] === zipName) {
-				console.log(
-					script,
-					" ",
-					script.categories.includes("Official") && script.categories.includes("Premium")
-				)
 				return script.categories.includes("Official") && script.categories.includes("Premium")
 			} else if (ALL_ZIPS[1] === zipName)
 				return script.categories.includes("Official") && script.categories.includes("Free")
@@ -102,13 +97,12 @@
 			else return true
 		})
 
-		scripts.forEach((s) => console.log(s.title))
-
 		let urls: (string | false)[] = []
 		let promises = []
 		let scriptIds = []
 
 		for (let script of scripts) {
+			console.log(script.title)
 			promises.push(
 				new Promise<string | false>(async (resolve) => {
 					const result = await getSignedURL(
