@@ -14,7 +14,12 @@ async function getScripts(
 	let query = supabase
 		.schema("scripts")
 		.from("scripts")
-		.select(scriptsQueryString, { count: "exact" })
+		.select(
+			`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
+			tooltip_emojis, tooltip_names,
+			protected!inner (assets, author_id, revision, username, avatar, revision_date)`,
+			{ count: "estimated" }
+		)
 		.eq("protected.author_id", developerID)
 		.order("title", { ascending: true })
 		.range(start, finish)

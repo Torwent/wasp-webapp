@@ -17,7 +17,8 @@ export const load = async ({ url: { searchParams }, params: { slug }, parent, de
 			.schema("profiles")
 			.from("scripters")
 			.select(
-				`id, realname, description, github, paypal_id, content,  profiles!left (username, avatar)`
+				`id, realname, description, github, paypal_id, content, url, profiles!left (username, avatar)`,
+				{ count: "estimated" }
 			)
 
 		if (search === "") {

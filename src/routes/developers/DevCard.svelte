@@ -1,12 +1,11 @@
 <script lang="ts">
 	import type { ScripterWithUsername } from "$lib/types/collection"
-	import { encodeSEO } from "$lib/utils"
 	import { Avatar } from "@skeletonlabs/skeleton"
 	export let scripter: ScripterWithUsername
 </script>
 
 <div class="card-hover rounded-md variant-ghost-surface m-4">
-	<a href="/developers/{encodeSEO(scripter.profiles.username)}">
+	<a href="/developers/{scripter.url}">
 		<div class="flex text-md font-semibold text-primary-600 dark:text-primary-500 truncate">
 			<Avatar
 				class="flex m-4 border-4 border-surface-300-600-token"

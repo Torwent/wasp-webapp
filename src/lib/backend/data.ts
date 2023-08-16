@@ -71,7 +71,7 @@ export function addToolTips(script: Script, categories: Category[], subcategorie
 
 export const scriptsQueryString = `id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
 			tooltip_emojis, tooltip_names,
-			protected (assets, author_id, revision, username, avatar, revision_date)`
+			protected!left (assets, author_id, revision, username, avatar, revision_date)`
 
 export async function getScripts(supabase: SupabaseClient) {
 	const { data, error: err } = await supabase
