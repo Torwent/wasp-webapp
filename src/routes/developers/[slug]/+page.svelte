@@ -6,7 +6,7 @@
 	import { page } from "$app/stores"
 	import { browser } from "$app/environment"
 	import { invalidate } from "$app/navigation"
-	import type { IScriptCard } from "$lib/types/collection"
+	import type { Script } from "$lib/types/collection"
 	import { onMount } from "svelte"
 	import ScriptCard from "$lib/components/ScriptCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
@@ -38,12 +38,12 @@
 		invalidate("supabase:developer")
 	}
 
-	function canSeeScript(script: IScriptCard) {
+	function canSeeScript(script: Script) {
 		if (script.published) return true
 		if (!profile) return false
 		if (profile.profiles_protected.administrator) return true
 		if (profile.profiles_protected.moderator) return true
-		return script.scripts_protected.author_id === profile.id
+		return script.protected.author_id === profile.id
 	}
 
 	onMount(() => (loading = false))

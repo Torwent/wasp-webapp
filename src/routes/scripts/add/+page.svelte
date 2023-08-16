@@ -9,7 +9,7 @@
 	import { FileCode, ImagePlus } from "lucide-svelte"
 	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
-	import type { IScriptCard } from "$lib/types/collection"
+	import type { Script } from "$lib/types/collection"
 	import ScriptHeader from "../ScriptHeader.svelte"
 	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
 	import ZipDownload from "$lib/components/ZIPDownload.svelte"
@@ -47,7 +47,7 @@
 	let showSearchResult: boolean = false
 
 	let isFocused: boolean = true
-	let script: IScriptCard = {
+	let script: Script = {
 		title: "",
 		description: "",
 		content: "",
@@ -59,26 +59,21 @@
 		min_gp: 0,
 		max_gp: 0,
 		id: "",
-		search_script: "",
-		updated_at: "",
-		scripts_protected: {
-			assets_alt: "",
-			assets_path: "",
+		protected: {
+			assets: "",
 			author_id: "",
-			created_at: null,
 			id: "",
 			revision: 0,
-			profiles_public: {
-				username: profile?.username || "",
-				avatar_url: profile?.avatar_url || ""
-			},
-			last_revision_date: new Date(Date.now()).toISOString()
+			username: profile?.username ?? "",
+			avatar: profile?.avatar_url ?? "",
+			revision_date: ""
 		},
 		fts: undefined,
 		search: "",
 		tooltip_emojis: [],
 		tooltip_names: [],
-		url: ""
+		url: "",
+		created_at: ""
 	}
 	$form.content = `### {$title} by {$author}
 
@@ -88,7 +83,7 @@ Latest revision: {$revision}
 
 Updated at: {$last_revision_full_date}
 
-Date updated at: {$last_revision_date}
+Date updated at: {$revision_date}
 
 Time of update: {$last_revision_time}
 
@@ -250,9 +245,17 @@ You need quest ABC completed to use this.
 				</header>
 
 				<StatsHeader
-					experience={Math.random() * 1000000}
-					gold={Math.random() * 1000000}
-					runtime={Math.random() * 1000000000}
+					stats={{
+						id: "",
+						experience: Math.random() * 1000000,
+						gold: Math.random() * 1000000,
+						runtime: Math.random() * 1000000000,
+						levels: 0,
+						online_users: [],
+						online_users_total: 0,
+						unique_users: [],
+						unique_users_total: 0
+					}}
 				/>
 
 				{#if profile}

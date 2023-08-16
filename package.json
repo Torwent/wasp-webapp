@@ -15,10 +15,10 @@
 		"gentypes": "supabase gen types typescript --linked > src/lib/types/supabase.ts"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.36.2",
-		"@skeletonlabs/skeleton": "^1.10.0",
-		"@supabase/auth-helpers-sveltekit": "^0.10.1",
-		"@sveltejs/kit": "^1.22.3",
+		"@playwright/test": "^1.37.0",
+		"@skeletonlabs/skeleton": "^1.11.0",
+		"@supabase/auth-helpers-sveltekit": "^0.10.2",
+		"@sveltejs/kit": "^1.22.6",
 		"@tailwindcss/forms": "^0.5.4",
 		"@tailwindcss/typography": "^0.5.9",
 		"@types/file-saver": "^2.0.5",
@@ -26,23 +26,23 @@
 		"@types/probe-image-size": "^7.2.0",
 		"@typescript-eslint/eslint-plugin": "^5.62.0",
 		"@typescript-eslint/parser": "^5.62.0",
-		"autoprefixer": "^10.4.14",
-		"eslint": "^8.46.0",
-		"eslint-config-prettier": "^8.9.0",
+		"autoprefixer": "^10.4.15",
+		"eslint": "^8.47.0",
+		"eslint-config-prettier": "^8.10.0",
 		"eslint-plugin-svelte": "^2.32.4",
 		"postcss": "^8.4.27",
 		"prettier": "^2.8.8",
 		"prettier-plugin-svelte": "^2.10.1",
-		"supabase": "^1.82.2",
-		"svelte": "^4.1.1",
-		"svelte-check": "^3.4.6",
-		"sveltekit-superforms": "^1.5.0",
+		"supabase": "^1.86.0",
+		"svelte": "^4.2.0",
+		"svelte-check": "^3.5.0",
+		"sveltekit-superforms": "^1.5.1",
 		"tailwindcss": "^3.3.3",
 		"tslib": "^2.6.1",
 		"typescript": "^5.1.6",
-		"vite": "^4.4.7",
+		"vite": "^4.4.9",
 		"vitest": "^0.25.8",
-		"zod": "^3.21.4"
+		"zod": "^3.22.0"
 	},
 	"type": "module",
 	"dependencies": {
@@ -50,8 +50,8 @@
 		"@dicebear/core": "^6.0.4",
 		"@enviro/metadata": "^1.5.1",
 		"@floating-ui/dom": "^1.5.1",
-		"@supabase/supabase-js": "^2.31.0",
-		"@sveltejs/adapter-vercel": "^3.0.2",
+		"@supabase/supabase-js": "^2.32.0",
+		"@sveltejs/adapter-vercel": "^3.0.3",
 		"file-saver": "^2.0.5",
 		"highlight.js": "^11.8.0",
 		"install": "^0.13.0",
@@ -59,6 +59,6 @@
 		"jszip": "^3.10.1",
 		"lucide-svelte": "^0.259.0",
 		"markdown-it": "^13.0.1",
-		"stripe": "^12.16.0"
+		"stripe": "^12.18.0"
 	}
 }

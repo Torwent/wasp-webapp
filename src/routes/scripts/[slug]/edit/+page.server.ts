@@ -60,7 +60,7 @@ export const actions = {
 			return setError(form, "", msg)
 		}
 
-		if (!canEdit(profile, script.scripts_protected.author_id)) {
+		if (!canEdit(profile, script.protected.author_id)) {
 			const msg = "That script does not belong to you!"
 			console.error(msg)
 			return setError(form, "", msg)
@@ -100,10 +100,6 @@ export const actions = {
 			return setError(form, "", error)
 		}
 
-		throw redirect(
-			303,
-			"/scripts/" +
-				encodeSEO(script.title + " by " + script.scripts_protected.profiles_public.username)
-		)
+		throw redirect(303, "/scripts/" + encodeSEO(script.title + " by " + script.protected.username))
 	}
 }

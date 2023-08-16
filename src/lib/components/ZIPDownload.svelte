@@ -108,7 +108,7 @@
 					const result = await getSignedURL(
 						$page.data.supabaseClient,
 						"scripts",
-						script.id + "/" + pad(script.scripts_protected.revision, 9),
+						script.id + "/" + pad(script.protected.revision, 9),
 						"script.simba"
 					)
 					progress += 1

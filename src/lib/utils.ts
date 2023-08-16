@@ -1,4 +1,4 @@
-import type { IScriptCard } from "./types/collection"
+import type { Script } from "./types/collection"
 
 export const API_URL = "https://api.waspscripts.com" //http://localhost:8080
 export const UUID_V4_REGEX =
@@ -108,38 +108,51 @@ export function encodeSEO(url: string) {
 	url = encodeURI(url.toLocaleLowerCase())
 		.replaceAll("%20", "-")
 		.replace(/&/g, "-and-")
-		.replace(/[^a-z\-]/g, "")
+		.replace(/[^a-z-]/g, "")
 		.replace(/-+/g, "-")
 		.replace(/^-*/, "")
 		.replace(/-*$/, "")
 	return url
 }
 
-export function replaceScriptContent(script: IScriptCard) {
+export function replaceScriptContent(script: Script) {
 	const placeholders: { [key: string]: string } = {
 		id: script.id,
 		title: script.title,
 		description: script.description,
-		author: script.scripts_protected.profiles_public.username,
-		revision: script.scripts_protected.revision.toString(),
-		last_revision_full_date: new Date(script.scripts_protected.last_revision_date).toLocaleString(
-			"pt-PT"
-		),
-		last_revision_date: new Date(script.scripts_protected.last_revision_date).toLocaleString(
-			"pt-PT",
-			{ day: "2-digit", month: "2-digit", year: "numeric" }
-		),
-		last_revision_time: new Date(script.scripts_protected.last_revision_date).toLocaleString(
-			"pt-PT",
-			{ hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }
-		),
+		author: script.protected.username,
+		revision: script.protected.revision.toString(),
+		revision_full_date: new Date(script.protected.revision_date).toLocaleString("pt-PT"),
+		last_revision_full_date: new Date(script.protected.revision_date).toLocaleString("pt-PT"),
+		revision_date: new Date(script.protected.revision_date).toLocaleString("pt-PT", {
+			day: "2-digit",
+			month: "2-digit",
+			year: "numeric"
+		}),
+		last_revision_date: new Date(script.protected.revision_date).toLocaleString("pt-PT", {
+			day: "2-digit",
+			month: "2-digit",
+			year: "numeric"
+		}),
+		last_revision_time: new Date(script.protected.revision_date).toLocaleString("pt-PT", {
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+			hour12: false
+		}),
+		revision_time: new Date(script.protected.revision_date).toLocaleString("pt-PT", {
+			hour: "2-digit",
+			minute: "2-digit",
+			second: "2-digit",
+			hour12: false
+		}),
 		min_xp: script.min_xp.toString(),
 		max_xp: script.max_xp.toString(),
 		min_gp: script.min_gp.toString(),
 		max_gp: script.max_gp.toString()
 	}
 
-	const result = script.content.replace(/\{\$([^\{\}\s$]+)\}/g, (match, placeholder) => {
+	const result = script.content.replace(/\{\$([^{}\s$]+)\}/g, (match, placeholder) => {
 		const value = placeholders[placeholder]
 		return value !== undefined ? value : match
 	})

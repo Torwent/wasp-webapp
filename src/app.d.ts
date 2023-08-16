@@ -12,6 +12,7 @@ declare global {
 			profile: Profile | null
 		}
 		interface PageData {
+			supabaseClient: SupabaseClient<Database>
 			session: Session | null
 			profile: Profile | null
 		}

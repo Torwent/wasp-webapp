@@ -4,8 +4,6 @@ import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit"
 import { API_URL } from "$lib/utils"
 import type { Profile } from "$lib/types/collection"
 import { stripe, updateProfileProtected } from "$lib/backend/supabase.server"
-import Stripe from "stripe"
-import { PRIVATE_STRIPE_KEY } from "$env/static/private"
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
@@ -17,6 +15,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
 		event
 	})
+	locals.supabaseServer
 
 	locals.getSession = async () => {
 		const {

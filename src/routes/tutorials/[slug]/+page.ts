@@ -15,7 +15,7 @@ export const load = async ({ params, parent }) => {
 		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
 			.from("tutorials")
-			.select("*, profiles_public (*)")
+			.select("*,  profiles_public (*)")
 			.eq("url", slug)
 			.returns<TutorialWithAuthor[]>()
 

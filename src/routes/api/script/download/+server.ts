@@ -1,4 +1,4 @@
-import { updateStatsScripts } from "$lib/backend/supabase.server"
+import { updateDownloaders } from "$lib/backend/supabase.server"
 
 export const POST = async ({ request, locals: { getProfile } }) => {
 	const promises = await Promise.all([request.json(), getProfile()])
@@ -9,7 +9,7 @@ export const POST = async ({ request, locals: { getProfile } }) => {
 
 	if (!Object.keys(data).includes("id")) return new Response()
 	const id = data.id as string
-	await updateStatsScripts(id, profile.id)
+	await updateDownloaders(id, profile.id)
 
 	return new Response()
 }

@@ -26,13 +26,14 @@ export const load = async ({ url, parent, depends }) => {
 		const { supabaseClient } = await parent()
 
 		let query = supabaseClient
-			.from("scripts_public")
+			.schema("scripts")
+			.from("scripts")
 			.select(
 				`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
 			tooltip_emojis, tooltip_names,
-			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public (username, avatar_url)),
-			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`,
-				{ count: "exact" }
+			protected (assets, author_id, revision, username, avatar),
+			stats_simba (experience, gold, runtime, levels, unique_users_total, online_users_total)`,
+				{ count: "estimated" }
 			)
 			.eq("published", true)
 			.contains("categories", categoriesFilter)

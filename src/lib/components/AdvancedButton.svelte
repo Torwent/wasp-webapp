@@ -7,9 +7,9 @@
 	import { browser } from "$app/environment"
 	import { ChevronDown, FileDown } from "lucide-svelte"
 	import { page } from "$app/stores"
-	import type { ScriptPublic } from "$lib/types/collection"
+	import type { ScriptBase } from "$lib/types/collection"
 
-	export let script: ScriptPublic
+	export let script: ScriptBase
 	export let rev: number
 	export let noDownload: boolean = false
 
@@ -36,9 +36,10 @@
 		document.body.appendChild(anchor)
 		anchor.click()
 		window.URL.revokeObjectURL(blob)
-		await fetch("/api/script", { body: JSON.stringify({ id: script.id }), method: "POST" }).catch(
-			(error) => console.error(error)
-		)
+		await fetch("/api/script/download", {
+			body: JSON.stringify({ id: script.id }),
+			method: "POST"
+		}).catch((error) => console.error(error))
 	}
 
 	let popupSettings: PopupSettings = {

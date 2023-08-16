@@ -15,7 +15,7 @@ export const load = async ({ url: { searchParams }, params: { slug }, parent, de
 		const { supabaseClient } = await parent()
 		let query = supabaseClient.from("developers").select(
 			`id, realname, description, github, paypal_id,
-				content, profiles_public (username, avatar_url)`,
+				content,  profiles_public (username, avatar_url)`,
 			{ count: "exact" }
 		)
 

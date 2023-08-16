@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from "$app/environment"
 	import { goto } from "$app/navigation"
-	import { canDownload, canEdit, updateWarning } from "$lib/backend/data"
+	import { canDownload, canEdit, getScriptsStats, updateWarning } from "$lib/backend/data"
 	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
 	import ZipDownload from "$lib/components/ZIPDownload.svelte"
 
@@ -17,12 +17,14 @@
 	import ScriptArticle from "../ScriptArticle.svelte"
 	import StatsHeader from "../StatsHeader.svelte"
 	import { onMount } from "svelte"
-	import { formatRSNumber, replaceScriptContent } from "$lib/utils"
+	import { replaceScriptContent } from "$lib/utils"
+	import ScriptData from "./ScriptData.svelte"
+	import type { StatsSimba } from "$lib/types/collection"
 
 	export let data
 
-	let { script, dismissed, profile } = data
-	$: ({ script, dismissed, profile } = data)
+	let { script, dismissed, profile, supabaseClient } = data
+	$: ({ script, dismissed, profile, supabaseClient } = data)
 
 	onMount(() => {
 		if (!$page.url.pathname.includes("-by-")) history.replaceState({}, "", "/scripts/" + script.url)
@@ -77,16 +79,15 @@
 
 	if (!profile) toastStore.trigger(t)
 
-	const authorButtons = ["none", "online list", "all time downloads", "monthly downloads"]
-	let selectedBtn = "none"
+	const scriptStats = getScriptsStats(supabaseClient, script.id)
 
 	const headTitle = script.title + " - WaspScripts"
 	const headDescription = "RuneScape OSRS Color Bot - " + script.description
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, " +
 		script.subcategories
-	const headAuthor = script.scripts_protected.profiles_public.username
-	const headImage = script?.scripts_protected.assets_path + "banner.jpg"
+	const headAuthor = script.protected.username
+	const headImage = script.protected.assets + "banner.jpg"
 </script>
 
 <svelte:head>
@@ -113,11 +114,11 @@
 </svelte:head>
 
 <div>
-	<ScriptHeader title={script.title} username={script.scripts_protected.profiles_public.username}>
+	<ScriptHeader title={script.title} username={script.protected.username}>
 		<img
 			class="z-0 absolute object-cover h-full w-full"
-			src={script?.scripts_protected.assets_path + "banner.jpg"}
-			alt={script?.scripts_protected.assets_alt}
+			src={script.protected.assets + "banner.jpg"}
+			alt="Script banner"
 			loading="lazy"
 		/>
 	</ScriptHeader>
@@ -128,96 +129,32 @@
 				{script.description}
 			</h3>
 
-			{#if !script.published && canEdit(profile, script.scripts_protected.author_id)}
+			{#if !script.published && canEdit(profile, script.protected.author_id)}
 				<h4 class="my-4 text-center text-error-500 text-shadow drop-shadow-2xl">Unpublished</h4>
 			{/if}
 		</header>
 
-		<StatsHeader
-			experience={script.stats_scripts.experience}
-			gold={script.stats_scripts.gold}
-			runtime={script.stats_scripts.runtime}
-		/>
-
-		{#if canEdit(profile, script.scripts_protected.author_id)}
+		{#await scriptStats}
 			<header class="text-center">
-				<div class="my-4 btn-group-vertical md:btn-group variant-ghost justify-evenly">
-					{#each authorButtons as btn, idx}
-						{#if idx > 0}
-							<button
-								class="w-full"
-								class:variant-glass-primary={selectedBtn === btn}
-								on:click={() => {
-									if (selectedBtn === btn) selectedBtn = authorButtons[0]
-									else selectedBtn = btn
-								}}
-							>
-								View {btn}
-							</button>
-						{/if}
-					{/each}
-				</div>
-
-				{#if selectedBtn === authorButtons[1]}
-					{#if script.stats_scripts.total_current_users}
-						<h4>
-							Currently online (simba uuids): {formatRSNumber(
-								script.stats_scripts.total_current_users
-							)}
-						</h4>
-
-						<div>
-							<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
-								{#each script.stats_scripts.current_users as user}
-									{#if user}
-										{Object.values(user)[0]}
-										<br />
-									{/if}
-								{/each}
-							</div>
-						</div>
-					{/if}
-				{:else if selectedBtn === authorButtons[2]}
-					{#if script.stats_scripts.total_unique_downloads}
-						<h4>
-							Total downloads: {formatRSNumber(script.stats_scripts.total_unique_downloads)}
-						</h4>
-
-						<div>
-							<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
-								{#each script.stats_scripts.unique_downloads as user}
-									{user}
-									<br />
-								{/each}
-							</div>
-						</div>
-					{/if}
-				{:else if selectedBtn === authorButtons[3]}
-					{#if script.stats_scripts.total_monthly_downloads}
-						<h4>
-							Total downloads: {formatRSNumber(script.stats_scripts.total_monthly_downloads)}
-						</h4>
-
-						<div>
-							<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
-								{#each script.stats_scripts.monthly_downloads as user}
-									{user}
-									<br />
-								{/each}
-							</div>
-						</div>
-					{/if}
-				{/if}
+				<h4>Total Experience Gained: ...</h4>
+				<h4>Total Gold Gained: ...</h4>
+				<h4>Total Runtime: ...</h4>
 			</header>
+		{:then stats}
+			<StatsHeader {stats} />
+		{/await}
+
+		{#if canEdit(profile, script.protected.author_id)}
+			<ScriptData id={script.id} {scriptStats} />
 		{/if}
 
 		{#if profile}
 			<div class="text-center">
 				{#if canDownloadScript()}
 					<div class="py-12 grid justify-center justify-items-center gap-8">
-						<AdvancedButton {script} rev={script.scripts_protected.revision} />
+						<AdvancedButton {script} rev={script.protected.revision} />
 						<ZipDownload bind:profile />
-						<EditButton author_id={script.scripts_protected.author_id} />
+						<EditButton author_id={script.protected.author_id} />
 					</div>
 
 					<h4 class="pt-4">

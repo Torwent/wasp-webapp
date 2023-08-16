@@ -8,7 +8,8 @@ export const load = async ({ parent, data }) => {
 	async function getScriptTotals() {
 		const { supabaseClient } = await parent()
 		let query = supabaseClient
-			.from("scripts_public")
+			.schema("scripts")
+			.from("scripts")
 			.select(`id`, { count: "estimated", head: true })
 			.eq("published", true)
 			.contains("categories", "{Premium}")

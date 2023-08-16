@@ -33,8 +33,8 @@ export interface TutorialWithAuthor extends Tutorial, ProfilePublicUsername {}
 export type Developer = Database["public"]["Tables"]["developers"]["Row"]
 export interface DeveloperWithUsername extends Developer, ProfilePublicUsername {}
 
-export type Category = Database["public"]["Tables"]["scripts_categories"]["Row"]
-export type SubCategory = Database["public"]["Tables"]["scripts_subcategories"]["Row"]
+export type Category = Database["scripts"]["Tables"]["categories"]["Row"]
+export type SubCategory = Database["scripts"]["Tables"]["subcategories"]["Row"]
 
 export interface EmojiTooltip {
 	emoji: string
@@ -49,21 +49,18 @@ export interface CheckboxType {
 	checked: boolean
 }
 
-export type ScriptPublic = Database["public"]["Tables"]["scripts_public"]["Row"]
-export type ScriptProtected = Database["public"]["Tables"]["scripts_protected"]["Row"]
-export interface ScriptsProtectedWithUsername extends ScriptProtected, ProfilePublicUsername {}
+export type ScriptBase = Database["scripts"]["Tables"]["scripts"]["Row"]
+export type ScriptProtected = Database["scripts"]["Tables"]["protected"]["Row"]
 
-export type ScriptStats = Database["public"]["Tables"]["stats_scripts"]["Row"]
+export type StatsSimba = Database["scripts"]["Tables"]["stats_simba"]["Row"]
+export type StatsSite = Database["scripts"]["Tables"]["stats_site"]["Row"]
+
 export interface UpdateScriptStats {
-	unique_downloads: Database["public"]["Tables"]["stats_scripts"]["Row"]["unique_downloads"]
-	monthly_downloads: Database["public"]["Tables"]["stats_scripts"]["Row"]["monthly_downloads"]
-	previous_months_downloads: Database["public"]["Tables"]["stats_scripts"]["Row"]["previous_months_downloads"]
+	unique_downloads: Database["public"]["Tables"]["stats_simba"]["Row"]["unique_downloads"]
+	monthly_downloads: Database["public"]["Tables"]["stats_simba"]["Row"]["monthly_downloads"]
+	previous_months_downloads: Database["public"]["Tables"]["stats_simba"]["Row"]["previous_months_downloads"]
 }
 
-export interface IScriptCard extends ScriptPublic {
-	scripts_protected: ScriptsProtectedWithUsername
-}
-
-export interface Script extends IScriptCard {
-	stats_scripts: ScriptStats
+export interface Script extends ScriptBase {
+	protected: ScriptProtected
 }

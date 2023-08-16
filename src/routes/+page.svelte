@@ -19,7 +19,7 @@
 				{
 					event: "UPDATE",
 					schema: "public",
-					table: "stats_scripts"
+					table: "stats"
 				},
 				() => invalidate("supabase:home_stats_total")
 			)

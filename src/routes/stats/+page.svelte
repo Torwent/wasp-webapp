@@ -56,7 +56,7 @@
 				{
 					event: "UPDATE",
 					schema: "public",
-					table: "stats_scripts"
+					table: "stats_simba"
 				},
 				() => invalidate("supabase:stats")
 			)

@@ -11,13 +11,14 @@ export const load = async ({ parent }) => {
 		if (!result) {
 			const { supabaseClient } = await parent()
 			const { data, error: err } = await supabaseClient
-				.from("scripts_categories")
+				.schema("scripts")
+				.from("categories")
 				.select("name, emoji")
 				.returns<Category[]>()
 			if (err)
 				throw error(
 					500,
-					`Server error, this is probably not an issure on your end! - SELECT scripts_categories failed
+					`Server error, this is probably not an issure on your end! - SELECT scripts.categories failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -34,13 +35,14 @@ export const load = async ({ parent }) => {
 		if (!result) {
 			const { supabaseClient } = await parent()
 			const { data, error: err } = await supabaseClient
-				.from("scripts_subcategories")
+				.schema("scripts")
+				.from("subcategories")
 				.select("category, name, emoji")
 				.returns<SubCategory[]>()
 			if (err)
 				throw error(
 					500,
-					`Server error, this is probably not an issure on your end! - SELECT scripts_subcategories failed
+					`Server error, this is probably not an issure on your end! - SELECT scripts.subcategories failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}

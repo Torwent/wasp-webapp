@@ -1,25 +1,24 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { encodeSEO } from "$lib/utils"
-import type { DeveloperWithUsername, IScriptCard, TutorialWithAuthor } from "$lib/types/collection"
+import type { DeveloperWithUsername, Script, TutorialWithAuthor } from "$lib/types/collection"
 
 const website = "https://waspscripts.com"
 
 const loadScripts = async (supabase: SupabaseClient) => {
 	const { data, error } = await supabase
-		.from("scripts_public")
-		.select(`title,	scripts_protected ( profiles_public (username, avatar_url) )`)
+		.schema("scripts")
+		.from("scripts")
+		.select(`title,	protected (username, avatar)`)
 		.order("title", { ascending: true })
-		.returns<IScriptCard[]>()
+		.returns<Script[]>()
 
-	if (error) return console.error("scripts_public SELECT failed:" + error.message)
+	if (error) return console.error("scripts.scripts SELECT failed:" + error.message)
 
 	const scriptData = data
 
 	const result: string[] = []
 	scriptData.forEach((script) => {
-		result.push(
-			encodeSEO(script.title + " by " + script.scripts_protected.profiles_public.username)
-		)
+		result.push(encodeSEO(script.title + " by " + script.protected.username))
 	})
 
 	return result
@@ -28,7 +27,7 @@ const loadScripts = async (supabase: SupabaseClient) => {
 const loadTutorials = async (supabase: SupabaseClient) => {
 	const { data, error } = await supabase
 		.from("tutorials")
-		.select("title, profiles_public (username, avatar_url)")
+		.select("title,  profiles_public (username, avatar_url)")
 		.returns<TutorialWithAuthor[]>()
 
 	if (error) return console.error("tutorials SELECT failed: " + error.message)
@@ -44,7 +43,7 @@ const loadTutorials = async (supabase: SupabaseClient) => {
 const loadDevelopers = async (supabase: SupabaseClient) => {
 	const { data, error } = await supabase
 		.from("developers")
-		.select("profiles_public (username, avatar_url)")
+		.select(" profiles_public (username, avatar_url)")
 		.returns<DeveloperWithUsername[]>()
 
 	if (error) return console.error("developers SELECT failed: " + error.message)

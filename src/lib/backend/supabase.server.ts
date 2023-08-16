@@ -88,49 +88,53 @@ export async function updateProfileProtected(profile: Profile) {
 	return true
 }
 
-export async function updateStatsScripts(script: string, user: string) {
+export async function updateDownloaders(script: string, user: string) {
 	if (!adminLoggedIn) {
 		await login(false)
 		if (!adminLoggedIn) return false
 	}
 
-	const { data, error: err } = await supabaseAdmin
-		.from("stats_scripts")
-		.select("unique_downloads, monthly_downloads")
-		.eq("script_id", script)
-		.limit(1)
-		.returns<UpdateScriptStats[]>()
+	const { error: err } = await supabaseAdmin
+		.schema("scripts")
+		.rpc("add_downloader", { script_id: script, user_id: user })
 
-	if (err) throw error(403, err)
-
-	let { unique_downloads, monthly_downloads } = data[0]
-	let updated = false
-	if (!unique_downloads.includes(user)) {
-		unique_downloads.push(user)
-		updated = true
-	}
-
-	if (!monthly_downloads.includes(user)) {
-		monthly_downloads.push(user)
-		updated = true
-	}
-
-	if (updated) {
-		unique_downloads.push(user)
-		const { error: err } = await supabaseAdmin
-			.from("stats_scripts")
-			.update({ unique_downloads: unique_downloads, monthly_downloads: monthly_downloads })
-			.eq("script_id", script)
-
-		if (err)
-			throw error(
-				500,
-				`Server error, this is probably not an issure on your end! - UPDATE stats_scripts failed
+	if (err) {
+		console.error(err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - UPDATE scripts.stats_site failed
+			Function name: add_downloaders
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
 			Error hint: ${err.message}`
-			)
+		)
+	}
+
+	return true
+}
+
+export async function updateReporters(script: string, user: string) {
+	if (!adminLoggedIn) {
+		await login(false)
+		if (!adminLoggedIn) return false
+	}
+
+	const { error: err } = await supabaseAdmin
+		.schema("scripts")
+		.rpc("add_reporters", { script_id: script, user_id: user })
+
+	if (err) {
+		console.error(err)
+		throw error(
+			500,
+			`Server error, this is probably not an issure on your end! - UPDATE scripts.stats_site failed
+			Function name: add_downloaders
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
 	}
 
 	return true

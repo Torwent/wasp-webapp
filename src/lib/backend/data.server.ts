@@ -1,4 +1,4 @@
-import type { Profile, Script, ScriptPublic } from "$lib/types/collection"
+import type { Profile, Script, ScriptBase } from "$lib/types/collection"
 import { pad } from "$lib/utils"
 import type { Provider, SupabaseClient } from "@supabase/supabase-js"
 import { error, redirect } from "@sveltejs/kit"
@@ -60,7 +60,7 @@ async function uploadFile(supabase: SupabaseClient, bucket: string, path: string
 
 export async function uploadScript(
 	supabase: SupabaseClient,
-	script: ScriptPublic,
+	script: ScriptBase,
 	scriptFile: File | undefined,
 	coverFile: File | undefined,
 	bannerFile: File | undefined
@@ -94,12 +94,13 @@ export async function uploadScript(
 	}
 
 	const { data, error } = await supabase
-		.from("scripts_public")
+		.schema("scripts")
+		.from("scripts")
 		.insert(publicData)
 		.select()
-		.returns<ScriptPublic[]>()
+		.returns<ScriptBase[]>()
 	if (error) {
-		console.error("scripts_public INSERT failed: " + error.message)
+		console.error("scripts.public INSERT failed: " + error.message)
 		return { error: error.message }
 	}
 
@@ -126,14 +127,7 @@ export async function updateScript(
 	coverFile: File | undefined,
 	bannerFile: File | undefined
 ) {
-	console.log(
-		"📜 Updating ",
-		script.title,
-		" by ",
-		script.scripts_protected.profiles_public.username,
-		" id: ",
-		script.id
-	)
+	console.log("📜 Updating ", script.title, " by ", script.protected.username, " id: ", script.id)
 
 	const publicData = {
 		title: script.title,
@@ -148,16 +142,20 @@ export async function updateScript(
 		published: script.published
 	}
 
-	const { error } = await supabase.from("scripts_public").update(publicData).eq("id", script.id)
+	const { error } = await supabase
+		.schema("scripts")
+		.from("scripts")
+		.update(publicData)
+		.eq("id", script.id)
 	if (error) {
-		console.error("scripts_public UPDATE failed: " + error.message)
+		console.error("scripts.public UPDATE failed: " + error.message)
 		return { error: error.message }
 	}
 
 	const promises = []
 
 	if (scriptFile) {
-		const revision = script.scripts_protected.revision + 1
+		const revision = script.protected.revision + 1
 		console.log("Updating script revision to ", revision)
 		scriptFile = await updateScriptFile(scriptFile, script.id as string, revision)
 		const path = script.id + "/" + pad(revision, 9) + "/script.simba"

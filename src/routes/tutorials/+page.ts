@@ -35,7 +35,7 @@ export const load = async ({ url, depends, parent }) => {
 		const { supabaseClient, profile } = await parent()
 		let query = supabaseClient
 			.from("tutorials")
-			.select("*, profiles_public (*)", { count: "exact" })
+			.select("*,  profiles_public (*)", { count: "exact" })
 
 		if (
 			profile &&

@@ -5,7 +5,7 @@ import { filesSchema } from "$lib/backend/schemas.server"
 import { uploadScript } from "$lib/backend/data.server"
 import { encodeSEO } from "$lib/utils"
 import { scriptExists } from "$lib/backend/data"
-import type { ScriptPublic } from "$lib/types/collection"
+import type { ScriptBase } from "$lib/types/collection"
 
 export const load = async (event) => {
 	return { form: superValidate(event, scriptSchema) }
@@ -57,7 +57,7 @@ export const actions = {
 
 		if (!validFiles.success) return fail(400, { form })
 
-		const script: ScriptPublic = {
+		const script: ScriptBase = {
 			title: form.data.title,
 			description: form.data.description,
 			content: form.data.content,
@@ -69,13 +69,12 @@ export const actions = {
 			min_gp: form.data.min_gp,
 			max_gp: form.data.max_gp,
 			id: "",
-			updated_at: "",
-			search_script: null,
 			fts: undefined,
 			search: "",
 			tooltip_emojis: [],
 			tooltip_names: [],
-			url: ""
+			url: "",
+			created_at: ""
 		}
 
 		const { error: err } = await uploadScript(

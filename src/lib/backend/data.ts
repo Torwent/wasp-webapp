@@ -4,9 +4,9 @@ import type {
 	SubCategory,
 	EmojiTooltip,
 	DeveloperWithUsername,
-	IScriptCard,
 	Script,
-	Profile
+	Profile,
+	StatsSimba
 } from "$lib/types/collection"
 import { error } from "@sveltejs/kit"
 
@@ -56,11 +56,7 @@ function getToolTips(
 	return result
 }
 
-export function addToolTips(
-	script: IScriptCard,
-	categories: Category[],
-	subcategories: SubCategory[]
-) {
+export function addToolTips(script: Script, categories: Category[], subcategories: SubCategory[]) {
 	const tooltips = getToolTips(script.categories, script.subcategories, categories, subcategories)
 
 	script.tooltip_emojis = []
@@ -72,20 +68,21 @@ export function addToolTips(
 	})
 }
 
+export const scriptsQueryString = `id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
+			tooltip_emojis, tooltip_names,
+			protected (assets, author_id, revision, username, avatar, revision_date)`
+
 export async function getScripts(supabase: SupabaseClient) {
 	const { data, error: err } = await supabase
-		.from("scripts_public")
-		.select(
-			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
-			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
-		)
+		.schema("scripts")
+		.from("scripts")
+		.select(scriptsQueryString)
 		.order("title", { ascending: true })
 		.returns<Script[]>()
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - SELECT scripts_public failed
+			`Server error, this is probably not an issure on your end! - SELECT scripts.scripts failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -96,19 +93,15 @@ export async function getScripts(supabase: SupabaseClient) {
 
 export async function getScript(supabase: SupabaseClient, slug: string) {
 	const { data, error: err } = await supabase
-		.from("scripts_public")
-		.select(
-			`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-			tooltip_emojis, tooltip_names,
-			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
-			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
-		)
+		.schema("scripts")
+		.from("scripts")
+		.select(scriptsQueryString)
 		.eq("url", slug)
 		.returns<Script[]>()
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - SELECT scripts_public failed
+			`Server error, this is probably not an issure on your end! - SELECT scripts.scripts failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -121,42 +114,36 @@ export async function getScript(supabase: SupabaseClient, slug: string) {
 
 export async function scriptExists(supabase: SupabaseClient, slug: string) {
 	const { data, error: err } = await supabase
-		.from("scripts_public")
-		.select(
-			`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-			tooltip_emojis, tooltip_names,
-			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
-			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
-		)
+		.schema("scripts")
+		.from("scripts")
+		.select("url", { head: true })
 		.eq("url", slug)
-		.returns<Script[]>()
+
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - SELECT scripts_public failed
+			`Server error, this is probably not an issure on your end! - SELECT scripts.scripts failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
 			Error hint: ${err.message}`
 		)
+
+	console.log("HERE: ", data)
 	return data.length > 0
 }
 
 export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {
 	const { data, error: err } = await supabase
-		.from("scripts_public")
-		.select(
-			`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-			tooltip_emojis, tooltip_names,
-			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public(username, avatar_url)),
-			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`
-		)
+		.schema("scripts")
+		.from("scripts")
+		.select(scriptsQueryString)
 		.eq("id", uuid)
 		.returns<Script[]>()
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - SELECT scripts_public failed
+			`Server error, this is probably not an issure on your end! - SELECT scripts.scripts failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -167,11 +154,40 @@ export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {
 	return data[0]
 }
 
+export async function getScriptsStats(supabase: SupabaseClient, script_id: string) {
+	const { data, error: err } = await supabase
+		.schema("scripts")
+		.from("stats_simba")
+		.select(
+			"experience, gold, runtime, levels, unique_users, unique_users_total, online_users, online_users_total"
+		)
+		.eq("id", script_id)
+		.limit(1)
+		.returns<StatsSimba[]>()
+
+	if (err) {
+		console.error(err)
+		return {
+			id: "",
+			experience: 0,
+			gold: 0,
+			runtime: 0,
+			levels: 0,
+			unique_users: [],
+			unique_users_total: 0,
+			online_users: [],
+			online_users_total: 0
+		}
+	}
+
+	return data[0]
+}
+
 export async function getDeveloper(supabase: SupabaseClient, slug: string) {
 	const { data, error: err } = await supabase
 		.from("developers")
 		.select(
-			`id, realname, description, github, paypal_id, content, profiles_public (username, avatar_url)`
+			`id, realname, description, github, paypal_id, content,  profiles_public (username, avatar_url)`
 		)
 		.eq("url", slug)
 		.returns<DeveloperWithUsername[]>()
@@ -192,7 +208,7 @@ export async function getDeveloperUUID(supabase: SupabaseClient, uuid: string) {
 	const { data, error: err } = await supabase
 		.from("developers")
 		.select(
-			`id, realname, description, github, paypal_id, content, profiles_public (username, avatar_url)`
+			`id, realname, description, github, paypal_id, content,  profiles_public (username, avatar_url)`
 		)
 		.eq("id", uuid)
 		.returns<DeveloperWithUsername[]>()
@@ -221,8 +237,8 @@ export async function getSignedURL(
 
 	if (err)
 		throw error(
-			401,
-			`Server error, this is probably not an issure on your end! - Get sign url for ${bucket} to ${bucket} failed!
+			501,
+			`Server error, this is probably not an issure on your end! - Get sign url for ${bucket} to ${path} failed!
 			Error name: ${err.name}
 			Error message: ${err.message}
 			Error cause: ${err.cause}

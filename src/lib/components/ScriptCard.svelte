@@ -1,15 +1,11 @@
 <script lang="ts">
-	import type { IScriptCard } from "$lib/types/collection"
+	import type { Script } from "$lib/types/collection"
 	import { encodeSEO } from "$lib/utils"
 	import ScriptCardBase from "./ScriptCardBase.svelte"
-	export let script: IScriptCard
+	export let script: Script
 
-	let link =
-		"/scripts/" +
-		encodeSEO(script.title + " by " + script.scripts_protected.profiles_public.username)
-	$: link =
-		"/scripts/" +
-		encodeSEO(script.title + " by " + script.scripts_protected.profiles_public.username)
+	let link = "/scripts/" + encodeSEO(script.title + " by " + script.protected.username)
+	$: link = "/scripts/" + encodeSEO(script.title + " by " + script.protected.username)
 </script>
 
 <a href={link}>
