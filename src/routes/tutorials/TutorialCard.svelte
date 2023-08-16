@@ -3,7 +3,7 @@
 	import { encodeSEO } from "$lib/utils"
 	export let tutorial: TutorialWithAuthor
 
-	$: link = "/tutorials/" + encodeSEO(tutorial.title + " by " + tutorial.profiles_public.username)
+	$: link = "/tutorials/" + encodeSEO(tutorial.title + " by " + tutorial.username)
 </script>
 
 <div
@@ -22,10 +22,10 @@
 
 			<small class="text-xs text-surface-400 truncate mt-1">
 				by <a
-					href="/developers/{encodeSEO(tutorial.profiles_public.username)}"
+					href="/developers/{encodeSEO(tutorial.username)}"
 					class="permalink text-secondary-500 font-semibold text-shadow"
 				>
-					{tutorial.profiles_public.username}
+					{tutorial.username}
 				</a>
 			</small>
 

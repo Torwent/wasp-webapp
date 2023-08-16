@@ -21,45 +21,58 @@ export const load = async ({ fetch, data, depends }) => {
 
 		const id = session.user.id
 		const { data, error } = await supabaseClient
-			.from("profiles_public")
-			.select(`*, profiles_protected!left (*, prices!left (*)), profiles_private!left (*)`)
+			.schema("profiles")
+			.from("profiles")
+			.select(
+				`id, discord, username, avatar, private!left (email, warning),
+				roles!left (banned, timeout, developer, premium, vip, tester, scripter, moderator, administrator),
+				subscriptions!left (customer_id, external, subscription_id, cancel, price_id, date_start, date_end)`
+			)
 			.eq("id", id)
 			.limit(1)
-			.limit(1, { foreignTable: "profiles_protected" })
-			.limit(1, { foreignTable: "profiles_private" })
+			.limit(1, { foreignTable: "private" })
+			.limit(1, { foreignTable: "roles" })
+			.limit(1, { foreignTable: "subscriptions" })
 			.returns<Profile[]>()
 
-		if (error || data.length === 0) return null
+		if (error) {
+			console.error(error)
+			return null
+		}
+
+		if (data.length === 0) {
+			return null
+		}
 
 		const profile = data[0]
 
-		let needUpdate = !profile.profiles_protected.customer_id
+		let needUpdate = !profile.subscriptions.customer_id
 
-		if (!profile.profiles_protected.subscription_external) {
-			const startDate = Date.parse(profile.profiles_protected.subscription_start ?? "0")
-			const endDate = Date.parse(profile.profiles_protected.subscription_end ?? "0")
+		if (!profile.subscriptions.external) {
+			const startDate = Date.parse(profile.subscriptions.date_start ?? "0")
+			const endDate = Date.parse(profile.subscriptions.date_end ?? "0")
 			const now = Date.now()
 
 			if (endDate - now < 0) {
-				if (profile.profiles_protected.vip) {
-					profile.profiles_protected.vip = false
+				if (profile.roles.vip) {
+					profile.roles.vip = false
 					needUpdate = true
 				}
 
-				if (profile.profiles_protected.premium) {
-					profile.profiles_protected.premium = false
+				if (profile.roles.premium) {
+					profile.roles.premium = false
 					needUpdate = true
 				}
 			} else {
 				const THREE_MONTHS = 7889400000
-				if (endDate - startDate > THREE_MONTHS && !profile.profiles_protected.vip) {
+				if (endDate - startDate > THREE_MONTHS && !profile.roles.vip) {
 					needUpdate = true
-					profile.profiles_protected.vip = true
+					profile.roles.vip = true
 				}
 
-				if (!profile.profiles_protected.premium) {
+				if (!profile.roles.premium) {
 					needUpdate = true
-					profile.profiles_protected.premium = true
+					profile.roles.premium = true
 				}
 			}
 		}

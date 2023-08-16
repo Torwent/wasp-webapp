@@ -13,7 +13,7 @@
 	$: ({ profile } = $page.data)
 
 	let src = profile
-		? profile.avatar_url
+		? profile.avatar
 		: "https://api.dicebear.com/6.x/bottts/svg?seed=" + randomString()
 
 	let popupSettings: PopupSettings = {
@@ -22,7 +22,7 @@
 		placement: "bottom-end"
 	}
 
-	$: if (profile) src = profile.avatar_url
+	$: if (profile) src = profile.avatar
 	$: if (!profile) src = "https://api.dicebear.com/6.x/bottts/svg?seed=" + randomString()
 </script>
 

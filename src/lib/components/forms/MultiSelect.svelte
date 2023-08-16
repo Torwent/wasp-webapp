@@ -59,7 +59,7 @@
 
 	$: ({ profile } = $page.data)
 
-	$: if (!profile || !profile.profiles_protected.administrator) {
+	$: if (!profile || !profile.roles.administrator) {
 		if (value.includes("Official") || (value.includes("Premium") && !hadPremium)) {
 			for (let i = 0; i < value.length; i++) {
 				if (value[i] === "Official" || (value[i] === "Premium" && !hadPremium)) {

@@ -3,7 +3,7 @@ import type {
 	Category,
 	SubCategory,
 	EmojiTooltip,
-	DeveloperWithUsername,
+	ScripterWithUsername,
 	Script,
 	Profile,
 	StatsSimba
@@ -18,14 +18,15 @@ export async function updateWarning(supabase: SupabaseClient) {
 	if (!user) return false
 
 	const { error: err } = await supabase
-		.from("profiles_private")
-		.update({ dismissed_warning: true })
+		.schema("profiles")
+		.from("private")
+		.update({ warning: true })
 		.eq("id", user.id)
 
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - UPDATE profiles_private failed
+			`Server error, this is probably not an issure on your end! - UPDATE profiles.private failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -183,14 +184,17 @@ export async function getScriptsStats(supabase: SupabaseClient, script_id: strin
 	return data[0]
 }
 
-export async function getDeveloper(supabase: SupabaseClient, slug: string) {
+export async function getScripter(supabase: SupabaseClient, slug: string) {
 	const { data, error: err } = await supabase
-		.from("developers")
+		.schema("profiles")
+		.from("scripters")
 		.select(
-			`id, realname, description, github, paypal_id, content,  profiles_public (username, avatar_url)`
+			`id, realname, description, github, paypal_id, content,  profiles!left (username, avatar)`
 		)
 		.eq("url", slug)
-		.returns<DeveloperWithUsername[]>()
+		.limit(1)
+		.limit(1, { foreignTable: "profiles" })
+		.returns<ScripterWithUsername[]>()
 
 	if (err)
 		throw error(
@@ -204,14 +208,17 @@ export async function getDeveloper(supabase: SupabaseClient, slug: string) {
 	return data[0]
 }
 
-export async function getDeveloperUUID(supabase: SupabaseClient, uuid: string) {
+export async function getScripterUUID(supabase: SupabaseClient, uuid: string) {
 	const { data, error: err } = await supabase
-		.from("developers")
+		.schema("profiles")
+		.from("scripters")
 		.select(
-			`id, realname, description, github, paypal_id, content,  profiles_public (username, avatar_url)`
+			`id, realname, description, github, paypal_id, content,  profiles!left (username, avatar)`
 		)
 		.eq("id", uuid)
-		.returns<DeveloperWithUsername[]>()
+		.limit(1)
+		.limit(1, { foreignTable: "profiles" })
+		.returns<ScripterWithUsername[]>()
 
 	if (err)
 		throw error(
@@ -250,19 +257,19 @@ export async function getSignedURL(
 export function canEdit(profile: Profile | null, author: string | null | undefined) {
 	if (!profile) return false
 
-	if (profile.profiles_protected.administrator) return true
-	if (profile.profiles_protected.moderator) return true
+	if (profile.roles.administrator) return true
+	if (profile.roles.moderator) return true
 
 	return profile.id === author
 }
 
 export function canDownload(profile: Profile | null) {
 	if (!profile) return false
-	if (profile.profiles_protected.administrator) return true
-	if (profile.profiles_protected.moderator) return true
-	if (profile.profiles_protected.scripter) return true
-	if (profile.profiles_protected.tester) return true
-	if (profile.profiles_protected.vip) return true
-	if (profile.profiles_protected.premium) return true
+	if (profile.roles.administrator) return true
+	if (profile.roles.moderator) return true
+	if (profile.roles.scripter) return true
+	if (profile.roles.tester) return true
+	if (profile.roles.vip) return true
+	if (profile.roles.premium) return true
 	return false
 }

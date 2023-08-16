@@ -1,4 +1,4 @@
-import { getDeveloper, getDeveloperUUID, scriptsQueryString } from "$lib/backend/data"
+import { getScripter, getScripterUUID, scriptsQueryString } from "$lib/backend/data"
 import type { Script } from "$lib/types/collection"
 import { UUID_V4_REGEX } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
@@ -51,8 +51,8 @@ export const load = async ({ url: { searchParams }, params: { slug }, parent, de
 
 	const { supabaseClient } = await parent()
 	const developer = UUID_V4_REGEX.test(slug)
-		? await getDeveloperUUID(supabaseClient, slug)
-		: await getDeveloper(supabaseClient, slug.toLowerCase())
+		? await getScripterUUID(supabaseClient, slug)
+		: await getScripter(supabaseClient, slug.toLowerCase())
 
 	return {
 		developer,

@@ -10,8 +10,8 @@
 	const headDescription = "OSRS Botting tutorial: " + tutorial.description
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide. " +
-		tutorial.profiles_public.username
-	const headAuthor = tutorial.profiles_public.username
+		tutorial.username
+	const headAuthor = tutorial.username
 	const headImage =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>

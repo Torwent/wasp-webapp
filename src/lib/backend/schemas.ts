@@ -150,7 +150,6 @@ export const developerSchema = z.object({
 		.string()
 		.min(2, "If your name really has less than 2 characters contact Torwent.")
 		.nullable(),
-	username: z.string().min(3, "That username is too short!").max(16, "That username is too large!"),
 	description: z
 		.string()
 		.min(6, "Must be more than 6 characters long.")

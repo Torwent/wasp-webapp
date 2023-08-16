@@ -24,23 +24,17 @@ export const actions = {
 
 		const form = await superValidate(promises[2], premiumSchema)
 
-		if (profile.profiles_protected.premium) {
+		if (profile.roles.premium) {
 			return setError(form, "", "You are premium already!")
 		}
 
-		if (!profile.profiles_protected.customer_id) {
+		if (!profile.subscriptions.customer_id) {
 			return setError(
 				form,
 				"",
 				"You don't seem to have a customer_id assign for some reason. This shouldn't happen. Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com"
 			)
 		}
-
-		return setError(
-			form,
-			"",
-			"waspscripts.com is under maintenance, subscriptions will be disabled for a few hours"
-		)
 
 		if (form.data.plan === "")
 			return setError(
@@ -54,14 +48,14 @@ export const actions = {
 			session = await stripe.checkout.sessions.create({
 				payment_method_types: ["card", "link"],
 				line_items: [{ price: form.data.plan, quantity: 1 }],
-				customer: profile.profiles_protected.customer_id,
+				customer: profile.subscriptions.customer_id,
 				customer_update: { address: "auto", shipping: "auto" },
 				mode: "subscription",
 				billing_address_collection: "auto",
 				success_url: origin + "/api/stripe/checkout/success?session_id={CHECKOUT_SESSION_ID}",
 				cancel_url: origin + "/api/stripe/checkout/cancel?session_id={CHECKOUT_SESSION_ID}",
 				automatic_tax: { enabled: true },
-				metadata: { id: profile.id, discord_id: profile.discord_id, username: profile.username },
+				metadata: { id: profile.id, discord_id: profile.discord, username: profile.username },
 				payment_method_collection: "always"
 			})
 		} catch (err: any) {
@@ -84,18 +78,18 @@ export const actions = {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
-		if (!profile.profiles_protected.premium) {
+		if (!profile.roles.premium) {
 			throw error(403, "You are not premium!")
 		}
 
-		if (!profile.profiles_protected.customer_id) {
+		if (!profile.subscriptions.customer_id) {
 			throw error(
 				403,
 				"You premium and you don't have a customer id. This should not be possible! Please contact support@waspscripts.com"
 			)
 		}
 
-		const customer = await stripe.customers.retrieve(profile.profiles_protected.customer_id, {
+		const customer = await stripe.customers.retrieve(profile.subscriptions.customer_id, {
 			expand: ["subscriptions"]
 		})
 
@@ -137,18 +131,18 @@ export const actions = {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
-		if (!profile.profiles_protected.premium) {
+		if (!profile.roles.premium) {
 			throw error(403, "You are not premium!")
 		}
 
-		if (!profile.profiles_protected.customer_id) {
+		if (!profile.subscriptions.customer_id) {
 			throw error(
 				403,
 				"You premium and you don't have a customer id. This should not be possible! Please contact support@waspscripts.com"
 			)
 		}
 
-		const customer = await stripe.customers.retrieve(profile.profiles_protected.customer_id, {
+		const customer = await stripe.customers.retrieve(profile.subscriptions.customer_id, {
 			expand: ["subscriptions"]
 		})
 

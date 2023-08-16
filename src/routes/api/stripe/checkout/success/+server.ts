@@ -43,7 +43,7 @@ export const GET = async ({ fetch, url: { searchParams }, locals: { supabaseServ
 		" wsid: ",
 		profile.id,
 		" discord_id: ",
-		profile.discord_id,
+		profile.discord,
 		" username: ",
 		profile.username
 	)
@@ -69,19 +69,15 @@ export const GET = async ({ fetch, url: { searchParams }, locals: { supabaseServ
 		const subscription = await stripe.subscriptions.retrieve(session.subscription.toString())
 
 		console.log("Checkout subscription data: ", subscription)
-		profile.profiles_protected.premium = true
-		profile.profiles_protected.subscription_external = false
+		profile.roles.premium = true
+		profile.subscriptions.external = false
 
-		profile.profiles_protected.subscription_start = new Date(
-			subscription.start_date * 1000
-		).toISOString()
-		profile.profiles_protected.subscription_end = new Date(
-			subscription.current_period_end * 1000
-		).toISOString()
+		profile.subscriptions.date_start = new Date(subscription.start_date * 1000).toISOString()
+		profile.subscriptions.date_end = new Date(subscription.current_period_end * 1000).toISOString()
 
-		profile.profiles_protected.subscription_id = subscription.id
-		profile.profiles_protected.cancel_at_period_end = false
-		profile.profiles_protected.price_id = subscription.items.data[0].price.id
+		profile.subscriptions.subscription_id = subscription.id
+		profile.subscriptions.cancel = false
+		profile.subscriptions.price_id = subscription.items.data[0].price.id
 	} else if (session.mode === "payment") {
 		console.error(
 			"Checkout session " + sessionID + " is a single time payment which is not implemented yet!"
@@ -90,7 +86,7 @@ export const GET = async ({ fetch, url: { searchParams }, locals: { supabaseServ
 	}
 
 	await updateProfileProtected(profile)
-	fetch(API_URL + "/discord/update/" + profile.discord_id, {
+	fetch(API_URL + "/discord/update/" + profile.discord, {
 		method: "GET"
 	}).catch((err) => console.error(err))
 

@@ -66,7 +66,7 @@
 		</div>
 	{/if}
 
-	{#if data.profile && data.profile.profiles_protected.administrator}
+	{#if data.profile && data.profile.roles.administrator}
 		<div class="flex">
 			<button class="btn variant-filled-secondary mx-auto" on:click={() => (show = !show)}>
 				{#if show}Hide{:else}Show{/if} Post Preview

@@ -41,8 +41,8 @@
 	function canSeeScript(script: Script) {
 		if (script.published) return true
 		if (!profile) return false
-		if (profile.profiles_protected.administrator) return true
-		if (profile.profiles_protected.moderator) return true
+		if (profile.roles.administrator) return true
+		if (profile.roles.moderator) return true
 		return script.protected.author_id === profile.id
 	}
 
@@ -51,12 +51,12 @@
 	$: replaceQuery({ page: currentPage.toString() })
 	$: replaceQuery({ page: "1", search: search })
 
-	const headTitle = developer.profiles_public.username + " - WaspScripts"
+	const headTitle = developer.profiles.username + " - WaspScripts"
 	const headDescription = developer.description
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Developer, " +
-		developer.profiles_public.username
-	const headAuthor = developer.profiles_public.username
+		developer.profiles.username
+	const headAuthor = developer.profiles.username
 	const headImage =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
@@ -90,7 +90,7 @@
 			<header>
 				<h3 class="font-bold text-2xl">
 					{#if developer.realname && developer.realname != ""} {developer.realname} / {/if}
-					{developer.profiles_public.username}
+					{developer.profiles.username}
 				</h3>
 			</header>
 		</div>
@@ -104,7 +104,7 @@
 			{/if}
 			{#if developer.paypal_id && developer.paypal_id != ""}
 				<div class="w-full mx-auto">
-					<PayPal paypal_id={developer.paypal_id} username={developer.profiles_public.username} />
+					<PayPal paypal_id={developer.paypal_id} username={developer.profiles.username} />
 				</div>
 			{/if}
 		</div>

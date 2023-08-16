@@ -23,7 +23,15 @@
 		validators: premiumSchema
 	})
 
-	let plan = profile?.profiles_protected.prices ?? prices[0]
+	function getPrice() {
+		if (!profile) return prices[0]
+
+		for (let i = 0; i < prices.length; i++)
+			if (profile.subscriptions.price_id === prices[i].stripe_id) return prices[i]
+		return prices[0]
+	}
+
+	let plan = getPrice()
 
 	$: $form.plan = plan.stripe_id || prices[0].stripe_id
 	$: if ($form.code === "") $form.code = undefined
@@ -104,7 +112,7 @@
 </svelte:head>
 
 <main class="grid">
-	{#if !profile || !profile.profiles_protected.premium}
+	{#if !profile || !profile.roles.premium}
 		<form
 			method="POST"
 			class="md:flex w-4/5 variant-ghost-surface mx-auto mt-24 mb-8 rounded-md"
@@ -215,7 +223,7 @@
 				</button>
 			</div>
 		</form>
-	{:else if profile.profiles_protected.premium && profile.profiles_protected.subscription_external}
+	{:else if profile.roles.premium && profile.subscriptions.external}
 		<div class="my-8 mx-auto text-center">
 			<p class="py-4">
 				The shop is handled by <a href="https://upgrade.chat/waspscripts">upgrade.chat</a>
@@ -256,7 +264,7 @@
 				.
 			</p>
 		</div>
-	{:else if profile.profiles_protected.premium && !profile.profiles_protected.subscription_external}
+	{:else if profile.roles.premium && !profile.subscriptions.external}
 		<form
 			method="POST"
 			class="md:flex w-4/5 variant-ghost-surface mx-auto my-24 rounded-md"
@@ -265,17 +273,13 @@
 			<div class="grid h-fit w-2/3 mx-auto content-between md:border-r-2 border-surface-500">
 				<div class="grid m-8 text-center">
 					<h4 class="my-4">Subscription information</h4>
-					{#if profile.profiles_protected.subscription_start && profile.profiles_protected.subscription_end}
+					{#if profile.subscriptions.date_start && profile.subscriptions.date_end}
 						<div class="w-full flex content-end">
 							<div class="mx-auto">
-								Start date: {new Date(profile.profiles_protected.subscription_start).toLocaleString(
-									"pt-PT"
-								)}
+								Start date: {new Date(profile.subscriptions.date_start).toLocaleString("pt-PT")}
 							</div>
 							<div class="mx-auto">
-								Period end: {new Date(profile.profiles_protected.subscription_end).toLocaleString(
-									"pt-PT"
-								)}
+								Period end: {new Date(profile.subscriptions.date_end).toLocaleString("pt-PT")}
 							</div>
 						</div>
 						<div class="w-full flex content-end">
@@ -284,11 +288,11 @@
 								active
 							</div>
 							<div class="mx-auto">
-								{#if profile && profile.profiles_protected.vip}
+								{#if profile && profile.roles.vip}
 									<span class="font-bold text-red-500">**VIP</span>
 									active
 								{:else}
-									{getDays(Number(profile.profiles_protected.subscription_start))} days left for
+									{getDays(Number(profile.subscriptions.date_start))} days left for
 									<span class="font-bold text-red-500">**VIP</span>
 								{/if}
 							</div>
@@ -334,7 +338,7 @@
 					{/if}
 				</div>
 
-				{#if profile.profiles_protected.cancel_at_period_end}
+				{#if profile.subscriptions.cancel}
 					<button
 						class="m-4 btn variant-filled-success flex"
 						name="Re-enable"

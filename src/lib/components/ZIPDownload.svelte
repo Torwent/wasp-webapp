@@ -25,7 +25,7 @@
 	]
 
 	$: isPremium = canDownload(profile)
-	$: dismissed = profile.profiles_private.dismissed_warning
+	$: dismissed = profile.private.warning
 	$: zipName = isPremium ? "wasp-premium.zip" : "wasp-free.zip"
 
 	function availableZIPs(isPremium: boolean, dismissed: boolean) {

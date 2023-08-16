@@ -3,8 +3,8 @@ import { encodeSEO } from "$lib/utils"
 import { error, redirect } from "@sveltejs/kit"
 
 export const load = async ({ parent }) => {
-	const { developersData, range } = await parent()
-	const { data, count, error: err } = developersData
+	const { scripterData, range } = await parent()
+	const { data, count, error: err } = scripterData
 
 	if (err)
 		throw error(
@@ -17,7 +17,7 @@ export const load = async ({ parent }) => {
 		)
 
 	if (!browser && data.length === 1)
-		throw redirect(303, "/developers/" + encodeSEO(data[0].profiles_public.username))
+		throw redirect(303, "/developers/" + encodeSEO(data[0].profiles.username))
 
 	return { developers: data, count, range }
 }

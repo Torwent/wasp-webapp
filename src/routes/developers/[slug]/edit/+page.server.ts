@@ -29,35 +29,23 @@ export const actions = {
 
 		if (!form.valid) return fail(400, { form })
 
-		const promises = await Promise.all([
-			supabaseServer
-				.from("developers")
-				.update({
-					content: form.data.content,
-					description: form.data.description,
-					github: form.data.github,
-					paypal_id: form.data.paypal_id,
-					realname: form.data.realname
-				})
-				.eq("id", form.data.id),
-			supabaseServer
-				.from("profiles_public")
-				.update({
-					username: form.data.username
-				})
-				.eq("id", form.data.id)
-		])
+		const { error: err } = await supabaseServer
+			.schema("profiles")
+			.from("scripters")
+			.update({
+				content: form.data.content,
+				description: form.data.description,
+				github: form.data.github,
+				paypal_id: form.data.paypal_id,
+				realname: form.data.realname
+			})
+			.eq("id", form.data.id)
 
-		if (promises[0].error) {
-			console.error(promises[0].error)
-			return setError(form, "", promises[0].error.message)
+		if (err) {
+			console.error(err)
+			return setError(form, "", err.message)
 		}
 
-		if (promises[1].error) {
-			console.error(promises[1].error)
-			return setError(form, "", promises[1].error.message)
-		}
-
-		throw redirect(303, "/developers/" + form.data.username)
+		throw redirect(303, "./")
 	}
 }

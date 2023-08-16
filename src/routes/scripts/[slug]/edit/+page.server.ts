@@ -54,7 +54,7 @@ export const actions = {
 			return setError(form, "", msg)
 		}
 
-		if (script.categories.includes("Official") && !profile.profiles_protected.administrator) {
+		if (script.categories.includes("Official") && !profile.roles.administrator) {
 			const msg = "You cannot edit an official script!"
 			console.error(msg)
 			return setError(form, "", msg)

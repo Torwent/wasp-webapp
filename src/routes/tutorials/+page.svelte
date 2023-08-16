@@ -144,7 +144,7 @@
 				</div>
 			</div>
 		</div>
-		{#if data.profile && data.profile.profiles_protected.administrator}
+		{#if data.profile && data.profile.roles.administrator}
 			<a href="/tutorials/add" class="flex mx-auto">
 				<button class="btn variant-filled-secondary flex mx-auto">Add Post</button>
 			</a>

@@ -1,7 +1,7 @@
 import { error, redirect } from "@sveltejs/kit"
 import { browser } from "$app/environment"
 import { encodeSEO } from "$lib/utils"
-import type { TutorialWithAuthor } from "$lib/types/collection"
+import type { Tutorial } from "$lib/types/collection.js"
 
 export const load = async ({ url, depends, parent }) => {
 	depends("supabase:tutorials")
@@ -33,15 +33,9 @@ export const load = async ({ url, depends, parent }) => {
 		ascending: boolean
 	) {
 		const { supabaseClient, profile } = await parent()
-		let query = supabaseClient
-			.from("tutorials")
-			.select("*,  profiles_public (*)", { count: "exact" })
+		let query = supabaseClient.from("tutorials").select("*", { count: "estimated" })
 
-		if (
-			profile &&
-			!profile.profiles_protected.administrator &&
-			!profile.profiles_protected.moderator
-		) {
+		if (profile && !profile.roles.administrator && !profile.roles.moderator) {
 			query = query.or("published.eq.true,user_id.eq." + profile.id)
 		}
 
@@ -53,7 +47,7 @@ export const load = async ({ url, depends, parent }) => {
 			query = query.ilike("search", "%" + search.replaceAll("%", "") + "%")
 		}
 
-		const { data, count, error: err } = await query.returns<TutorialWithAuthor[]>()
+		const { data, count, error: err } = await query.returns<Tutorial[]>()
 
 		if (err)
 			throw error(
@@ -66,10 +60,7 @@ export const load = async ({ url, depends, parent }) => {
 			)
 
 		if (!browser && count === 1)
-			throw redirect(
-				303,
-				"/tutorials/" + encodeSEO(data[0].title + " by " + data[0].profiles_public.username)
-			)
+			throw redirect(303, "/tutorials/" + encodeSEO(data[0].title + " by " + data[0].username))
 		return { data, count }
 	}
 

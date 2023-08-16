@@ -1,5 +1,5 @@
 import { error } from "@sveltejs/kit"
-import type { TutorialWithAuthor } from "$lib/types/collection"
+import type { Tutorial } from "$lib/types/collection"
 
 export const load = async ({ params, parent }) => {
 	const { slug } = params
@@ -15,9 +15,9 @@ export const load = async ({ params, parent }) => {
 		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
 			.from("tutorials")
-			.select("*,  profiles_public (*)")
+			.select("*")
 			.eq("url", slug)
-			.returns<TutorialWithAuthor[]>()
+			.returns<Tutorial[]>()
 
 		if (err)
 			throw error(

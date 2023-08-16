@@ -27,8 +27,8 @@
 	import type { AuthChangeEvent, RealtimeChannel, Session } from "@supabase/supabase-js"
 	export let data
 
-	let { supabaseClient, session, profile } = data
-	$: ({ supabaseClient, session, profile } = data)
+	let { supabaseClient, session } = data
+	$: ({ supabaseClient, session } = data)
 
 	onMount(() => {
 		const {
@@ -44,18 +44,16 @@
 		let profileProtectedSubscription: RealtimeChannel | null = null
 		if (session) {
 			supabaseClient
-				.channel("profiles_protected-changes")
+				.channel("profiles-roles-changes")
 				.on(
 					"postgres_changes",
 					{
 						event: "UPDATE",
-						schema: "public",
-						table: "profiles_protected",
+						schema: "profiles",
+						table: "roles",
 						filter: "id=eq." + session.user.id
 					},
-					() => {
-						invalidate("supabase:auth")
-					}
+					() => invalidate("supabase:auth")
 				)
 				.subscribe()
 		}

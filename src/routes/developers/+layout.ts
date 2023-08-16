@@ -1,4 +1,4 @@
-import type { DeveloperWithUsername } from "$lib/types/collection"
+import type { ScripterWithUsername } from "$lib/types/collection"
 
 export const load = async ({ url: { searchParams }, params: { slug }, parent, depends }) => {
 	depends("supabase:developers")
@@ -11,27 +11,28 @@ export const load = async ({ url: { searchParams }, params: { slug }, parent, de
 	const start = ((slug ? 1 : page) - 1) * range
 	const finish = start + range
 
-	async function getDevelopers(search: string, start: number, finish: number) {
+	async function getScripters(search: string, start: number, finish: number) {
 		const { supabaseClient } = await parent()
-		let query = supabaseClient.from("developers").select(
-			`id, realname, description, github, paypal_id,
-				content,  profiles_public (username, avatar_url)`,
-			{ count: "exact" }
-		)
+		let query = supabaseClient
+			.schema("profiles")
+			.from("scripters")
+			.select(
+				`id, realname, description, github, paypal_id, content,  profiles!left (username, avatar)`
+			)
 
 		if (search === "") {
 			query = query
-				.order("username", { foreignTable: "profiles_public", ascending: true })
+				.order("username", { foreignTable: "profiles", ascending: true })
 				.range(start, finish)
 		} else {
 			query = query.ilike("search", "%" + search + "%")
 		}
 
-		return await query.returns<DeveloperWithUsername[]>()
+		return await query.returns<ScripterWithUsername[]>()
 	}
 
 	return {
-		developersData: getDevelopers(slug ? "" : search, start, finish),
+		scripterData: getScripters(slug ? "" : search, start, finish),
 		range
 	}
 }

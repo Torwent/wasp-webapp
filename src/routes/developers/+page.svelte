@@ -95,7 +95,7 @@
 
 	<div class="mx-auto max-w-2xl flex-grow">
 		{#each developers as developer}
-			<DevCard bind:developer />
+			<DevCard bind:scripter={developer} />
 		{/each}
 	</div>
 

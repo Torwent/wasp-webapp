@@ -26,18 +26,17 @@
 
 	$form.id = developer.id
 	$: $form.realname = developer.realname
-	$: $form.username = developer.profiles_public.username
 	$: $form.description = developer.description
 	$: $form.content = developer.content
 	$: $form.github = developer.github
 	$: $form.paypal_id = developer.paypal_id
 
-	const headTitle = "Edit " + developer.profiles_public.username + " - WaspScripts"
-	const headDescription = "Edit " + developer.profiles_public.username + " developer page."
+	const headTitle = "Edit " + developer.profiles.username + " - WaspScripts"
+	const headDescription = "Edit " + developer.profiles.username + " developer page."
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour, Bot, Wasp, Scripts, Simba, Developer, " +
-		developer.profiles_public.username
-	const headAuthor = developer.profiles_public.username
+		developer.profiles.username
+	const headAuthor = developer.profiles.username
 	const headImage =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
@@ -73,7 +72,7 @@
 					<header>
 						<h3 class="font-bold text-2xl">
 							{#if developer.realname && developer.realname != ""} {developer.realname} / {/if}
-							{developer.profiles_public.username}
+							{developer.profiles.username}
 						</h3>
 					</header>
 				</div>
@@ -85,10 +84,7 @@
 					</a>
 					{#if developer.paypal_id && developer.paypal_id != ""}
 						<div class="w-full mx-auto">
-							<PayPal
-								paypal_id={developer.paypal_id}
-								username={developer.profiles_public.username}
-							/>
+							<PayPal paypal_id={developer.paypal_id} username={developer.profiles.username} />
 						</div>
 					{/if}
 				</div>
@@ -111,11 +107,7 @@
 
 		<form method="POST" use:focusTrap={isFocused} use:enhance>
 			<FormInput title="Name" bind:value={developer.realname} bind:errors={$errors.realname} />
-			<FormInput
-				title="Username"
-				bind:value={developer.profiles_public.username}
-				bind:errors={$errors.username}
-			/>
+			<FormInput title="Username" bind:value={developer.profiles.username} />
 
 			<FormInput
 				title="Description"

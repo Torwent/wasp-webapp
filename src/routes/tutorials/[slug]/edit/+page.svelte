@@ -35,8 +35,8 @@
 	const headDescription = "Edit " + tutorial.title + " in WaspScripts."
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide, " +
-		tutorial.profiles_public.username
-	const headAuthor = tutorial.profiles_public.username
+		tutorial.username
+	const headAuthor = tutorial.username
 	const headImage =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
@@ -78,7 +78,7 @@
 		</div>
 	{/if}
 
-	{#if data.profile && data.profile.profiles_protected.administrator}
+	{#if data.profile && data.profile.roles.administrator}
 		<div class="flex">
 			<button class="btn variant-filled-secondary mx-auto" on:click={() => (show = !show)}>
 				{#if show}Hide{:else}Show{/if} Post Preview

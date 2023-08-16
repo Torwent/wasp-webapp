@@ -199,9 +199,18 @@ export async function getSignedURLServer(
 
 export async function getProfile(supabase: SupabaseClient, id: string) {
 	const { data, error } = await supabase
-		.from("profiles_public")
-		.select(`*, profiles_protected (*), profiles_private (*)`)
+		.schema("profiles")
+		.from("profiles")
+		.select(
+			`id, discord, username, avatar, private!left (email, warning),
+				roles!left (banned, timeout, developer, premium, vip, tester, scripter, moderator, administrator),
+				subscriptions!left (customer_id, external, subscription_id, cancel, price_id, date_start, date_end)`
+		)
 		.eq("id", id)
+		.limit(1)
+		.limit(1, { foreignTable: "private" })
+		.limit(1, { foreignTable: "roles" })
+		.limit(1, { foreignTable: "subscriptions" })
 		.returns<Profile[]>()
 	if (error || data.length < 1) return null
 	return data[0]
