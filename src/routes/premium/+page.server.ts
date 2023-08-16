@@ -22,21 +22,30 @@ export const actions = {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
+		const form = await superValidate(promises[2], premiumSchema)
+
 		if (profile.profiles_protected.premium) {
-			throw error(403, "You are premium already!")
+			return setError(form, "", "You are premium already!")
 		}
 
 		if (!profile.profiles_protected.customer_id) {
-			throw error(
-				403,
+			return setError(
+				form,
+				"",
 				"You don't seem to have a customer_id assign for some reason. This shouldn't happen. Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com"
 			)
 		}
-		const form = await superValidate(promises[2], premiumSchema)
+
+		return setError(
+			form,
+			"",
+			"waspscripts.com is under maintenance, subscriptions will be disabled for a few hours"
+		)
 
 		if (form.data.plan === "")
-			throw error(
-				403,
+			return setError(
+				form,
+				"",
 				"Something went wrong! Seems like no plan was selected? If this keeps occuring please contact support@waspscripts.com"
 			)
 
@@ -60,7 +69,7 @@ export const actions = {
 		}
 
 		if (session && session.url) throw redirect(303, session.url)
-		throw error(403, "Something went wrong!")
+		return setError(form, "", "Something went wrong!")
 	},
 
 	cancel: async ({

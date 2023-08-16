@@ -103,11 +103,11 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main class="flex">
+<main class="grid">
 	{#if !profile || !profile.profiles_protected.premium}
 		<form
 			method="POST"
-			class="md:flex w-4/5 variant-ghost-surface mx-auto my-24 rounded-md"
+			class="md:flex w-4/5 variant-ghost-surface mx-auto mt-24 mb-8 rounded-md"
 			action="?/checkout"
 			use:enhance
 		>
@@ -356,15 +356,15 @@
 			</div>
 		</form>
 	{/if}
-</main>
 
-{#if $errors._errors}
-	<div class="my-8 text-center">
-		{#each $errors._errors as err}
-			<small class="text-error-500">{err}</small>
-		{/each}
-	</div>
-{/if}
+	{#if $errors._errors}
+		<div class="w-full my-8 text-center mx-auto">
+			{#each $errors._errors as err}
+				<span class="text-error-500">{err}</span>
+			{/each}
+		</div>
+	{/if}
+</main>
 
 <h5 class="my-8 text-center">
 	Please read the
