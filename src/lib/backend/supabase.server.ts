@@ -75,11 +75,11 @@ export async function updateProfileProtected(profile: Profile) {
 		.schema("profiles")
 		.from("subscriptions")
 		.update({
-			subscription_end: profile.subscriptions.date_end,
-			subscription_external: profile.subscriptions.external,
+			date_end: profile.subscriptions.date_end,
+			external: profile.subscriptions.external,
 			subscription_id: profile.subscriptions.subscription_id,
-			subscription_start: profile.subscriptions.date_start,
-			cancel_at_period_end: profile.subscriptions.cancel,
+			date_start: profile.subscriptions.date_start,
+			cancel: profile.subscriptions.cancel,
 			customer_id: profile.subscriptions.customer_id,
 			price_id: profile.subscriptions.price_id
 		})
