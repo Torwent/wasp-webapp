@@ -125,7 +125,7 @@ export async function updateDownloaders(script: string, user: string) {
 		console.error(err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - UPDATE scripts.stats_site failed
+			`Server error, this is probably not an issue on your end! - UPDATE scripts.stats_site failed
 			Function name: add_downloaders
 			Error code: ${err.code}
 			Error hint: ${err.hint}
@@ -151,7 +151,7 @@ export async function updateReporters(script: string, user: string) {
 		console.error(err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - UPDATE scripts.stats_site failed
+			`Server error, this is probably not an issue on your end! - UPDATE scripts.stats_site failed
 			Function name: add_downloaders
 			Error code: ${err.code}
 			Error hint: ${err.hint}

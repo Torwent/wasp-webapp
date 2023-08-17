@@ -13,7 +13,7 @@
 			.schema("scripts")
 			.from("stats_site")
 			.select(
-				"unique_downloads, unique_downloads_total, month_downloads, month_downloads_total, previous_months"
+				`unique_downloads, unique_downloads_total, month_downloads, month_downloads_total, previous_months`
 			)
 			.eq("id", id)
 			.limit(1)
@@ -63,7 +63,7 @@
 
 			<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
 				{#each data.online_users as user}
-					{#if user}
+					{#if user && Object.values(user).length > 0}
 						{Object.values(user)[0]}
 						<br />
 					{/if}

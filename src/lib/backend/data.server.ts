@@ -188,7 +188,7 @@ export async function getSignedURLServer(
 	if (err)
 		throw error(
 			401,
-			`Server error, this is probably not an issure on your end! - Get sign url for ${bucket} to ${bucket} failed!
+			`Server error, this is probably not an issue on your end! - Get sign url for ${bucket} to ${bucket} failed!
 			Error name: ${err.name}
 			Error message: ${err.message}
 			Error cause: ${err.cause}

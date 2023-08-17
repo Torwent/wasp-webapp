@@ -26,7 +26,7 @@ export async function updateWarning(supabase: SupabaseClient) {
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - UPDATE profiles.private failed
+			`Server error, this is probably not an issue on your end! - UPDATE profiles.private failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -83,7 +83,7 @@ export async function getScripts(supabase: SupabaseClient) {
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - SELECT scripts.scripts failed
+			`Server error, this is probably not an issue on your end! - SELECT scripts.scripts failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -102,7 +102,7 @@ export async function getScript(supabase: SupabaseClient, slug: string) {
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - SELECT scripts.scripts failed
+			`Server error, this is probably not an issue on your end! - SELECT scripts.scripts failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -123,7 +123,7 @@ export async function scriptExists(supabase: SupabaseClient, slug: string) {
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - SELECT scripts.scripts failed
+			`Server error, this is probably not an issue on your end! - SELECT scripts.scripts failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -144,7 +144,7 @@ export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - SELECT scripts.scripts failed
+			`Server error, this is probably not an issue on your end! - SELECT scripts.scripts failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -199,7 +199,7 @@ export async function getScripter(supabase: SupabaseClient, slug: string) {
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - SELECT developers failed
+			`Server error, this is probably not an issue on your end! - SELECT developers failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -223,7 +223,7 @@ export async function getScripterUUID(supabase: SupabaseClient, uuid: string) {
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - SELECT developers failed
+			`Server error, this is probably not an issue on your end! - SELECT developers failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -245,7 +245,7 @@ export async function getSignedURL(
 	if (err)
 		throw error(
 			501,
-			`Server error, this is probably not an issure on your end! - Get sign url for ${bucket} to ${path} failed!
+			`Server error, this is probably not an issue on your end! - Get sign url for ${bucket} to ${path} failed!
 			Error name: ${err.name}
 			Error message: ${err.message}
 			Error cause: ${err.cause}

@@ -31,7 +31,7 @@ async function getScripts(
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - SELECT scripts.scripts failed
+			`Server error, this is probably not an issue on your end! - SELECT scripts.scripts failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}

@@ -50,7 +50,7 @@ export const load = async ({ url, parent, depends }) => {
 		if (err)
 			throw error(
 				500,
-				`Server error, this is probably not an issure on your end! - SELECT scripts failed
+				`Server error, this is probably not an issue on your end! - SELECT scripts failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}

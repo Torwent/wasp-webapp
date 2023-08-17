@@ -18,7 +18,7 @@ export const load = async ({ parent }) => {
 			if (err)
 				throw error(
 					500,
-					`Server error, this is probably not an issure on your end! - SELECT scripts.categories failed
+					`Server error, this is probably not an issue on your end! - SELECT scripts.categories failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -42,7 +42,7 @@ export const load = async ({ parent }) => {
 			if (err)
 				throw error(
 					500,
-					`Server error, this is probably not an issure on your end! - SELECT scripts.subcategories failed
+					`Server error, this is probably not an issue on your end! - SELECT scripts.subcategories failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}

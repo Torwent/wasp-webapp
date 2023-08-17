@@ -19,7 +19,6 @@
 	import { onMount } from "svelte"
 	import { replaceScriptContent } from "$lib/utils"
 	import ScriptData from "./ScriptData.svelte"
-	import type { StatsSimba } from "$lib/types/collection"
 
 	export let data
 

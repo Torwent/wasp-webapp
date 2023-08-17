@@ -13,7 +13,7 @@ export const load = async ({ parent }) => {
 		if (questions.error) {
 			throw error(
 				500,
-				`Server error, this is probably not an issure on your end! - SELECT faq_questions failed
+				`Server error, this is probably not an issue on your end! - SELECT faq_questions failed
 			Error code: ${questions.error.code}
 			Error hint: ${questions.error.hint}
 			Error details: ${questions.error.details}
@@ -34,7 +34,7 @@ export const load = async ({ parent }) => {
 		if (errors.error) {
 			throw error(
 				500,
-				`Server error, this is probably not an issure on your end! - SELECT faq_errors failed
+				`Server error, this is probably not an issue on your end! - SELECT faq_errors failed
 			Error code: ${errors.error.code}
 			Error hint: ${errors.error.hint}
 			Error details: ${errors.error.details}`
