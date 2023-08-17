@@ -41,9 +41,10 @@
 			}
 		)
 
-		let profileProtectedSubscription: RealtimeChannel | null = null
+		let profilesRolesSubscription: RealtimeChannel | null = null
+		let profilesSubscriptionsSubscription: RealtimeChannel | null = null
 		if (session) {
-			supabaseClient
+			profilesRolesSubscription = supabaseClient
 				.channel("profiles-roles-changes")
 				.on(
 					"postgres_changes",
@@ -56,11 +57,26 @@
 					() => invalidate("supabase:auth")
 				)
 				.subscribe()
+
+			profilesSubscriptionsSubscription = supabaseClient
+				.channel("profiles-roles-changes")
+				.on(
+					"postgres_changes",
+					{
+						event: "UPDATE",
+						schema: "profiles",
+						table: "subscriptions",
+						filter: "id=eq." + session.user.id
+					},
+					() => invalidate("supabase:auth")
+				)
+				.subscribe()
 		}
 
 		return () => {
 			subscription.unsubscribe()
-			if (profileProtectedSubscription) profileProtectedSubscription.unsubscribe()
+			if (profilesRolesSubscription) profilesRolesSubscription.unsubscribe()
+			if (profilesSubscriptionsSubscription) profilesSubscriptionsSubscription.unsubscribe()
 		}
 	})
 </script>
