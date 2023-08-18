@@ -138,8 +138,6 @@
 		})
 	}
 
-	
-
 	const scriptStats = getScriptsStats(supabaseClient, script.id)
 
 	const headTitle = "Edit " + script.title + " - WaspScripts"
@@ -178,7 +176,7 @@
 <div>
 	{#if showScriptPage}
 		<div>
-			<ScriptHeader title={$form.title} username={script.protected.username} hasLink={false}>
+			<ScriptHeader title={$form.title} username={script.protected.username ?? ""} hasLink={false}>
 				<img
 					bind:this={bannerElement}
 					class="z-0 absolute object-cover h-full w-full"

@@ -33,15 +33,11 @@ export const load = async ({ url, depends, parent }) => {
 			Error hint: ${err.message}`
 			)
 
-		const total: Stats = {
-			username: "Total",
-			experience: data[0].experience || 0,
-			gold: data[0].gold || 0,
-			levels: data[0].levels || 0,
-			runtime: data[0].runtime || 0,
-			password: "",
-			updated_at: null,
-			userID: ""
+		const total = {
+			experience: data[0].experience ?? 0,
+			gold: data[0].gold ?? 0,
+			levels: data[0].levels ?? 0,
+			runtime: data[0].runtime ?? 0
 		}
 
 		return total
@@ -58,9 +54,9 @@ export const load = async ({ url, depends, parent }) => {
 			query
 				.or("experience.gt.0,gold.gt.0")
 				.range(start, finish)
-				.order(order, { ascending: ascending, foreignTable: "", nullsFirst: false })
+				.order(order, { ascending: ascending, nullsFirst: false })
 		} else if (UUID_V4_REGEX.test(search)) {
-			query.eq("userID", search)
+			query.eq("id", search)
 		} else {
 			query.ilike("username", "%" + search.replaceAll("%", "") + "%")
 		}

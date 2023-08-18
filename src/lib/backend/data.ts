@@ -114,11 +114,12 @@ export async function getScript(supabase: SupabaseClient, slug: string) {
 }
 
 export async function scriptExists(supabase: SupabaseClient, slug: string) {
-	const { data, error: err } = await supabase
+	const { count, error: err } = await supabase
 		.schema("scripts")
 		.from("scripts")
-		.select("url", { head: true })
+		.select("url", { count: "exact", head: true })
 		.eq("url", slug)
+		.limit(1)
 
 	if (err)
 		throw error(
@@ -130,8 +131,7 @@ export async function scriptExists(supabase: SupabaseClient, slug: string) {
 			Error hint: ${err.message}`
 		)
 
-	console.log("HERE: ", data)
-	return data.length > 0
+	return (count ?? 0) > 0
 }
 
 export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {

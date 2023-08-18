@@ -47,6 +47,7 @@
 	let { count } = data.stats
 	$: ({ count } = data.stats)
 
+	$: console.log(data.stats.stats[0])
 	onMount(() => {
 		loading = false
 		const subscription = supabaseClient
@@ -166,22 +167,12 @@
 						scope="row"
 						class="py-4 px-6 font-medium text-stone-900 whitespace-nowrap dark:text-white w-96"
 					>
-						{#if entry.username}
-							{entry.username}
-						{:else}
-							Anonymous
-						{/if}
+						{entry.username !== "" ? entry.username : "Anonymous"}
 					</th>
-					<td class="py-4 px-6 w-64">
-						{formatRSNumber(entry.experience || 0)}
-					</td>
-					<td class="py-4 px-6 w-64">
-						{formatRSNumber(entry.gold || 0)}
-					</td>
+					<td class="py-4 px-6 w-64">{formatRSNumber(entry.experience ?? 0)}</td>
+					<td class="py-4 px-6 w-64">{formatRSNumber(entry.gold ?? 0)}</td>
 					<td class="py-4 px-6 w-64">{entry.levels}</td>
-					<td class="py-4 px-6 w-64">
-						{convertTime(entry.runtime || 0)}
-					</td>
+					<td class="py-4 px-6 w-64">{convertTime(entry.runtime ?? 0)}</td>
 				</tr>
 			{/each}
 		</tbody>

@@ -97,10 +97,12 @@ export async function uploadScript(
 		.schema("scripts")
 		.from("scripts")
 		.insert(publicData)
-		.select()
+		.select("id, url")
 		.returns<ScriptBase[]>()
+
 	if (error) {
-		console.error("scripts.public INSERT failed: " + error.message)
+		console.log("scripts.public INSERT failed: ")
+		console.error(error)
 		return { error: error.message }
 	}
 
@@ -117,7 +119,7 @@ export async function uploadScript(
 		uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
 	])
 
-	return { error: undefined }
+	return { url: data[0].url, error: undefined }
 }
 
 export async function updateScript(
@@ -147,8 +149,10 @@ export async function updateScript(
 		.from("scripts")
 		.update(publicData)
 		.eq("id", script.id)
+
 	if (error) {
-		console.error("scripts.public UPDATE failed: " + error.message)
+		console.log("scripts.public UPDATE failed: ")
+		console.error(error)
 		return { error: error.message }
 	}
 

@@ -65,7 +65,7 @@
 			id: "",
 			revision: 0,
 			username: profile?.username ?? "",
-			avatar: profile?.avatar_url ?? "",
+			avatar: profile?.avatar ?? "",
 			revision_date: ""
 		},
 		fts: undefined,

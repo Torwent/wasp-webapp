@@ -77,7 +77,7 @@ export const actions = {
 			created_at: ""
 		}
 
-		const { error: err } = await uploadScript(
+		const { url: script_url, error: err } = await uploadScript(
 			supabaseServer,
 			script,
 			validFiles.data.script,
@@ -90,6 +90,7 @@ export const actions = {
 			return setError(form, "", err)
 		}
 
+		if (script_url) throw redirect(303, "./" + script_url)
 		throw redirect(303, "./" + url)
 	}
 }
