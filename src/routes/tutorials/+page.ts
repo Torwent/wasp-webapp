@@ -36,7 +36,7 @@ export const load = async ({ url, depends, parent }) => {
 		let query = supabaseClient.from("tutorials").select("*", { count: "estimated" })
 
 		if (profile && !profile.roles.administrator && !profile.roles.moderator) {
-			query = query.or("published.eq.true,user_id.eq." + profile.id)
+			query = query.or("published.eq.true,author_id.eq." + profile.id)
 		}
 
 		if (level > -1) {
