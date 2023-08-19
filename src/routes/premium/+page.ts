@@ -7,7 +7,7 @@ const pricesStore = writable<Prices[] | null>(null)
 export const load = async ({ parent, data }) => {
 	async function getScriptTotals() {
 		const { supabaseClient } = await parent()
-		let query = supabaseClient
+		const query = supabaseClient
 			.schema("scripts")
 			.from("scripts")
 			.select(`id`, { count: "estimated", head: true })

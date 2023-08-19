@@ -40,7 +40,7 @@
 </svelte:head>
 
 <main class="container mx-auto my-6 max-w-4xl flex-grow">
-	<EditButton author_id={tutorial.user_id} />
+	<EditButton author_id={tutorial.author_id} />
 	<h2 class="text-center mb-4 font-bold text-3xl">{tutorial.title}</h2>
 	<h3 class="text-center font-semibold leading-normal mb-4">{tutorial.description}</h3>
 

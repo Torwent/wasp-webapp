@@ -3,7 +3,7 @@ import type Stripe from "stripe"
 
 export const GET = async ({ request }) => {
 	const rawBody = await request.text()
-	//console.log("GET => Stripe webhook: ", rawBody)
+	console.log("GET => Stripe webhook: ", rawBody)
 	return new Response()
 }
 

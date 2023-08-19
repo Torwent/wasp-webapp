@@ -1,7 +1,6 @@
 import type { SupabaseClient, Session } from "@supabase/supabase-js"
 import type { Database } from "$lib/types/supabase"
 import type { Profile } from "$lib/types/collection"
-import Stripe from "stripe"
 
 declare global {
 	namespace App {

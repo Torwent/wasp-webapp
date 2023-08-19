@@ -1,4 +1,4 @@
-import { getScripter, getScripterUUID, scriptsQueryString } from "$lib/backend/data"
+import { getScripter, getScripterUUID } from "$lib/backend/data"
 import type { Script } from "$lib/types/collection"
 import { UUID_V4_REGEX } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"

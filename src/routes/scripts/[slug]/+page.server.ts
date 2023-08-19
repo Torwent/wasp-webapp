@@ -1,7 +1,6 @@
 import { supabaseAdmin, updateReporters } from "$lib/backend/supabase.server.js"
 import { UUID_V4_REGEX } from "$lib/utils.js"
 import { error } from "@sveltejs/kit"
-import { promise } from "zod"
 
 export const load = async ({ cookies }) => {
 	return { dismissed: cookies.get("warning_dismissed") === "true" }

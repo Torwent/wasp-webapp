@@ -10,9 +10,9 @@ const options = { auth: { autoRefreshToken: true, persistSession: false } }
 
 export const supabaseAdmin = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, options)
 
-export let adminLoggedIn: boolean = false //login cache.
+export let adminLoggedIn = false //login cache.
 
-async function login(cacheOnly: boolean = true) {
+async function login(cacheOnly = true) {
 	if (adminLoggedIn && cacheOnly) {
 		login(false) //make a full async run, this should relog if needed.
 		return true

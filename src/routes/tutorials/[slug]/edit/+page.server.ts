@@ -1,7 +1,7 @@
 import { setError, superValidate } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
 import { postSchema } from "$lib/backend/schemas"
-import type { TutorialWithAuthor } from "$lib/types/collection"
+import type { Tutorial } from "$lib/types/collection"
 
 export const load = async (event) => {
 	return { form: superValidate(event, postSchema) }
@@ -28,7 +28,7 @@ export const actions = {
 			.update(formUpdateData)
 			.eq("id", form.data.id)
 			.select()
-			.returns<TutorialWithAuthor[]>()
+			.returns<Tutorial[]>()
 
 		if (error) {
 			console.error("tutorials UPDATE failed: " + error.message)

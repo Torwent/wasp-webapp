@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { TutorialWithAuthor } from "$lib/types/collection"
+	import type { Tutorial } from "$lib/types/collection"
 	import { encodeSEO } from "$lib/utils"
-	export let tutorial: TutorialWithAuthor
+	export let tutorial: Tutorial
 
 	$: link = "/tutorials/" + encodeSEO(tutorial.title + " by " + tutorial.username)
 </script>
