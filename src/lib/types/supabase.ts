@@ -254,9 +254,32 @@ export interface Database {
         }
         Returns: string
       }
+      get_discord: {
+        Args: {
+          user_id: string
+        }
+        Returns: string
+      }
       get_email: {
         Args: {
           user_id: string
+        }
+        Returns: string
+      }
+      get_profile:
+        | {
+            Args: {
+              user_id: string
+            }
+            Returns: Database["public"]["CompositeTypes"]["profile_data_type"]
+          }
+        | {
+            Args: Record<PropertyKey, never>
+            Returns: Database["public"]["CompositeTypes"]["profile_data_type"]
+          }
+      get_user_id: {
+        Args: {
+          disc_id: string
         }
         Returns: string
       }
@@ -285,6 +308,30 @@ export interface Database {
             }
             Returns: boolean
           }
+      set_roles: {
+        Args: {
+          discord_id: string
+          param_developer: boolean
+          param_premium: boolean
+          param_vip: boolean
+          param_tester: boolean
+          param_mod: boolean
+        }
+        Returns: undefined
+      }
+      set_user_roles: {
+        Args: {
+          user_id: string
+          param_developer: boolean
+          param_premium: boolean
+          param_vip: boolean
+          param_tester: boolean
+          param_scripter: boolean
+          param_moderator: boolean
+          param_administrator: boolean
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
@@ -601,7 +648,7 @@ export interface Database {
           experience: number | null
           gold: number | null
           id: string
-          levels: number | null
+          levels: number
           password: string
           runtime: number | null
           updated_at: string | null
@@ -611,7 +658,7 @@ export interface Database {
           experience?: number | null
           gold?: number | null
           id: string
-          levels?: number | null
+          levels?: number
           password?: string
           runtime?: number | null
           updated_at?: string | null
@@ -621,7 +668,7 @@ export interface Database {
           experience?: number | null
           gold?: number | null
           id?: string
-          levels?: number | null
+          levels?: number
           password?: string
           runtime?: number | null
           updated_at?: string | null
@@ -629,36 +676,36 @@ export interface Database {
         }
         Relationships: []
       }
-      stats_duplicate: {
+      stats_backup: {
         Row: {
           experience: number | null
           gold: number | null
+          id: string
           levels: number | null
-          password: string
+          password: string | null
           runtime: number | null
           updated_at: string | null
-          userID: string
-          username: string
+          username: string | null
         }
         Insert: {
           experience?: number | null
           gold?: number | null
+          id: string
           levels?: number | null
-          password?: string
+          password?: string | null
           runtime?: number | null
           updated_at?: string | null
-          userID: string
-          username?: string
+          username?: string | null
         }
         Update: {
           experience?: number | null
           gold?: number | null
+          id?: string
           levels?: number | null
-          password?: string
+          password?: string | null
           runtime?: number | null
           updated_at?: string | null
-          userID?: string
-          username?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -828,12 +875,6 @@ export interface Database {
         }
         Returns: unknown
       }
-      get_assets_path: {
-        Args: {
-          id: string
-        }
-        Returns: string
-      }
       get_common_words:
         | {
             Args: {
@@ -848,35 +889,6 @@ export interface Database {
             }
             Returns: unknown
           }
-      get_discord_id: {
-        Args: {
-          user_id: string
-        }
-        Returns: string
-      }
-      get_email: {
-        Args: {
-          id: string
-        }
-        Returns: string
-      }
-      get_profile:
-        | {
-            Args: {
-              user_id: string
-            }
-            Returns: Database["public"]["CompositeTypes"]["profile_data_type"]
-          }
-        | {
-            Args: Record<PropertyKey, never>
-            Returns: Database["public"]["CompositeTypes"]["profile_data_type"]
-          }
-      get_script_revision: {
-        Args: {
-          script_id: string
-        }
-        Returns: number
-      }
       get_stats_total: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -886,12 +898,6 @@ export interface Database {
           runtime: number
         }[]
       }
-      get_user_id: {
-        Args: {
-          disc_id: string
-        }
-        Returns: string
-      }
       is_dashboard: {
         Args: Record<PropertyKey, never>
         Returns: boolean
@@ -899,19 +905,6 @@ export interface Database {
       is_owner: {
         Args: {
           id: string
-        }
-        Returns: boolean
-      }
-      profile_protected_exists: {
-        Args: {
-          id: string
-        }
-        Returns: boolean
-      }
-      profile_public_exists: {
-        Args: {
-          user_id: string
-          disc_id: string
         }
         Returns: boolean
       }
@@ -932,30 +925,6 @@ export interface Database {
           "": unknown
         }
         Returns: string
-      }
-      set_discord_roles: {
-        Args: {
-          discord_id: string
-          param_developer: boolean
-          param_premium: boolean
-          param_vip: boolean
-          param_tester: boolean
-          param_mod: boolean
-        }
-        Returns: undefined
-      }
-      set_user_roles: {
-        Args: {
-          user_id: string
-          param_developer: boolean
-          param_premium: boolean
-          param_vip: boolean
-          param_tester: boolean
-          param_scripter: boolean
-          param_moderator: boolean
-          param_administrator: boolean
-        }
-        Returns: undefined
       }
     }
     Enums: {
@@ -1011,6 +980,7 @@ export interface Database {
           assets: string
           author_id: string
           avatar: string
+          broken: boolean
           id: string
           revision: number
           revision_date: string
@@ -1020,6 +990,7 @@ export interface Database {
           assets?: string
           author_id: string
           avatar?: string
+          broken?: boolean
           id: string
           revision?: number
           revision_date?: string
@@ -1029,6 +1000,7 @@ export interface Database {
           assets?: string
           author_id?: string
           avatar?: string
+          broken?: boolean
           id?: string
           revision?: number
           revision_date?: string
@@ -1067,7 +1039,7 @@ export interface Database {
           title: string
           tooltip_emojis: string[]
           tooltip_names: string[]
-          url: string
+          url: string | null
         }
         Insert: {
           categories?: string[]
@@ -1086,7 +1058,7 @@ export interface Database {
           title: string
           tooltip_emojis?: string[]
           tooltip_names?: string[]
-          url: string
+          url?: string | null
         }
         Update: {
           categories?: string[]
@@ -1105,7 +1077,7 @@ export interface Database {
           title?: string
           tooltip_emojis?: string[]
           tooltip_names?: string[]
-          url?: string
+          url?: string | null
         }
         Relationships: []
       }
@@ -1190,7 +1162,7 @@ export interface Database {
           {
             foreignKeyName: "stats_site_id_fkey"
             columns: ["id"]
-            referencedRelation: "scripts_public"
+            referencedRelation: "scripts"
             referencedColumns: ["id"]
           }
         ]

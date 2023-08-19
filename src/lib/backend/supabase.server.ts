@@ -145,7 +145,7 @@ export async function updateReporters(script: string, user: string) {
 
 	const { error: err } = await supabaseAdmin
 		.schema("scripts")
-		.rpc("add_reporters", { script_id: script, user_id: user })
+		.rpc("add_reporter", { script_id: script, user_id: user })
 
 	if (err) {
 		console.error(err)

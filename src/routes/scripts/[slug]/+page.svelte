@@ -19,6 +19,7 @@
 	import { onMount } from "svelte"
 	import { replaceScriptContent } from "$lib/utils"
 	import ScriptData from "./ScriptData.svelte"
+	import { BadgeAlert, BadgeCheck } from "lucide-svelte"
 
 	export let data
 
@@ -112,8 +113,8 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<div>
-	<ScriptHeader title={script.title} username={script.protected.username}>
+<main>
+	<ScriptHeader title={script.title} username={script.protected.username ?? ""}>
 		<img
 			class="z-0 absolute object-cover h-full w-full"
 			src={script.protected.assets + "banner.jpg"}
@@ -124,10 +125,35 @@
 
 	<div class="container mt-80 mx-auto mb-6 max-w-lg md:max-w-2xl flex-grow">
 		<header class="my-8">
-			<h3 class="text-center text-secondary-500 text-shadow drop-shadow-2xl">
+			<h3 class="my-4 text-center text-secondary-500 text-shadow drop-shadow-2xl">
 				{script.description}
 			</h3>
 
+			<form method="POST" class="grid">
+				{#if script.protected.broken}
+					<h4 class="text-error-500 my-2">
+						This script has been reported broken and it might not work.
+					</h4>
+				{/if}
+				<div class="flex my-2">
+					{#if script.protected.broken && profile?.roles.tester}
+						<button
+							type="submit"
+							class="mx-auto btn variant-glass-success"
+							formaction="?/clear&id={script.id}"
+						>
+							<BadgeCheck class="mr-2" /> Clear reports
+						</button>
+					{/if}
+					<button
+						type="submit"
+						class="mx-auto btn variant-glass-error"
+						formaction="?/report&id={script.id}"
+					>
+						Report broken <BadgeAlert class="ml-2" />
+					</button>
+				</div>
+			</form>
 			{#if !script.published && canEdit(profile, script.protected.author_id)}
 				<h4 class="my-4 text-center text-error-500 text-shadow drop-shadow-2xl">Unpublished</h4>
 			{/if}
@@ -174,4 +200,4 @@
 
 		<ScriptArticle content={replaceScriptContent(script)} />
 	</div>
-</div>
+</main>

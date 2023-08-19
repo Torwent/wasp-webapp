@@ -1,0 +1,15 @@
+.git
+.gitattributes
+.gitignore
+.github
+.dockerignore
+.eslintignore
+.eslintrc.cjs
+.prettierignore
+.prettierrc
+.svelte-kit
+build
+node_modules
+Dockerfile
+docker-compose.yml
+README.md
