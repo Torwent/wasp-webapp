@@ -5,9 +5,7 @@ module.exports = {
 	plugins: ["svelte", "@typescript-eslint"],
 	ignorePatterns: ["*.cjs"],
 	overrides: [{ files: ["*.svelte"], processor: "svelte/svelte" }],
-	settings: {
-		"svelte/typescript": () => require("typescript")
-	},
+	settings: { "svelte/typescript": () => require("typescript") },
 	parserOptions: {
 		sourceType: "module",
 		ecmaVersion: 2020

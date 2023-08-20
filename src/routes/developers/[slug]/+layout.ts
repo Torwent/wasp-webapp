@@ -56,7 +56,7 @@ export const load = async ({ url: { searchParams }, params: { slug }, parent, de
 
 	const { supabaseClient } = await parent()
 	const developer = UUID_V4_REGEX.test(slug)
-		? await getScripterUUID(supabaseClient, slug)
+		? await getScripterUUID(supabaseClient, slug.toLowerCase())
 		: await getScripter(supabaseClient, slug.toLowerCase())
 
 	return {

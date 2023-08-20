@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { ScripterWithUsername } from "$lib/types/collection"
+	import type { ScripterWithProfile } from "$lib/types/collection"
 	import { Avatar } from "@skeletonlabs/skeleton"
-	export let scripter: ScripterWithUsername
+	export let scripter: ScripterWithProfile
 </script>
 
 <div class="card-hover rounded-md variant-ghost-surface m-4">

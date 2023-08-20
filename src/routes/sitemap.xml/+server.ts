@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { encodeSEO } from "$lib/utils"
-import type { ScripterWithUsername, Script, Tutorial } from "$lib/types/collection"
+import type { ScripterWithProfile, Script, Tutorial } from "$lib/types/collection"
 
 const website = "https://waspscripts.com"
 
@@ -45,7 +45,7 @@ const loadDevelopers = async (supabase: SupabaseClient) => {
 		.schema("profiles")
 		.from("scripters")
 		.select("profiles (username)")
-		.returns<ScripterWithUsername[]>()
+		.returns<ScripterWithProfile[]>()
 
 	if (error) return console.error("developers SELECT failed: " + error.message)
 

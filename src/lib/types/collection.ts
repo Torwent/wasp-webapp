@@ -21,7 +21,7 @@ export type ErrorEntry = Database["public"]["Tables"]["faq_errors"]["Row"]
 export type Tutorial = Database["public"]["Tables"]["tutorials"]["Row"]
 
 export type Scripter = Database["profiles"]["Tables"]["scripters"]["Row"]
-export interface ScripterWithUsername extends Scripter {
+export interface ScripterWithProfile extends Scripter {
 	profiles: ProfileBase
 }
 

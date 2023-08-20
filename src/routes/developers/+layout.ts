@@ -1,4 +1,4 @@
-import type { ScripterWithUsername } from "$lib/types/collection"
+import type { ScripterWithProfile } from "$lib/types/collection"
 
 export const load = async ({ url: { searchParams }, params: { slug }, parent, depends }) => {
 	depends("supabase:developers")
@@ -29,7 +29,7 @@ export const load = async ({ url: { searchParams }, params: { slug }, parent, de
 			query = query.ilike("search", "%" + search + "%")
 		}
 
-		return await query.returns<ScripterWithUsername[]>()
+		return await query.returns<ScripterWithProfile[]>()
 	}
 
 	return {

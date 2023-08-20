@@ -1,6 +1,44 @@
 <script lang="ts">
 	import { Github, Globe } from "lucide-svelte"
 	import Logo from "./Logo.svelte"
+	import type { ScripterWithProfile } from "$lib/types/collection"
+	import { page } from "$app/stores"
+
+	async function getScripters() {
+		const { data, error: err } = await $page.data.supabaseClient
+			.schema("profiles")
+			.from("scripters")
+			.select(`id, realname, url, profiles!left (username, avatar)`)
+
+			.order("username", { foreignTable: "profiles", ascending: true })
+			.limit(5)
+			.limit(1, { foreignTable: "profiles" })
+			.returns<ScripterWithProfile[]>()
+
+		if (err) console.error(err)
+
+		function shuffle(array: ScripterWithProfile[]) {
+			let currentIndex = array.length,
+				randomIndex
+
+			// While there remain elements to shuffle.
+			while (currentIndex != 0) {
+				// Pick a remaining element.
+				randomIndex = Math.floor(Math.random() * currentIndex)
+				currentIndex--
+
+				// And swap it with the current element.
+				;[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]
+			}
+
+			return array
+		}
+
+		let result: ScripterWithProfile[] = []
+		if (data) result = shuffle(data)
+
+		return result
+	}
 </script>
 
 <footer class="variant-soft-surface">
@@ -32,8 +70,16 @@
 				<nav>
 					<span class="mb-6 text-sm font-semibold uppercase">Special thanks:</span>
 					<ul>
-						<li><a href="/developers/Slacky">Jarl Holta</a></li>
-						<li><a href="/developers/Olly">Olly</a></li>
+						{#await getScripters()}
+							<li>Loading...</li>
+							<li>Loading...</li>
+							<li>Loading...</li>
+						{:then scripters}
+							{#each scripters as scripter}
+								<li><a href="/developers/{scripter.url}">{scripter.profiles.username}</a></li>
+							{/each}
+						{/await}
+
 						<li><a href="/developers">Many more devs...</a></li>
 					</ul>
 				</nav>

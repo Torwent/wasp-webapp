@@ -3,7 +3,7 @@ import type {
 	Category,
 	SubCategory,
 	EmojiTooltip,
-	ScripterWithUsername,
+	ScripterWithProfile,
 	Script,
 	Profile,
 	StatsSimba
@@ -194,7 +194,7 @@ export async function getScripter(supabase: SupabaseClient, slug: string) {
 		.eq("url", slug)
 		.limit(1)
 		.limit(1, { foreignTable: "profiles" })
-		.returns<ScripterWithUsername[]>()
+		.returns<ScripterWithProfile[]>()
 
 	if (err)
 		throw error(
@@ -218,7 +218,7 @@ export async function getScripterUUID(supabase: SupabaseClient, uuid: string) {
 		.eq("id", uuid)
 		.limit(1)
 		.limit(1, { foreignTable: "profiles" })
-		.returns<ScripterWithUsername[]>()
+		.returns<ScripterWithProfile[]>()
 
 	if (err)
 		throw error(
