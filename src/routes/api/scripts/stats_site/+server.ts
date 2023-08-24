@@ -17,9 +17,29 @@ export const POST = async ({ request }) => {
 
 	console.log(id, " ", month_downloads_total, " ", month_reports_total)
 
+	const hook = {
+		content: `Script with id: ${id} was reported broken by ${month_reports_total} out of ${month_downloads_total}. Please <@907209408860291113> test the script, if it works please clear the reports.
+		https://waspscripts.com/scripts/${id}`,
+		embeds: [
+			{
+				title: "Test",
+				color: 16760576,
+				thumbnail: { url: "https://waspscripts.com/scripts/" + id },
+				fields: [
+					{
+						name: "Broken script:",
+						value: id,
+						inline: true
+					}
+				]
+			}
+		]
+	}
+
 	fetch(PRIVATE_DISCORD_WEBHOOK, {
-		body: `Script with id: ${id} was reported broken by ${month_reports_total} out of ${month_downloads_total}. Please <@907209408860291113> test the script, if it works please clear the reports.
-		https://waspscripts.com/scripts/${id}`
+		method: "POST",
+		headers: { "Content-type": "application/json" },
+		body: JSON.stringify(hook)
 	})
 	throw redirect(303, "/")
 }
