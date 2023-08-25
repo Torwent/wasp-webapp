@@ -30,12 +30,14 @@ export const load = async ({ url, parent, depends }) => {
 			.from("scripts")
 			.select(
 				`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-			tooltip_emojis, tooltip_names,
-			protected (assets, author_id, revision, username, avatar),
-			stats_simba (experience, gold, runtime, levels, unique_users_total, online_users_total)`,
+				tooltip_emojis, tooltip_names,
+				protected (assets, author_id, revision, username, avatar),
+				stats_simba (experience, gold, runtime, levels, unique_users_total, online_users_total)`,
 				{ count: "estimated" }
 			)
 			.eq("published", true)
+			.limit(1, { foreignTable: "protected" })
+			.limit(1, { foreignTable: "stats_simba" })
 			.contains("categories", categoriesFilter)
 			.contains("subcategories", subcategoriesFilter)
 

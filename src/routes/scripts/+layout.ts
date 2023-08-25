@@ -19,10 +19,10 @@ export const load = async ({ parent }) => {
 				throw error(
 					500,
 					`Server error, this is probably not an issue on your end! - SELECT scripts.categories failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+					Error code: ${err.code}
+					Error hint: ${err.hint}
+					Error details: ${err.details}
+					Error hint: ${err.message}`
 				)
 			result = data
 			categoriesStore.set(result)

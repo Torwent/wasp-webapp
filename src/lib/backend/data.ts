@@ -77,10 +77,13 @@ export async function getScripts(supabase: SupabaseClient) {
 	const { data, error: err } = await supabase
 		.schema("scripts")
 		.from("scripts")
-		.select(scriptsQueryString)
+		.select(`id, url, title, categories, published, protected!left (revision, broken)`)
 		.order("title", { ascending: true })
+		.eq("published", true)
+		.eq("protected.broken", false)
+		.limit(1, { foreignTable: "protected" })
 		.returns<Script[]>()
-	if (err)
+	if (err) {
 		throw error(
 			500,
 			`Server error, this is probably not an issue on your end! - SELECT scripts.scripts failed
@@ -89,6 +92,7 @@ export async function getScripts(supabase: SupabaseClient) {
 			Error details: ${err.details}
 			Error hint: ${err.message}`
 		)
+	}
 	return data
 }
 
@@ -98,8 +102,10 @@ export async function getScript(supabase: SupabaseClient, slug: string) {
 		.from("scripts")
 		.select(scriptsQueryString)
 		.eq("url", slug)
+		.limit(1, { foreignTable: "protected" })
 		.returns<Script[]>()
-	if (err)
+
+	if (err) {
 		throw error(
 			500,
 			`Server error, this is probably not an issue on your end! - SELECT scripts.scripts failed
@@ -108,6 +114,7 @@ export async function getScript(supabase: SupabaseClient, slug: string) {
 			Error details: ${err.details}
 			Error hint: ${err.message}`
 		)
+	}
 
 	if (data.length === 0) throw error(404, "That script doesn't exist.")
 	return data[0]
@@ -140,6 +147,7 @@ export async function getScriptUUID(supabase: SupabaseClient, uuid: string) {
 		.from("scripts")
 		.select(scriptsQueryString)
 		.eq("id", uuid)
+		.limit(1, { foreignTable: "protected" })
 		.returns<Script[]>()
 	if (err)
 		throw error(
@@ -242,7 +250,7 @@ export async function getSignedURL(
 
 	const { data, error: err } = await supabase.storage.from(bucket).createSignedUrl(path, 10)
 
-	if (err)
+	if (err) {
 		throw error(
 			501,
 			`Server error, this is probably not an issue on your end! - Get sign url for ${bucket} to ${path} failed!
@@ -251,6 +259,7 @@ export async function getSignedURL(
 			Error cause: ${err.cause}
 			Error stack: ${err.stack}`
 		)
+	}
 
 	return data.signedUrl
 }

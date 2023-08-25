@@ -26,6 +26,7 @@ export const load = async ({ params, parent }) => {
 			.select(scriptsQueryString)
 			.eq("url", slug)
 			.limit(1)
+			.limit(1, { foreignTable: "protected" })
 			.returns<Script[]>()
 
 		if (err)
@@ -50,6 +51,7 @@ export const load = async ({ params, parent }) => {
 			.select(scriptsQueryString)
 			.eq("id", uuid)
 			.limit(1)
+			.limit(1, { foreignTable: "protected" })
 			.returns<Script[]>()
 		if (err)
 			throw error(

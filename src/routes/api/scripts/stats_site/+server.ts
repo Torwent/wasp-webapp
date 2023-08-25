@@ -8,7 +8,7 @@ export const POST = async ({ fetch, request }) => {
 		console.error("Webhook password doesn't match")
 		throw Error("Webhook password doesn't match")
 	}
-	if (req.type !== "INSERT" || req.schema !== "profiles" || req.table !== "subscriptions") {
+	if (req.type !== "UPDATE" || req.schema !== "scripts" || req.table !== "stats_site") {
 		console.error("Webhook sent doesn't match this endpoint.")
 		throw Error("Webhook sent doesn't match this endpoint.")
 	}
