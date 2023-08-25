@@ -34,7 +34,8 @@ export const POST = async ({ fetch, request }) => {
 					month_reports_total +
 					" out of " +
 					month_downloads_total +
-					" downloads.\n\nPlease <@&907209408860291113> test the script, if it works please clear the reports.\n\nhttps://waspscripts.com/scripts/SCRIPT_ID_HERE",
+					" downloads.\n\nPlease <@&907209408860291113> test the script, if it works please clear the reports.\n\nhttps://waspscripts.com/scripts/" +
+					id,
 
 				footer: { text: "Please clear the reports if the script works" }
 			}
