@@ -1,9 +1,11 @@
-import { PRIVATE_DISCORD_WEBHOOK } from "$env/static/private"
+import { ADMIN_PASS, PRIVATE_DISCORD_WEBHOOK } from "$env/static/private"
 
 export const POST = async ({ request }) => {
-	console.log(request.headers)
+	const hookPassword = request.headers.get("password")
+	console.log(hookPassword)
 	const req = await request.json()
 
+	if (hookPassword !== ADMIN_PASS) return new Response()
 	if (req.type !== "UPDATE" || req.schema !== "scripts" || req.table !== "stats_site")
 		return new Response()
 
@@ -13,7 +15,7 @@ export const POST = async ({ request }) => {
 
 	if ((Number(month_downloads_total) / 100) * 1 > Number(month_reports_total)) return new Response()
 
-	console.log(id, " ", month_downloads_total, " ", month_reports_total)
+	console.log("Posting to discord #🧪testers channel")
 
 	const hook = {
 		embeds: [
