@@ -6,6 +6,7 @@
 	import type { Stats } from "$lib/types/collection"
 	import { convertTime, formatRSNumber } from "$lib/utils"
 	import Paginator from "$lib/components/Paginator.svelte"
+	import { ChevronDown, ChevronUp } from "lucide-svelte"
 
 	export let data
 
@@ -47,7 +48,6 @@
 	let { count } = data.stats
 	$: ({ count } = data.stats)
 
-	$: console.log(data.stats.stats[0])
 	onMount(() => {
 		loading = false
 		const subscription = supabaseClient
@@ -132,12 +132,12 @@
 	</div>
 
 	<table class="w-full text-sm text-left text-stone-500 dark:text-stone-400">
-		<thead class="text-xs text-secondary-500 uppercase bg-stone-50 dark:bg-stone-700">
+		<thead class="text-xs text-primary-500 uppercase bg-stone-50 dark:bg-stone-700">
 			<tr>
 				{#each headers as header}
 					<th scope="col" class="py-3 px-6" on:click={() => sortBy(header)}>
 						<div class="flex justify-between text-sm">
-							<span>
+							<span class="align-middle h-full my-auto">
 								{header}
 								{#if header === "levels"}
 									<a
@@ -149,9 +149,7 @@
 								{/if}
 							</span>
 							{#if selectedHeader === header}
-								<span class="text-primary-400">
-									{@html ascending ? "&#8638;" : "&#8643;"}
-								</span>
+								{#if ascending} <ChevronDown /> {:else} <ChevronUp /> {/if}
 							{/if}
 						</div>
 					</th>
