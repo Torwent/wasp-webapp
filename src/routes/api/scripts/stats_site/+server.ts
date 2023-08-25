@@ -3,7 +3,6 @@ import { PRIVATE_DISCORD_WEBHOOK } from "$env/static/private"
 export const POST = async ({ request }) => {
 	console.log(request.headers)
 	const req = await request.json()
-	console.log("POST => supabase scripts webhook: ", req)
 
 	if (req.type !== "UPDATE" || req.schema !== "scripts" || req.table !== "stats_site")
 		return new Response()
