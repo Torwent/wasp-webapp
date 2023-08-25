@@ -83,16 +83,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 				}
 			}
 		}
-		const promises = []
-		if (needUpdate) promises.push(updateProfileProtected(profile))
-		if (!profile.subscriptions.external)
-			promises.push(
-				fetch(API_URL + "/discord/update/" + profile.discord, {
-					method: "GET"
-				}).catch((err) => console.error(err))
-			)
 
-		Promise.all(promises)
+		if (needUpdate) await updateProfileProtected(profile)
+		if (!profile.subscriptions.external) {
+			fetch(API_URL + "/discord/update/" + profile.discord, {
+				method: "GET"
+			}).catch((err) => console.error(err))
+		}
 
 		return profile
 	}

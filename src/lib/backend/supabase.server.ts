@@ -87,7 +87,7 @@ export async function updateProfileProtected(profile: Profile) {
 
 	if (errSub) {
 		console.error(errSub)
-		throw error(403, errSub)
+		throw error(500, errSub)
 	}
 
 	const { error: errRoles } = await supabaseAdmin
@@ -106,8 +106,95 @@ export async function updateProfileProtected(profile: Profile) {
 
 	if (errRoles) {
 		console.error(errRoles)
-		throw error(403, errRoles)
+		throw error(500, errRoles)
 	}
+	return true
+}
+
+export async function updateProfileRoles(profile: Profile) {
+	if (!adminLoggedIn) {
+		await login(false)
+		if (!adminLoggedIn) return false
+	}
+
+	console.log("Updating profile.roles for user: ", profile.id, " current roles: ", profile.roles)
+
+	const { error: err } = await supabaseAdmin
+		.schema("profiles")
+		.from("roles")
+		.update({
+			developer: profile.roles.developer,
+			premium: profile.roles.premium,
+			scripter: profile.roles.scripter,
+			tester: profile.roles.tester,
+			timeout: profile.roles.timeout,
+			banned: profile.roles.banned,
+			vip: profile.roles.vip
+		})
+		.eq("id", profile.id)
+
+	if (err) {
+		console.error(err)
+		throw error(500, err)
+	}
+	return true
+}
+
+export async function updateProfileSubscription(profile: Profile) {
+	if (!adminLoggedIn) {
+		await login(false)
+		if (!adminLoggedIn) return false
+	}
+
+	console.log(
+		"Updating profile subscription for user: ",
+		profile.id,
+		" current subscription: ",
+		profile.subscriptions
+	)
+
+	const { error: err } = await supabaseAdmin
+		.schema("profiles")
+		.from("subscriptions")
+		.update({
+			date_end: profile.subscriptions.date_end,
+			external: profile.subscriptions.external,
+			subscription_id: profile.subscriptions.subscription_id,
+			date_start: profile.subscriptions.date_start,
+			cancel: profile.subscriptions.cancel,
+			customer_id: profile.subscriptions.customer_id,
+			price_id: profile.subscriptions.price_id
+		})
+		.eq("id", profile.id)
+
+	if (err) {
+		console.error(err)
+		throw error(500, err)
+	}
+
+	return true
+}
+
+export async function removeScriptBroken(id: string) {
+	if (!adminLoggedIn) {
+		await login(false)
+		if (!adminLoggedIn) return false
+	}
+
+	console.log("Updating scripts.protected.broken for script: ", id)
+
+	const { error: err } = await supabaseAdmin
+		.schema("scripts")
+		.from("protected")
+		.update({ broken: false })
+		.eq("id", id)
+
+	if (err) {
+		console.log("scripts.protected UPDATE failed: ")
+		console.error(err)
+		throw error(500, err.message)
+	}
+
 	return true
 }
 

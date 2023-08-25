@@ -1,5 +1,5 @@
 import { ADMIN_PASS } from "$env/static/private"
-import { getProfile, stripe, updateProfileProtected } from "$lib/backend/supabase.server"
+import { getProfile, stripe, updateProfileSubscription } from "$lib/backend/supabase.server"
 import type Stripe from "stripe"
 
 export const POST = async ({ request }) => {
@@ -48,7 +48,7 @@ export const POST = async ({ request }) => {
 			profile.subscriptions.customer_id = customer.id
 		}
 
-		await updateProfileProtected(profile)
+		await updateProfileSubscription(profile)
 	}
 
 	return new Response()
