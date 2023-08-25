@@ -51,33 +51,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 		let needUpdate = false
 
-		if (!profile.subscriptions.customer_id) {
-			let customer: Stripe.Customer
-			const customerSearch = await stripe.customers.search({ query: `name:"${session.user.id}"` })
-			if (customerSearch.data.length > 1) {
-				throw Error(
-					"Your profile seems to be corrupted. Please contact support@waspscripts.com and provide your discord id"
-				)
-			}
-
-			if (customerSearch.data.length > 0) {
-				profile.subscriptions.customer_id = customerSearch.data[0].id
-			} else {
-				customer = await stripe.customers.create({
-					email: session.user.email,
-					name: session.user.id,
-					metadata: {
-						id: session.user.id,
-						discord_id: profile.discord,
-						username: profile.username
-					}
-				})
-				profile.subscriptions.customer_id = customer.id
-			}
-
-			needUpdate = true
-		}
-
 		if (profile.subscriptions.external) {
 			fetch(API_URL + "/discord/refresh/" + profile.discord, {
 				method: "GET"

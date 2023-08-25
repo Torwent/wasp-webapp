@@ -1,13 +1,17 @@
 import { ADMIN_PASS, PRIVATE_DISCORD_WEBHOOK } from "$env/static/private"
 
-export const POST = async ({ request }) => {
+export const POST = async ({ fetch, request }) => {
 	const hookPassword = request.headers.get("password")
-	console.log(hookPassword)
 	const req = await request.json()
 
-	if (hookPassword !== ADMIN_PASS) return new Response()
-	if (req.type !== "UPDATE" || req.schema !== "scripts" || req.table !== "stats_site")
-		return new Response()
+	if (hookPassword !== ADMIN_PASS) {
+		console.error("Webhook password doesn't match")
+		throw Error("Webhook password doesn't match")
+	}
+	if (req.type !== "INSERT" || req.schema !== "profiles" || req.table !== "subscriptions") {
+		console.error("Webhook sent doesn't match this endpoint.")
+		throw Error("Webhook sent doesn't match this endpoint.")
+	}
 
 	const {
 		record: { id, month_downloads_total, month_reports_total }
@@ -26,14 +30,18 @@ export const POST = async ({ request }) => {
 				description:
 					"Script with id: " +
 					id +
-					" was reported broken by X out of Y downloads.\n\nPlease <@&907209408860291113> test the script, if it works please clear the reports.\n\nhttps://waspscripts.com/scripts/SCRIPT_ID_HERE",
+					" was reported broken by " +
+					month_reports_total +
+					" out of " +
+					month_downloads_total +
+					" downloads.\n\nPlease <@&907209408860291113> test the script, if it works please clear the reports.\n\nhttps://waspscripts.com/scripts/SCRIPT_ID_HERE",
 
 				footer: { text: "Please clear the reports if the script works" }
 			}
 		]
 	}
 
-	fetch(PRIVATE_DISCORD_WEBHOOK, {
+	await fetch(PRIVATE_DISCORD_WEBHOOK, {
 		method: "POST",
 		headers: { "Content-type": "application/json" },
 		body: JSON.stringify(hook)
