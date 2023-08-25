@@ -1,24 +1,55 @@
-import { PRIVATE_DISCORD_WEBHOOK } from "$env/static/private"
-import { redirect } from "@sveltejs/kit"
+import { ADMIN_PASS } from "$env/static/private"
+import { getProfile, stripe, updateProfileProtected } from "$lib/backend/supabase.server"
+import type Stripe from "stripe"
 
 export const POST = async ({ request }) => {
+	const hookPassword = request.headers.get("password")
 	const req = await request.json()
-	console.log("POST => supabase webhook: ", req)
 
-	if (req.status !== 200) return new Response()
-	if (req.data.table !== "stats_site") return new Response()
+	if (hookPassword !== ADMIN_PASS) {
+		console.error("Webhook password doesn't match")
+		throw Error("Webhook password doesn't match")
+	}
+	if (req.type !== "INSERT" || req.schema !== "profiles" || req.table !== "subscriptions") {
+		console.error("Webhook sent doesn't match this endpoint.")
+		throw Error("Webhook sent doesn't match this endpoint.")
+	}
 
-	const entry = req.data.record
+	const {
+		record: { id }
+	} = req
 
-	const { id, month_downloads_total, month_reports_total } = entry
+	const profile = await getProfile(id)
+	if (!profile) {
+		console.error("Something went wrong getting " + id + " profile.")
+		throw Error("Something went wrong getting " + id + " profile.")
+	}
 
-	if ((Number(month_downloads_total) / 100) * 1 > Number(month_reports_total)) return new Response()
+	if (!profile.subscriptions.customer_id) {
+		console.log("Creating customer for " + id)
+		let customer: Stripe.Customer
+		const customerSearch = await stripe.customers.search({ query: `name:"${profile.id}"` })
+		if (customerSearch.data.length > 1) {
+			throw Error("Profile with " + id + " seems to be corrupted!")
+		}
 
-	console.log(id, " ", month_downloads_total, " ", month_reports_total)
+		if (customerSearch.data.length > 0) {
+			profile.subscriptions.customer_id = customerSearch.data[0].id
+		} else {
+			customer = await stripe.customers.create({
+				email: profile.private.email,
+				name: profile.id,
+				metadata: {
+					id: profile.id,
+					discord_id: profile.discord,
+					username: profile.username
+				}
+			})
+			profile.subscriptions.customer_id = customer.id
+		}
 
-	fetch(PRIVATE_DISCORD_WEBHOOK, {
-		body: `Script with id: ${id} was reported broken by ${month_reports_total} out of ${month_downloads_total}. Please <@907209408860291113> test the script, if it works please clear the reports.
-		https://waspscripts.com/scripts/${id}`
-	})
-	throw redirect(303, "/")
+		await updateProfileProtected(profile)
+	}
+
+	return new Response()
 }
