@@ -1,5 +1,4 @@
 import { PRIVATE_DISCORD_WEBHOOK } from "$env/static/private"
-import { redirect } from "@sveltejs/kit"
 
 export const POST = async ({ request }) => {
 	console.log(request.headers)
@@ -18,20 +17,17 @@ export const POST = async ({ request }) => {
 	console.log(id, " ", month_downloads_total, " ", month_reports_total)
 
 	const hook = {
-		content: `Script with id: ${id} was reported broken by ${month_reports_total} out of ${month_downloads_total}. Please <@907209408860291113> test the script, if it works please clear the reports.
-		https://waspscripts.com/scripts/${id}`,
 		embeds: [
 			{
-				title: "Test",
-				color: 16760576,
-				thumbnail: { url: "https://waspscripts.com/scripts/" + id },
-				fields: [
-					{
-						name: "Broken script:",
-						value: id,
-						inline: true
-					}
-				]
+				title: id + " broken",
+				url: "https://waspscripts.com/scripts/" + id,
+				color: "5763719",
+				description:
+					"Script with id: " +
+					id +
+					" was reported broken by X out of Y downloads.\n\nPlease <@&907209408860291113> test the script, if it works please clear the reports.\n\nhttps://waspscripts.com/scripts/SCRIPT_ID_HERE",
+
+				footer: { text: "Please clear the reports if the script works" }
 			}
 		]
 	}
@@ -41,5 +37,5 @@ export const POST = async ({ request }) => {
 		headers: { "Content-type": "application/json" },
 		body: JSON.stringify(hook)
 	})
-	throw redirect(303, "/")
+	return new Response()
 }
