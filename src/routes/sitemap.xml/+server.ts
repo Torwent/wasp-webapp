@@ -1,25 +1,24 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { encodeSEO } from "$lib/utils"
-import type { DeveloperWithUsername, IScriptCard, TutorialWithAuthor } from "$lib/types/collection"
+import type { ScripterWithProfile, Script, Tutorial } from "$lib/types/collection"
 
 const website = "https://waspscripts.com"
 
 const loadScripts = async (supabase: SupabaseClient) => {
 	const { data, error } = await supabase
-		.from("scripts_public")
-		.select(`title,	scripts_protected ( profiles_public (username, avatar_url) )`)
+		.schema("scripts")
+		.from("scripts")
+		.select(`title,	protected (username, avatar)`)
 		.order("title", { ascending: true })
-		.returns<IScriptCard[]>()
+		.returns<Script[]>()
 
-	if (error) return console.error("scripts_public SELECT failed:" + error.message)
+	if (error) return console.error("scripts.scripts SELECT failed:" + error.message)
 
 	const scriptData = data
 
-	let result: string[] = []
+	const result: string[] = []
 	scriptData.forEach((script) => {
-		result.push(
-			encodeSEO(script.title + " by " + script.scripts_protected.profiles_public.username)
-		)
+		result.push(encodeSEO(script.title + " by " + script.protected.username))
 	})
 
 	return result
@@ -28,14 +27,14 @@ const loadScripts = async (supabase: SupabaseClient) => {
 const loadTutorials = async (supabase: SupabaseClient) => {
 	const { data, error } = await supabase
 		.from("tutorials")
-		.select("title, profiles_public (username, avatar_url)")
-		.returns<TutorialWithAuthor[]>()
+		.select("title,  username")
+		.returns<Tutorial[]>()
 
 	if (error) return console.error("tutorials SELECT failed: " + error.message)
 
-	let result: string[] = []
+	const result: string[] = []
 	data.forEach((tutorial) => {
-		result.push(encodeSEO(tutorial.title + " by " + tutorial.profiles_public.username))
+		result.push(encodeSEO(tutorial.title + " by " + tutorial.username))
 	})
 
 	return result
@@ -43,15 +42,16 @@ const loadTutorials = async (supabase: SupabaseClient) => {
 
 const loadDevelopers = async (supabase: SupabaseClient) => {
 	const { data, error } = await supabase
-		.from("developers")
-		.select("profiles_public (username, avatar_url)")
-		.returns<DeveloperWithUsername[]>()
+		.schema("profiles")
+		.from("scripters")
+		.select("profiles (username)")
+		.returns<ScripterWithProfile[]>()
 
 	if (error) return console.error("developers SELECT failed: " + error.message)
 
-	let result: string[] = []
+	const result: string[] = []
 	data.forEach((developer) => {
-		result.push(encodeSEO(developer.profiles_public.username))
+		result.push(encodeSEO(developer.profiles.username))
 	})
 
 	return result
@@ -67,8 +67,7 @@ const buildLoc = async (supabase: SupabaseClient, loc: string) => {
 		data = (await loadDevelopers(supabase)) || []
 	}
 
-	let result: string = ""
-
+	let result = ""
 	data.forEach((el) => {
 		result += `
       <url>
@@ -83,9 +82,14 @@ const buildLoc = async (supabase: SupabaseClient, loc: string) => {
 }
 
 export const GET = async ({ locals: { supabaseServer } }) => {
-	const scripts = await buildLoc(supabaseServer, "scripts")
-	const tutorials = await buildLoc(supabaseServer, "tutorials")
-	const developers = await buildLoc(supabaseServer, "developers")
+	const promises = await Promise.all([
+		buildLoc(supabaseServer, "scripts"),
+		buildLoc(supabaseServer, "tutorials"),
+		buildLoc(supabaseServer, "developers")
+	])
+	const scripts = promises[0]
+	const tutorials = promises[1]
+	const developers = promises[2]
 
 	const headers = {
 		"Cache-Control": "max-age=0, s-maxage=3600",

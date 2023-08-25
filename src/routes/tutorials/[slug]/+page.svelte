@@ -10,8 +10,8 @@
 	const headDescription = "OSRS Botting tutorial: " + tutorial.description
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide. " +
-		tutorial.profiles_public.username
-	const headAuthor = tutorial.profiles_public.username
+		tutorial.username
+	const headAuthor = tutorial.username
 	const headImage =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
@@ -40,7 +40,7 @@
 </svelte:head>
 
 <main class="container mx-auto my-6 max-w-4xl flex-grow">
-	<EditButton author_id={tutorial.user_id} />
+	<EditButton author_id={tutorial.author_id} />
 	<h2 class="text-center mb-4 font-bold text-3xl">{tutorial.title}</h2>
 	<h3 class="text-center font-semibold leading-normal mb-4">{tutorial.description}</h3>
 

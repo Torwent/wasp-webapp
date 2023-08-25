@@ -5,17 +5,13 @@
 	import { ChevronDown, X } from "lucide-svelte"
 	export let title: string
 	export let value: string[]
-	export let error: Record<number, string[]> | undefined
+	export let errors: string[] | undefined = undefined
 	export let placeholder = ""
 	export let entries: Category[] | SubCategory[]
 
-	function checkErrors(err: Record<number, string[]> | undefined) {
+	function checkErrors(err: string[] | undefined) {
 		if (!err) return false
-
-		for (const e of Object.entries(err)) {
-			if (e[1] != null) return true
-		}
-		return false
+		return err.length > 0
 	}
 
 	let input: HTMLInputElement
@@ -59,11 +55,11 @@
 	})
 
 	const hadPremium = value.includes("Premium")
-	$: hasError = checkErrors(error)
+	$: hasError = checkErrors(errors)
 
 	$: ({ profile } = $page.data)
 
-	$: if (!profile || !profile.profiles_protected.administrator) {
+	$: if (!profile || !profile.roles.administrator) {
 		if (value.includes("Official") || (value.includes("Premium") && !hadPremium)) {
 			for (let i = 0; i < value.length; i++) {
 				if (value[i] === "Official" || (value[i] === "Premium" && !hadPremium)) {
@@ -125,6 +121,7 @@
 		{/if}
 
 		{#if showOptions}
+			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			<ul on:mousedown|preventDefault={handleOptionMousedown}>
 				{#each entries as entry}
 					<li
@@ -139,13 +136,11 @@
 			</ul>
 		{/if}
 	</div>
-	<div class="grid">
-		{#if error}
-			{#each Object.entries(error) as err, idx}
-				{#if err[1]}
-					<small class="text-error-500 mx-auto w-full">{err[1]}</small>
-				{/if}
+	{#if errors}
+		<div class="grid">
+			{#each errors as err}
+				<small class="text-error-500 mx-auto w-full">{err}</small>
 			{/each}
-		{/if}
-	</div>
+		</div>
+	{/if}
 </div>

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { superForm } from "sveltekit-superforms/client"
 	import { FileDropzone, focusTrap } from "@skeletonlabs/skeleton"
-	import { cropString } from "$lib/utils"
+	import { cropString, replaceScriptContent } from "$lib/utils"
 	import { scriptSchema } from "$lib/backend/schemas"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
@@ -9,7 +9,7 @@
 	import { FileCode, ImagePlus } from "lucide-svelte"
 	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
-	import type { IScriptCard } from "$lib/types/collection"
+	import type { Script } from "$lib/types/collection"
 	import ScriptHeader from "../ScriptHeader.svelte"
 	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
 	import ZipDownload from "$lib/components/ZIPDownload.svelte"
@@ -25,7 +25,6 @@
 
 	const { form, errors, enhance, validate } = superForm(data.form, {
 		multipleSubmits: "prevent",
-		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
 		validators: scriptSchema
 	})
@@ -48,7 +47,7 @@
 	let showSearchResult: boolean = false
 
 	let isFocused: boolean = true
-	let script: IScriptCard = {
+	let script: Script = {
 		title: "",
 		description: "",
 		content: "",
@@ -60,29 +59,71 @@
 		min_gp: 0,
 		max_gp: 0,
 		id: "",
-		search_script: "",
-		updated_at: "",
-		scripts_protected: {
-			assets_alt: "",
-			assets_path: "",
+		protected: {
+			assets: "",
 			author_id: "",
-			created_at: null,
 			id: "",
 			revision: 0,
-			profiles_public: {
-				username: profile?.username || "",
-				avatar_url: profile?.avatar_url || ""
-			}
+			username: profile?.username ?? "",
+			avatar: profile?.avatar ?? "",
+			revision_date: ""
 		},
-		emojiTooltips: []
+		fts: undefined,
+		search: "",
+		tooltip_emojis: [],
+		tooltip_names: [],
+		url: "",
+		created_at: ""
 	}
+	$form.content = `### {$title} by {$author}
+
+Script ID: {$id}
+
+Latest revision: {$revision}
+
+Updated at: {$last_revision_full_date}
+
+Date updated at: {$revision_date}
+
+Time of update: {$last_revision_time}
+
+{$description}
+
+Can get {$min_xp}-{$max_xp} xp/h and {$min_gp}-{$max_gp} gp/h.
+
+#### Required Setup:
+- Item A visible in bank
+- Item B visible in bank
+
+#### Features:
+- Does this cool task
+- Supports X method
+- Supports Y method
+
+#### Known Issues:
+- Buggy at doing Z.
+
+#### Additional information:
+You need quest ABC completed to use this.
+`
 
 	$: addToolTips(script, categories, subcategories)
 
-	$: if ($form.categories) validate("categories")
-	$: if ($form.subcategories) validate("subcategories")
-	$: if ($form.min_xp) validate("min_xp")
-	$: if ($form.max_xp) validate("max_xp")
+	$: if (
+		$form.categories ||
+		$form.subcategories ||
+		$form.min_xp ||
+		$form.max_xp ||
+		$form.min_gp ||
+		$form.max_gp
+	)
+		validate()
+
+	$: {
+		script.categories = $form.categories
+		script.subcategories = $form.subcategories
+		addToolTips(script, categories, subcategories)
+	}
 
 	function onChangeCover(e: Event): void {
 		if (coverFiles.length === 0) {
@@ -149,6 +190,7 @@
 
 	$: script.title = $form.title
 	$: script.description = $form.description
+	$: script.content = $form.content
 	$: script.categories = $form.categories
 	$: script.subcategories = $form.subcategories
 
@@ -203,9 +245,17 @@
 				</header>
 
 				<StatsHeader
-					experience={Math.random() * 1000000}
-					gold={Math.random() * 1000000}
-					runtime={Math.random() * 1000000000}
+					stats={{
+						id: "",
+						experience: Math.random() * 1000000,
+						gold: Math.random() * 1000000,
+						runtime: Math.random() * 1000000000,
+						levels: 0,
+						online_users: [],
+						online_users_total: 0,
+						unique_users: [],
+						unique_users_total: 0
+					}}
 				/>
 
 				{#if profile}
@@ -223,7 +273,7 @@
 					</div>
 				{/if}
 
-				<ScriptArticle content={$form.content} />
+				<ScriptArticle content={replaceScriptContent(script)} />
 			</div>
 		</div>
 	{/if}
@@ -303,11 +353,6 @@
 		</div>
 
 		<article class="variant-ringed-secondary p-8 my-8 mx-auto xs:w-4/5 md:w-4/5 lg:w-3/4">
-			{#if $errors._errors && $errors._errors.length > 0}
-				{#each $errors._errors as error}
-					<div class="flex justify-center">{error}</div>
-				{/each}
-			{/if}
 			<header class="text-center my-8">
 				<h3>Update Script</h3>
 			</header>
@@ -342,7 +387,7 @@
 							{#if coverStyle === 0}
 								<span>Must be exactly 300x200 pixels and JPG format.</span>
 							{:else if coverStyle === 1}
-								<span class="text-success-500">{$form.cover.name}</span>
+								<span class="text-success-500">{$form.cover?.name}</span>
 							{:else if $errors.cover && $errors.cover.length > 0}
 								{#each $errors.cover as error}
 									{#if error}
@@ -384,7 +429,7 @@
 							{#if bannerStyle === 0}
 								<span>Must be exactly 1920x768 pixels and JPG format.</span>
 							{:else if bannerStyle === 1}
-								<span class="text-success-500">{$form.banner.name}</span>
+								<span class="text-success-500">{$form.banner?.name}</span>
 							{:else if $errors.banner && $errors.banner.length > 0}
 								{#each $errors.banner as error}
 									{#if error}
@@ -396,34 +441,34 @@
 					</FileDropzone>
 				</label>
 
-				<FormInput title="Title" bind:value={$form.title} bind:error={$errors.title} />
+				<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
 
 				<FormTextarea
 					title="Description"
 					extraTitle=" (recommended 60-80 characters)"
 					bind:value={$form.description}
-					bind:error={$errors.description}
+					bind:errors={$errors.description}
 					h={"h-18"}
 				/>
 
 				<MultiSelect
 					title="Categories"
 					bind:value={$form.categories}
-					bind:error={$errors.categories}
+					errors={$errors.categories?._errors}
 					entries={categories}
 				/>
 
 				<MultiSelect
 					title="Subcategories"
 					bind:value={$form.subcategories}
-					bind:error={$errors.subcategories}
+					errors={$errors.subcategories?._errors}
 					entries={subcategories}
 				/>
 
 				<FormTextarea
 					title="Content"
 					bind:value={$form.content}
-					bind:error={$errors.content}
+					bind:errors={$errors.content}
 					h={"h-64"}
 				/>
 
@@ -535,8 +580,8 @@
 							{#if scriptStyle === 0}
 								<span>Must be a Simba script file.</span>
 							{:else if scriptStyle === 1}
-								<span class="text-success-500">{$form.script.name}</span>
-							{:else if $errors.script && $errors.script.length > 0}
+								<span class="text-success-500">{$form.script?.name}</span>
+							{:else if $errors.script && $errors.script?.length > 0}
 								{#each $errors.script as error}
 									{#if error}
 										<small class="flex justify-center text-error-500">{error}</small>
@@ -546,6 +591,14 @@
 						</svelte:fragment>
 					</FileDropzone>
 				</label>
+
+				<div class="my-8">
+					{#if $errors._errors && $errors._errors.length > 0}
+						{#each $errors._errors as error}
+							<div class="flex justify-center text-error-500">{error}</div>
+						{/each}
+					{/if}
+				</div>
 
 				<div class="flex justify-between">
 					<a href="./">

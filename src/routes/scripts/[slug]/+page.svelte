@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from "$app/environment"
 	import { goto } from "$app/navigation"
-	import { canDownload, canEdit, updateWarning } from "$lib/backend/data"
+	import { canDownload, canEdit, getScriptsStats, updateWarning } from "$lib/backend/data"
 	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
 	import ZipDownload from "$lib/components/ZIPDownload.svelte"
 
@@ -16,25 +16,24 @@
 	import ScriptHeader from "../ScriptHeader.svelte"
 	import ScriptArticle from "../ScriptArticle.svelte"
 	import StatsHeader from "../StatsHeader.svelte"
-	import { encodeSEO } from "$lib/utils"
+	import { onMount } from "svelte"
+	import { replaceScriptContent } from "$lib/utils"
+	import ScriptData from "./ScriptData.svelte"
+	import { BadgeAlert, BadgeCheck } from "lucide-svelte"
 
 	export let data
 
-	let { script, dismissed, profile } = data
-	$: ({ script, dismissed, profile } = data)
-	$: if (browser)
-		if (!$page.url.pathname.includes("-by-"))
-			history.replaceState(
-				{},
-				"",
-				"/scripts/" +
-					encodeSEO(script.title + " by " + script.scripts_protected.profiles_public.username)
-			)
+	let { script, dismissed, profile, supabaseClient } = data
+	$: ({ script, dismissed, profile, supabaseClient } = data)
+
+	onMount(() => {
+		if (!$page.url.pathname.includes("-by-")) history.replaceState({}, "", "/scripts/" + script.url)
+	})
 
 	function warningDismissed(r: boolean) {
 		if (r) {
 			updateWarning(data.supabaseClient)
-			if (browser) document.cookie = `warningDismissed=true;max-age=31536000;path="/"`
+			if (browser) document.cookie = `warning_dismissed=true;max-age=31536000;path="/"`
 		} else goto("/scripts")
 	}
 
@@ -80,13 +79,15 @@
 
 	if (!profile) toastStore.trigger(t)
 
+	const scriptStats = getScriptsStats(supabaseClient, script.id)
+
 	const headTitle = script.title + " - WaspScripts"
 	const headDescription = "RuneScape OSRS Color Bot - " + script.description
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, " +
 		script.subcategories
-	const headAuthor = script.scripts_protected.profiles_public.username
-	const headImage = script?.scripts_protected.assets_path + "banner.jpg"
+	const headAuthor = script.protected.username
+	const headImage = script.protected.assets + "banner.jpg"
 </script>
 
 <svelte:head>
@@ -112,40 +113,73 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<div>
-	<ScriptHeader title={script.title} username={script.scripts_protected.profiles_public.username}>
+<main>
+	<ScriptHeader title={script.title} username={script.protected.username ?? ""}>
 		<img
 			class="z-0 absolute object-cover h-full w-full"
-			src={script?.scripts_protected.assets_path + "banner.jpg"}
-			alt={script?.scripts_protected.assets_alt}
+			src={script.protected.assets + "banner.jpg"}
+			alt="Script banner"
 			loading="lazy"
 		/>
 	</ScriptHeader>
 
 	<div class="container mt-80 mx-auto mb-6 max-w-lg md:max-w-2xl flex-grow">
 		<header class="my-8">
-			<h3 class="text-center text-secondary-500 text-shadow drop-shadow-2xl">
+			<h3 class="my-4 text-center text-secondary-500 text-shadow drop-shadow-2xl">
 				{script.description}
 			</h3>
 
-			{#if !script.published && canEdit(profile, script.scripts_protected.author_id)}
+			<form method="POST" class="grid">
+				{#if script.protected.broken}
+					<h4 class="text-error-500 my-2">
+						This script has been reported broken and it might not work.
+					</h4>
+				{/if}
+				<div class="flex my-2">
+					{#if script.protected.broken && profile?.roles.tester}
+						<button
+							type="submit"
+							class="mx-auto btn variant-glass-success"
+							formaction="?/clear&id={script.id}"
+						>
+							<BadgeCheck class="mr-2" /> Clear reports
+						</button>
+					{/if}
+					<button
+						type="submit"
+						class="mx-auto btn variant-glass-error"
+						formaction="?/report&id={script.id}"
+					>
+						Report broken <BadgeAlert class="ml-2" />
+					</button>
+				</div>
+			</form>
+			{#if !script.published && canEdit(profile, script.protected.author_id)}
 				<h4 class="my-4 text-center text-error-500 text-shadow drop-shadow-2xl">Unpublished</h4>
 			{/if}
 		</header>
 
-		<StatsHeader
-			experience={script.stats_scripts.experience}
-			gold={script.stats_scripts.gold}
-			runtime={script.stats_scripts.runtime}
-		/>
+		{#await scriptStats}
+			<header class="text-center">
+				<h4>Total Experience Gained: ...</h4>
+				<h4>Total Gold Gained: ...</h4>
+				<h4>Total Runtime: ...</h4>
+			</header>
+		{:then stats}
+			<StatsHeader {stats} />
+		{/await}
+
+		{#if canEdit(profile, script.protected.author_id)}
+			<ScriptData id={script.id} {scriptStats} />
+		{/if}
 
 		{#if profile}
 			<div class="text-center">
 				{#if canDownloadScript()}
 					<div class="py-12 grid justify-center justify-items-center gap-8">
-						<AdvancedButton {script} rev={script.scripts_protected.revision} />
+						<AdvancedButton {script} rev={script.protected.revision} />
 						<ZipDownload bind:profile />
-						<EditButton author_id={script.scripts_protected.author_id} />
+						<EditButton author_id={script.protected.author_id} />
 					</div>
 
 					<h4 class="pt-4">
@@ -164,6 +198,6 @@
 			</div>
 		{/if}
 
-		<ScriptArticle content={script.content} />
+		<ScriptArticle content={replaceScriptContent(script)} />
 	</div>
-</div>
+</main>

@@ -24,7 +24,7 @@
 	import { browser } from "$app/environment"
 	import { invalidate } from "$app/navigation"
 	import { onMount } from "svelte"
-	import type { AuthChangeEvent, Session } from "@supabase/supabase-js"
+	import type { AuthChangeEvent, RealtimeChannel, Session } from "@supabase/supabase-js"
 	export let data
 
 	let { supabaseClient, session } = data
@@ -41,8 +41,42 @@
 			}
 		)
 
+		let profilesRolesSubscription: RealtimeChannel | null = null
+		let profilesSubscriptionsSubscription: RealtimeChannel | null = null
+		if (session) {
+			profilesRolesSubscription = supabaseClient
+				.channel("profiles-roles-changes")
+				.on(
+					"postgres_changes",
+					{
+						event: "UPDATE",
+						schema: "profiles",
+						table: "roles",
+						filter: "id=eq." + session.user.id
+					},
+					() => invalidate("supabase:auth")
+				)
+				.subscribe()
+
+			profilesSubscriptionsSubscription = supabaseClient
+				.channel("profiles-roles-changes")
+				.on(
+					"postgres_changes",
+					{
+						event: "UPDATE",
+						schema: "profiles",
+						table: "subscriptions",
+						filter: "id=eq." + session.user.id
+					},
+					() => invalidate("supabase:auth")
+				)
+				.subscribe()
+		}
+
 		return () => {
 			subscription.unsubscribe()
+			if (profilesRolesSubscription) profilesRolesSubscription.unsubscribe()
+			if (profilesSubscriptionsSubscription) profilesSubscriptionsSubscription.unsubscribe()
 		}
 	})
 </script>
@@ -51,7 +85,7 @@
 	<Modal regionBody="overflow-y-scroll max-h-96" />
 {/if}
 <!-- App Shell -->
-<AppShell regionPage="relative" slotPageHeader="sticky top-0 z-10">
+<AppShell regionPage="relative" slotPageHeader="sticky top-0 z-10" slotPageFooter="grid">
 	<svelte:fragment slot="pageHeader">
 		<div
 			class="backdrop-blur transition-colors duration-500 border-b dark:border-surface-50/[0.06]

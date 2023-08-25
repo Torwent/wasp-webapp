@@ -4,9 +4,9 @@
 	import { cropString } from "$lib/utils"
 	import { onMount } from "svelte"
 	import { browser } from "$app/environment"
-	import type { EmojiTooltip, IScriptCard } from "$lib/types/collection"
-	export let script: IScriptCard
+	import type { Script } from "$lib/types/collection"
 
+	export let script: Script
 	export let imgElement: HTMLImageElement | undefined = browser ? new Image() : undefined
 
 	const defaultCover =
@@ -25,11 +25,10 @@
 		return path + "cover.jpg"
 	}
 
-	let imgLink: string = getCover(script.scripts_protected.assets_path)
-	$: imgLink = getCover(script.scripts_protected.assets_path)
+	let imgLink: string = getCover(script.protected.assets)
+	$: imgLink = getCover(script.protected.assets)
+	$: script = script
 
-	let tooltips: EmojiTooltip[] = script.emojiTooltips
-	$: tooltips = script.emojiTooltips
 	onMount(async () => {
 		const response = await fetch(imgLink)
 		if (response.status != 200) imgLink = defaultCover
@@ -38,13 +37,7 @@
 
 <div class="card w-[300px] shadow-sm card-hover">
 	<header class="group h-[200px] p-0">
-		<img
-			bind:this={imgElement}
-			src={imgLink}
-			alt={script.scripts_protected.assets_alt}
-			class="rounded-t"
-			loading="lazy"
-		/>
+		<img bind:this={imgElement} src={imgLink} alt="Script cover" class="rounded-t" loading="lazy" />
 	</header>
 	<section class="p-4">
 		<header class="h-12">
@@ -53,8 +46,8 @@
 			</h5>
 			<span class="text-xs whitespace-nowrap text-primary-600 dark:text-secondary-500 drop-shadow">
 				by
-				<a href="/developers/{script.scripts_protected.profiles_public.username}" class="permalink">
-					{script.scripts_protected.profiles_public.username}
+				<a href="/developers/{script.protected.username}" class="permalink">
+					{script.protected.username}
 				</a>
 				{#if !script.published}<small class="text-error-500">Unpublished</small>{/if}
 			</span>
@@ -64,15 +57,15 @@
 		</article>
 	</section>
 	<footer class="card-footer flex h-8 w-full justify-end">
-		{#each tooltips as tooltip, i}
+		{#each script.tooltip_emojis as emoji, i}
 			<button use:popup={getPopup(script.id + "-hover-" + i.toString())}>
-				{tooltip.icon}
+				{emoji}
 			</button>
 			<div
 				class="card variant-filled-secondary p-2"
 				data-popup={script.id + "-hover-" + i.toString()}
 			>
-				{tooltip.tooltip}
+				{script.tooltip_names[i]}
 				<div class="arrow variant-filled-secondary" />
 			</div>
 		{/each}

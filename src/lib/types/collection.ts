@@ -1,19 +1,16 @@
 import type { Database } from "$lib/types/supabase"
 
-export type ProfilePublic = Database["public"]["Tables"]["profiles_public"]["Row"]
-export type ProfileProtected = Database["public"]["Tables"]["profiles_protected"]["Row"]
-export type ProfilePrivate = Database["public"]["Tables"]["profiles_private"]["Row"]
+export type Prices = Database["public"]["Tables"]["prices"]["Row"]
 
-type ProfilePublicUsername = {
-	profiles_public: {
-		username: Database["public"]["Tables"]["profiles_public"]["Row"]["username"]
-		avatar_url: Database["public"]["Tables"]["profiles_public"]["Row"]["avatar_url"]
-	}
-}
+export type ProfileBase = Database["profiles"]["Tables"]["profiles"]["Row"]
+export type ProfileRoles = Database["profiles"]["Tables"]["roles"]["Row"]
+export type ProfilePrivate = Database["profiles"]["Tables"]["private"]["Row"]
+export type ProfileSubscription = Database["profiles"]["Tables"]["subscriptions"]["Row"]
 
-export interface Profile extends ProfilePublic {
-	profiles_protected: ProfileProtected
-	profiles_private: ProfilePrivate
+export interface Profile extends ProfileBase {
+	private: ProfilePrivate
+	roles: ProfileRoles
+	subscriptions: ProfileSubscription
 }
 
 export type Stats = Database["public"]["Tables"]["stats"]["Row"]
@@ -22,17 +19,18 @@ export type FAQEntry = Database["public"]["Tables"]["faq_questions"]["Row"]
 export type ErrorEntry = Database["public"]["Tables"]["faq_errors"]["Row"]
 
 export type Tutorial = Database["public"]["Tables"]["tutorials"]["Row"]
-export interface TutorialWithAuthor extends Tutorial, ProfilePublicUsername {}
 
-export type Developer = Database["public"]["Tables"]["developers"]["Row"]
-export interface DeveloperWithUsername extends Developer, ProfilePublicUsername {}
+export type Scripter = Database["profiles"]["Tables"]["scripters"]["Row"]
+export interface ScripterWithProfile extends Scripter {
+	profiles: ProfileBase
+}
 
-export type Category = Database["public"]["Tables"]["scripts_categories"]["Row"]
-export type SubCategory = Database["public"]["Tables"]["scripts_subcategories"]["Row"]
+export type Category = Database["scripts"]["Tables"]["categories"]["Row"]
+export type SubCategory = Database["scripts"]["Tables"]["subcategories"]["Row"]
 
 export interface EmojiTooltip {
-	icon: string
-	tooltip: string
+	emoji: string
+	name: string
 }
 
 export interface CheckboxType {
@@ -43,17 +41,12 @@ export interface CheckboxType {
 	checked: boolean
 }
 
-export type ScriptPublic = Database["public"]["Tables"]["scripts_public"]["Row"]
-export type ScriptProtected = Database["public"]["Tables"]["scripts_protected"]["Row"]
-export interface ScriptsProtectedWithUsername extends ScriptProtected, ProfilePublicUsername {}
+export type ScriptBase = Database["scripts"]["Tables"]["scripts"]["Row"]
+export type ScriptProtected = Database["scripts"]["Tables"]["protected"]["Row"]
 
-export type ScriptStats = Database["public"]["Tables"]["stats_scripts"]["Row"]
+export type StatsSimba = Database["scripts"]["Tables"]["stats_simba"]["Row"]
+export type StatsSite = Database["scripts"]["Tables"]["stats_site"]["Row"]
 
-export interface IScriptCard extends ScriptPublic {
-	scripts_protected: ScriptsProtectedWithUsername
-	emojiTooltips: EmojiTooltip[]
-}
-
-export interface Script extends IScriptCard {
-	stats_scripts: ScriptStats
+export interface Script extends ScriptBase {
+	protected: ScriptProtected
 }

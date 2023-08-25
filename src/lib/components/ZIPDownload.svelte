@@ -25,7 +25,7 @@
 	]
 
 	$: isPremium = canDownload(profile)
-	$: dismissed = profile.profiles_private.dismissed_warning
+	$: dismissed = profile.private.warning
 	$: zipName = isPremium ? "wasp-premium.zip" : "wasp-free.zip"
 
 	function availableZIPs(isPremium: boolean, dismissed: boolean) {
@@ -83,10 +83,9 @@
 		if (!scripts) return console.error("Failed to retrieve scripts information!")
 
 		scripts = scripts.filter((script) => {
-			console.log(zipName, " and ", ALL_ZIPS)
-			if (ALL_ZIPS[0] === zipName)
+			if (ALL_ZIPS[0] === zipName) {
 				return script.categories.includes("Official") && script.categories.includes("Premium")
-			else if (ALL_ZIPS[1] === zipName)
+			} else if (ALL_ZIPS[1] === zipName)
 				return script.categories.includes("Official") && script.categories.includes("Free")
 			else if (ALL_ZIPS[2] === zipName) return script.categories.includes("Official")
 			else if (ALL_ZIPS[3] === zipName)
@@ -98,29 +97,33 @@
 			else return true
 		})
 
-		scripts.forEach((s) => console.log(s.title))
-
 		let urls: (string | false)[] = []
 		let promises = []
+		let scriptIds = []
 
 		for (let script of scripts) {
+			console.log(script.title)
 			promises.push(
 				new Promise<string | false>(async (resolve) => {
 					const result = await getSignedURL(
 						$page.data.supabaseClient,
 						"scripts",
-						script.id + "/" + pad(script.scripts_protected.revision, 9),
+						script.id + "/" + pad(script.protected.revision, 9),
 						"script.simba"
 					)
 					progress += 1
 					resolve(result)
 				})
 			)
+			scriptIds.push(script.id)
 		}
 
 		urls = await Promise.all(promises)
 
 		const { blobs, fileNames } = await downloadGroup(scripts, urls)
+		await fetch("/api/scripts", { body: JSON.stringify({ ids: scriptIds }), method: "POST" }).catch(
+			(error) => console.error(error)
+		)
 		return await exportZip(blobs, fileNames)
 	}
 

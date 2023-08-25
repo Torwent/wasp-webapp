@@ -1,13 +1,12 @@
 <script lang="ts">
 	import { superForm } from "sveltekit-superforms/client"
 	import { FileDropzone, focusTrap } from "@skeletonlabs/skeleton"
-	import { cropString } from "$lib/utils"
+	import { cropString, replaceScriptContent } from "$lib/utils"
 	import { scriptSchema } from "$lib/backend/schemas"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
 	import MultiSelect from "$lib/components/forms/MultiSelect.svelte"
 	import { FileCode, ImagePlus } from "lucide-svelte"
-	import { redirect } from "@sveltejs/kit"
 	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
 	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
@@ -16,20 +15,18 @@
 	import ScriptArticle from "../../ScriptArticle.svelte"
 	import StatsHeader from "../../StatsHeader.svelte"
 	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
+	import { addToolTips, getScriptsStats } from "$lib/backend/data"
 
 	export let data
 
 	const { categories, subcategories } = data
 
-	if (!categories || !subcategories) throw redirect(303, "./")
-
-	let { script, profile } = data
-	$: ({ script, profile } = data)
+	let { script, profile, supabaseClient } = data
+	$: ({ script, profile, supabaseClient } = data)
 
 	const { form, errors, enhance, validate } = superForm(data.form, {
 		dataType: "form",
 		multipleSubmits: "prevent",
-		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
 		validators: scriptSchema
 	})
@@ -45,7 +42,7 @@
 	$form.min_gp = script.min_gp
 	$form.max_gp = script.max_gp
 
-	const defaultBanner = script.scripts_protected.assets_path + "/banner.jpg"
+	const defaultBanner = script.protected.assets + "/banner.jpg"
 	let coverElement: HTMLImageElement | undefined
 	let bannerElement: HTMLImageElement | undefined
 
@@ -63,10 +60,20 @@
 
 	let isFocused: boolean = true
 
-	$: if ($form.categories) validate("categories")
-	$: if ($form.subcategories) validate("subcategories")
+	$: if ($form.categories) validate()
+	$: if ($form.subcategories) validate()
 	$: if ($form.min_xp) validate("min_xp")
 	$: if ($form.max_xp) validate("max_xp")
+
+	$: script.title = $form.title
+	$: script.description = $form.description
+	$: script.content = $form.content
+
+	$: {
+		script.categories = $form.categories
+		script.subcategories = $form.subcategories
+		addToolTips(script, categories, subcategories)
+	}
 
 	function onChangeCover(e: Event): void {
 		if (coverFiles.length === 0) {
@@ -82,7 +89,6 @@
 				return
 			}
 			coverStyle = 1
-			console.log(coverStyle)
 			let reader = new FileReader()
 			reader.onload = function () {
 				if (!coverElement) coverElement = new Image()
@@ -132,13 +138,15 @@
 		})
 	}
 
+	const scriptStats = getScriptsStats(supabaseClient, script.id)
+
 	const headTitle = "Edit " + script.title + " - WaspScripts"
 	const headDescription = "Edit " + script.title
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, " +
 		script.subcategories
-	const headAuthor = script.scripts_protected.profiles_public.username
-	const headImage = script?.scripts_protected.assets_path + "banner.jpg"
+	const headAuthor = script.protected.username
+	const headImage = script?.protected.assets + "banner.jpg"
 </script>
 
 <svelte:head>
@@ -168,11 +176,7 @@
 <div>
 	{#if showScriptPage}
 		<div>
-			<ScriptHeader
-				title={$form.title}
-				username={script.scripts_protected.profiles_public.username}
-				hasLink={false}
-			>
+			<ScriptHeader title={$form.title} username={script.protected.username ?? ""} hasLink={false}>
 				<img
 					bind:this={bannerElement}
 					class="z-0 absolute object-cover h-full w-full"
@@ -189,16 +193,20 @@
 					</h3>
 				</header>
 
-				<StatsHeader
-					experience={script.stats_scripts.experience}
-					gold={script.stats_scripts.gold}
-					runtime={script.stats_scripts.runtime}
-				/>
+				{#await scriptStats}
+					<header class="text-center">
+						<h4>Total Experience Gained: ...</h4>
+						<h4>Total Gold Gained: ...</h4>
+						<h4>Total Runtime: ...</h4>
+					</header>
+				{:then stats}
+					<StatsHeader {stats} />
+				{/await}
 
 				{#if profile}
 					<div class="text-center">
 						<div class="py-12 grid justify-center justify-items-center gap-8">
-							<AdvancedButton {script} noDownload={true} rev={script.scripts_protected.revision} />
+							<AdvancedButton {script} noDownload={true} rev={script.protected.revision} />
 							<ZipDownload bind:profile noDownload={true} />
 						</div>
 
@@ -210,7 +218,7 @@
 					</div>
 				{/if}
 
-				<ScriptArticle content={$form.content} />
+				<ScriptArticle content={replaceScriptContent(script)} />
 			</div>
 		</div>
 	{/if}
@@ -290,11 +298,6 @@
 		</div>
 
 		<article class="variant-ringed-secondary p-8 my-8 mx-auto xs:w-4/5 md:w-4/5 lg:w-3/4">
-			{#if $errors._errors && $errors._errors.length > 0}
-				{#each $errors._errors as error}
-					<div class="flex justify-center">{error}</div>
-				{/each}
-			{/if}
 			<header class="text-center my-8">
 				<h3>Update Script</h3>
 			</header>
@@ -385,34 +388,34 @@
 					</FileDropzone>
 				</label>
 
-				<FormInput title="Title" bind:value={$form.title} bind:error={$errors.title} />
+				<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
 
 				<FormTextarea
 					title="Description"
 					extraTitle=" (recommended 60-80 characters)"
 					bind:value={$form.description}
-					bind:error={$errors.description}
+					bind:errors={$errors.description}
 					h={"h-18"}
 				/>
 
 				<MultiSelect
 					title="Categories"
 					bind:value={$form.categories}
-					bind:error={$errors.categories}
+					errors={$errors.categories?._errors}
 					entries={categories}
 				/>
 
 				<MultiSelect
 					title="Subcategories"
 					bind:value={$form.subcategories}
-					bind:error={$errors.subcategories}
+					errors={$errors.subcategories?._errors}
 					entries={subcategories}
 				/>
 
 				<FormTextarea
 					title="Content"
 					bind:value={$form.content}
-					bind:error={$errors.content}
+					bind:errors={$errors.content}
 					h={"h-64"}
 				/>
 
@@ -550,6 +553,14 @@
 							bind:checked={script.published}
 						/>
 					</label>
+				</div>
+
+				<div class="my-8">
+					{#if $errors._errors && $errors._errors.length > 0}
+						{#each $errors._errors as error}
+							<div class="flex justify-center text-error-500">{error}</div>
+						{/each}
+					{/if}
 				</div>
 
 				<div class="flex justify-between">

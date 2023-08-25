@@ -3,7 +3,11 @@
 </script>
 
 <div class="flex justify-center">
-	<a href="https://discord.com/invite/YMYUahmww9" class="decoration-transparent" aria-label="Join WaspScripts Discord server">
+	<a
+		href="https://discord.com/invite/YMYUahmww9"
+		class="decoration-transparent"
+		aria-label="Join WaspScripts Discord server"
+	>
 		<button
 			name="Discord button"
 			type="button"

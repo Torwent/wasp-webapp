@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { TutorialWithAuthor } from "$lib/types/collection"
+	import type { Tutorial } from "$lib/types/collection"
 	import { encodeSEO } from "$lib/utils"
-	export let tutorial: TutorialWithAuthor
+	export let tutorial: Tutorial
 
-	$: link = "/tutorials/" + encodeSEO(tutorial.title + " by " + tutorial.profiles_public.username)
+	$: link = "/tutorials/" + encodeSEO(tutorial.title + " by " + tutorial.username)
 </script>
 
 <div
@@ -17,14 +17,15 @@
 		<div class="flex flex-col p-3">
 			<div class="text-md font-semibold text-primary-500 text-shadow truncate">
 				{tutorial.title}
+				{#if !tutorial.published}<small class="text-error-500">Unpublished</small>{/if}
 			</div>
 
 			<small class="text-xs text-surface-400 truncate mt-1">
 				by <a
-					href="/developers/{encodeSEO(tutorial.profiles_public.username)}"
+					href="/developers/{encodeSEO(tutorial.username)}"
 					class="permalink text-secondary-500 font-semibold text-shadow"
 				>
-					{tutorial.profiles_public.username}
+					{tutorial.username}
 				</a>
 			</small>
 

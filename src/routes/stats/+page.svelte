@@ -32,11 +32,6 @@
 		invalidate("supabase:stats")
 	}
 
-	function rerunLoad() {
-		invalidate("supabase:stats")
-		setTimeout(rerunLoad, 5000)
-	}
-
 	function sortBy(header: keyof Stats) {
 		search = ""
 		ascending = selectedHeader === header ? !ascending : false
@@ -47,14 +42,28 @@
 		})
 	}
 
-	const { range } = data
+	const { range, supabaseClient } = data
 
-	let count = 0
-	$: count = (data.count as number) || 0
+	let { count } = data.stats
+	$: ({ count } = data.stats)
 
+	$: console.log(data.stats.stats[0])
 	onMount(() => {
 		loading = false
-		rerunLoad()
+		const subscription = supabaseClient
+			.channel("stats-changed")
+			.on(
+				"postgres_changes",
+				{
+					event: "UPDATE",
+					schema: "public",
+					table: "stats_simba"
+				},
+				() => invalidate("supabase:stats")
+			)
+			.subscribe()
+
+		return () => subscription.unsubscribe()
 	})
 
 	$: if (browser) replaceQuery({ search: search })
@@ -150,7 +159,7 @@
 			</tr>
 		</thead>
 		<tbody>
-			{#each data.stats as entry}
+			{#each data.stats.stats as entry}
 				<tr
 					class="bg-white border-b dark:bg-stone-800 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-600"
 				>
@@ -158,22 +167,12 @@
 						scope="row"
 						class="py-4 px-6 font-medium text-stone-900 whitespace-nowrap dark:text-white w-96"
 					>
-						{#if entry.username}
-							{entry.username}
-						{:else}
-							Anonymous
-						{/if}
+						{entry.username !== "" ? entry.username : "Anonymous"}
 					</th>
-					<td class="py-4 px-6 w-64">
-						{formatRSNumber(entry.experience || 0)}
-					</td>
-					<td class="py-4 px-6 w-64">
-						{formatRSNumber(entry.gold || 0)}
-					</td>
+					<td class="py-4 px-6 w-64">{formatRSNumber(entry.experience ?? 0)}</td>
+					<td class="py-4 px-6 w-64">{formatRSNumber(entry.gold ?? 0)}</td>
 					<td class="py-4 px-6 w-64">{entry.levels}</td>
-					<td class="py-4 px-6 w-64">
-						{convertTime(entry.runtime || 0)}
-					</td>
+					<td class="py-4 px-6 w-64">{convertTime(entry.runtime ?? 0)}</td>
 				</tr>
 			{/each}
 		</tbody>

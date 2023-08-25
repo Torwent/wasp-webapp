@@ -8,12 +8,12 @@ declare global {
 			supabaseServer: SupabaseClient<Database>
 			getSession(): Promise<Session | null>
 			getProfile(): Promise<Profile | null>
-			warningDismissed: boolean
+			profile: Profile | null
 		}
 		interface PageData {
+			supabaseClient: SupabaseClient<Database>
 			session: Session | null
 			profile: Profile | null
-			warningDismissed: boolean
 		}
 		// interface Error {}
 		// interface Platform {}

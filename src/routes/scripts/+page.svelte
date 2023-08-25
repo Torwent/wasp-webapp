@@ -15,7 +15,7 @@
 	$: ({ profile, scripts } = data)
 
 	let count = 0
-	$: count = (data.count as number) || 0
+	$: count = (scripts.count as number) || 0
 
 	const pageStr = $page.url.searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
@@ -107,13 +107,13 @@
 							on:change={() => handleFilters()}
 						>
 							<input
-								class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-amber-500"
+								class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-primary-500"
 								type="checkbox"
 								id={"checkbox" + checkbox.id}
 								bind:checked={checkbox.checked}
 							/>
 							<label
-								class="form-check-label inline-block cursor-pointer dark:hover:text-amber-100 hover:text-orange-400"
+								class="form-check-label inline-block cursor-pointer hover:text-primary-200"
 								for={"checkbox" + checkbox.id}
 								class:text-amber-500={checkbox.checked}
 							>
@@ -137,7 +137,7 @@
 
 	<main class="container mt-8 mx-auto flex-grow w-[95%] max-h-screen overflow-y-visible">
 		<div>
-			{#if profile && profile.profiles_protected.developer}
+			{#if profile && profile.roles.developer}
 				<a href="/scripts/add" class="block mx-auto w-fit">
 					<button class="btn variant-filled-secondary inline-block">Add Script</button>
 				</a>
@@ -154,7 +154,7 @@
 			<div
 				class="grid gap-8 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 justify-center justify-items-center"
 			>
-				{#each scripts as script}
+				{#each scripts.data as script}
 					<ScriptCard {script} />
 				{/each}
 			</div>

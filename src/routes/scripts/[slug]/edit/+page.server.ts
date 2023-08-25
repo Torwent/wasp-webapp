@@ -7,8 +7,7 @@ import { updateScript } from "$lib/backend/data.server"
 import { encodeSEO } from "$lib/utils"
 
 export const load = async (event) => {
-	const form = superValidate(event, scriptSchema)
-	return { form }
+	return { form: superValidate(event, scriptSchema) }
 }
 
 interface FormFiles {
@@ -18,52 +17,53 @@ interface FormFiles {
 }
 
 export const actions = {
-	default: async ({ request, locals }) => {
-		const { supabaseServer, getProfile } = locals
-		const profile = await getProfile()
-		const formData = await request.formData()
+	default: async ({ request, locals: { supabaseServer, getProfile } }) => {
+		const promises = await Promise.all([getProfile(), request.formData()])
 
-		let files: FormFiles = { cover: undefined, banner: undefined, script: undefined }
+		const profile = promises[0]
+		const data = promises[1]
 
-		const coverFile = formData.get("cover") as File
-		const bannerFile = formData.get("banner") as File
-		const scriptFile = formData.get("script") as File
+		const files: FormFiles = { cover: undefined, banner: undefined, script: undefined }
+
+		const coverFile = data.get("cover") as File
+		const bannerFile = data.get("banner") as File
+		const scriptFile = data.get("script") as File
 
 		if (coverFile.size > 0) files.cover = coverFile
 		if (bannerFile.size > 0) files.banner = bannerFile
 		if (scriptFile.size > 0) files.script = scriptFile
 
-		formData.delete("cover")
-		formData.delete("banner")
-		formData.delete("script")
+		data.delete("cover")
+		data.delete("banner")
+		data.delete("script")
 
-		const form = await superValidate(formData, scriptSchema)
+		const form = await superValidate(data, scriptSchema)
 
 		if (!profile) {
 			const msg = "You need to login to edit a script."
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		if (!form.valid) return fail(400, { form })
 
-		let script = form.data.id ? await getScriptUUID(supabaseServer, form.data.id) : null
+		const script = form.data.id ? await getScriptUUID(supabaseServer, form.data.id) : null
 		if (!script) {
 			const msg = "That script does not exist!"
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
-		if (script.categories.includes("Official") && !profile.profiles_protected.administrator) {
+		if (script.categories.includes("Official") && !profile.roles.administrator) {
 			const msg = "You cannot edit an official script!"
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
-		if (!canEdit(profile, script.scripts_protected.author_id)) {
+		if (!canEdit(profile, script.protected.author_id)) {
 			const msg = "That script does not belong to you!"
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		script.title = form.data.title
@@ -75,14 +75,14 @@ export const actions = {
 		script.max_xp = form.data.max_xp
 		script.min_gp = form.data.min_gp
 		script.max_gp = form.data.max_gp
-		script.published = formData.has("published")
+		script.published = data.has("published")
 
 		let validFiles
 		try {
 			validFiles = await filesEditSchema.safeParseAsync(files)
 		} catch (error) {
 			console.error(error)
-			return setError(form, null, "The files your sent are not valid!")
+			return setError(form, "", "The files your sent are not valid!")
 		}
 
 		if (!validFiles.success) return fail(400, { form })
@@ -97,13 +97,9 @@ export const actions = {
 
 		if (error) {
 			console.error(error)
-			return setError(form, null, error)
+			return setError(form, "", error)
 		}
 
-		throw redirect(
-			303,
-			"/scripts/" +
-				encodeSEO(script.title + " by " + script.scripts_protected.profiles_public.username)
-		)
+		throw redirect(303, "/scripts/" + encodeSEO(script.title + " by " + script.protected.username))
 	}
 }

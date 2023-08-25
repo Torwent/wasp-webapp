@@ -4,19 +4,19 @@ import { scriptSchema } from "$lib/backend/schemas"
 import { filesSchema } from "$lib/backend/schemas.server"
 import { uploadScript } from "$lib/backend/data.server"
 import { encodeSEO } from "$lib/utils"
-import { getScript } from "$lib/backend/data"
-import type { ScriptPublic } from "$lib/types/collection"
+import { scriptExists } from "$lib/backend/data"
+import type { ScriptBase } from "$lib/types/collection"
 
 export const load = async (event) => {
-	const form = superValidate(event, scriptSchema)
-	return { form }
+	return { form: superValidate(event, scriptSchema) }
 }
 
 export const actions = {
-	default: async ({ request, locals }) => {
-		const { supabaseServer, getProfile } = locals
-		const profile = await getProfile()
-		const formData = await request.formData()
+	default: async ({ request, locals: { supabaseServer, getProfile } }) => {
+		const promises = await Promise.all([getProfile(), request.formData()])
+
+		const profile = promises[0]
+		const formData = promises[1]
 
 		const files = {
 			cover: formData.get("cover"),
@@ -33,18 +33,18 @@ export const actions = {
 		if (!profile) {
 			const msg = "You need to login to add a script."
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		if (!form.valid) return fail(400, { form })
 
 		const url = encodeSEO(form.data.title + " by " + profile.username)
 
-		const tmp = await getScript(supabaseServer, url)
+		const tmp = await scriptExists(supabaseServer, url)
 		if (tmp) {
 			const msg = "A script with that name by you already exists! Choose a different name."
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		let validFiles
@@ -52,12 +52,12 @@ export const actions = {
 			validFiles = await filesSchema.safeParseAsync(files)
 		} catch (error) {
 			console.error(error)
-			return setError(form, null, "The files your sent are not valid!")
+			return setError(form, "", "The files your sent are not valid!")
 		}
 
 		if (!validFiles.success) return fail(400, { form })
 
-		const script: ScriptPublic = {
+		const script: ScriptBase = {
 			title: form.data.title,
 			description: form.data.description,
 			content: form.data.content,
@@ -69,11 +69,15 @@ export const actions = {
 			min_gp: form.data.min_gp,
 			max_gp: form.data.max_gp,
 			id: "",
-			updated_at: "",
-			search_script: null
+			fts: undefined,
+			search: "",
+			tooltip_emojis: [],
+			tooltip_names: [],
+			url: "",
+			created_at: ""
 		}
 
-		const { error } = await uploadScript(
+		const { url: script_url, error: err } = await uploadScript(
 			supabaseServer,
 			script,
 			validFiles.data.script,
@@ -81,11 +85,12 @@ export const actions = {
 			validFiles.data.banner
 		)
 
-		if (error) {
-			console.error(error)
-			return setError(form, null, error)
+		if (err) {
+			console.error(err)
+			return setError(form, "", err)
 		}
 
+		if (script_url) throw redirect(303, "./" + script_url)
 		throw redirect(303, "./" + url)
 	}
 }

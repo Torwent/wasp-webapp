@@ -7,8 +7,8 @@ async function checkClientImageDimensions(file: any, w: number, h: number): Prom
 	if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) return false
 
 	return new Promise((resolve) => {
-		let reader = new FileReader()
-		let img = new Image()
+		const reader = new FileReader()
+		const img = new Image()
 
 		reader.onload = function () {
 			img.src = reader.result as string
@@ -109,7 +109,7 @@ export const scriptSchema = z
 	)
 
 export const postSchema = z.object({
-	id: z.number().int("ID must be greater than 0.").optional(),
+	id: z.string().uuid("ID must be a valid UUID.").optional(),
 	title: z
 		.string()
 		.min(4, "Must be more than 3 characters long.")
@@ -127,7 +127,12 @@ export const postSchema = z.object({
 		.number()
 		.int("Level has to be between 0 and 2")
 		.min(0, "Level has to be positive.")
-		.max(2, "Level has to be less than 3.")
+		.max(2, "Level has to be less than 3."),
+	order: z
+		.number()
+		.int("Order has to be a whole number.")
+		.min(0, "Order has to be positive.")
+		.max(1000, "Order has to be less than 1000.")
 })
 
 export const profileSchema = z.object({
@@ -145,7 +150,6 @@ export const developerSchema = z.object({
 		.string()
 		.min(2, "If your name really has less than 2 characters contact Torwent.")
 		.nullable(),
-	username: z.string().min(3, "That username is too short!").max(16, "That username is too large!"),
 	description: z
 		.string()
 		.min(6, "Must be more than 6 characters long.")
@@ -164,4 +168,13 @@ export const developerSchema = z.object({
 		)
 		.nullable(),
 	content: z.string().includes(" ", { message: "This should be a couple of words." }).nullable()
+})
+
+export const premiumSchema = z.object({
+	plan: z.string(),
+	code: z
+		.string()
+		.min(6, "Must be more than 6 characters long.")
+		.max(12, "Must be less than 12 characters long.")
+		.optional()
 })

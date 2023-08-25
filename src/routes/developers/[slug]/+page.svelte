@@ -6,7 +6,7 @@
 	import { page } from "$app/stores"
 	import { browser } from "$app/environment"
 	import { invalidate } from "$app/navigation"
-	import type { IScriptCard } from "$lib/types/collection"
+	import type { Script } from "$lib/types/collection"
 	import { onMount } from "svelte"
 	import ScriptCard from "$lib/components/ScriptCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
@@ -17,7 +17,7 @@
 	$: ({ profile, developer, scripts } = data)
 
 	let count = 0
-	$: count = (data.count as number) || 0
+	$: count = (scripts.count as number) || 0
 
 	const pageStr = $page.url.searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
@@ -38,12 +38,12 @@
 		invalidate("supabase:developer")
 	}
 
-	function canSeeScript(script: IScriptCard) {
+	function canSeeScript(script: Script) {
 		if (script.published) return true
 		if (!profile) return false
-		if (profile.profiles_protected.administrator) return true
-		if (profile.profiles_protected.moderator) return true
-		return script.scripts_protected.author_id === profile.id
+		if (profile.roles.administrator) return true
+		if (profile.roles.moderator) return true
+		return script.protected.author_id === profile.id
 	}
 
 	onMount(() => (loading = false))
@@ -51,12 +51,12 @@
 	$: replaceQuery({ page: currentPage.toString() })
 	$: replaceQuery({ page: "1", search: search })
 
-	const headTitle = developer.profiles_public.username + " - WaspScripts"
+	const headTitle = developer.profiles.username + " - WaspScripts"
 	const headDescription = developer.description
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Developer, " +
-		developer.profiles_public.username
-	const headAuthor = developer.profiles_public.username
+		developer.profiles.username
+	const headAuthor = developer.profiles.username
 	const headImage =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
@@ -90,7 +90,7 @@
 			<header>
 				<h3 class="font-bold text-2xl">
 					{#if developer.realname && developer.realname != ""} {developer.realname} / {/if}
-					{developer.profiles_public.username}
+					{developer.profiles.username}
 				</h3>
 			</header>
 		</div>
@@ -104,7 +104,7 @@
 			{/if}
 			{#if developer.paypal_id && developer.paypal_id != ""}
 				<div class="w-full mx-auto">
-					<PayPal paypal_id={developer.paypal_id} username={developer.profiles_public.username} />
+					<PayPal paypal_id={developer.paypal_id} username={developer.profiles.username} />
 				</div>
 			{/if}
 		</div>
@@ -139,7 +139,7 @@
 		<div
 			class="grid gap-8 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 justify-center justify-items-center"
 		>
-			{#each scripts as script}
+			{#each scripts.data as script}
 				{#if canSeeScript(script)}
 					<ScriptCard {script} />
 				{/if}

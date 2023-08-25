@@ -3,13 +3,13 @@ import { encodeSEO } from "$lib/utils"
 import { error, redirect } from "@sveltejs/kit"
 
 export const load = async ({ parent }) => {
-	const { developersData, range } = await parent()
-	const { data, count, error: err } = developersData
+	const { scripterData, range } = await parent()
+	const { data, count, error: err } = scripterData
 
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issure on your end! - SELECT developers failed
+			`Server error, this is probably not an issue on your end! - SELECT developers failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -17,7 +17,7 @@ export const load = async ({ parent }) => {
 		)
 
 	if (!browser && data.length === 1)
-		throw redirect(303, "/developers/" + encodeSEO(data[0].profiles_public.username))
+		throw redirect(303, "/developers/" + encodeSEO(data[0].profiles.username))
 
 	return { developers: data, count, range }
 }

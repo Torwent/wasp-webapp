@@ -1,42 +1,10 @@
 import { browser } from "$app/environment"
-import { addToolTips, getCheckBoxes } from "$lib/backend/data"
-import type { Script } from "$lib/types/collection"
-import { encodeSEO } from "$lib/utils"
-import type { SupabaseClient } from "@supabase/supabase-js"
+import type { CheckboxType, Script } from "$lib/types/collection"
 import { error, redirect } from "@sveltejs/kit"
-
-async function getScripts(
-	supabase: SupabaseClient,
-	search: string,
-	categories: string[],
-	subcategories: string[],
-	ascending: boolean,
-	start: number,
-	finish: number
-) {
-	let query = supabase
-		.from("scripts_public")
-		.select(
-			`id, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-			scripts_protected (assets_path, author_id, assets_alt, revision, profiles_public (username, avatar_url)),
-			stats_scripts (experience, gold, runtime, levels, total_unique_users, total_current_users, total_monthly_users)`,
-			{ count: "exact" }
-		)
-		.eq("published", true)
-		.contains("categories", categories)
-		.contains("subcategories", subcategories)
-
-	if (search === "") {
-		query = query.order("title", { ascending: ascending }).range(start, finish)
-	} else {
-		query = query.ilike("search_script", "%" + search + "%")
-	}
-
-	return await query.returns<Script[]>()
-}
+import { get, writable } from "svelte/store"
+const checkboxesStore = writable<CheckboxType[] | null>(null)
 
 export const load = async ({ url, parent, depends }) => {
-	const parentPromise = parent()
 	depends("supabase:scripts")
 
 	const pageStr = url.searchParams.get("page") || "-1"
@@ -54,50 +22,84 @@ export const load = async ({ url, parent, depends }) => {
 	const start = (page - 1) * range
 	const finish = start + range
 
-	const { supabaseClient, categories, subcategories } = await parentPromise
+	async function getScripts(search: string, ascending: boolean, start: number, finish: number) {
+		const { supabaseClient } = await parent()
 
-	const {
-		data,
-		error: err,
-		count
-	} = await getScripts(
-		supabaseClient,
-		search,
-		categoriesFilter,
-		subcategoriesFilter,
-		ascending,
-		start,
-		finish
-	)
-	if (err)
-		throw error(
-			500,
-			`Server error, this is probably not an issure on your end! - SELECT scripts failed
+		let query = supabaseClient
+			.schema("scripts")
+			.from("scripts")
+			.select(
+				`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
+				tooltip_emojis, tooltip_names,
+				protected (assets, author_id, revision, username, avatar),
+				stats_simba (experience, gold, runtime, levels, unique_users_total, online_users_total)`,
+				{ count: "estimated" }
+			)
+			.eq("published", true)
+			.limit(1, { foreignTable: "protected" })
+			.limit(1, { foreignTable: "stats_simba" })
+			.contains("categories", categoriesFilter)
+			.contains("subcategories", subcategoriesFilter)
+
+		if (search === "") {
+			query = query.order("title", { ascending: ascending }).range(start, finish)
+		} else {
+			query = query.ilike("search", "%" + search + "%")
+		}
+
+		const { data, error: err, count } = await query.returns<Script[]>()
+
+		if (err)
+			throw error(
+				500,
+				`Server error, this is probably not an issue on your end! - SELECT scripts failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
 			Error hint: ${err.message}`
-		)
+			)
 
-	await new Promise<void>((resolve) => {
-		data.forEach(async (script, index, array) => {
-			await addToolTips(script, categories, subcategories)
+		if (!browser && data.length === 1) throw redirect(303, "/scripts/" + data[0].url)
 
-			if (index === array.length - 1) resolve()
-		})
-	})
+		return { data, count }
+	}
 
-	if (!browser && data.length === 1)
-		throw redirect(
-			303,
-			"/scripts/" +
-				encodeSEO(data[0].title + " by " + data[0].scripts_protected.profiles_public.username)
-		)
+	async function getCheckBoxes() {
+		let result = get(checkboxesStore)
+		if (!result) {
+			result = []
+			let id = 0
+			const { categories, subcategories } = await parent()
+			for (const category of categories) {
+				result.push({
+					id: id++,
+					name: category.name,
+					emoji: category.emoji,
+					main: true,
+					checked: false
+				})
+
+				for (const subcategory of subcategories) {
+					if (category.name === subcategory.category) {
+						result.push({
+							id: id++,
+							name: subcategory.name,
+							emoji: subcategory.emoji,
+							main: false,
+							checked: false
+						})
+					}
+				}
+			}
+			checkboxesStore.set(result)
+		}
+
+		return result
+	}
 
 	return {
-		scripts: data,
-		checkboxes: getCheckBoxes(categories, subcategories),
-		count,
+		scripts: getScripts(search, ascending, start, finish),
+		checkboxes: getCheckBoxes(),
 		range
 	}
 }

@@ -2,17 +2,14 @@ version: "3.9"
 
 services:
   webapp:
-    container_name: "webapp"
+    container_name: webapp
     build:
       context: .
-      args:
-        PUBLIC_SUPABASE_URL: $PUBLIC_SUPABASE_URL
-        PUBLIC_SUPABASE_ANON_KEY: $PUBLIC_SUPABASE_ANON_KEY
     restart: unless-stopped
     networks:
       - hive
     env_file:
-      - .env
+      - stack.env
 
 networks:
   hive:

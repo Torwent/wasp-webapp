@@ -1,7 +1,34 @@
-import type { Script, ScriptPublic } from "$lib/types/collection"
+import type { Profile, Script, ScriptBase } from "$lib/types/collection"
 import { pad } from "$lib/utils"
-import type { SupabaseClient } from "@supabase/supabase-js"
-import { error } from "@sveltejs/kit"
+import type { Provider, SupabaseClient } from "@supabase/supabase-js"
+import { error, redirect } from "@sveltejs/kit"
+
+export async function doLogin(
+	supabase: SupabaseClient,
+	origin: string,
+	searchParams: URLSearchParams
+) {
+	const provider = searchParams.get("provider") as Provider
+
+	if (provider) {
+		const { data, error: err } = await supabase.auth.signInWithOAuth({
+			provider: provider,
+			options: {
+				redirectTo: origin + "/api/auth/callback/",
+				scopes: "identify email guilds guilds.members.read"
+			}
+		})
+
+		if (err) {
+			console.error("Login failed: " + err.message)
+			throw error(400, { message: "Something went wrong logging you in!" })
+		}
+
+		throw redirect(303, data.url)
+	}
+
+	throw error(403, "Failed to login! Provider not specified!")
+}
 
 function updateID(str: string, id: string) {
 	const regex = /{\$DEFINE SCRIPT_ID := '(.*?)'}/
@@ -33,7 +60,7 @@ async function uploadFile(supabase: SupabaseClient, bucket: string, path: string
 
 export async function uploadScript(
 	supabase: SupabaseClient,
-	script: ScriptPublic,
+	script: ScriptBase,
 	scriptFile: File | undefined,
 	coverFile: File | undefined,
 	bannerFile: File | undefined
@@ -67,12 +94,15 @@ export async function uploadScript(
 	}
 
 	const { data, error } = await supabase
-		.from("scripts_public")
+		.schema("scripts")
+		.from("scripts")
 		.insert(publicData)
-		.select()
-		.returns<ScriptPublic[]>()
+		.select("id, url")
+		.returns<ScriptBase[]>()
+
 	if (error) {
-		console.error("scripts_public INSERT failed: " + error.message)
+		console.log("scripts.public INSERT failed: ")
+		console.error(error)
 		return { error: error.message }
 	}
 
@@ -83,11 +113,13 @@ export async function uploadScript(
 	//rename all scripts to script so we can always fetch them later regardless of name changes.
 	const path = script.id + "/" + pad(1, 9) + "/script.simba"
 
-	uploadFile(supabase, "scripts", path, scriptFile)
-	uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
-	uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+	await Promise.all([
+		uploadFile(supabase, "scripts", path, scriptFile),
+		uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile),
+		uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+	])
 
-	return { error: undefined }
+	return { url: data[0].url, error: undefined }
 }
 
 export async function updateScript(
@@ -97,14 +129,7 @@ export async function updateScript(
 	coverFile: File | undefined,
 	bannerFile: File | undefined
 ) {
-	console.log(
-		"📜 Updating ",
-		script.title,
-		" by ",
-		script.scripts_protected.profiles_public.username,
-		" id: ",
-		script.id
-	)
+	console.log("📜 Updating ", script.title, " by ", script.protected.username, " id: ", script.id)
 
 	const publicData = {
 		title: script.title,
@@ -119,28 +144,38 @@ export async function updateScript(
 		published: script.published
 	}
 
-	const { error } = await supabase.from("scripts_public").update(publicData).eq("id", script.id)
+	const { error } = await supabase
+		.schema("scripts")
+		.from("scripts")
+		.update(publicData)
+		.eq("id", script.id)
+
 	if (error) {
-		console.error("scripts_public UPDATE failed: " + error.message)
+		console.log("scripts.public UPDATE failed: ")
+		console.error(error)
 		return { error: error.message }
 	}
 
+	const promises = []
+
 	if (scriptFile) {
-		const revision = script.scripts_protected.revision + 1
+		const revision = script.protected.revision + 1
 		console.log("Updating script revision to ", revision)
 		scriptFile = await updateScriptFile(scriptFile, script.id as string, revision)
 		const path = script.id + "/" + pad(revision, 9) + "/script.simba"
-		uploadFile(supabase, "scripts", path, scriptFile)
+		promises.push(uploadFile(supabase, "scripts", path, scriptFile))
 	}
 
 	if (coverFile) {
 		console.log("Updating script cover")
-		uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile)
+		promises.push(uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile))
 	}
 	if (bannerFile) {
 		console.log("Updating script banner")
-		uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+		promises.push(uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile))
 	}
+
+	if (promises.length > 0) await Promise.all(promises)
 
 	return { error: undefined }
 }
@@ -157,11 +192,30 @@ export async function getSignedURLServer(
 	if (err)
 		throw error(
 			401,
-			`Server error, this is probably not an issure on your end! - Get sign url for ${bucket} to ${bucket} failed!
+			`Server error, this is probably not an issue on your end! - Get sign url for ${bucket} to ${bucket} failed!
 			Error name: ${err.name}
 			Error message: ${err.message}
 			Error cause: ${err.cause}
 			Error stack: ${err.stack}`
 		)
 	return data.signedUrl
+}
+
+export async function getProfile(supabase: SupabaseClient, id: string) {
+	const { data, error } = await supabase
+		.schema("profiles")
+		.from("profiles")
+		.select(
+			`id, discord, username, avatar, private!left (email, warning),
+				roles!left (banned, timeout, developer, premium, vip, tester, scripter, moderator, administrator),
+				subscriptions!left (customer_id, external, subscription_id, cancel, price_id, date_start, date_end)`
+		)
+		.eq("id", id)
+		.limit(1)
+		.limit(1, { foreignTable: "private" })
+		.limit(1, { foreignTable: "roles" })
+		.limit(1, { foreignTable: "subscriptions" })
+		.returns<Profile[]>()
+	if (error || data.length < 1) return null
+	return data[0]
 }

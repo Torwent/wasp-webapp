@@ -1,55 +1,64 @@
 import { setError, superValidate } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
 import { postSchema } from "$lib/backend/schemas"
-import { encodeSEO } from "$lib/utils"
-import type { TutorialWithAuthor } from "$lib/types/collection"
+import type { Tutorial } from "$lib/types/collection"
 
 export const load = async (event) => {
-	const form = superValidate(event, postSchema)
-	return { form }
+	return { form: superValidate(event, postSchema) }
 }
 
 export const actions = {
-	default: async ({ request, locals }) => {
-		const formData = await request.formData()
-		const form = await superValidate(formData, postSchema)
+	default: async ({ request, locals: { getProfile, supabaseServer } }) => {
+		const promises = await Promise.all([getProfile(), request.formData()])
+		const profile = promises[0]
+
+		const dataForm = promises[1]
+
+		const form = await superValidate(dataForm, postSchema)
 
 		if (!form.valid) return fail(400, { form })
-
-		const { getProfile, supabaseServer } = locals
-
-		const profile = await getProfile()
 
 		if (!profile) {
 			const msg = "You need to login to add a script."
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
 		const { data } = await supabaseServer
 			.from("tutorials")
-			.select("id, created_at, user_id, author, title, description, content, level")
+			.select("*")
 			.eq("title", form.data.title)
-			.eq("user_id", profile.id)
-			.returns<TutorialWithAuthor[]>()
+			.eq("author_id", profile.id)
+			.returns<Tutorial[]>()
 
 		if (data && data.length > 0) {
 			const msg = "A post with that name by you already exists! Choose a different title."
 			console.error(msg)
-			return setError(form, null, msg)
+			return setError(form, "", msg)
 		}
 
-		const { data: tutorial, error } = await supabaseServer
+		const { data: tutorial, error: err } = await supabaseServer
 			.from("tutorials")
-			.insert(form.data)
-			.returns<TutorialWithAuthor[]>()
+			.insert({
+				title: form.data.title,
+				description: form.data.description,
+				content: form.data.content,
+				level: form.data.level,
+				order: form.data.order,
+				published: dataForm.has("published"),
+				search: "",
+				url: "",
+				author_id: profile.id
+			})
+			.select()
+			.returns<Tutorial[]>()
 
-		if (error) {
-			console.error("tutorials INSERT failed: " + error.message)
-			return setError(form, null, error.message)
+		if (err) {
+			console.log("tutorials INSERT failed: ")
+			console.error(err)
+			return setError(form, "", err.message)
 		}
 
-		const url = encodeSEO(tutorial[0].title + " by " + profile.username)
-		throw redirect(303, "./" + url)
+		throw redirect(303, "./" + tutorial[0].url)
 	}
 }

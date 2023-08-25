@@ -1,37 +1,40 @@
 import { setError, superValidate } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
 import { postSchema } from "$lib/backend/schemas"
-import { encodeSEO } from "$lib/utils"
-import type { TutorialWithAuthor } from "$lib/types/collection"
+import type { Tutorial } from "$lib/types/collection"
 
 export const load = async (event) => {
-	const form = superValidate(event, postSchema)
-	return { form }
+	return { form: superValidate(event, postSchema) }
 }
 
 export const actions = {
 	default: async ({ request, locals: { supabaseServer } }) => {
-		const formData = await request.formData()
-		const form = await superValidate(formData, postSchema)
+		const dataForm = await request.formData()
+		const form = await superValidate(dataForm, postSchema)
 
-		if (!form.valid || form.data.id === null || form.data.id === undefined)
-			return fail(400, { form })
+		if (!form.valid) return fail(400, { form })
+
+		const formUpdateData = {
+			title: form.data.title,
+			description: form.data.description,
+			content: form.data.content,
+			level: form.data.level,
+			order: form.data.order,
+			published: dataForm.has("published")
+		}
 
 		const { data, error } = await supabaseServer
 			.from("tutorials")
-			.update(form.data)
+			.update(formUpdateData)
 			.eq("id", form.data.id)
 			.select()
-			.returns<TutorialWithAuthor[]>()
+			.returns<Tutorial[]>()
 
 		if (error) {
 			console.error("tutorials UPDATE failed: " + error.message)
-			return setError(form, null, error.message)
+			return setError(form, "", error.message)
 		}
 
-		throw redirect(
-			303,
-			"/tutorials/" + encodeSEO(data[0].title + " by " + data[0].profiles_public.username)
-		)
+		throw redirect(303, "/tutorials/" + data[0].url)
 	}
 }
