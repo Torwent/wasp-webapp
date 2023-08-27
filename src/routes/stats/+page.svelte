@@ -48,6 +48,7 @@
 	let { count } = data.stats
 	$: ({ count } = data.stats)
 
+	$: console.log(data.stats.stats[0])
 	onMount(() => {
 		loading = false
 		const subscription = supabaseClient
