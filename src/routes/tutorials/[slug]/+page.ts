@@ -19,15 +19,15 @@ export const load = async ({ params, parent }) => {
 			.eq("url", slug)
 			.returns<Tutorial[]>()
 
-		if (err)
+		if (err){
 			throw error(
 				500,
 				`Server error, this is probably not an issue on your end! - SELECT tutorials failed!
 				Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
-			)
+				Error hint: ${err.hint}
+				Error details: ${err.details}
+				Error hint: ${err.message}`
+			)}
 
 		if (data.length === 0) throw error(404, "Tutorial not found!")
 		return data[0]

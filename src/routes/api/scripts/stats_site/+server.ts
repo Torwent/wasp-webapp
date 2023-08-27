@@ -17,7 +17,8 @@ export const POST = async ({ fetch, request }) => {
 		record: { id, month_downloads_total, month_reports_total }
 	} = req
 
-	if ((Number(month_downloads_total) / 100) * 1 > Number(month_reports_total)) return new Response()
+	if ((Number(month_downloads_total) / 100) * 10 > Number(month_reports_total))
+		return new Response()
 
 	console.log("Posting to discord #🧪testers channel")
 

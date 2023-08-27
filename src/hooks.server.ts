@@ -3,8 +3,7 @@ import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/publi
 import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit"
 import { API_URL } from "$lib/utils"
 import type { Profile } from "$lib/types/collection"
-import { stripe, updateProfileProtected } from "$lib/backend/supabase.server"
-import type Stripe from "stripe"
+import { updateProfileProtected } from "$lib/backend/supabase.server"
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
