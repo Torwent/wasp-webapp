@@ -221,7 +221,7 @@ export async function getScripterUUID(supabase: SupabaseClient, uuid: string) {
 		.schema("profiles")
 		.from("scripters")
 		.select(
-			`id, realname, description, github, paypal_id, content,  profiles!left (username, avatar)`
+			`id, url, realname, description, github, paypal_id, content,  profiles!left (username, avatar)`
 		)
 		.eq("id", uuid)
 		.limit(1)

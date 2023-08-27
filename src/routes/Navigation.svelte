@@ -8,7 +8,16 @@
 
 	let showMenu = false
 
-	const routeArray = ["Home", "Setup", "Scripts", "Stats", "Premium", "FAQ", "Tutorials"] as const
+	const routeArray = [
+		"Home",
+		"Setup",
+		"Scripts",
+		"Stats",
+		"Premium",
+		"FAQ",
+		"Tutorials",
+		"Dashboard"
+	] as const
 	let currentPage: (typeof routeArray)[number] = "Home"
 
 	function getLink(route: string): string {
@@ -71,9 +80,9 @@
 	function onTouchEnd(e: TouchEvent) {
 		const { clientX, clientY } = e.changedTouches[0]
 
-		if (clientY <= touchY - 130 || clientY >= touchY + 130) return
-		if (clientX >= touchX - 40 && clientX <= touchX + 40) return
-		if (Date.now() - touchTime >= 1000) return
+		if (clientY <= touchY - 120 || clientY >= touchY + 120) return
+		if (clientX >= touchX - 50 && clientX <= touchX + 50) return
+		if (Date.now() - touchTime >= 500) return
 
 		if (clientX > touchX) {
 			for (let i = 0; i < routeArray.length; i++) {
@@ -127,6 +136,10 @@
 							{route}
 						{:else}
 							<Logo selected={route === currentPage} />
+						{/if}
+					{:else if route === "Dashboard"}
+						{#if $page.data.profile?.roles.scripter}
+							{route}
 						{/if}
 					{:else}
 						{route}
