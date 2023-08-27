@@ -297,7 +297,9 @@
 								{/if}
 							</div>
 						</div>
-						<span class="my-8 text-error-500">Will be canceled at period end</span>
+						{#if profile.subscriptions.cancel}
+							<span class="my-8 text-error-500">Will be canceled at period end</span>
+						{/if}
 					{/if}
 				</div>
 
