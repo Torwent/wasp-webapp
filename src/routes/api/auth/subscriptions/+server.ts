@@ -1,5 +1,10 @@
 import { ADMIN_PASS } from "$env/static/private"
-import { getProfile, stripe, updateProfileSubscription } from "$lib/backend/supabase.server"
+import {
+	getProfile,
+	stripe,
+	updateCustomerID,
+	updateProfileSubscription
+} from "$lib/backend/supabase.server"
 import type Stripe from "stripe"
 
 export const POST = async ({ request }) => {
@@ -25,7 +30,7 @@ export const POST = async ({ request }) => {
 		throw Error("Something went wrong getting " + id + " profile.")
 	}
 
-	if (!profile.subscriptions.customer_id) {
+	if (!profile.customer_id) {
 		console.log("Creating customer for " + id)
 		let customer: Stripe.Customer
 		const customerSearch = await stripe.customers.search({ query: `name:"${profile.id}"` })
@@ -34,10 +39,10 @@ export const POST = async ({ request }) => {
 		}
 
 		if (customerSearch.data.length > 0) {
-			profile.subscriptions.customer_id = customerSearch.data[0].id
+			profile.customer_id = customerSearch.data[0].id
 		} else {
 			customer = await stripe.customers.create({
-				email: profile.private.email,
+				email: profile.email,
 				name: profile.id,
 				metadata: {
 					id: profile.id,
@@ -45,10 +50,10 @@ export const POST = async ({ request }) => {
 					username: profile.username
 				}
 			})
-			profile.subscriptions.customer_id = customer.id
+			profile.customer_id = customer.id
 		}
 
-		await updateProfileSubscription(profile)
+		await updateCustomerID(profile.id, profile.customer_id)
 	}
 
 	return new Response()

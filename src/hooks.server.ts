@@ -33,9 +33,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 			.schema("profiles")
 			.from("profiles")
 			.select(
-				`id, discord, username, avatar, private!left (email, warning),
+				`id, discord, username, avatar, email, customer_id, private!left (warning),
 				roles!left (banned, timeout, developer, premium, vip, tester, scripter, moderator, administrator),
-				subscriptions!left (customer_id, external, subscription_id, cancel, price_id, date_start, date_end)`
+				subscriptions!left (external, subscription_id, cancel, price_id, date_start, date_end)`
 			)
 			.eq("id", id)
 			.limit(1)

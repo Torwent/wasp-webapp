@@ -48,9 +48,9 @@ export async function getProfile(id: string) {
 		.schema("profiles")
 		.from("profiles")
 		.select(
-			`id, discord, username, avatar, private!left (email, warning),
+			`id, discord, username, avatar, email, customer_id, private!left (email, warning),
 				roles!left (banned, timeout, developer, premium, vip, tester, scripter, moderator, administrator),
-				subscriptions!left (customer_id, external, subscription_id, cancel, price_id, date_start, date_end)`
+				subscriptions!left (external, subscription_id, cancel, price_id, date_start, date_end)`
 		)
 		.eq("id", id)
 		.limit(1)
@@ -61,6 +61,28 @@ export async function getProfile(id: string) {
 
 	if (error || data.length < 1) return null
 	return data[0]
+}
+
+export async function updateCustomerID(id: string, customer_id: string) {
+	if (!adminLoggedIn) {
+		await login(false)
+		if (!adminLoggedIn) return false
+	}
+
+	console.log("Updating profiles.profiles for user: ", id)
+
+	const { error: err } = await supabaseAdmin
+		.schema("profiles")
+		.from("profiles")
+		.update({ customer_id: customer_id })
+		.eq("id", id)
+
+	if (err) {
+		console.error(err)
+		throw error(500, err)
+	}
+
+	return true
 }
 
 export async function updateProfileProtected(profile: Profile) {
@@ -80,7 +102,6 @@ export async function updateProfileProtected(profile: Profile) {
 			subscription_id: profile.subscriptions.subscription_id,
 			date_start: profile.subscriptions.date_start,
 			cancel: profile.subscriptions.cancel,
-			customer_id: profile.subscriptions.customer_id,
 			price_id: profile.subscriptions.price_id
 		})
 		.eq("id", profile.id)
@@ -162,7 +183,6 @@ export async function updateProfileSubscription(profile: Profile) {
 			subscription_id: profile.subscriptions.subscription_id,
 			date_start: profile.subscriptions.date_start,
 			cancel: profile.subscriptions.cancel,
-			customer_id: profile.subscriptions.customer_id,
 			price_id: profile.subscriptions.price_id
 		})
 		.eq("id", profile.id)

@@ -28,7 +28,7 @@ export const actions = {
 			return setError(form, "", "You are premium already!")
 		}
 
-		if (!profile.subscriptions.customer_id) {
+		if (!profile.customer_id) {
 			return setError(
 				form,
 				"",
@@ -48,7 +48,7 @@ export const actions = {
 			session = await stripe.checkout.sessions.create({
 				payment_method_types: ["card", "link"],
 				line_items: [{ price: form.data.plan, quantity: 1 }],
-				customer: profile.subscriptions.customer_id,
+				customer: profile.customer_id,
 				customer_update: { address: "auto", shipping: "auto" },
 				mode: "subscription",
 				billing_address_collection: "auto",
@@ -82,14 +82,14 @@ export const actions = {
 			throw error(403, "You are not premium!")
 		}
 
-		if (!profile.subscriptions.customer_id) {
+		if (!profile.customer_id) {
 			throw error(
 				403,
 				"You premium and you don't have a customer id. This should not be possible! Please contact support@waspscripts.com"
 			)
 		}
 
-		const customer = await stripe.customers.retrieve(profile.subscriptions.customer_id, {
+		const customer = await stripe.customers.retrieve(profile.customer_id, {
 			expand: ["subscriptions"]
 		})
 
@@ -135,14 +135,14 @@ export const actions = {
 			throw error(403, "You are not premium!")
 		}
 
-		if (!profile.subscriptions.customer_id) {
+		if (!profile.customer_id) {
 			throw error(
 				403,
 				"You premium and you don't have a customer id. This should not be possible! Please contact support@waspscripts.com"
 			)
 		}
 
-		const customer = await stripe.customers.retrieve(profile.subscriptions.customer_id, {
+		const customer = await stripe.customers.retrieve(profile.customer_id, {
 			expand: ["subscriptions"]
 		})
 

@@ -24,9 +24,9 @@ export const load = async ({ fetch, data, depends }) => {
 			.schema("profiles")
 			.from("profiles")
 			.select(
-				`id, discord, username, avatar, private!left (email, warning),
+				`id, discord, username, avatar, email, customer_id, private!left (email, warning),
 				roles!left (banned, timeout, developer, premium, vip, tester, scripter, moderator, administrator),
-				subscriptions!left (customer_id, external, subscription_id, cancel, price_id, date_start, date_end)`
+				subscriptions!left (external, subscription_id, cancel, price_id, date_start, date_end)`
 			)
 			.eq("id", id)
 			.limit(1)
@@ -46,7 +46,7 @@ export const load = async ({ fetch, data, depends }) => {
 
 		const profile = data[0]
 
-		let needUpdate = !profile.subscriptions.customer_id
+		let needUpdate = !profile.customer_id
 
 		if (!profile.subscriptions.external) {
 			const startDate = Date.parse(profile.subscriptions.date_start ?? "0")

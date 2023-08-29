@@ -34,6 +34,31 @@ export interface Database {
   }
   profiles: {
     Tables: {
+      access: {
+        Row: {
+          bundles: string[]
+          id: string
+          scripts: string[]
+        }
+        Insert: {
+          bundles?: string[]
+          id: string
+          scripts?: string[]
+        }
+        Update: {
+          bundles?: string[]
+          id?: string
+          scripts?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "access_id_fkey"
+            columns: ["id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       private: {
         Row: {
           email: string
@@ -62,19 +87,25 @@ export interface Database {
       profiles: {
         Row: {
           avatar: string
+          customer_id: string | null
           discord: string
+          email: string
           id: string
           username: string
         }
         Insert: {
           avatar?: string
+          customer_id?: string | null
           discord?: string
+          email?: string
           id: string
           username?: string
         }
         Update: {
           avatar?: string
+          customer_id?: string | null
           discord?: string
+          email?: string
           id?: string
           username?: string
         }
@@ -225,6 +256,49 @@ export interface Database {
           }
         ]
       }
+      subscriptions_new: {
+        Row: {
+          cancel: boolean
+          customer_id: string | null
+          date_end: string
+          date_start: string
+          id: string
+          price_id: string
+          subscription: string | null
+        }
+        Insert: {
+          cancel?: boolean
+          customer_id?: string | null
+          date_end?: string
+          date_start?: string
+          id: string
+          price_id?: string
+          subscription?: string | null
+        }
+        Update: {
+          cancel?: boolean
+          customer_id?: string | null
+          date_end?: string
+          date_start?: string
+          id?: string
+          price_id?: string
+          subscription?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_new_id_fkey"
+            columns: ["id"]
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_new_price_id_fkey"
+            columns: ["price_id"]
+            referencedRelation: "prices"
+            referencedColumns: ["stripe_id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -342,43 +416,6 @@ export interface Database {
   }
   public: {
     Tables: {
-      developers: {
-        Row: {
-          content: string | null
-          description: string | null
-          fts: unknown
-          github: string | null
-          id: string
-          paypal_id: string | null
-          realname: string | null
-          search: string
-          url: string
-          search_developers: string | null
-        }
-        Insert: {
-          content?: string | null
-          description?: string | null
-          fts?: unknown
-          github?: string | null
-          id: string
-          paypal_id?: string | null
-          realname?: string | null
-          search: string
-          url: string
-        }
-        Update: {
-          content?: string | null
-          description?: string | null
-          fts?: unknown
-          github?: string | null
-          id?: string
-          paypal_id?: string | null
-          realname?: string | null
-          search?: string
-          url?: string
-        }
-        Relationships: []
-      }
       faq_errors: {
         Row: {
           content: string
@@ -454,98 +491,6 @@ export interface Database {
         }
         Relationships: []
       }
-      profiles_public: {
-        Row: {
-          avatar_url: string
-          discord_id: string
-          id: string
-          updated_at: string
-          username: string
-        }
-        Insert: {
-          avatar_url: string
-          discord_id: string
-          id: string
-          updated_at?: string
-          username: string
-        }
-        Update: {
-          avatar_url?: string
-          discord_id?: string
-          id?: string
-          updated_at?: string
-          username?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "profiles_public_id_fkey"
-            columns: ["id"]
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
-      scripts_public: {
-        Row: {
-          categories: string[]
-          content: string
-          description: string
-          fts: unknown
-          id: string
-          max_gp: number
-          max_xp: number
-          min_gp: number
-          min_xp: number
-          published: boolean
-          search: string
-          subcategories: string[]
-          title: string
-          tooltip_emojis: string[]
-          tooltip_names: string[]
-          updated_at: string
-          url: string
-          search_script: string | null
-        }
-        Insert: {
-          categories: string[]
-          content: string
-          description: string
-          fts?: unknown
-          id?: string
-          max_gp?: number
-          max_xp?: number
-          min_gp?: number
-          min_xp?: number
-          published?: boolean
-          search: string
-          subcategories: string[]
-          title: string
-          tooltip_emojis: string[]
-          tooltip_names: string[]
-          updated_at?: string
-          url: string
-        }
-        Update: {
-          categories?: string[]
-          content?: string
-          description?: string
-          fts?: unknown
-          id?: string
-          max_gp?: number
-          max_xp?: number
-          min_gp?: number
-          min_xp?: number
-          published?: boolean
-          search?: string
-          subcategories?: string[]
-          title?: string
-          tooltip_emojis?: string[]
-          tooltip_names?: string[]
-          updated_at?: string
-          url?: string
-        }
-        Relationships: []
-      }
       stats: {
         Row: {
           experience: number | null
@@ -594,7 +539,6 @@ export interface Database {
           title: string
           url: string
           username: string
-          search_tutorials: string | null
         }
         Insert: {
           author_id: string
@@ -717,24 +661,6 @@ export interface Database {
         }
         Returns: boolean
       }
-      search_developers: {
-        Args: {
-          "": unknown
-        }
-        Returns: string
-      }
-      search_script: {
-        Args: {
-          "": unknown
-        }
-        Returns: string
-      }
-      search_tutorials: {
-        Args: {
-          "": unknown
-        }
-        Returns: string
-      }
     }
     Enums: {
       [_ in never]: never
@@ -769,6 +695,27 @@ export interface Database {
   }
   scripts: {
     Tables: {
+      bundles: {
+        Row: {
+          id: string
+          name: string
+          quantity: number | null
+          scripts: string[]
+        }
+        Insert: {
+          id?: string
+          name?: string
+          quantity?: number | null
+          scripts: string[]
+        }
+        Update: {
+          id?: string
+          name?: string
+          quantity?: number | null
+          scripts?: string[]
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           emoji: string
@@ -819,7 +766,7 @@ export interface Database {
           {
             foreignKeyName: "protected_author_id_fkey"
             columns: ["author_id"]
-            referencedRelation: "profiles_public"
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
