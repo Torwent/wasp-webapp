@@ -34,7 +34,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 			.from("profiles")
 			.select(
 				`id, discord, username, avatar, email, customer_id, private!left (warning),
-				roles!left (banned, timeout, developer, premium, vip, tester, scripter, moderator, administrator),
+				roles!left (banned, timeout, premium, vip, tester, scripter, moderator, administrator),
 				subscriptions!left (external, subscription_id, cancel, price_id, date_start, date_end)`
 			)
 			.eq("id", id)

@@ -66,7 +66,8 @@
 			revision: 0,
 			username: profile?.username ?? "",
 			avatar: profile?.avatar ?? "",
-			revision_date: ""
+			revision_date: "",
+			broken: false
 		},
 		fts: undefined,
 		search: "",

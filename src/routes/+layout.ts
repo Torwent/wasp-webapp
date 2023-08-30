@@ -25,7 +25,7 @@ export const load = async ({ fetch, data, depends }) => {
 			.from("profiles")
 			.select(
 				`id, discord, username, avatar, email, customer_id, private!left (email, warning),
-				roles!left (banned, timeout, developer, premium, vip, tester, scripter, moderator, administrator),
+				roles!left (banned, timeout, premium, vip, tester, scripter, moderator, administrator),
 				subscriptions!left (external, subscription_id, cancel, price_id, date_start, date_end)`
 			)
 			.eq("id", id)

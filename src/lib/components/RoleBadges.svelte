@@ -5,19 +5,12 @@
 </script>
 
 <div class="w-full">
-	{#if profile.roles.developer}
-		<span
-			class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-sky-500 text-white rounded-full"
-		>
-			Developer
-		</span>
-	{:else}
-		<span
-			class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-stone-500 text-white rounded-full"
-		>
-			OSRS Botter
-		</span>
-	{/if}
+	<span
+		class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-stone-500 text-white rounded-full"
+	>
+		OSRS Botter
+	</span>
+
 	{#if profile.roles.premium}
 		<span
 			class="text-xs inline-block py-1 px-2.5 leading-none text-center whitespace-nowrap align-baseline font-bold bg-yellow-500 text-white rounded-full"

@@ -322,6 +322,12 @@ export interface Database {
         }
         Returns: string
       }
+      get_access: {
+        Args: {
+          user_id: string
+        }
+        Returns: unknown
+      }
       get_avatar: {
         Args: {
           user_id: string
@@ -367,6 +373,20 @@ export interface Database {
               user_id: string
             }
             Returns: string
+          }
+      has_access:
+        | {
+            Args: {
+              user_id: string
+              script_id: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              script_id: string
+            }
+            Returns: boolean
           }
       is_role:
         | {
@@ -974,6 +994,13 @@ export interface Database {
         }
         Returns: undefined
       }
+      bundle_contains: {
+        Args: {
+          bundle: string
+          script: string
+        }
+        Returns: boolean
+      }
       fix_categories:
         | {
             Args: {
@@ -993,6 +1020,12 @@ export interface Database {
           script_id: string
         }
         Returns: string
+      }
+      get_bundle_scripts: {
+        Args: {
+          ids: string[]
+        }
+        Returns: unknown
       }
       get_month_downloads_total: {
         Args: Record<PropertyKey, never>

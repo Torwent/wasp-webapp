@@ -115,7 +115,6 @@ export async function updateProfileProtected(profile: Profile) {
 		.schema("profiles")
 		.from("roles")
 		.update({
-			developer: profile.roles.developer,
 			premium: profile.roles.premium,
 			scripter: profile.roles.scripter,
 			tester: profile.roles.tester,
@@ -144,7 +143,6 @@ export async function updateProfileRoles(profile: Profile) {
 		.schema("profiles")
 		.from("roles")
 		.update({
-			developer: profile.roles.developer,
 			premium: profile.roles.premium,
 			scripter: profile.roles.scripter,
 			tester: profile.roles.tester,

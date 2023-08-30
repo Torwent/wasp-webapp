@@ -137,7 +137,7 @@
 
 	<main class="container mt-8 mx-auto flex-grow w-[95%] max-h-screen overflow-y-visible">
 		<div>
-			{#if profile && profile.roles.developer}
+			{#if profile && profile.roles.scripter}
 				<a href="/scripts/add" class="block mx-auto w-fit">
 					<button class="btn variant-filled-secondary inline-block">Add Script</button>
 				</a>

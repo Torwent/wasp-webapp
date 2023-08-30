@@ -21,8 +21,10 @@ export const POST = async ({ request }) => {
 	if (!profile) return new Response()
 
 	if (type === "customer.subscription.updated") {
-		profile.subscriptions.date_end = new Date(object.current_period_end * 1000).toISOString()
-		profile.subscriptions.cancel = object.cancel_at_period_end
+		if (object.status === "active") {
+			profile.subscriptions.date_end = new Date(object.current_period_end * 1000).toISOString()
+			profile.subscriptions.cancel = object.cancel_at_period_end
+		}
 	} else {
 		profile.roles.premium = false
 		profile.roles.vip = false

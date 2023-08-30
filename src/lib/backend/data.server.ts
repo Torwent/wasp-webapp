@@ -101,7 +101,7 @@ export async function uploadScript(
 		.returns<ScriptBase[]>()
 
 	if (error) {
-		console.log("scripts.public INSERT failed: ")
+		console.log("scripts.scripts INSERT failed: ")
 		console.error(error)
 		return { error: error.message }
 	}
@@ -151,7 +151,7 @@ export async function updateScript(
 		.eq("id", script.id)
 
 	if (error) {
-		console.log("scripts.public UPDATE failed: ")
+		console.log("scripts.scripts UPDATE failed: ")
 		console.error(error)
 		return { error: error.message }
 	}
@@ -207,7 +207,7 @@ export async function getProfile(supabase: SupabaseClient, id: string) {
 		.from("profiles")
 		.select(
 			`id, discord, username, avatar, email, customer_id, private!left (email, warning),
-				roles!left (banned, timeout, developer, premium, vip, tester, scripter, moderator, administrator),
+				roles!left (banned, timeout, premium, vip, tester, scripter, moderator, administrator),
 				subscriptions!left (external, subscription_id, cancel, price_id, date_start, date_end)`
 		)
 		.eq("id", id)
