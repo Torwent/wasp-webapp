@@ -64,7 +64,7 @@ export const scriptSchema = z
 		max_xp: z
 			.number()
 			.int("Only whole numbers are allowed.")
-			.max(40000, "That exceeds the reasonable limit."),
+			.max(60000, "That exceeds the reasonable limit."),
 		min_gp: z
 			.number()
 			.int("Only whole numbers are allowed.")

@@ -146,10 +146,10 @@ export function replaceScriptContent(script: Script) {
 			second: "2-digit",
 			hour12: false
 		}),
-		min_xp: script.min_xp.toString(),
-		max_xp: script.max_xp.toString(),
-		min_gp: script.min_gp.toString(),
-		max_gp: script.max_gp.toString()
+		min_xp: formatRSNumber(Number(script.min_xp * 12)),
+		max_xp: formatRSNumber(Number(script.max_xp * 12)),
+		min_gp: formatRSNumber(Number(script.min_gp * 12)),
+		max_gp: formatRSNumber(Number(script.max_gp * 12))
 	}
 
 	const result = script.content.replace(/\{\$([^{}\s$]+)\}/g, (match, placeholder) => {
