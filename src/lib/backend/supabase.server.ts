@@ -85,6 +85,28 @@ export async function updateCustomerID(id: string, customer_id: string) {
 	return true
 }
 
+export async function updateScripterAccount(id: string, account_id: string) {
+	if (!adminLoggedIn) {
+		await login(false)
+		if (!adminLoggedIn) return false
+	}
+
+	console.log("Updating profiles.profiles for user: ", id)
+
+	const { error: err } = await supabaseAdmin
+		.schema("profiles")
+		.from("scripter")
+		.update({ stripe: account_id })
+		.eq("id", id)
+
+	if (err) {
+		console.error(err)
+		throw error(500, err)
+	}
+
+	return true
+}
+
 export async function updateProfileProtected(profile: Profile) {
 	if (!adminLoggedIn) {
 		await login(false)
