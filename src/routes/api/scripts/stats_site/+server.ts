@@ -1,4 +1,5 @@
 import { ADMIN_PASS, PRIVATE_DISCORD_WEBHOOK } from "$env/static/private"
+import { updateScriptNotification } from "$lib/backend/supabase.server"
 
 export const POST = async ({ fetch, request }) => {
 	const hookPassword = request.headers.get("password")
@@ -14,9 +15,10 @@ export const POST = async ({ fetch, request }) => {
 	}
 
 	const {
-		record: { id, month_downloads_total, month_reports_total }
+		record: { id, month_downloads_total, month_reports_total, notified }
 	} = req
 
+	if (notified) return new Response()
 	if (Number(month_downloads_total) <= 10) return new Response()
 	if ((Number(month_downloads_total) / 100) * 5 > Number(month_reports_total)) return new Response()
 
@@ -43,10 +45,13 @@ export const POST = async ({ fetch, request }) => {
 		]
 	}
 
-	await fetch(PRIVATE_DISCORD_WEBHOOK, {
-		method: "POST",
-		headers: { "Content-type": "application/json" },
-		body: JSON.stringify(hook)
-	})
+	await Promise.all([
+		fetch(PRIVATE_DISCORD_WEBHOOK, {
+			method: "POST",
+			headers: { "Content-type": "application/json" },
+			body: JSON.stringify(hook)
+		}).catch((err) => console.log(err)),
+		updateScriptNotification(id)
+	])
 	return new Response()
 }

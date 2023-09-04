@@ -238,6 +238,28 @@ export async function removeScriptBroken(id: string) {
 	return true
 }
 
+export async function updateScriptNotification(id: string) {
+	if (!adminLoggedIn) {
+		await login(false)
+		if (!adminLoggedIn) return false
+	}
+
+	console.log("Updating scripts.stats_site.notified for script: ", id)
+
+	const { error: err } = await supabaseAdmin
+		.schema("scripts")
+		.from("stats_site")
+		.update({ notified: true })
+		.eq("id", id)
+
+	if (err) {
+		console.log("scripts.stats_site.notified UPDATE failed: ")
+		console.error(err)
+		throw error(500, err.message)
+	}
+
+	return true
+}
 export async function updateDownloaders(script: string, user: string) {
 	if (!adminLoggedIn) {
 		await login(false)

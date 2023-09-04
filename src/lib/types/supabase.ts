@@ -177,6 +177,7 @@ export interface Database {
           paypal_id: string | null
           realname: string | null
           search: string
+          stripe: string | null
           url: string
         }
         Insert: {
@@ -188,6 +189,7 @@ export interface Database {
           paypal_id?: string | null
           realname?: string | null
           search: string
+          stripe?: string | null
           url?: string
         }
         Update: {
@@ -199,6 +201,7 @@ export interface Database {
           paypal_id?: string | null
           realname?: string | null
           search?: string
+          stripe?: string | null
           url?: string
         }
         Relationships: [
@@ -760,7 +763,7 @@ export interface Database {
           id: string
           revision: number
           revision_date: string
-          username: string | null
+          username: string
         }
         Insert: {
           assets?: string
@@ -770,7 +773,7 @@ export interface Database {
           id: string
           revision?: number
           revision_date?: string
-          username?: string | null
+          username?: string
         }
         Update: {
           assets?: string
@@ -780,7 +783,7 @@ export interface Database {
           id?: string
           revision?: number
           revision_date?: string
-          username?: string | null
+          username?: string
         }
         Relationships: [
           {
@@ -908,6 +911,7 @@ export interface Database {
           month_downloads_total: number
           month_reports: string[]
           month_reports_total: number
+          notified: boolean
           previous_months: Json[]
           unique_downloads: string[]
           unique_downloads_total: number
@@ -919,6 +923,7 @@ export interface Database {
           month_downloads_total?: number
           month_reports?: string[]
           month_reports_total?: number
+          notified?: boolean
           previous_months?: Json[]
           unique_downloads?: string[]
           unique_downloads_total?: number
@@ -930,6 +935,7 @@ export interface Database {
           month_downloads_total?: number
           month_reports?: string[]
           month_reports_total?: number
+          notified?: boolean
           previous_months?: Json[]
           unique_downloads?: string[]
           unique_downloads_total?: number
