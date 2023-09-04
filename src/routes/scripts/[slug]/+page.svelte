@@ -136,7 +136,7 @@
 					</h4>
 				{/if}
 				<div class="flex my-2">
-					{#if script.protected.broken && profile?.roles.tester}
+					{#if profile?.roles.tester}
 						<button
 							type="submit"
 							class="mx-auto btn variant-glass-success"
