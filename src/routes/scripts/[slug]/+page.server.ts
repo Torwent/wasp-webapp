@@ -15,7 +15,7 @@ export const actions = {
 		const profile = await getProfile()
 		if (!profile) throw error(403, "You need to be logged in to clear reports.")
 
-		if (!profile.roles.tester || !profile.roles.moderator || !profile.roles.administrator) {
+		if (!profile.roles.tester && !profile.roles.moderator && !profile.roles.administrator) {
 			throw error(403, "Only testers, moderators and administrators can clear reports.")
 		}
 
