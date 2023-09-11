@@ -1,6 +1,6 @@
 import { doLogin } from "$lib/backend/data.server"
 import { premiumSchema } from "$lib/backend/schemas"
-import { stripe } from "$lib/backend/supabase.server"
+import { stripe, updateCustomerID } from "$lib/backend/supabase.server"
 import { error, redirect } from "@sveltejs/kit"
 import type Stripe from "stripe"
 import { setError, superValidate } from "sveltekit-superforms/server"
@@ -29,11 +29,25 @@ export const actions = {
 		}
 
 		if (!profile.customer_id) {
-			return setError(
-				form,
-				"",
-				"You don't seem to have a customer_id assign for some reason. This shouldn't happen. Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com"
-			)
+			const customerSearch = await stripe.customers.search({ query: 'name: "' + profile.id + '"' })
+
+			if (customerSearch.data.length !== 1)
+				return setError(
+					form,
+					"",
+					"You don't seem to have a customer_id assign for some reason. This shouldn't happen. Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com"
+				)
+
+			profile.customer_id = customerSearch.data[0].id
+
+			const updateCustomer = await updateCustomerID(profile.id, profile.customer_id)
+
+			if (!updateCustomer)
+				return setError(
+					form,
+					"",
+					"You don't seem to have a customer_id assign for some reason and something failed creating it. This shouldn't happen. Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com"
+				)
 		}
 
 		if (form.data.plan === "")
