@@ -83,18 +83,20 @@
 		if (!scripts) return console.error("Failed to retrieve scripts information!")
 
 		scripts = scripts.filter((script) => {
-			if (ALL_ZIPS[0] === zipName) {
-				return script.categories.includes("Official") && script.categories.includes("Premium")
-			} else if (ALL_ZIPS[1] === zipName)
-				return script.categories.includes("Official") && script.categories.includes("Free")
-			else if (ALL_ZIPS[2] === zipName) return script.categories.includes("Official")
-			else if (ALL_ZIPS[3] === zipName)
-				return script.categories.includes("Community") && script.categories.includes("Premium")
-			else if (ALL_ZIPS[4] === zipName)
-				return script.categories.includes("Community") && script.categories.includes("Free")
-			else if (ALL_ZIPS[5] === zipName) return script.categories.includes("Premium")
-			else if (ALL_ZIPS[6] === zipName) return script.categories.includes("Free")
-			else return true
+			if (script.protected && !script.protected.broken) {
+				if (ALL_ZIPS[0] === zipName) {
+					return script.categories.includes("Official") && script.categories.includes("Premium")
+				} else if (ALL_ZIPS[1] === zipName)
+					return script.categories.includes("Official") && script.categories.includes("Free")
+				else if (ALL_ZIPS[2] === zipName) return script.categories.includes("Official")
+				else if (ALL_ZIPS[3] === zipName)
+					return script.categories.includes("Community") && script.categories.includes("Premium")
+				else if (ALL_ZIPS[4] === zipName)
+					return script.categories.includes("Community") && script.categories.includes("Free")
+				else if (ALL_ZIPS[5] === zipName) return script.categories.includes("Premium")
+				else if (ALL_ZIPS[6] === zipName) return script.categories.includes("Free")
+				else return true
+			}
 		})
 
 		let urls: (string | false)[] = []
