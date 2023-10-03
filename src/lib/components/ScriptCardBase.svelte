@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { popup } from "@skeletonlabs/skeleton"
 	import type { PopupSettings } from "@skeletonlabs/skeleton"
-	import { cropString } from "$lib/utils"
+	import { cropString, encodeSEO } from "$lib/utils"
 	import { onMount } from "svelte"
 	import { browser } from "$app/environment"
 	import type { Script } from "$lib/types/collection"
@@ -46,7 +46,10 @@
 			</h5>
 			<span class="text-xs whitespace-nowrap text-primary-600 dark:text-secondary-500 drop-shadow">
 				by
-				<a href="/developers/{script.protected.username}" class="permalink">
+				<a
+					href="/developers/{encodeSEO(script.protected.username.normalize('NFKC'))}"
+					class="permalink"
+				>
 					{script.protected.username}
 				</a>
 				{#if !script.published}<small class="text-error-500">Unpublished</small>{/if}
