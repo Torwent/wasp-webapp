@@ -15,7 +15,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
 		event
 	})
-	locals.supabaseServer
 
 	locals.getSession = async () => {
 		const {
