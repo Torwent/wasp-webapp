@@ -64,7 +64,7 @@ export const actions = {
 		let session: Stripe.Checkout.Session
 		try {
 			session = await stripe.checkout.sessions.create({
-				payment_method_types: ["card", "link"],
+				payment_method_types: ["card", "link", "paypal"],
 				line_items: [{ price: form.data.plan, quantity: 1 }],
 				customer: profile.customer_id,
 				customer_update: { address: "auto", shipping: "auto" },
