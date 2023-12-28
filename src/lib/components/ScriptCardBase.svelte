@@ -47,7 +47,7 @@
 			<span class="text-xs whitespace-nowrap text-primary-600 dark:text-secondary-500 drop-shadow">
 				by
 				<a
-					href="/developers/{encodeSEO(script.protected.username.normalize('NFKC'))}"
+					href="/scripters/{encodeSEO(script.protected.username.normalize('NFKC'))}"
 					class="permalink"
 				>
 					{script.protected.username}

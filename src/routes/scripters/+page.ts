@@ -17,7 +17,7 @@ export const load = async ({ parent }) => {
 		)
 
 	if (!browser && data.length === 1)
-		throw redirect(303, "/developers/" + encodeSEO(data[0].profiles.username))
+		throw redirect(303, "/scripters/" + encodeSEO(data[0].profiles.username))
 
 	return { developers: data, count, range }
 }

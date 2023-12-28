@@ -50,7 +50,7 @@
 	</h3>
 
 	<div class="my-8 grid place-items-center">
-		<a href="/developers/{scripter.url}" class="btn variant-filled-secondary">Scripter profile</a>
+		<a href="/scripters/{scripter.url}" class="btn variant-filled-secondary">Scripter profile</a>
 	</div>
 
 	<form method="POST" class="my-32 grid place-items-center" action="?/linkStripe" use:enhance>

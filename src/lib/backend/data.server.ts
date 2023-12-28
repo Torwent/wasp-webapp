@@ -253,6 +253,15 @@ export async function createStripeAccount(
 				card_payments: { requested: true },
 				link_payments: { requested: true },
 				transfers: { requested: true }
+			},
+			business_profile: {
+				mcc: "5734",
+				support_url: "https://waspscripts.com/scripters/" + scripter.url,
+				url: "https://waspscripts.com/scripters/" + scripter.url
+			},
+			metadata: { id: scripter.id, username: scripter.profiles.username },
+			settings: {
+				payouts: { schedule: { interval: "weekly", delay_days: 10, weekly_anchor: "monday" } }
 			}
 		})
 	} catch (error) {

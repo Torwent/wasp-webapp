@@ -13,7 +13,7 @@
 
 		<h2 class="text-xl">
 			{#if hasLink}
-				<a href="/developers/{username}" class="font-semibold text-xl text-shadow drop-shadow-2xl">
+				<a href="/scripters/{username}" class="font-semibold text-xl text-shadow drop-shadow-2xl">
 					by {username}
 				</a>
 			{:else}

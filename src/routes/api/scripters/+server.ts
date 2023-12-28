@@ -28,7 +28,7 @@ export const POST = async ({ request }) => {
 	const account = await stripe.accounts.create({
 		business_profile: {
 			name: profile.username,
-			url: "https://waspscripts.com/developers/" + url
+			url: "https://waspscripts.com/scripters/" + url
 		},
 		metadata: { id: profile.id, discord: profile.discord, email: profile.private.email },
 		email: profile.email,

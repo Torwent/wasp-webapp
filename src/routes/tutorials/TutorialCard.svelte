@@ -22,7 +22,7 @@
 
 			<small class="text-xs text-surface-400 truncate mt-1">
 				by <a
-					href="/developers/{encodeSEO(tutorial.username)}"
+					href="/scripters/{encodeSEO(tutorial.username)}"
 					class="permalink text-secondary-500 font-semibold text-shadow"
 				>
 					{tutorial.username}

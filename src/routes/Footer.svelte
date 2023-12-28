@@ -76,11 +76,11 @@
 							<li>Loading...</li>
 						{:then scripters}
 							{#each scripters as scripter}
-								<li><a href="/developers/{scripter.url}">{scripter.profiles.username}</a></li>
+								<li><a href="/scripters/{scripter.url}">{scripter.profiles.username}</a></li>
 							{/each}
 						{/await}
 
-						<li><a href="/developers">Many more devs...</a></li>
+						<li><a href="/scripters">Many more devs...</a></li>
 					</ul>
 				</nav>
 				<nav>

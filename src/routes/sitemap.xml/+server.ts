@@ -143,7 +143,7 @@ export const GET = async ({ locals: { supabaseServer } }) => {
       </url>
       ${tutorials}
       <url>
-        <loc>${website}/developers</loc>
+        <loc>${website}/scripters</loc>
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
       </url>
