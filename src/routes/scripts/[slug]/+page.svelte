@@ -47,7 +47,7 @@
 			<div class="block p-4">
 				<p>
 					Community scripts can be uploaded by anyone with the
-					<span class="text-sky-500 dark:text-sky-400"> Developer </span>
+					<span class="text-sky-500 dark:text-teal-400"> Scripter </span>
 					role and are not reviewed, therefore they can be malicious.
 				</p>
 				<br>
@@ -59,6 +59,9 @@
 				<p>
 					Maintenance of the script is also responsibility of it's developer. So if the script
 					doesn't work or has bugs you need to report those issues to the developer.
+				</p>
+				<p>
+					For more information read the <a href="/legal/user_terms_of_service">user terms of service</a>.
 				</p>
 			</div>
 		</div>

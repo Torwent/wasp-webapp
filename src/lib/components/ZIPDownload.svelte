@@ -24,20 +24,20 @@
 		"all.zip"
 	]
 
-	$: isPremium = canDownload(profile)
+	$: hasPermissions = canDownload(profile)
 	$: dismissed = profile.private.warning
-	$: zipName = isPremium ? "wasp-premium.zip" : "wasp-free.zip"
+	$: zipName = hasPermissions ? "wasp-premium.zip" : "wasp-free.zip"
 
-	function availableZIPs(isPremium: boolean, dismissed: boolean) {
+	function availableZIPs(hasPermissions: boolean, dismissed: boolean) {
 		let zips: string[] = ["wasp-free.zip"]
 		if (dismissed) zips = ["wasp-free.zip", "community-free.zip", "all-free.zip"]
-		if (isPremium) zips = ["wasp-premium.zip", "wasp-free.zip", "wasp-all.zip"]
-		if (isPremium && dismissed) zips = ALL_ZIPS
+		if (hasPermissions) zips = ["wasp-premium.zip", "wasp-free.zip", "wasp-all.zip"]
+		if (hasPermissions && dismissed) zips = ALL_ZIPS
 
 		return zips
 	}
 
-	$: zipsAvailable = availableZIPs(isPremium, dismissed)
+	$: zipsAvailable = availableZIPs(hasPermissions, dismissed)
 
 	let progress: number = -1
 

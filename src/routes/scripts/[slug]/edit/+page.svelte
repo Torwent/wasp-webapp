@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { superForm } from "sveltekit-superforms/client"
-	import { FileDropzone, focusTrap } from "@skeletonlabs/skeleton"
+	import { FileDropzone, SlideToggle, focusTrap } from "@skeletonlabs/skeleton"
 	import { cropString, replaceScriptContent } from "$lib/utils"
 	import { scriptSchema } from "$lib/backend/schemas"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
@@ -41,6 +41,35 @@
 	$form.max_xp = script.max_xp
 	$form.min_gp = script.min_gp
 	$form.max_gp = script.max_gp
+
+	async function loadPrices() {
+		if (!script.product) return
+		const { data, error } = await supabaseClient
+			.schema("scripts")
+			.from("prices")
+			.select("amount, interval, currency")
+			.eq("product", script.product)
+			.eq("active", true)
+
+		if (error) console.error(error)
+		if (data) {
+			data.forEach((price) => {
+				switch (price.interval) {
+					case "week":
+						$form.week_value = price.amount / 100
+						break
+
+					case "month":
+						$form.month_value = price.amount / 100
+						break
+
+					case "year":
+						$form.year_value = price.amount / 100
+						break
+				}
+			})
+		}
+	}
 
 	const defaultBanner = script.protected.assets + "/banner.jpg"
 	let coverElement: HTMLImageElement | undefined
@@ -297,15 +326,61 @@
 			</button>
 		</div>
 
-		<article class="variant-ringed-secondary p-8 my-8 mx-auto xs:w-4/5 md:w-4/5 lg:w-3/4">
+		<article class="variant-ringed-surface p-8 my-8 mx-auto xs:w-full md:w-6/7 lg:w-3/4 rounded-md">
 			<header class="text-center my-8">
 				<h3>Update Script</h3>
 			</header>
 			<form method="POST" enctype="multipart/form-data" use:focusTrap={isFocused} use:enhance>
 				<input type="text" id="id" name="id" class="hidden" bind:value={$form.id} />
 
-				<label for="cover" class="my-4">
-					<span>Cover:</span>
+				<div class="flex justify-evenly">
+					<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
+
+					<div class="my-8">
+						<SlideToggle
+							name="published"
+							bind:checked={script.published}
+							background="bg-error-500"
+							active="bg-primary-500"
+						>
+							{#if script.published}Public{:else}Hidden{/if}
+						</SlideToggle>
+					</div>
+				</div>
+
+				<FormTextarea
+					title="Description"
+					extraTitle=" (recommended 60-80 characters)"
+					bind:value={$form.description}
+					bind:errors={$errors.description}
+					h={"h-18"}
+				/>
+
+				<FormTextarea
+					title="Content"
+					bind:value={$form.content}
+					bind:errors={$errors.content}
+					h={"h-64"}
+				/>
+
+				<MultiSelect
+					title="Categories"
+					bind:value={$form.categories}
+					errors={$errors.categories?._errors}
+					entries={categories}
+				/>
+
+				<MultiSelect
+					title="Subcategories"
+					bind:value={$form.subcategories}
+					errors={$errors.subcategories?._errors}
+					entries={subcategories}
+				/>
+
+				<header class="text-center my-8">
+					<h5>Files</h5>
+				</header>
+				<div class="flex justify-between gap-4">
 					<FileDropzone
 						name="cover"
 						bind:files={coverFiles}
@@ -344,10 +419,7 @@
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>
-				</label>
 
-				<label for="banner" class="my-4">
-					<span>Banner:</span>
 					<FileDropzone
 						name="banner"
 						bind:files={bannerFiles}
@@ -386,119 +458,7 @@
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>
-				</label>
 
-				<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
-
-				<FormTextarea
-					title="Description"
-					extraTitle=" (recommended 60-80 characters)"
-					bind:value={$form.description}
-					bind:errors={$errors.description}
-					h={"h-18"}
-				/>
-
-				<MultiSelect
-					title="Categories"
-					bind:value={$form.categories}
-					errors={$errors.categories?._errors}
-					entries={categories}
-				/>
-
-				<MultiSelect
-					title="Subcategories"
-					bind:value={$form.subcategories}
-					errors={$errors.subcategories?._errors}
-					entries={subcategories}
-				/>
-
-				<FormTextarea
-					title="Content"
-					bind:value={$form.content}
-					bind:errors={$errors.content}
-					h={"h-64"}
-				/>
-
-				<div class="flex flex-col text-sm mt-8 mb-2">
-					<h5 class="text-center">Stats limits (every 5 minutes)</h5>
-					<div class="grid grid-cols-2 gap-8">
-						<label for="min_xp" class="label my-2">
-							<span>Minimum Experience:</span>
-							<input
-								type="number"
-								id="min_xp"
-								name="min_xp"
-								class="input h-10"
-								class:input-error={$errors.min_xp}
-								bind:value={$form.min_xp}
-							/>
-
-							{#if $errors.min_xp}
-								<small class="text-error-500">{$errors.min_xp}</small>
-							{:else}
-								<div class="m-0 h-5" />
-							{/if}
-						</label>
-
-						<label for="max_xp" class="label my-2">
-							<span>Maximum Experience:</span>
-							<input
-								type="number"
-								id="max_xp"
-								name="max_xp"
-								class="input h-10"
-								class:input-error={$errors.max_xp}
-								bind:value={$form.max_xp}
-							/>
-
-							{#if $errors.min_xp}
-								<small class="text-error-500">{$errors.min_xp}</small>
-							{:else}
-								<div class="m-0 h-5" />
-							{/if}
-						</label>
-					</div>
-					<div class="grid grid-cols-2 gap-8">
-						<label for="min_gp" class="label my-2">
-							<span>Minimum Gold:</span>
-							<input
-								type="number"
-								id="min_gp"
-								name="min_gp"
-								class="input h-10"
-								class:input-error={$errors.min_gp}
-								bind:value={$form.min_gp}
-							/>
-
-							{#if $errors.min_gp}
-								<small class="text-error-500">{$errors.min_gp}</small>
-							{:else}
-								<div class="m-0 h-5" />
-							{/if}
-						</label>
-
-						<label for="max_gp" class="label my-2">
-							<span>Maximum Gold:</span>
-							<input
-								type="number"
-								id="max_gp"
-								name="max_gp"
-								class="input h-10"
-								class:input-error={$errors.max_gp}
-								bind:value={$form.max_gp}
-							/>
-
-							{#if $errors.max_gp}
-								<small class="text-error-500">{$errors.max_gp}</small>
-							{:else}
-								<div class="m-0 h-5" />
-							{/if}
-						</label>
-					</div>
-				</div>
-
-				<label for="script" class="my-4">
-					<span>Script:</span>
 					<FileDropzone
 						name="script"
 						bind:files={scriptFiles}
@@ -537,31 +497,94 @@
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>
-				</label>
-
-				<div class="flex my-8">
-					<label
-						for="published"
-						class="form-check-label inline-block cursor-pointer dark:hover:text-primary-100 hover:text-primary-400"
-					>
-						Published
-						<input
-							type="checkbox"
-							id="published"
-							name="published"
-							class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-primary-500"
-							bind:checked={script.published}
-						/>
-					</label>
 				</div>
 
-				<div class="my-8">
-					{#if $errors._errors && $errors._errors.length > 0}
+				<div class="variant-soft-surface p-8 my-8 mx-auto rounded-md">
+					<header class="text-center my-8">
+						<h5>Stats limits (every 5 minutes)</h5>
+					</header>
+					<div class="flex justify-between gap-4">
+						<label for="min_xp" class="label my-2">
+							<span>Minimum Experience:</span>
+							<input
+								type="number"
+								id="min_xp"
+								name="min_xp"
+								class="input h-10"
+								class:input-error={$errors.min_xp}
+								bind:value={$form.min_xp}
+							/>
+
+							{#if $errors.min_xp}
+								<small class="text-error-500">{$errors.min_xp}</small>
+							{:else}
+								<div class="m-0 h-5" />
+							{/if}
+						</label>
+
+						<label for="max_xp" class="label my-2">
+							<span>Maximum Experience:</span>
+							<input
+								type="number"
+								id="max_xp"
+								name="max_xp"
+								class="input h-10"
+								class:input-error={$errors.max_xp}
+								bind:value={$form.max_xp}
+							/>
+
+							{#if $errors.min_xp}
+								<small class="text-error-500">{$errors.min_xp}</small>
+							{:else}
+								<div class="m-0 h-5" />
+							{/if}
+						</label>
+
+						<label for="min_gp" class="label my-2">
+							<span>Minimum Gold:</span>
+							<input
+								type="number"
+								id="min_gp"
+								name="min_gp"
+								class="input h-10"
+								class:input-error={$errors.min_gp}
+								bind:value={$form.min_gp}
+							/>
+
+							{#if $errors.min_gp}
+								<small class="text-error-500">{$errors.min_gp}</small>
+							{:else}
+								<div class="m-0 h-5" />
+							{/if}
+						</label>
+
+						<label for="max_gp" class="label my-2">
+							<span>Maximum Gold:</span>
+							<input
+								type="number"
+								id="max_gp"
+								name="max_gp"
+								class="input h-10"
+								class:input-error={$errors.max_gp}
+								bind:value={$form.max_gp}
+							/>
+
+							{#if $errors.max_gp}
+								<small class="text-error-500">{$errors.max_gp}</small>
+							{:else}
+								<div class="m-0 h-5" />
+							{/if}
+						</label>
+					</div>
+				</div>
+
+				{#if $errors._errors && $errors._errors.length > 0}
+					<div class="my-8">
 						{#each $errors._errors as error}
 							<div class="flex justify-center text-error-500">{error}</div>
 						{/each}
-					{/if}
-				</div>
+					</div>
+				{/if}
 
 				<div class="flex justify-between">
 					<a href="./">

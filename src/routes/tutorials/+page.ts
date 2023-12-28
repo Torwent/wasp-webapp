@@ -25,6 +25,8 @@ export const load = async ({ url, depends, parent }) => {
 	const start = (page - 1) * range
 	const finish = start + range
 
+	const { supabaseClient, profile } = await parent()
+
 	async function getTutorials(
 		level: number,
 		search: string,
@@ -32,7 +34,6 @@ export const load = async ({ url, depends, parent }) => {
 		finish: number,
 		ascending: boolean
 	) {
-		const { supabaseClient, profile } = await parent()
 		let query = supabaseClient.from("tutorials").select("*", { count: "estimated" })
 
 		if (profile && !profile.roles.administrator && !profile.roles.moderator) {
@@ -64,5 +65,5 @@ export const load = async ({ url, depends, parent }) => {
 		return { data, count }
 	}
 
-	return { tutorials: getTutorials(level, search, start, finish, ascending), range }
+	return { tutorials: await getTutorials(level, search, start, finish, ascending), range }
 }

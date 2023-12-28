@@ -4,7 +4,7 @@ import { postSchema } from "$lib/backend/schemas"
 import type { Tutorial } from "$lib/types/collection"
 
 export const load = async (event) => {
-	return { form: superValidate(event, postSchema) }
+	return { form: await superValidate(event, postSchema) }
 }
 
 export const actions = {

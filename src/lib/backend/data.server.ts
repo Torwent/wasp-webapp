@@ -1,7 +1,19 @@
-import type { Profile, Script, ScriptBase } from "$lib/types/collection"
+import type {
+	Bundle,
+	Interval,
+	Price,
+	Profile,
+	Script,
+	ScriptBase,
+	ScripterDashboard,
+	ScripterWithProfile
+} from "$lib/types/collection"
 import { pad } from "$lib/utils"
 import type { Provider, SupabaseClient } from "@supabase/supabase-js"
 import { error, redirect } from "@sveltejs/kit"
+import { stripe } from "./supabase.server"
+import type { BundleSchema, NewScriptSchema, PriceSchema } from "./schemas"
+import type Stripe from "stripe"
 
 export async function doLogin(
 	supabase: SupabaseClient,
@@ -206,16 +218,244 @@ export async function getProfile(supabase: SupabaseClient, id: string) {
 		.schema("profiles")
 		.from("profiles")
 		.select(
-			`id, discord, username, avatar, email, customer_id, private!left (email, warning),
-				roles!left (banned, timeout, premium, vip, tester, scripter, moderator, administrator),
-				subscriptions!left (external, subscription_id, cancel, price_id, date_start, date_end)`
+			`id, discord, username, avatar, email, customer_id,
+			private!private_id_fkey (email, warning),
+			roles!roles_id_fkey (banned, tester, scripter, moderator, administrator),
+			subscription!subscription_id_fkey (subscription, product, price, date_start, date_end, cancel)`
 		)
 		.eq("id", id)
 		.limit(1)
 		.limit(1, { foreignTable: "private" })
 		.limit(1, { foreignTable: "roles" })
-		.limit(1, { foreignTable: "subscriptions" })
 		.returns<Profile[]>()
+
 	if (error || data.length < 1) return null
 	return data[0]
+}
+
+export async function createStripeAccount(
+	supabase: SupabaseClient,
+	baseURL: string,
+	scripter: ScripterDashboard
+) {
+	let account: Stripe.Response<Stripe.Account>
+	let accountLink: Stripe.Response<Stripe.AccountLink>
+
+	try {
+		account = await stripe.accounts.create({
+			type: "custom",
+			email: scripter.profiles.private.email,
+			business_type: "individual",
+			individual: { full_name_aliases: [scripter.id, scripter.profiles.username] },
+			capabilities: {
+				card_payments: { requested: true },
+				link_payments: { requested: true },
+				transfers: { requested: true }
+			},
+			default_currency: "eur"
+		})
+	} catch (error) {
+		console.error(error)
+		return
+	}
+
+	console.log(account)
+
+	const { error } = await supabase
+		.schema("profiles")
+		.from("scripters")
+		.update({ stripe: account.id })
+		.eq("id", scripter.id)
+
+	if (error) {
+		console.error(error)
+		return
+	}
+
+	try {
+		accountLink = await stripe.accountLinks.create({
+			account: account.id,
+			refresh_url: baseURL + "/api/stripe/connect/reauth",
+			return_url: baseURL + "/api/stripe/connect/return",
+			type: "account_onboarding"
+		})
+	} catch (error) {
+		console.error(error)
+		return
+	}
+
+	return accountLink.url
+}
+
+export async function finishStripeAccountSetup(baseURL: string, account: string) {
+	let accountLink: Stripe.Response<Stripe.AccountLink>
+
+	try {
+		accountLink = await stripe.accountLinks.create({
+			account: account,
+			refresh_url: baseURL + "/api/stripe/connect/reauth",
+			return_url: baseURL + "/api/stripe/connect/return",
+			type: "account_update"
+		})
+	} catch (error) {
+		console.error(error)
+		return
+	}
+
+	return accountLink.url
+}
+
+export async function StripeAccount(baseURL: string, developer: ScripterWithProfile) {
+	let accountLink: Stripe.Response<Stripe.AccountLink>
+
+	if (!developer.stripe) return
+
+	try {
+		accountLink = await stripe.accountLinks.create({
+			account: developer.stripe,
+			refresh_url: baseURL + "/api/stripe/connect/reauth",
+			return_url: baseURL + "/api/stripe/connect/return",
+			type: "account_update"
+		})
+		return accountLink.url
+	} catch (error) {
+		console.error(error)
+		return
+	}
+}
+
+export async function createStripePrice(price: PriceSchema, product: string) {
+	if (price.amount === 0) return
+	await stripe.prices
+		.create({
+			unit_amount: price.amount * 100,
+			currency: price.currency,
+			active: true,
+			product: product,
+			recurring: { interval: price.interval as Interval }
+		})
+		.catch((error) => console.error(error.raw.message))
+}
+
+export async function createStripePriceEx(product: string, amount: number, interval: Interval) {
+	if (amount === 0) return
+	await stripe.prices
+		.create({
+			unit_amount: amount * 100,
+			currency: "eur",
+			active: true,
+			product: product,
+			recurring: { interval: interval }
+		})
+		.catch((error) => console.error(error.raw.message))
+}
+
+export async function updateStripePriceEx(price: Price, amount: number) {
+	if (price.amount === amount) return
+
+	await Promise.all([
+		stripe.prices
+			.create({
+				unit_amount: amount * 100,
+				currency: "EUR",
+				active: true,
+				product: price.product,
+				recurring: { interval: price.interval as Interval }
+			})
+			.catch((error) => console.error(error.raw.message)),
+		stripe.prices
+			.update(price.id, { active: false })
+			.catch((error) => console.error(error.raw.message))
+	])
+}
+
+export async function updateStripePrice(price: Price) {
+	const promises = []
+
+	if (price.amount > 0)
+		promises.push(
+			stripe.prices.create({
+				unit_amount: price.amount * 100,
+				currency: "EUR",
+				active: true,
+				product: price.product,
+				recurring: { interval: price.interval as Interval }
+			})
+		)
+	promises.push(stripe.prices.update(price.id, { active: false }))
+
+	await Promise.all(promises)
+}
+
+export async function createStripeBundleProduct(supabase: SupabaseClient, bundle: BundleSchema) {
+	const scripts = bundle.bundledScripts.reduce((acc: string[], script) => {
+		if (script.active) acc.push(script.id)
+		return acc
+	}, [])
+
+	bundle.prices = bundle.prices.filter((price) => price.amount > 0)
+
+	if (bundle.prices.length === 0) return
+
+	const { data, error } = await supabase
+		.schema("scripts")
+		.from("bundles")
+		.insert({ name: bundle.name, user_id: bundle.user_id, scripts: scripts })
+		.select()
+		.returns<Bundle[]>()
+
+	if (error) return error
+
+	const product = await stripe.products
+		.create({
+			name: data[0].name,
+			tax_code: "txcd_10202000",
+			metadata: { user_id: data[0].user_id, bundle: data[0].id }
+		})
+		.catch((error) => console.error(error.raw.message))
+
+	if (!product) return { message: "Failed to create bundle product in Stripe" }
+
+	const stripePromises: Promise<void>[] = []
+
+	bundle.prices.forEach((price) => {
+		if (Boolean(price.amount)) {
+			stripePromises.push(createStripePriceEx(product.id, price.amount, price.interval as Interval))
+		}
+	})
+
+	await Promise.all(stripePromises)
+}
+
+export async function createStripeScriptProduct(script: NewScriptSchema, user_id: string) {
+	script.prices = script.prices.filter((price) => price.amount > 0)
+	if (script.prices.length === 0) return
+
+	const product = await stripe.products
+		.create({
+			name: script.name,
+			tax_code: "txcd_10202000",
+			metadata: { user_id: user_id, script: script.id }
+		})
+		.catch((error) => console.error(error.raw.message))
+
+	if (!product) return { message: "Failed to create script product in Stripe" }
+
+	const stripePromises: Promise<void>[] = []
+
+	script.prices.forEach((price) => {
+		if (Boolean(price.amount)) {
+			stripePromises.push(createStripePriceEx(product.id, price.amount, price.interval as Interval))
+		}
+	})
+
+	await Promise.all(stripePromises)
+}
+
+export async function updateStripeProduct(id: string, name: string) {
+	await stripe.products
+		.update(id, {
+			name: name
+		})
+		.catch((error) => console.error(error.raw.message))
 }

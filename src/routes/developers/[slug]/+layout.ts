@@ -59,9 +59,38 @@ export const load = async ({ url: { searchParams }, params: { slug }, parent, de
 		? await getScripterUUID(supabaseClient, slug.toLowerCase())
 		: await getScripter(supabaseClient, slug.toLowerCase())
 
+	let query = supabaseClient
+		.schema("scripts")
+		.from("scripts")
+		.select(
+			`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
+			tooltip_emojis, tooltip_names,
+			protected!inner (assets, author_id, revision, username, avatar, revision_date)`,
+			{ count: "estimated" }
+		)
+		.eq("protected.author_id", developer.id)
+		.order("title", { ascending: true })
+		.range(start, finish)
+
+	if (search !== "") query = query.ilike("search", "%" + search + "%")
+
+	const { data, error: err, count } = await query.returns<Script[]>()
+
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issue on your end! - SELECT scripts.scripts failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
+
+	const devData = { data, count: count ? count : 0 }
+
 	return {
 		developer,
-		scripts: getScripts(supabaseClient, developer.id, search, start, finish),
+		scripts: devData,
 		range
 	}
 }

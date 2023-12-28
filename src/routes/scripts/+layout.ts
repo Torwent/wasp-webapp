@@ -6,10 +6,11 @@ const categoriesStore = writable<Category[] | null>(null)
 const subcategoriesStore = writable<SubCategory[] | null>(null)
 
 export const load = async ({ parent }) => {
+	const { supabaseClient } = await parent()
+
 	async function getCategories() {
 		let result = get(categoriesStore)
 		if (!result) {
-			const { supabaseClient } = await parent()
 			const { data, error: err } = await supabaseClient
 				.schema("scripts")
 				.from("categories")
@@ -33,7 +34,6 @@ export const load = async ({ parent }) => {
 	async function getSubCategories() {
 		let result = get(subcategoriesStore)
 		if (!result) {
-			const { supabaseClient } = await parent()
 			const { data, error: err } = await supabaseClient
 				.schema("scripts")
 				.from("subcategories")
@@ -54,8 +54,10 @@ export const load = async ({ parent }) => {
 		return result
 	}
 
+	const promises = await Promise.all([getCategories(), getSubCategories()])
+
 	return {
-		categories: getCategories(),
-		subcategories: getSubCategories()
+		categories: promises[0],
+		subcategories: promises[1]
 	}
 }

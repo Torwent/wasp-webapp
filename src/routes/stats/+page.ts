@@ -18,9 +18,9 @@ export const load = async ({ url, depends, parent }) => {
 
 	const totalEntries = 10
 
-	async function getTotal() {
-		const { supabaseClient } = await parent()
+	const { supabaseClient } = await parent()
 
+	async function getTotal() {
 		const { data, error: err } = await supabaseClient.rpc("get_stats_total").returns<Stats[]>()
 
 		if (err)
@@ -44,8 +44,6 @@ export const load = async ({ url, depends, parent }) => {
 	}
 
 	async function getStats() {
-		const { supabaseClient } = await parent()
-
 		const query = supabaseClient
 			.from("stats")
 			.select("username, experience, gold, levels, runtime", { count: "exact" })
@@ -75,5 +73,7 @@ export const load = async ({ url, depends, parent }) => {
 
 		return { stats: data, count: count || totalEntries }
 	}
-	return { total: getTotal(), stats: getStats(), range: range }
+
+	const promises = await Promise.all([getTotal(), getStats()])
+	return { total: promises[0], stats: promises[1], range: range }
 }

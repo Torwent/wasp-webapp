@@ -13,7 +13,7 @@
 		"Setup",
 		"Scripts",
 		"Stats",
-		"Premium",
+		"Subscriptions",
 		"FAQ",
 		"Tutorials",
 		"Dashboard"

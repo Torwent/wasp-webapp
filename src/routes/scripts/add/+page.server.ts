@@ -8,7 +8,7 @@ import { scriptExists } from "$lib/backend/data"
 import type { ScriptBase } from "$lib/types/collection"
 
 export const load = async (event) => {
-	return { form: superValidate(event, scriptSchema) }
+	return { form: await superValidate(event, scriptSchema) }
 }
 
 export const actions = {
@@ -63,7 +63,7 @@ export const actions = {
 			content: form.data.content,
 			categories: form.data.categories,
 			subcategories: form.data.subcategories,
-			published: false,
+			published: formData.has("published"),
 			min_xp: form.data.min_xp,
 			max_xp: form.data.max_xp,
 			min_gp: form.data.min_gp,
@@ -74,7 +74,8 @@ export const actions = {
 			tooltip_emojis: [],
 			tooltip_names: [],
 			url: "",
-			created_at: ""
+			created_at: "",
+			product: null
 		}
 
 		const { url: script_url, error: err } = await uploadScript(

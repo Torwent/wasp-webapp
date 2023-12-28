@@ -97,9 +97,14 @@ export const load = async ({ url, parent, depends }) => {
 		return result
 	}
 
+	const promises = await Promise.all([
+		getScripts(search, ascending, start, finish),
+		getCheckBoxes()
+	])
+
 	return {
-		scripts: getScripts(search, ascending, start, finish),
-		checkboxes: getCheckBoxes(),
+		scripts: promises[0],
+		checkboxes: promises[1],
 		range
 	}
 }

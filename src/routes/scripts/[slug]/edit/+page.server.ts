@@ -3,11 +3,17 @@ import { fail, redirect } from "@sveltejs/kit"
 import { scriptSchema } from "$lib/backend/schemas"
 import { canEdit, getScriptUUID } from "$lib/backend/data"
 import { filesEditSchema } from "$lib/backend/schemas.server"
-import { updateScript } from "$lib/backend/data.server"
+import {
+	createStripePriceEx,
+	createStripeScriptProduct,
+	updateStripePriceEx,
+	updateScript
+} from "$lib/backend/data.server"
 import { encodeSEO } from "$lib/utils"
+import type { Interval, Price } from "$lib/types/collection"
 
 export const load = async (event) => {
-	return { form: superValidate(event, scriptSchema) }
+	return { form: await superValidate(event, scriptSchema) }
 }
 
 interface FormFiles {

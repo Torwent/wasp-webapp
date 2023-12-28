@@ -11,29 +11,28 @@ export const load = async ({ url: { searchParams }, params: { slug }, parent, de
 	const start = ((slug ? 1 : page) - 1) * range
 	const finish = start + range
 
-	async function getScripters(search: string, start: number, finish: number) {
-		const { supabaseClient } = await parent()
-		let query = supabaseClient
-			.schema("profiles")
-			.from("scripters")
-			.select(
-				`id, realname, description, github, paypal_id, content, url, profiles!left (username, avatar)`,
-				{ count: "estimated" }
-			)
+	const { supabaseClient } = await parent()
 
-		if (search === "") {
-			query = query
-				.order("username", { foreignTable: "profiles", ascending: true })
-				.range(start, finish)
-		} else {
-			query = query.ilike("search", "%" + search + "%")
-		}
+	let query = supabaseClient
+		.schema("profiles")
+		.from("scripters")
+		.select(
+			`id, realname, description, github, paypal_id, content, url, profiles!left (username, avatar)`,
+			{ count: "estimated" }
+		)
 
-		return await query.returns<ScripterWithProfile[]>()
+	if (search === "") {
+		query = query
+			.order("username", { foreignTable: "profiles", ascending: true })
+			.range(start, finish)
+	} else {
+		query = query.ilike("search", "%" + search + "%")
 	}
 
+	const scripters = await query.returns<ScripterWithProfile[]>()
+
 	return {
-		scripterData: getScripters(slug ? "" : search, start, finish),
+		scripterData: scripters,
 		range
 	}
 }

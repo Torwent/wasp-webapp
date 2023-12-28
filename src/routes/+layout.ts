@@ -2,6 +2,7 @@ import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/publi
 import type { Profile } from "$lib/types/collection"
 import type { Database } from "$lib/types/supabase"
 import { createSupabaseLoadClient } from "@supabase/auth-helpers-sveltekit"
+import { error } from "@sveltejs/kit"
 
 export const load = async ({ fetch, data, depends }) => {
 	depends("supabase:auth")
@@ -16,74 +17,38 @@ export const load = async ({ fetch, data, depends }) => {
 		data: { session }
 	} = await supabaseClient.auth.getSession()
 
-	async function getProfile() {
-		if (!session) return null
-
+	let profile: Profile | null = null
+	if (session) {
 		const id = session.user.id
-		const { data, error } = await supabaseClient
+		const { data: profileData, error: err } = await supabaseClient
 			.schema("profiles")
 			.from("profiles")
 			.select(
-				`id, discord, username, avatar, email, customer_id, private!left (email, warning),
-				roles!left (banned, timeout, premium, vip, tester, scripter, moderator, administrator),
-				subscriptions!left (external, subscription_id, cancel, price_id, date_start, date_end)`
+				`id, discord, username, avatar, customer_id,
+				 private!private_id_fkey (email, warning),
+				 roles!roles_id_fkey (banned, tester, scripter, moderator, administrator),
+				 subscription!subscription_id_fkey (subscription, product, price, date_start, date_end, cancel)`
 			)
 			.eq("id", id)
 			.limit(1)
 			.limit(1, { foreignTable: "private" })
 			.limit(1, { foreignTable: "roles" })
-			.limit(1, { foreignTable: "subscriptions" })
 			.returns<Profile[]>()
 
-		if (error) {
-			console.error(error)
-			return null
+		if (err) {
+			console.error(err)
+			throw error(
+				500,
+				`Server error, this is probably not an issue on your end! - SELECT prices failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+			)
 		}
 
-		if (data.length === 0) {
-			return null
-		}
-
-		const profile = data[0]
-
-		let needUpdate = !profile.customer_id
-
-		if (!profile.subscriptions.external) {
-			const startDate = Date.parse(profile.subscriptions.date_start ?? "0")
-			const endDate = Date.parse(profile.subscriptions.date_end ?? "0")
-			const now = Date.now()
-
-			if (endDate - now < 0) {
-				if (profile.roles.vip) {
-					profile.roles.vip = false
-					needUpdate = true
-				}
-
-				if (profile.roles.premium) {
-					profile.roles.premium = false
-					needUpdate = true
-				}
-			} else {
-				const THREE_MONTHS = 7889400000
-				if (endDate - startDate > THREE_MONTHS && !profile.roles.vip) {
-					needUpdate = true
-					profile.roles.vip = true
-				}
-
-				if (!profile.roles.premium) {
-					needUpdate = true
-					profile.roles.premium = true
-				}
-			}
-		}
-
-		if (needUpdate)
-			fetch("/api/auth/profile/", {
-				method: "GET"
-			}).catch((err) => console.error(err))
-
-		return profile
+		if (profileData.length === 1) profile = profileData[0]
 	}
 
-	return { supabaseClient, session, profile: getProfile() }
+	return { supabaseClient, session, profile: profile }
 }

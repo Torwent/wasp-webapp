@@ -127,7 +127,7 @@ export const GET = async ({ locals: { supabaseServer } }) => {
         <priority>0.7</priority>
       </url>
       <url>
-        <loc>${website}/premium</loc>
+        <loc>${website}/subscriptions</loc>
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
       </url>      
@@ -148,6 +148,21 @@ export const GET = async ({ locals: { supabaseServer } }) => {
         <priority>0.7</priority>
       </url>
       ${developers}
+	  <url>
+        <loc>${website}/legal/user_terms_of_service</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.6</priority>
+      </url>
+	  <url>
+        <loc>${website}/legal/scripter_terms_of_service</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.6</priority>
+      </url>
+	  <url>
+        <loc>${website}/legal/privacy_policy</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.6</priority>
+      </url>
     </urlset>`,
 		{ headers: headers }
 	)

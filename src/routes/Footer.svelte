@@ -86,8 +86,9 @@
 				<nav>
 					<span class="mb-6 text-sm font-semibold uppercase">Legal</span>
 					<ul>
-						<li><a href="/">Privacy Policy</a></li>
-						<li><a href="/">Terms &amp; Conditions</a></li>
+						<li><a href="/legal/privacy_policy">Privacy Policy</a></li>
+						<li><a href="/legal/user_terms_of_service">User Terms &amp; Conditions</a></li>
+						<li><a href="/legal/scripter_terms_of_service">Scripter Terms &amp; Conditions</a></li>
 					</ul>
 				</nav>
 			</div>

@@ -3,8 +3,13 @@ import { fail } from "@sveltejs/kit"
 import { setError, superValidate } from "sveltekit-superforms/server"
 
 export const load = async (event) => {
-	const form = superValidate(event, profileSchema)
-	return { form, address: event.getClientAddress() }
+	let address: string = ""
+	try {
+		address = event.getClientAddress()
+	} catch (error) {
+		console.error(error)
+	}
+	return { form: await superValidate(event, profileSchema), address }
 }
 
 export const actions = {

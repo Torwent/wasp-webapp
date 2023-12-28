@@ -1,14 +1,12 @@
-import type { Handle } from "@sveltejs/kit"
+import { error, type Handle } from "@sveltejs/kit"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit"
-import { API_URL } from "$lib/utils"
 import type { Profile } from "$lib/types/collection"
-import { updateProfileProtected } from "$lib/backend/supabase.server"
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
 
-	const { url, locals, fetch } = event
+	const { url, locals } = event
 
 	locals.supabaseServer = createSupabaseServerClient({
 		supabaseUrl: PUBLIC_SUPABASE_URL,
@@ -32,62 +30,21 @@ export const handle: Handle = async ({ event, resolve }) => {
 			.schema("profiles")
 			.from("profiles")
 			.select(
-				`id, discord, username, avatar, email, customer_id, private!left (warning),
-				roles!left (banned, timeout, premium, vip, tester, scripter, moderator, administrator),
-				subscriptions!left (external, subscription_id, cancel, price_id, date_start, date_end)`
+				`id, discord, username, avatar, customer_id,
+				 private!private_id_fkey (email, warning),
+				 roles!roles_id_fkey (banned, tester, scripter, moderator, administrator),
+				 subscription!subscription_id_fkey (subscription, product, price, date_start, date_end, cancel)`
 			)
 			.eq("id", id)
 			.limit(1)
 			.limit(1, { foreignTable: "private" })
 			.limit(1, { foreignTable: "roles" })
-			.limit(1, { foreignTable: "subscriptions" })
 			.returns<Profile[]>()
 
 		if (err || data.length < 1) return null
 
 		const profile = data[0]
-
-		let needUpdate = false
-
-		if (profile.subscriptions.external) {
-			fetch(API_URL + "/discord/refresh/" + profile.discord, {
-				method: "GET"
-			}).catch((err) => console.error(err))
-		} else {
-			const startDate = Date.parse(profile.subscriptions.date_start ?? "0")
-			const endDate = Date.parse(profile.subscriptions.date_end ?? "0")
-			const now = Date.now()
-
-			if (endDate - now < 0) {
-				if (profile.roles.vip) {
-					profile.roles.vip = false
-					needUpdate = true
-				}
-
-				if (profile.roles.premium) {
-					profile.roles.premium = false
-					needUpdate = true
-				}
-			} else {
-				const THREE_MONTHS = 7889400000
-				if (endDate - startDate > THREE_MONTHS && !profile.roles.vip) {
-					needUpdate = true
-					profile.roles.vip = true
-				}
-
-				if (!profile.roles.premium) {
-					needUpdate = true
-					profile.roles.premium = true
-				}
-			}
-		}
-
-		if (needUpdate) await updateProfileProtected(profile)
-		if (!profile.subscriptions.external) {
-			fetch(API_URL + "/discord/update/" + profile.discord, {
-				method: "GET"
-			}).catch((err) => console.error(err))
-		}
+		if (profile.roles.banned) throw error(403, "You've been banned!")
 
 		return profile
 	}
@@ -98,7 +55,6 @@ export const handle: Handle = async ({ event, resolve }) => {
 		}
 	})
 
-	//if (response.status == 404) throw redirect(303, "/")
 	response.headers.delete("link")
 
 	const loadTime = performance.now() - start

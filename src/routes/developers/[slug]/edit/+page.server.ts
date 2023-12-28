@@ -4,8 +4,7 @@ import { developerSchema } from "$lib/backend/schemas"
 import { canEdit } from "$lib/backend/data"
 
 export const load = async (event) => {
-	const form = superValidate(event, developerSchema)
-	return { form }
+	return { form: await superValidate(event, developerSchema) }
 }
 
 export const actions = {

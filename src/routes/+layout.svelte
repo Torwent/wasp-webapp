@@ -41,31 +41,16 @@
 			}
 		)
 
-		let profilesRolesSubscription: RealtimeChannel | null = null
-		let profilesSubscriptionsSubscription: RealtimeChannel | null = null
+		let profilesSubscriptionSubscription: RealtimeChannel | null = null
 		if (session) {
-			profilesRolesSubscription = supabaseClient
-				.channel("profiles-roles-changes")
+			profilesSubscriptionSubscription = supabaseClient
+				.channel("profiles-subscription-changes")
 				.on(
 					"postgres_changes",
 					{
-						event: "UPDATE",
+						event: "*",
 						schema: "profiles",
-						table: "roles",
-						filter: "id=eq." + session.user.id
-					},
-					() => invalidate("supabase:auth")
-				)
-				.subscribe()
-
-			profilesSubscriptionsSubscription = supabaseClient
-				.channel("profiles-roles-changes")
-				.on(
-					"postgres_changes",
-					{
-						event: "UPDATE",
-						schema: "profiles",
-						table: "subscriptions",
+						table: "subscription",
 						filter: "id=eq." + session.user.id
 					},
 					() => invalidate("supabase:auth")
@@ -75,8 +60,7 @@
 
 		return () => {
 			subscription.unsubscribe()
-			if (profilesRolesSubscription) profilesRolesSubscription.unsubscribe()
-			if (profilesSubscriptionsSubscription) profilesSubscriptionsSubscription.unsubscribe()
+			if (profilesSubscriptionSubscription) profilesSubscriptionSubscription.unsubscribe()
 		}
 	})
 </script>
@@ -84,7 +68,7 @@
 {#if browser && $modalStore.length > 0}
 	<Modal regionBody="overflow-y-scroll max-h-96" />
 {/if}
-<!-- App Shell -->
+
 <AppShell regionPage="relative" slotPageHeader="sticky top-0 z-10" slotPageFooter="grid">
 	<svelte:fragment slot="pageHeader">
 		<div

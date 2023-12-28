@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { superForm } from "sveltekit-superforms/client"
-	import { FileDropzone, focusTrap } from "@skeletonlabs/skeleton"
+	import { FileDropzone, SlideToggle, focusTrap } from "@skeletonlabs/skeleton"
 	import { cropString, replaceScriptContent } from "$lib/utils"
 	import { scriptSchema } from "$lib/backend/schemas"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
@@ -74,7 +74,8 @@
 		tooltip_emojis: [],
 		tooltip_names: [],
 		url: "",
-		created_at: ""
+		created_at: "",
+		product: null
 	}
 	$form.content = `### {$title} by {$author}
 
@@ -353,13 +354,59 @@ You need quest ABC completed to use this.
 			</button>
 		</div>
 
-		<article class="variant-ringed-secondary p-8 my-8 mx-auto xs:w-4/5 md:w-4/5 lg:w-3/4">
+		<article class="variant-ringed-surface p-8 my-8 mx-auto xs:w-full md:w-6/7 lg:w-3/4 rounded-md">
 			<header class="text-center my-8">
-				<h3>Update Script</h3>
+				<h3>Add Script</h3>
 			</header>
 			<form method="POST" enctype="multipart/form-data" use:focusTrap={isFocused} use:enhance>
-				<label for="cover" class="my-4">
-					<span>Cover:</span>
+				<div class="flex justify-evenly">
+					<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
+
+					<div class="my-8">
+						<SlideToggle
+							name="published"
+							bind:checked={script.published}
+							background="bg-error-500"
+							active="bg-primary-500"
+						>
+							{#if script.published}Public{:else}Hidden{/if}
+						</SlideToggle>
+					</div>
+				</div>
+
+				<FormTextarea
+					title="Description"
+					extraTitle=" (recommended 60-80 characters)"
+					bind:value={$form.description}
+					bind:errors={$errors.description}
+					h={"h-18"}
+				/>
+
+				<FormTextarea
+					title="Content"
+					bind:value={$form.content}
+					bind:errors={$errors.content}
+					h={"h-64"}
+				/>
+
+				<MultiSelect
+					title="Categories"
+					bind:value={$form.categories}
+					errors={$errors.categories?._errors}
+					entries={categories}
+				/>
+
+				<MultiSelect
+					title="Subcategories"
+					bind:value={$form.subcategories}
+					errors={$errors.subcategories?._errors}
+					entries={subcategories}
+				/>
+
+				<header class="text-center my-8">
+					<h5>Files</h5>
+				</header>
+				<div class="flex justify-between gap-4">
 					<FileDropzone
 						name="cover"
 						bind:files={coverFiles}
@@ -388,7 +435,7 @@ You need quest ABC completed to use this.
 							{#if coverStyle === 0}
 								<span>Must be exactly 300x200 pixels and JPG format.</span>
 							{:else if coverStyle === 1}
-								<span class="text-success-500">{$form.cover?.name}</span>
+								<span class="text-success-500">{$form.cover.name}</span>
 							{:else if $errors.cover && $errors.cover.length > 0}
 								{#each $errors.cover as error}
 									{#if error}
@@ -398,10 +445,7 @@ You need quest ABC completed to use this.
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>
-				</label>
 
-				<label for="banner" class="my-4">
-					<span>Banner:</span>
 					<FileDropzone
 						name="banner"
 						bind:files={bannerFiles}
@@ -430,7 +474,7 @@ You need quest ABC completed to use this.
 							{#if bannerStyle === 0}
 								<span>Must be exactly 1920x768 pixels and JPG format.</span>
 							{:else if bannerStyle === 1}
-								<span class="text-success-500">{$form.banner?.name}</span>
+								<span class="text-success-500">{$form.banner.name}</span>
 							{:else if $errors.banner && $errors.banner.length > 0}
 								{#each $errors.banner as error}
 									{#if error}
@@ -440,42 +484,52 @@ You need quest ABC completed to use this.
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>
-				</label>
 
-				<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
+					<FileDropzone
+						name="script"
+						bind:files={scriptFiles}
+						accept=".simba"
+						on:change={onChangeScript}
+					>
+						<svelte:fragment slot="lead">
+							{#if scriptStyle === 0}
+								<FileCode class="mx-auto" />
+							{:else if scriptStyle === 1}
+								<FileCode class="mx-auto stroke-success-500" />
+							{:else}
+								<FileCode class="mx-auto stroke-error-500" />
+							{/if}
+						</svelte:fragment>
+						<svelte:fragment slot="message">
+							{#if scriptStyle === 0}
+								<span class="mx-auto">Simba script</span>
+							{:else if scriptStyle === 1}
+								<span class="mx-auto text-success-500">Simba script</span>
+							{:else}
+								<span class="mx-auto text-error-500">Simba script</span>
+							{/if}
+						</svelte:fragment>
+						<svelte:fragment slot="meta">
+							{#if scriptStyle === 0}
+								<span>Must be a Simba script file.</span>
+							{:else if scriptStyle === 1}
+								<span class="text-success-500">{$form.script.name}</span>
+							{:else if $errors.script && $errors.script.length > 0}
+								{#each $errors.script as error}
+									{#if error}
+										<small class="flex justify-center text-error-500">{error}</small>
+									{/if}
+								{/each}
+							{/if}
+						</svelte:fragment>
+					</FileDropzone>
+				</div>
 
-				<FormTextarea
-					title="Description"
-					extraTitle=" (recommended 60-80 characters)"
-					bind:value={$form.description}
-					bind:errors={$errors.description}
-					h={"h-18"}
-				/>
-
-				<MultiSelect
-					title="Categories"
-					bind:value={$form.categories}
-					errors={$errors.categories?._errors}
-					entries={categories}
-				/>
-
-				<MultiSelect
-					title="Subcategories"
-					bind:value={$form.subcategories}
-					errors={$errors.subcategories?._errors}
-					entries={subcategories}
-				/>
-
-				<FormTextarea
-					title="Content"
-					bind:value={$form.content}
-					bind:errors={$errors.content}
-					h={"h-64"}
-				/>
-
-				<div class="flex flex-col text-sm mt-8 mb-2">
-					<h5 class="text-center">Stats limits (every 5 minutes)</h5>
-					<div class="grid grid-cols-2 gap-8">
+				<div class="variant-soft-surface p-8 my-8 mx-auto rounded-md">
+					<header class="text-center my-8">
+						<h5>Stats limits (every 5 minutes)</h5>
+					</header>
+					<div class="flex justify-between gap-4">
 						<label for="min_xp" class="label my-2">
 							<span>Minimum Experience:</span>
 							<input
@@ -511,8 +565,7 @@ You need quest ABC completed to use this.
 								<div class="m-0 h-5" />
 							{/if}
 						</label>
-					</div>
-					<div class="grid grid-cols-2 gap-8">
+
 						<label for="min_gp" class="label my-2">
 							<span>Minimum Gold:</span>
 							<input
@@ -551,55 +604,13 @@ You need quest ABC completed to use this.
 					</div>
 				</div>
 
-				<label for="script" class="my-4">
-					<span>Script:</span>
-					<FileDropzone
-						name="script"
-						bind:files={scriptFiles}
-						accept=".simba"
-						on:change={onChangeScript}
-					>
-						<svelte:fragment slot="lead">
-							{#if scriptStyle === 0}
-								<FileCode class="mx-auto" />
-							{:else if scriptStyle === 1}
-								<FileCode class="mx-auto stroke-success-500" />
-							{:else}
-								<FileCode class="mx-auto stroke-error-500" />
-							{/if}
-						</svelte:fragment>
-						<svelte:fragment slot="message">
-							{#if scriptStyle === 0}
-								<span class="mx-auto">Simba script</span>
-							{:else if scriptStyle === 1}
-								<span class="mx-auto text-success-500">Simba script</span>
-							{:else}
-								<span class="mx-auto text-error-500">Simba script</span>
-							{/if}
-						</svelte:fragment>
-						<svelte:fragment slot="meta">
-							{#if scriptStyle === 0}
-								<span>Must be a Simba script file.</span>
-							{:else if scriptStyle === 1}
-								<span class="text-success-500">{$form.script?.name}</span>
-							{:else if $errors.script && $errors.script?.length > 0}
-								{#each $errors.script as error}
-									{#if error}
-										<small class="flex justify-center text-error-500">{error}</small>
-									{/if}
-								{/each}
-							{/if}
-						</svelte:fragment>
-					</FileDropzone>
-				</label>
-
-				<div class="my-8">
-					{#if $errors._errors && $errors._errors.length > 0}
+				{#if $errors._errors && $errors._errors.length > 0}
+					<div class="my-8">
 						{#each $errors._errors as error}
 							<div class="flex justify-center text-error-500">{error}</div>
 						{/each}
-					{/if}
-				</div>
+					</div>
+				{/if}
 
 				<div class="flex justify-between">
 					<a href="./">

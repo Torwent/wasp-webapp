@@ -6,7 +6,8 @@ import type {
 	ScripterWithProfile,
 	Script,
 	Profile,
-	StatsSimba
+	StatsSimba,
+	ScripterDashboard
 } from "$lib/types/collection"
 import { error } from "@sveltejs/kit"
 
@@ -70,7 +71,7 @@ export function addToolTips(script: Script, categories: Category[], subcategorie
 }
 
 export const scriptsQueryString = `id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-								   tooltip_emojis, tooltip_names,
+								   tooltip_emojis, tooltip_names, product,
 								   protected!left (assets, author_id, revision, username, avatar, revision_date, broken)`
 
 export async function getScripts(supabase: SupabaseClient) {
@@ -221,7 +222,7 @@ export async function getScripterUUID(supabase: SupabaseClient, uuid: string) {
 		.schema("profiles")
 		.from("scripters")
 		.select(
-			`id, url, realname, description, github, paypal_id, content,  profiles!left (username, avatar)`
+			`id, url, realname, description, github, paypal_id, content,  profiles!profiles_id_fkey (username, avatar)`
 		)
 		.eq("id", uuid)
 		.limit(1)
@@ -237,6 +238,33 @@ export async function getScripterUUID(supabase: SupabaseClient, uuid: string) {
 			Error details: ${err.details}
 			Error hint: ${err.message}`
 		)
+	return data[0]
+}
+
+export async function getScripterDashboard(supabase: SupabaseClient, uuid: string) {
+	const { data, error: err } = await supabase
+		.schema("profiles")
+		.from("scripters")
+		.select(
+			`id, url, realname, github, paypal_id, stripe,
+			 profiles!scripters_id_fkey (username, avatar, private!private_id_fkey (email))`
+		)
+		.eq("id", uuid)
+		.limit(1)
+		.limit(1, { foreignTable: "profiles" })
+		.limit(1, { foreignTable: "profiles.private" })
+		.returns<ScripterDashboard[]>()
+
+	if (err)
+		throw error(
+			500,
+			`Server error, this is probably not an issue on your end! - SELECT developers failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+		)
+
 	return data[0]
 }
 
@@ -279,7 +307,5 @@ export function canDownload(profile: Profile | null) {
 	if (profile.roles.moderator) return true
 	if (profile.roles.scripter) return true
 	if (profile.roles.tester) return true
-	if (profile.roles.vip) return true
-	if (profile.roles.premium) return true
 	return false
 }

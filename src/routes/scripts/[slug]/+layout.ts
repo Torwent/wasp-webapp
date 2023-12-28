@@ -17,9 +17,9 @@ export const load = async ({ params, parent }) => {
 		throw redirect(301, "/scripts/" + slug)
 	}
 
-	async function getScript(slug: string) {
-		const { supabaseClient } = await parent()
+	const { supabaseClient } = await parent()
 
+	async function getScript(slug: string) {
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("scripts")
@@ -44,7 +44,6 @@ export const load = async ({ params, parent }) => {
 	}
 
 	async function getScriptUUID(uuid: string) {
-		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("scripts")
@@ -68,6 +67,6 @@ export const load = async ({ params, parent }) => {
 	}
 
 	return {
-		script: isUUID ? getScriptUUID(slug) : getScript(slug)
+		script: isUUID ? await getScriptUUID(slug) : await getScript(slug)
 	}
 }

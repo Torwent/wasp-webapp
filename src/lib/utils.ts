@@ -1,4 +1,4 @@
-import type { Script } from "./types/collection"
+import type { Price, Script } from "./types/collection"
 
 export const API_URL = "https://api.waspscripts.com" //http://localhost:8080
 export const UUID_V4_REGEX =
@@ -158,4 +158,36 @@ export function replaceScriptContent(script: Script) {
 	})
 
 	return result
+}
+
+export function getPriceInterval(interval: string) {
+	return interval.slice(0)[0].toUpperCase() + interval.slice(1) + "ly"
+}
+export function getPriceIntervalEx(price: Price) {
+	return getPriceInterval(price.interval)
+}
+
+export function setPriceInterval(index: number, prices: Price[]) {
+	for (let i = 0; i < prices.length; i++) prices[i].active = false
+	prices[index].active = true
+}
+
+export function getPriceAmount(price: Price) {
+	return new Intl.NumberFormat("pt-PT", {
+		style: "currency",
+		currency: price.currency
+	}).format(price.amount / 100)
+}
+
+export function getPrice(id: string, prices: Price[]) {
+	return prices.find((price) => price.id === id)
+}
+
+export function getActivePrice(prices: Price[]) {
+	return prices.find((price) => price.active)
+}
+
+export function getCurrentPrice(prices: Price[]) {
+	const price = getActivePrice(prices)
+	if (price) return getPriceAmount(price)
 }
