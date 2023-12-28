@@ -126,7 +126,7 @@ export const actions = {
 				payment_method_collection: "always",
 				allow_promotion_codes: true,
 				subscription_data: {
-					application_fee_percent: stripeUser ? 20 : 0,
+					application_fee_percent: stripeUser ? 20 : undefined,
 					transfer_data: stripeUser ? { destination: stripeUser } : undefined,
 					metadata: { user_id: profile.id }
 				},
