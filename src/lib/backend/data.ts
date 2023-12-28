@@ -301,11 +301,21 @@ export function canEdit(profile: Profile | null, author: string | null | undefin
 	return profile.id === author
 }
 
-export function canDownload(profile: Profile | null) {
+export async function canDownload(
+	supabase: SupabaseClient,
+	profile: Profile | null,
+	script_id: string
+) {
 	if (!profile) return false
 	if (profile.roles.administrator) return true
 	if (profile.roles.moderator) return true
 	if (profile.roles.scripter) return true
 	if (profile.roles.tester) return true
-	return false
+
+	const { data, error } = await supabase
+		.schema("profiles")
+		.rpc("can_access", { script_id: script_id })
+		.returns<boolean>()
+
+	return data ?? false
 }

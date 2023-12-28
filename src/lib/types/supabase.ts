@@ -383,6 +383,20 @@ export interface Database {
         }
         Returns: string
       }
+      can_access:
+        | {
+            Args: {
+              script_id: string
+            }
+            Returns: boolean
+          }
+        | {
+            Args: {
+              user_id: string
+              script_id: string
+            }
+            Returns: boolean
+          }
       get_access: {
         Args: {
           user_id: string

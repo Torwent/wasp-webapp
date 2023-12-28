@@ -71,9 +71,9 @@
 
 	if (!dismissed && script && script.categories.includes("Community")) modalStore.trigger(warn)
 
-	function canDownloadScript() {
+	async function canDownloadScript() {
 		if (script.categories.includes("Free")) return true
-		return canDownload(profile)
+		return await canDownload(supabaseClient, profile, script.id)
 	}
 
 	const t: ToastSettings = {
@@ -178,26 +178,28 @@
 
 		{#if profile}
 			<div class="text-center">
-				{#if canDownloadScript()}
-					<div class="py-12 grid justify-center justify-items-center gap-8">
-						<AdvancedButton {script} rev={script.protected.revision} />
-						<ZipDownload bind:profile />
-						<EditButton author_id={script.protected.author_id} />
-					</div>
+				{#await canDownloadScript() then has_access}
+					{#if has_access}
+						<div class="py-12 grid justify-center justify-items-center gap-8">
+							<AdvancedButton {script} rev={script.protected.revision} />
+							<ZipDownload bind:profile />
+							<EditButton author_id={script.protected.author_id} />
+						</div>
 
-					<h4 class="pt-4">
-						You should move this script to
-						<b class="text-primary-500">/Simba/Scripts/</b>
-						and place it in the respective folder.
-					</h4>
-				{:else}
-					<h4 class="py-2">This is a premium script and you are not premium.</h4>
-					<h5>
-						To be able to download this script join
-						<a href="/premium" class="font-semibold text-primary-500 hover:underline">Premium</a>
-						!
-					</h5>
-				{/if}
+						<h4 class="pt-4">
+							You should move this script to
+							<b class="text-primary-500">/Simba/Scripts/</b>
+							and place it in the respective folder.
+						</h4>
+					{:else}
+						<h4 class="py-2">This is a premium script and you are not premium.</h4>
+						<h5>
+							To be able to download this script join
+							<a href="/premium" class="font-semibold text-primary-500 hover:underline">Premium</a>
+							!
+						</h5>
+					{/if}
+				{/await}
 			</div>
 		{/if}
 
