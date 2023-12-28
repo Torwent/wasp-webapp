@@ -253,8 +253,7 @@ export async function createStripeAccount(
 				card_payments: { requested: true },
 				link_payments: { requested: true },
 				transfers: { requested: true }
-			},
-			default_currency: "eur"
+			}
 		})
 	} catch (error) {
 		console.error(error)
