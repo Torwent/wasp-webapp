@@ -1,4 +1,4 @@
-import { STRIPE_WEBHOOOK_SECRET_LOCAL } from "$env/static/private"
+//import { STRIPE_WEBHOOOK_SECRET_LOCAL } from "$env/static/private"
 import {
 	insertProduct,
 	deleteProduct,
@@ -25,7 +25,7 @@ export const POST = async ({ request, locals }) => {
 	const body = await request.text()
 
 	try {
-		event = stripe.webhooks.constructEvent(body, sig, STRIPE_WEBHOOOK_SECRET_LOCAL)
+		event = stripe.webhooks.constructEvent(body, sig, "STRIPE_WEBHOOOK_SECRET_LOCAL")
 	} catch (err) {
 		console.log(err)
 		throw error(404, "Event is not valid! Body: " + body + " Error: " + err)
