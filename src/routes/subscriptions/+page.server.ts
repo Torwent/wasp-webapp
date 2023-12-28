@@ -122,10 +122,11 @@ export const actions = {
 				customer_update: { address: "auto", shipping: "auto" },
 				mode: "subscription",
 				billing_address_collection: "auto",
-				automatic_tax: { enabled: true },
+				automatic_tax: { enabled: stripeUser == null },
 				payment_method_collection: "always",
 				allow_promotion_codes: true,
 				subscription_data: {
+					on_behalf_of: stripeUser ?? undefined,
 					application_fee_percent: stripeUser ? 20 : undefined,
 					transfer_data: stripeUser ? { destination: stripeUser } : undefined,
 					metadata: { user_id: profile.id }
