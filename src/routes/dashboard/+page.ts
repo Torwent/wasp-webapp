@@ -135,6 +135,7 @@ export const load = async ({ parent, data, depends, url }) => {
 		}
 
 		return data.map((script) => {
+			console.log(url.host + "/" + script.url)
 			return {
 				id: script.id,
 				name: script.title,
