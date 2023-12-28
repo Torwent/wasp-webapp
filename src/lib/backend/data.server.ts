@@ -236,7 +236,8 @@ export async function getProfile(supabase: SupabaseClient, id: string) {
 export async function createStripeAccount(
 	supabase: SupabaseClient,
 	baseURL: string,
-	scripter: ScripterDashboard
+	scripter: ScripterDashboard,
+	country: string
 ) {
 	let account: Stripe.Response<Stripe.Account>
 	let accountLink: Stripe.Response<Stripe.AccountLink>
@@ -244,6 +245,7 @@ export async function createStripeAccount(
 	try {
 		account = await stripe.accounts.create({
 			type: "custom",
+			country: country,
 			email: scripter.profiles.private.email,
 			business_type: "individual",
 			individual: { full_name_aliases: [scripter.id, scripter.profiles.username] },

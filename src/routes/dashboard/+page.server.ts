@@ -11,6 +11,7 @@ import {
 } from "$lib/backend/data.server"
 import {
 	bundleArraySchema,
+	countryCodeSchema,
 	newBundleSchema,
 	newScriptArraySchema,
 	scriptArraySchema
@@ -19,17 +20,29 @@ import { redirect } from "@sveltejs/kit"
 import { setError, superValidate } from "sveltekit-superforms/server"
 
 export const load = async (event) => {
+	const promises = await Promise.all([
+		superValidate(event, countryCodeSchema),
+		superValidate(event, bundleArraySchema),
+		superValidate(event, newBundleSchema),
+		superValidate(event, scriptArraySchema),
+		superValidate(event, newScriptArraySchema)
+	])
 	return {
-		bundlesForm: await superValidate(event, bundleArraySchema),
-		newBundleForm: await superValidate(event, newBundleSchema),
-		scriptsForm: await superValidate(event, scriptArraySchema),
-		newScriptForm: await superValidate(event, newScriptArraySchema)
+		countryForm: promises[0],
+		bundlesForm: promises[1],
+		newBundleForm: promises[2],
+		scriptsForm: promises[3],
+		newScriptForm: promises[4]
 	}
 }
 
 export const actions = {
-	linkStripe: async ({ locals: { supabaseServer, getSession, getProfile }, url: { origin } }) => {
-		const promises = await Promise.all([getSession(), getProfile()])
+	linkStripe: async ({
+		request,
+		locals: { supabaseServer, getSession, getProfile },
+		url: { origin }
+	}) => {
+		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
 		const profile = promises[1]
 
 		if (!promises[0] || !profile) {
@@ -39,8 +52,12 @@ export const actions = {
 		const scripter = await getScripterDashboard(supabaseServer, profile.id)
 
 		let link: string | undefined
-		if (!scripter.stripe) link = await createStripeAccount(supabaseServer, origin, scripter)
-		else link = await finishStripeAccountSetup(origin, scripter.stripe)
+		if (!scripter.stripe) {
+			const form = await superValidate(promises[2], countryCodeSchema)
+			if (!form.valid) return setError(form, "", "The country code form is not valid!")
+
+			link = await createStripeAccount(supabaseServer, origin, scripter, form.data.code)
+		} else link = await finishStripeAccountSetup(origin, scripter.stripe)
 
 		if (link) throw redirect(303, link)
 		return

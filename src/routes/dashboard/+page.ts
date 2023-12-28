@@ -274,6 +274,7 @@ export const load = async ({ parent, data, depends, url }) => {
 	])
 
 	return {
+		countryForm: data.countryForm,
 		bundlesForm,
 		newBundleForm,
 		scriptsForm,

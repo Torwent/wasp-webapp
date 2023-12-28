@@ -355,6 +355,10 @@ export const newScriptArraySchema = z.object({
 	scripts: z.array(newScriptSchema)
 })
 
+export const countryCodeSchema = z.object({
+	code: z.string().length(2, "Country codes have to be only 2 letters")
+})
+
 export type PriceSchema = z.infer<typeof priceSchema>
 export type BundleSchema = z.infer<typeof newBundleSchema>
 export type NewScriptSchema = z.infer<typeof newScriptSchema>
