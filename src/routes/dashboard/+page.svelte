@@ -1,7 +1,6 @@
 <script lang="ts">
 	import TableHeader from "$lib/components/tables/TableHeader.svelte"
 	import TableCell from "$lib/components/tables/TableCell.svelte"
-
 	import { onMount } from "svelte"
 	import { invalidate } from "$app/navigation"
 	import {
@@ -13,6 +12,8 @@
 	} from "$lib/backend/schemas"
 	import Table from "./Table.svelte"
 	import { superForm } from "sveltekit-superforms/client"
+	import { PUBLIC_STRIPE_PUBLISHABLE_KEY } from "$env/static/public"
+	import { browser } from "$app/environment"
 
 	export let data
 	let { supabaseClient, profile, scripter, stats } = data
@@ -24,7 +25,28 @@
 		validators: countryCodeSchema
 	})
 
-	onMount(() => {
+	onMount(async () => {
+		if (browser && document) {
+			const connectJS = await import("@stripe/connect-js")
+
+			const fetchClientSecret = async () => {
+				invalidate("dashboard:stripe_session")
+				return data.stripeSession ?? ""
+			}
+
+			const stripeConnectInstance = connectJS.loadConnectAndInitialize({
+				publishableKey: PUBLIC_STRIPE_PUBLISHABLE_KEY,
+				fetchClientSecret: fetchClientSecret
+			})
+			const paymentComponent = stripeConnectInstance.create("payments")
+			const paymentContainer = document.getElementById("stripePaymentsContainer")
+			const payoutComponent = stripeConnectInstance.create("payouts")
+			const payoutContainer = document.getElementById("stripePayoutsContainer")
+			
+			if (paymentContainer) paymentContainer.appendChild(paymentComponent)
+			if (payoutContainer) payoutContainer.appendChild(payoutComponent)
+		}
+
 		const subscription = supabaseClient
 			.channel("products-subscription-changes")
 			.on(
@@ -215,5 +237,14 @@
 			headers={["New Premium Script", "Price (Week/Month/Year)", "Action"]}
 			action={"scriptAdd&script"}
 		/>
+
+		<div class="my-16 mx-auto max-w-7xl">
+			<h3 class="text-center"> Stripe Dashboard </h3>
+			
+			<h5 class="text-center my-4"> Payments </h5>
+			<div id="stripePaymentsContainer" class="my-8"/>
+			<h5 class="text-center my-4"> Payouts </h5>
+			<div id="stripePayoutsContainer" class="my-8" />
+		</div>
 	{/if}
 </main>

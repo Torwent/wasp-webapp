@@ -274,6 +274,7 @@ export const load = async ({ parent, data, depends, url }) => {
 	])
 
 	return {
+		stripeSession: data.stripeSession,
 		countryForm: data.countryForm,
 		bundlesForm,
 		newBundleForm,

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { modalStore, type ModalSettings, SlideToggle } from "@skeletonlabs/skeleton"
+	import { SlideToggle } from "@skeletonlabs/skeleton"
 	import { page } from "$app/stores"
 	import { superForm } from "sveltekit-superforms/client"
 	import { checkoutSchema } from "$lib/backend/schemas"
@@ -83,49 +83,6 @@
 	onMount(() => {
 		userLocale = navigator.language
 	})
-
-	const confirm: ModalSettings = {
-		type: "alert",
-		// Data
-		title: "Terms and Conditions:",
-		buttonTextCancel: "Confirm",
-		body: `
-		<p class="py-2">
-			Not all scripts are guaranteed to be working all the time. They can be broken at times and
-			take some time to be fixed. So you shouldn't buy or subscribe to Premium for one specific
-			script.
-		</p>
-		<p class="py-2">
-			<span class="font-bold text-red-600 dark:text-red-500">VIP</span> is not sold directly.
-			You earn it after being subscribed for at least 3 months or buying a subscription longer than that
-			or permanent.
-		</p>
-		<p class="py-2">
-			As this is a digital product, all sales are final and refunds are not accepted except in rare
-			occasions that I deem appropriate.
-		</p>
-		<p class="py-2">
-			Permanent purchage is not literally permanent, it's for how long WaspScripts is doing
-			business. The same applies to temporary subscriptions which might end earlier than they would
-			be expected to in case WaspScripts shuts down.
-		</p>
-		<p class="py-2">
-			In case of an early termination, subscriptions will be reimbursed a percentage of the price
-			you paid depending on how long you had left and as long as it surpasses 1 month left.
-		</p>
-		<p class="py-2">
-			For permanent purchase, you will be reimbursed the same way assuming it was a subscription of
-			1 year and a half.
-		</p>
-		<p class="py-2">
-			This means that if you had your permanent premium for 1 year and 8 months and it gets
-			terminated you will not get any refund.
-		</p>`
-	}
-
-	function handleClick() {
-		modalStore.trigger(confirm)
-	}
 
 	const headTitle = "Subscriptions - WaspScripts"
 	const headDescription =

@@ -1,13 +1,14 @@
 import { getScripterDashboard } from "$lib/backend/data"
 import {
-	createStripeAccount,
+	createStripeConnectAccount,
 	createStripeBundleProduct,
 	createStripePrice,
 	createStripeScriptProduct,
 	doLogin,
 	finishStripeAccountSetup,
 	updateStripePrice,
-	updateStripeProduct
+	updateStripeProduct,
+	getStripeSession
 } from "$lib/backend/data.server"
 import {
 	bundleArraySchema,
@@ -16,23 +17,33 @@ import {
 	newScriptArraySchema,
 	scriptArraySchema
 } from "$lib/backend/schemas"
-import { redirect } from "@sveltejs/kit"
+import { error, redirect } from "@sveltejs/kit"
 import { setError, superValidate } from "sveltekit-superforms/server"
 
 export const load = async (event) => {
+	const { supabaseServer, getProfile } = event.locals
+	const profile = await getProfile()
+	if (!profile) throw error(403, "You need to be logged in.")
+
 	const promises = await Promise.all([
 		superValidate(event, countryCodeSchema),
 		superValidate(event, bundleArraySchema),
 		superValidate(event, newBundleSchema),
 		superValidate(event, scriptArraySchema),
-		superValidate(event, newScriptArraySchema)
+		superValidate(event, newScriptArraySchema),
+		getScripterDashboard(supabaseServer, profile.id)
 	])
+
+	event.depends("dashboard:stripe_session")
+	const stripeSession = promises[5].stripe ? await getStripeSession(promises[5].stripe) : null
+
 	return {
 		countryForm: promises[0],
 		bundlesForm: promises[1],
 		newBundleForm: promises[2],
 		scriptsForm: promises[3],
-		newScriptForm: promises[4]
+		newScriptForm: promises[4],
+		stripeSession: stripeSession
 	}
 }
 
@@ -56,7 +67,7 @@ export const actions = {
 			const form = await superValidate(promises[2], countryCodeSchema)
 			if (!form.valid) return setError(form, "", "The country code form is not valid!")
 
-			link = await createStripeAccount(supabaseServer, origin, scripter, form.data.code)
+			link = await createStripeConnectAccount(supabaseServer, origin, scripter, form.data.code)
 		} else link = await finishStripeAccountSetup(origin, scripter.stripe)
 
 		if (link) throw redirect(303, link)

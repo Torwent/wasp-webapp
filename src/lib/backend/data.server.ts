@@ -233,7 +233,43 @@ export async function getProfile(supabase: SupabaseClient, id: string) {
 	return data[0]
 }
 
-export async function createStripeAccount(
+export async function createStripeCustomer(
+	id: string,
+	email: string,
+	discord: string,
+	username: string
+) {
+	let customer: Stripe.Customer
+	let customerSearch: Stripe.Response<Stripe.ApiSearchResult<Stripe.Customer>>
+
+	try {
+		customerSearch = await stripe.customers.search({ query: `name:"${id}"` })
+	} catch (error) {
+		console.error(error)
+		return null
+	}
+
+	if (customerSearch.data.length > 1) return false
+	if (customerSearch.data.length === 1) return customerSearch.data[0].id
+
+	try {
+		customer = await stripe.customers.create({
+			email: email,
+			name: id,
+			metadata: {
+				id: id,
+				discord_id: discord,
+				username: username
+			}
+		})
+	} catch (error) {
+		console.error(error)
+		return null
+	}
+	return customer.id
+}
+
+export async function createStripeConnectAccount(
 	supabase: SupabaseClient,
 	baseURL: string,
 	scripter: ScripterDashboard,
@@ -313,6 +349,40 @@ export async function finishStripeAccountSetup(baseURL: string, account: string)
 	}
 
 	return accountLink.url
+}
+
+export async function getStripeSession(account: string) {
+	let accountSession: Stripe.Response<Stripe.AccountSession> | null = null
+
+	try {
+		accountSession = await stripe.accountSessions.create({
+			account: account,
+			components: {
+				payments: {
+					enabled: true,
+					features: {
+						refund_management: true,
+						dispute_management: true,
+						capture_payments: true
+					}
+				},
+				payouts: {
+					enabled: true
+				},
+				payment_details: {
+					enabled: true,
+					features: { refund_management: true, capture_payments: true, dispute_management: true }
+				}
+			}
+		})
+	} catch (error) {
+		console.error(
+			"An error occurred when calling the Stripe API to create an account session",
+			error
+		)
+	}
+
+	return accountSession?.client_secret
 }
 
 export async function StripeAccount(baseURL: string, developer: ScripterWithProfile) {

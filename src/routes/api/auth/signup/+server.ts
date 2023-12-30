@@ -1,6 +1,6 @@
 import { ADMIN_PASS } from "$env/static/private"
-import { getPrivateProfile, stripe, updateCustomerID } from "$lib/backend/supabase.server"
-import type Stripe from "stripe"
+import { createStripeCustomer } from "$lib/backend/data.server"
+import { getPrivateProfile, updateCustomerID } from "$lib/backend/supabase.server"
 
 export const POST = async ({ request }) => {
 	const hookPassword = request.headers.get("password")
@@ -33,35 +33,12 @@ export const POST = async ({ request }) => {
 	}
 
 	console.log("Creating customer for " + id)
-	let customer: Stripe.Customer
+	const customer = await createStripeCustomer(id, email, profile.discord, profile.username)
 
-	try {
-		const customerSearch = await stripe.customers.search({ query: `name:"${id}"` })
-		if (customerSearch.data.length > 1) {
-			throw Error("Profile with " + id + " seems to be corrupted!")
-		}
-		let customer_id
-
-		if (customerSearch.data.length > 0) {
-			customer_id = customerSearch.data[0].id
-		} else {
-			customer = await stripe.customers.create({
-				email: email,
-				name: id,
-				metadata: {
-					id: id,
-					discord_id: profile.discord,
-					username: profile.username
-				}
-			})
-
-			customer_id = customer.id
-		}
-		await updateCustomerID(id, customer_id)
-	} catch (error) {
-		console.error(error)
+	if (!customer) {
 		throw Error("Failed to create stripe user for " + id)
 	}
+	await updateCustomerID(id, customer)
 
 	return new Response()
 }

@@ -10,10 +10,12 @@ const config = {
 		csp: {
 			mode: "auto",
 			directives: {
+				"frame-src": ["self", "https://connect-js.stripe.com", "https://js.stripe.com"],
 				"script-src": [
 					"self",
 					"https://enqlpchobniylwpsjcqc.supabase.co/",
 					"https://js.stripe.com/",
+					"https://connect-js.stripe.com",
 					"sha256-NIGxH81XzlJ1MLZd3Miw/iZ1aTKLJT4aAbU5iVmRLTw=",
 					"unsafe-inline",
 					"sha256-PBmRLzA7Ofi7WtgbjS5vmS9t83AYv5oRRywasLtzZ9Y=", //dev
