@@ -13,7 +13,14 @@ export const POST = async ({ request }) => {
 
 	if (req.type !== "INSERT" || req.schema !== "profiles" || req.table !== "private") {
 		console.error("Webhook sent doesn't match this endpoint.")
-		throw Error("Webhook sent doesn't match this endpoint.")
+		throw Error(
+			"Webhook sent doesn't match this endpoint. Type: " +
+				req.type +
+				" Schema: " +
+				req.schema +
+				" Table: " +
+				req.table
+		)
 	}
 
 	const { id, email } = req.record
@@ -22,7 +29,7 @@ export const POST = async ({ request }) => {
 
 	if (!profile) {
 		console.error("Failed to load user profile for: " + id)
-		throw Error("Failed to load user profile for: " + id)
+		throw Error("Failed to load user private profile for: " + id)
 	}
 
 	console.log("Creating customer for " + id)
