@@ -20,7 +20,6 @@ export const load = async ({ fetch, data, depends }) => {
 	let profile: Profile | null = null
 	if (session) {
 		const id = session.user.id
-		console.log(id)
 		const { data: profileData, error: err } = await supabaseClient
 			.schema("profiles")
 			.from("profiles")

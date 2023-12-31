@@ -272,7 +272,7 @@ export async function updateSubscription(subscription: ProfileSubscription) {
 
 	console.log("UPDATE profile.subscription for user: ", subscription.id)
 
-	const { error: errSubscription } = await supabaseAdmin
+	const { data, error: errSub } = await supabaseAdmin
 		.schema("profiles")
 		.from("subscription")
 		.update({
@@ -281,10 +281,31 @@ export async function updateSubscription(subscription: ProfileSubscription) {
 			cancel: subscription.cancel
 		})
 		.eq("subscription", subscription.subscription)
+		.select()
+		.single()
 
-	if (errSubscription) {
-		console.error(errSubscription)
-		throw error(500, errSubscription)
+	if (!data) {
+		console.log("UPDATE profile.subscription_old for user: ", subscription.id)
+		const { error: errSubOld } = await supabaseAdmin
+			.schema("profiles")
+			.from("subscription_old")
+			.update({
+				date_end: subscription.date_end,
+				date_start: subscription.date_start,
+				cancel: subscription.cancel
+			})
+			.eq("subscription", subscription.subscription)
+			.select()
+			.single()
+
+		if (errSubOld) {
+			console.error("errSub: " + errSub)
+			console.error("errSubOld: " + errSubOld)
+			throw error(
+				500,
+				"errSub: " + JSON.stringify(errSub) + "errSubOld: " + JSON.stringify(errSubOld)
+			)
+		}
 	}
 
 	return true

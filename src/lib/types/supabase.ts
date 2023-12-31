@@ -444,11 +444,9 @@ export interface Database {
             }
             Returns: boolean
           }
-      get_access: {
-        Args: {
-          user_id: string
-        }
-        Returns: unknown
+      cron_check_subscriptions: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       get_avatar: {
         Args: {
@@ -1418,10 +1416,6 @@ export interface Database {
           script_id: string
         }
         Returns: boolean
-      }
-      remove_expired_subscriptions: {
-        Args: Record<PropertyKey, never>
-        Returns: undefined
       }
       script_exists: {
         Args: {

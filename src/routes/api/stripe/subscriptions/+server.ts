@@ -8,7 +8,7 @@ import {
 import { error, json } from "@sveltejs/kit"
 import type Stripe from "stripe"
 
-export const POST = async ({ request, locals }) => {
+export const POST = async ({ request }) => {
 	const sig = request.headers.get("stripe-signature") ?? ""
 	let event: Stripe.Event
 
