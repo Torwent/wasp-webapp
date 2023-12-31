@@ -31,7 +31,7 @@ export const POST = async ({ request }) => {
 			url: "https://waspscripts.com/scripters/" + url
 		},
 		metadata: { id: profile.id, discord: profile.discord, email: profile.private.email },
-		email: profile.email,
+		email: profile.private.email,
 		type: "custom"
 	})
 

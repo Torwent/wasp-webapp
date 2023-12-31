@@ -42,7 +42,7 @@ export const actions = {
 					"",
 					`You don't seem to have a customer_id assign for some reason. This shouldn't happen and has to be fixed manually.
 					Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com and send the following:
-					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${profile.email} username: ${profile.username}`
+					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${profile.private.email} username: ${profile.username}`
 				)
 
 			profile.customer_id = customerSearch.data[0].id
@@ -55,7 +55,7 @@ export const actions = {
 					"",
 					`You don't seem to have a customer_id assign for some reason and one couldn't be created. This shouldn't happen and has to be fixed manually.
 					Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com and send the following:
-					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${profile.email}  username: ${profile.username}`
+					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${profile.private.email}  username: ${profile.username}`
 				)
 		}
 

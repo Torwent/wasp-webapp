@@ -34,32 +34,6 @@ export interface Database {
   }
   profiles: {
     Tables: {
-      access: {
-        Row: {
-          bundles: string[]
-          id: string
-          scripts: string[]
-        }
-        Insert: {
-          bundles?: string[]
-          id: string
-          scripts?: string[]
-        }
-        Update: {
-          bundles?: string[]
-          id?: string
-          scripts?: string[]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "access_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          }
-        ]
-      }
       private: {
         Row: {
           email: string
@@ -91,7 +65,6 @@ export interface Database {
           avatar: string
           customer_id: string | null
           discord: string
-          email: string
           id: string
           username: string
         }
@@ -99,7 +72,6 @@ export interface Database {
           avatar?: string
           customer_id?: string | null
           discord?: string
-          email?: string
           id: string
           username?: string
         }
@@ -107,7 +79,6 @@ export interface Database {
           avatar?: string
           customer_id?: string | null
           discord?: string
-          email?: string
           id?: string
           username?: string
         }
@@ -300,13 +271,6 @@ export interface Database {
         }
         Relationships: [
           {
-            foreignKeyName: "subscriptions_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "subscriptions_price_id_fkey"
             columns: ["price_id"]
             isOneToOne: false
@@ -315,44 +279,127 @@ export interface Database {
           }
         ]
       }
-      subscriptions_past: {
+      subscriptions_bak: {
         Row: {
-          bundle: string | null
+          cancel: boolean
+          date_end: string
+          date_start: string
+          external: boolean
+          id: string
+          price_id: string
+          subscription_id: string | null
+        }
+        Insert: {
+          cancel?: boolean
+          date_end?: string
+          date_start?: string
+          external?: boolean
+          id: string
+          price_id?: string
+          subscription_id?: string | null
+        }
+        Update: {
+          cancel?: boolean
+          date_end?: string
+          date_start?: string
+          external?: boolean
+          id?: string
+          price_id?: string
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_bak_price_id_fkey"
+            columns: ["price_id"]
+            isOneToOne: false
+            referencedRelation: "prices"
+            referencedColumns: ["stripe_id"]
+          }
+        ]
+      }
+      subscriptions_old: {
+        Row: {
+          cancel: boolean
           date_end: string
           date_start: string
           id: string
-          price_id: string
-          script: string | null
+          price: string
+          product: string
           subscription: string
         }
         Insert: {
-          bundle?: string | null
+          cancel?: boolean
           date_end?: string
           date_start?: string
           id: string
-          price_id?: string
-          script?: string | null
+          price: string
+          product: string
           subscription: string
         }
         Update: {
-          bundle?: string | null
+          cancel?: boolean
           date_end?: string
           date_start?: string
           id?: string
-          price_id?: string
-          script?: string | null
+          price?: string
+          product?: string
           subscription?: string
         }
         Relationships: [
           {
-            foreignKeyName: "subscriptions_past_id_fkey"
+            foreignKeyName: "subscriptions_old_id_fkey"
             columns: ["id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "subscriptions_past_price_id_fkey"
+            foreignKeyName: "subscriptions_old_price_fkey"
+            columns: ["price"]
+            isOneToOne: false
+            referencedRelation: "prices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "subscriptions_old_product_fkey"
+            columns: ["product"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      subscriptions_uc: {
+        Row: {
+          cancel: boolean
+          date_end: string
+          date_start: string
+          external: boolean
+          id: string
+          price_id: string
+          subscription_id: string | null
+        }
+        Insert: {
+          cancel?: boolean
+          date_end?: string
+          date_start?: string
+          external?: boolean
+          id: string
+          price_id?: string
+          subscription_id?: string | null
+        }
+        Update: {
+          cancel?: boolean
+          date_end?: string
+          date_start?: string
+          external?: boolean
+          id?: string
+          price_id?: string
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_uc_price_id_fkey"
             columns: ["price_id"]
             isOneToOne: false
             referencedRelation: "prices"
@@ -386,13 +433,13 @@ export interface Database {
       can_access:
         | {
             Args: {
+              accesser_id: string
               script_id: string
             }
             Returns: boolean
           }
         | {
             Args: {
-              user_id: string
               script_id: string
             }
             Returns: boolean
@@ -753,6 +800,21 @@ export interface Database {
           runtime: number
         }[]
       }
+      insert_ten_year_sub:
+        | {
+            Args: {
+              start: number
+              user_ids: string[]
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              start: number
+              user_ids: string[]
+            }
+            Returns: undefined
+          }
       is_dashboard: {
         Args: Record<PropertyKey, never>
         Returns: boolean

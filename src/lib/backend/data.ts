@@ -312,7 +312,7 @@ export async function canDownload(
 	if (profile.roles.scripter) return true
 	if (profile.roles.tester) return true
 
-	const { data, error } = await supabase
+	const { data } = await supabase
 		.schema("profiles")
 		.rpc("can_access", { script_id: script_id })
 		.returns<boolean>()
