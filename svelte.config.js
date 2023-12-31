@@ -10,7 +10,12 @@ const config = {
 		csp: {
 			mode: "auto",
 			directives: {
-				"frame-src": ["self", "https://connect-js.stripe.com", "https://js.stripe.com"],
+				"frame-src": [
+					"self",
+					"https://connect-js.stripe.com",
+					"https://js.stripe.com",
+					"https://www.youtube.com/"
+				],
 				"script-src": [
 					"self",
 					"https://enqlpchobniylwpsjcqc.supabase.co/",
