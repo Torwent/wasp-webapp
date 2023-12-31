@@ -285,10 +285,10 @@ export async function updateSubscription(subscription: ProfileSubscription) {
 		.single()
 
 	if (!data) {
-		console.log("UPDATE profile.subscription_old for user: ", subscription.id)
+		console.log("UPDATE profile.subscriptions_old for user: ", subscription.id)
 		const { error: errSubOld } = await supabaseAdmin
 			.schema("profiles")
-			.from("subscription_old")
+			.from("subscriptions_old")
 			.update({
 				date_end: subscription.date_end,
 				date_start: subscription.date_start,
