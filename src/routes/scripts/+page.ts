@@ -44,7 +44,7 @@ export const load = async ({ url, parent, depends }) => {
 		if (search === "") {
 			query = query.order("title", { ascending: ascending }).range(start, finish)
 		} else {
-			query = query.ilike("search", "%" + search + "%")
+			query = query.ilike("search", "%" + search.replaceAll(" ", "%") + "%")
 		}
 
 		const { data, error: err, count } = await query.returns<Script[]>()
