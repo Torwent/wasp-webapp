@@ -48,7 +48,7 @@ export const load = async (event) => {
 }
 
 export const actions = {
-	linkStripe: async ({
+	createStripe: async ({
 		request,
 		locals: { supabaseServer, getSession, getProfile },
 		url: { origin }
@@ -62,13 +62,27 @@ export const actions = {
 
 		const scripter = await getScripterDashboard(supabaseServer, profile.id)
 
-		let link: string | undefined
-		if (!scripter.stripe) {
-			const form = await superValidate(promises[2], countryCodeSchema)
-			if (!form.valid) return setError(form, "", "The country code form is not valid!")
+		const form = await superValidate(promises[2], countryCodeSchema)
+		if (!form.valid) return setError(form, "", "The country code form is not valid!")
+		if (scripter.stripe) return setError(form, "", "Stripe account is already created!")
 
-			link = await createStripeConnectAccount(supabaseServer, origin, scripter, form.data.code)
-		} else link = await finishStripeAccountSetup(origin, scripter.stripe)
+		const link = await createStripeConnectAccount(supabaseServer, origin, scripter, form.data.code)
+		if (link) throw redirect(303, link)
+		return
+	},
+
+	updateStripe: async ({ locals: { supabaseServer, getSession, getProfile }, url: { origin } }) => {
+		const promises = await Promise.all([getSession(), getProfile()])
+		const profile = promises[1]
+
+		if (!promises[0] || !profile) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
+
+		const scripter = await getScripterDashboard(supabaseServer, profile.id)
+		if (!scripter.stripe) throw error(403, "You need a linked stripe account to edit it.")
+
+		const link = await finishStripeAccountSetup(origin, scripter.stripe)
 
 		if (link) throw redirect(303, link)
 		return

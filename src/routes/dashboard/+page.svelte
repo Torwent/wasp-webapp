@@ -42,7 +42,7 @@
 			const paymentContainer = document.getElementById("stripePaymentsContainer")
 			const payoutComponent = stripeConnectInstance.create("payouts")
 			const payoutContainer = document.getElementById("stripePayoutsContainer")
-			
+
 			if (paymentContainer) paymentContainer.appendChild(paymentComponent)
 			if (payoutContainer) payoutContainer.appendChild(payoutComponent)
 		}
@@ -74,10 +74,10 @@
 	<div class="my-8 grid place-items-center">
 		<a href="/scripters/{scripter.url}" class="btn variant-filled-secondary">Scripter profile</a>
 	</div>
+	{#if !scripter.stripe}
+		<form method="POST" action="?/createStripe" class="my-32 grid place-items-center" use:enhance>
+			<h3>Stripe Account</h3>
 
-	<form method="POST" class="my-32 grid place-items-center" action="?/linkStripe" use:enhance>
-		<h3>Stripe Account</h3>
-		{#if !scripter.stripe}
 			<div class="my-4">
 				<label for="code">Choose a country (this cannot be changed later):</label>
 				<select class="select" name="code" id="code" bind:value={$form.code}>
@@ -152,10 +152,14 @@
 			<button disabled={$form.code === ""} class="btn variant-filled-secondary">
 				Create stripe connected account
 			</button>
-		{:else}
+		</form>
+	{:else}
+		<form method="POST" action="?/updateStripe" class="my-32 grid place-items-center">
+			<h3>Stripe Account</h3>
+
 			<button class="btn variant-filled-secondary">Update stripe connected account</button>
-		{/if}
-	</form>
+		</form>
+	{/if}
 
 	<h3 class="justify-center text-center my-12">General stats</h3>
 
@@ -239,11 +243,11 @@
 		/>
 
 		<div class="my-16 mx-auto max-w-7xl">
-			<h3 class="text-center"> Stripe Dashboard </h3>
-			
-			<h5 class="text-center my-4"> Payments </h5>
-			<div id="stripePaymentsContainer" class="my-8"/>
-			<h5 class="text-center my-4"> Payouts </h5>
+			<h3 class="text-center">Stripe Dashboard</h3>
+
+			<h5 class="text-center my-4">Payments</h5>
+			<div id="stripePaymentsContainer" class="my-8" />
+			<h5 class="text-center my-4">Payouts</h5>
 			<div id="stripePayoutsContainer" class="my-8" />
 		</div>
 	{/if}
