@@ -293,7 +293,8 @@ export async function createStripeConnectAccount(
 			business_profile: {
 				mcc: "5734",
 				support_url: "https://waspscripts.com/scripters/" + scripter.url,
-				url: "https://waspscripts.com/scripters/" + scripter.url
+				url: "https://waspscripts.com/scripters/" + scripter.url,
+				support_email: "support@waspscripts.com"
 			},
 			metadata: { id: scripter.id, username: scripter.profiles.username },
 			settings: {
