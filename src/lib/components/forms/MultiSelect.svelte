@@ -60,15 +60,14 @@
 	$: ({ profile } = $page.data)
 
 	$: if (!profile || !profile.roles.administrator) {
-		if (value.includes("Official") || (value.includes("Premium") && !hadPremium)) {
+		if (value.includes("Official")) {
 			for (let i = 0; i < value.length; i++) {
-				if (value[i] === "Official" || (value[i] === "Premium" && !hadPremium)) {
+				if (value[i] === "Official") {
 					value.splice(i, 1)
 					i--
 				}
 			}
 		}
-		value = hadPremium ? ["Community", "Premium", ...value] : ["Community", "Free", ...value]
 	}
 </script>
 
