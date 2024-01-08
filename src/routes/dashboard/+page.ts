@@ -1,5 +1,5 @@
 import { getScripterDashboard } from "$lib/backend/data"
-import type { Prices, ProductEx, Profile, Script, ScriptSimple } from "$lib/types/collection"
+import type { Prices, ProductEx, Profile, Script } from "$lib/types/collection"
 import { error } from "@sveltejs/kit"
 
 export const load = async ({ parent, data, depends, url }) => {
@@ -139,7 +139,7 @@ export const load = async ({ parent, data, depends, url }) => {
 				id: script.id,
 				name: script.title,
 				author: script.protected.username,
-				url: url.protocol + "//" + url.host + "/" + script.url,
+				url: url.protocol + "//" + url.host + "/" + script.url ?? "",
 				active: false
 			}
 		})
