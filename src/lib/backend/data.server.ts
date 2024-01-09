@@ -441,7 +441,7 @@ export async function createStripePrice(price: PriceSchema, product: string) {
 	if (price.amount === 0) return
 	await stripe.prices
 		.create({
-			unit_amount: price.amount * 100,
+			unit_amount: Math.round(price.amount * 100),
 			currency: price.currency,
 			active: true,
 			product: product,
@@ -454,7 +454,7 @@ export async function createStripePriceEx(product: string, amount: number, inter
 	if (amount === 0) return
 	await stripe.prices
 		.create({
-			unit_amount: amount * 100,
+			unit_amount: Math.round(amount * 100),
 			currency: "eur",
 			active: true,
 			product: product,
@@ -469,7 +469,7 @@ export async function updateStripePriceEx(price: Price, amount: number) {
 	await Promise.all([
 		stripe.prices
 			.create({
-				unit_amount: amount * 100,
+				unit_amount: Math.round(amount * 100),
 				currency: "EUR",
 				active: true,
 				product: price.product,
@@ -488,7 +488,7 @@ export async function updateStripePrice(price: Price) {
 	if (price.amount > 0)
 		promises.push(
 			stripe.prices.create({
-				unit_amount: price.amount * 100,
+				unit_amount: Math.round(price.amount * 100),
 				currency: "EUR",
 				active: true,
 				product: price.product,

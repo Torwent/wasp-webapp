@@ -238,7 +238,7 @@ export const actions = {
 			const newPrice = product.prices.find((price) => price.id === currentPrice.id)
 
 			if (!newPrice) continue
-			if (newPrice.amount * 100 !== currentPrice.amount)
+			if (Math.round(newPrice.amount * 100) !== currentPrice.amount)
 				await updateStripePrice({
 					active: true,
 					amount: newPrice.amount,
@@ -394,7 +394,7 @@ export const actions = {
 			if (j === -1) continue
 			const newPrice = product.prices[j]
 
-			if (newPrice.amount * 100 !== currentPrice.amount)
+			if (Math.round(newPrice.amount * 100) !== currentPrice.amount)
 				await updateStripePrice({
 					active: true,
 					amount: newPrice.amount,

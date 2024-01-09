@@ -135,8 +135,8 @@
 				</div>
 			{/if}
 
-			<div class="table-container max-w-7xl mx-auto">
-				<table class="table table-hover border-separate space-y-6 text-sm">
+			<div class="table-container max-w-md md:max-w-3xl lg:max-w-6xl xl:mx-w-7xl mx-auto">
+				<table class="table table-hover border-separate space-y-6 text-xs">
 					<TableHeader
 						headers={["Product", "Type", "Price", "Interval", "Start date", "End date", "Cancel"]}
 					/>
@@ -301,7 +301,7 @@
 	<form method="POST" class="my-8 items-center justify-center" use:checkoutEnhance>
 		<h3 class="justify-center text-center my-12">New subscriptions</h3>
 
-		<div class="table-container max-w-7xl mx-auto">
+		<div class="table-container max-w-md md:max-w-3xl lg:max-w-6xl xl:mx-w-7xl mx-auto">
 			<table class="table table-hover border-separate space-y-6 text-sm">
 				<TableHeader headers={["Product", "Type", "Price", "Interval", "Checkout"]} />
 				<tbody>

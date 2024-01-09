@@ -309,7 +309,6 @@ export async function canDownload(
 	if (!profile) return false
 	if (profile.roles.administrator) return true
 	if (profile.roles.moderator) return true
-	if (profile.roles.scripter) return true
 	if (profile.roles.tester) return true
 
 	const { data } = await supabase

@@ -102,7 +102,7 @@
 	}
 </script>
 
-<svelte:window on:keydown={onKeyDown} on:touchstart={onTouchStart} on:touchend={onTouchEnd} />
+<svelte:window on:keydown={onKeyDown} />
 
 <nav class="transition-colors duration-500 font-semibold">
 	{#if !large}
