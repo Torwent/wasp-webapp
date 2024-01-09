@@ -17,6 +17,7 @@ import {
 	newScriptArraySchema,
 	scriptArraySchema
 } from "$lib/backend/schemas"
+import { UUID_V4_REGEX } from "$lib/utils"
 import { error, redirect } from "@sveltejs/kit"
 import { setError, superValidate } from "sveltekit-superforms/server"
 
@@ -24,6 +25,13 @@ export const load = async (event) => {
 	const { supabaseServer, getProfile } = event.locals
 	const profile = await getProfile()
 	if (!profile) throw error(403, "You need to be logged in.")
+	const {
+		params: { slug }
+	} = event
+
+	if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+	if (profile.id !== slug && !profile.roles.administrator)
+		throw error(403, "You cannot access another scripter dashboard.")
 
 	const promises = await Promise.all([
 		superValidate(event, countryCodeSchema),
@@ -31,7 +39,7 @@ export const load = async (event) => {
 		superValidate(event, newBundleSchema),
 		superValidate(event, scriptArraySchema),
 		superValidate(event, newScriptArraySchema),
-		getScripterDashboard(supabaseServer, profile.id)
+		getScripterDashboard(supabaseServer, slug)
 	])
 
 	event.depends("dashboard:stripe_session")
@@ -51,7 +59,8 @@ export const actions = {
 	createStripe: async ({
 		request,
 		locals: { supabaseServer, getSession, getProfile },
-		url: { origin }
+		url: { origin },
+		params: { slug }
 	}) => {
 		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
 		const profile = promises[1]
@@ -60,7 +69,11 @@ export const actions = {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
-		const scripter = await getScripterDashboard(supabaseServer, profile.id)
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
+		const scripter = await getScripterDashboard(supabaseServer, slug)
 
 		const form = await superValidate(promises[2], countryCodeSchema)
 		if (!form.valid) return setError(form, "", "The country code form is not valid!")
@@ -70,8 +83,11 @@ export const actions = {
 		if (link) throw redirect(303, link)
 		return
 	},
-
-	updateStripe: async ({ locals: { supabaseServer, getSession, getProfile }, url: { origin } }) => {
+	updateStripe: async ({
+		locals: { supabaseServer, getSession, getProfile },
+		url: { origin },
+		params: { slug }
+	}) => {
 		const promises = await Promise.all([getSession(), getProfile()])
 		const profile = promises[1]
 
@@ -79,7 +95,11 @@ export const actions = {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
-		const scripter = await getScripterDashboard(supabaseServer, profile.id)
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
+		const scripter = await getScripterDashboard(supabaseServer, slug)
 		if (!scripter.stripe) throw error(403, "You need a linked stripe account to edit it.")
 
 		const link = await finishStripeAccountSetup(origin, scripter.stripe)
@@ -91,7 +111,8 @@ export const actions = {
 	bundleEdit: async ({
 		request,
 		locals: { supabaseServer, getSession, getProfile },
-		url: { origin, searchParams }
+		url: { origin, searchParams },
+		params: { slug }
 	}) => {
 		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
 		const profile = promises[1]
@@ -100,10 +121,14 @@ export const actions = {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
 		const form = await superValidate(promises[2], bundleArraySchema)
 		if (!form.valid) return setError(form, "", "The form is not valid!")
 
-		const scripter = await getScripterDashboard(supabaseServer, profile.id)
+		const scripter = await getScripterDashboard(supabaseServer, slug)
 
 		if (!scripter.stripe) {
 			console.error("Stripe account is not setup!")
@@ -207,7 +232,8 @@ export const actions = {
 	bundleAdd: async ({
 		request,
 		locals: { supabaseServer, getSession, getProfile },
-		url: { origin }
+		url: { origin },
+		params: { slug }
 	}) => {
 		console.log("bundleAdd")
 		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
@@ -217,10 +243,14 @@ export const actions = {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
 		const form = await superValidate(promises[2], newBundleSchema)
 		if (!form.valid) return setError(form, "", "The form is not valid!")
 
-		const scripter = await getScripterDashboard(supabaseServer, profile.id)
+		const scripter = await getScripterDashboard(supabaseServer, slug)
 
 		if (!scripter.stripe) {
 			console.error("Stripe account is not setup!")
@@ -244,7 +274,8 @@ export const actions = {
 	scriptEdit: async ({
 		request,
 		locals: { supabaseServer, getSession, getProfile },
-		url: { origin, searchParams }
+		url: { origin, searchParams },
+		params: { slug }
 	}) => {
 		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
 		const profile = promises[1]
@@ -253,10 +284,14 @@ export const actions = {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
 		const form = await superValidate(promises[2], scriptArraySchema)
 		if (!form.valid) return setError(form, "", "The form is not valid!")
 
-		const scripter = await getScripterDashboard(supabaseServer, profile.id)
+		const scripter = await getScripterDashboard(supabaseServer, slug)
 
 		if (!scripter.stripe) {
 			console.error("Stripe account is not setup!")
@@ -350,7 +385,8 @@ export const actions = {
 	scriptAdd: async ({
 		request,
 		locals: { supabaseServer, getSession, getProfile },
-		url: { origin, searchParams }
+		url: { origin, searchParams },
+		params: { slug }
 	}) => {
 		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
 		const profile = promises[1]
@@ -359,10 +395,14 @@ export const actions = {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
 		const form = await superValidate(promises[2], newScriptArraySchema)
 		if (!form.valid) return setError(form, "", "The form is not valid!")
 
-		const scripter = await getScripterDashboard(supabaseServer, profile.id)
+		const scripter = await getScripterDashboard(supabaseServer, slug)
 
 		if (!scripter.stripe) {
 			console.error("Stripe account is not setup!")

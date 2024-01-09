@@ -10,7 +10,7 @@
 		newScriptArraySchema,
 		scriptArraySchema
 	} from "$lib/backend/schemas"
-	import Table from "./Table.svelte"
+	import Table from "../Table.svelte"
 	import { superForm } from "sveltekit-superforms/client"
 	import { PUBLIC_STRIPE_PUBLISHABLE_KEY } from "$env/static/public"
 	import { browser } from "$app/environment"
