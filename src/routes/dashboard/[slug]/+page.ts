@@ -5,6 +5,7 @@ import { error } from "@sveltejs/kit"
 
 export const load = async ({ parent, data, depends, url, params: { slug } }) => {
 	const { profile, supabaseClient } = await parent()
+
 	if (!profile) throw error(403, "You need to be logged in.")
 	if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
 	if (profile.id !== slug && !profile.roles.administrator)

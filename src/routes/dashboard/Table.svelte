@@ -19,13 +19,15 @@
 	export let subscriptions: number[] | undefined = undefined
 	export let action: string
 
-	$: ({ form, errors, enhance, allErrors } = superForm(data, {
+	const { form, errors, enhance, allErrors } = superForm(data, {
 		id: id,
 		dataType: "json",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors-and-message",
-		validators: schema
-	}))
+		validators: schema,
+		resetForm: true,
+		invalidateAll: true
+	})
 
 	const btnText = action.includes("dd") ? "Add" : "Save"
 </script>
