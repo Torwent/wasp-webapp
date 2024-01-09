@@ -25,8 +25,7 @@
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors-and-message",
 		validators: schema,
-		resetForm: true,
-		invalidateAll: true
+		resetForm: true
 	})
 
 	const btnText = action.includes("dd") ? "Add" : "Save"

@@ -292,6 +292,7 @@ export async function createStripeConnectAccount(
 			},
 			business_profile: {
 				mcc: "5734",
+				name: scripter.profiles.username,
 				support_url: "https://waspscripts.com/scripters/" + scripter.url,
 				url: "https://waspscripts.com/scripters/" + scripter.url,
 				support_email: "support@waspscripts.com"
@@ -350,6 +351,37 @@ export async function finishStripeAccountSetup(baseURL: string, account: string)
 	}
 
 	return accountLink.url
+}
+
+export async function getStripeAccount(id: string) {
+	let stripeAccount: Stripe.Response<Stripe.Account> | null = null
+
+	try {
+		stripeAccount = await stripe.accounts.retrieve(id)
+	} catch (error) {
+		console.error(
+			"An error occurred when calling the Stripe API to create an account session",
+			error
+		)
+	}
+
+	return stripeAccount
+}
+
+export async function updateStripeAccount(id: string, dba: string) {
+	let stripeAccount: Stripe.Response<Stripe.Account> | null = null
+
+	try {
+		stripeAccount = await stripe.accounts.update(id, { business_profile: { name: dba } })
+	} catch (error) {
+		console.error(
+			"An error occurred when calling the Stripe API to create an account session",
+			error
+		)
+		return false
+	}
+
+	return true
 }
 
 export async function getStripeSession(account: string) {

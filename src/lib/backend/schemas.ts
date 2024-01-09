@@ -359,6 +359,10 @@ export const countryCodeSchema = z.object({
 	code: z.string().length(2, "Country codes have to be only 2 letters")
 })
 
+export const dbaSchema = z.object({
+	dba: z.string().min(3, "Your name needs to be longer")
+})
+
 export type PriceSchema = z.infer<typeof priceSchema>
 export type BundleSchema = z.infer<typeof newBundleSchema>
 export type NewScriptSchema = z.infer<typeof newScriptSchema>

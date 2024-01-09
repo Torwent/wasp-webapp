@@ -8,11 +8,14 @@ import {
 	finishStripeAccountSetup,
 	updateStripePrice,
 	updateStripeProduct,
-	getStripeSession
+	getStripeSession,
+	getStripeAccount,
+	updateStripeAccount
 } from "$lib/backend/data.server"
 import {
 	bundleArraySchema,
 	countryCodeSchema,
+	dbaSchema,
 	newBundleSchema,
 	newScriptArraySchema,
 	scriptArraySchema
@@ -35,6 +38,7 @@ export const load = async (event) => {
 
 	const promises = await Promise.all([
 		superValidate(event, countryCodeSchema),
+		superValidate(event, dbaSchema),
 		superValidate(event, bundleArraySchema),
 		superValidate(event, newBundleSchema),
 		superValidate(event, scriptArraySchema),
@@ -43,15 +47,21 @@ export const load = async (event) => {
 	])
 
 	event.depends("dashboard:stripe_session")
-	const stripeSession = promises[5].stripe ? await getStripeSession(promises[5].stripe) : null
+
+	const scripter = promises[6]
+
+	const stripeAccount = scripter.stripe ? await getStripeAccount(scripter.stripe) : null
+	const stripeSession = scripter.stripe ? await getStripeSession(scripter.stripe) : null
 
 	return {
 		countryForm: promises[0],
-		bundlesForm: promises[1],
-		newBundleForm: promises[2],
-		scriptsForm: promises[3],
-		newScriptForm: promises[4],
-		stripeSession: stripeSession
+		dbaForm: promises[1],
+		bundlesForm: promises[2],
+		newBundleForm: promises[3],
+		scriptsForm: promises[4],
+		newScriptForm: promises[5],
+		stripeAccount,
+		stripeSession
 	}
 }
 
@@ -105,6 +115,34 @@ export const actions = {
 		const link = await finishStripeAccountSetup(origin, scripter.stripe)
 
 		if (link) throw redirect(303, link)
+		return
+	},
+
+	displayName: async ({
+		request,
+		locals: { supabaseServer, getSession, getProfile },
+		url: { origin },
+		params: { slug }
+	}) => {
+		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
+		const profile = promises[1]
+
+		if (!promises[0] || !profile) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
+
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
+		const scripter = await getScripterDashboard(supabaseServer, slug)
+
+		const form = await superValidate(promises[2], dbaSchema)
+		if (!form.valid) return setError(form, "", "The name you set is not valid!")
+		if (!scripter.stripe) return setError(form, "", "The user is missing a stripe profile!")
+
+		const success = await updateStripeAccount(scripter.stripe, form.data.dba)
+		if (!success) return setError(form, "", "Failed to update stripe's business name")
 		return
 	},
 

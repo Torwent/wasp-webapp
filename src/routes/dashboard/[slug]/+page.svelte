@@ -1,11 +1,12 @@
 <script lang="ts">
 	import TableHeader from "$lib/components/tables/TableHeader.svelte"
 	import TableCell from "$lib/components/tables/TableCell.svelte"
-	import { onMount } from "svelte"
+	import { onDestroy, onMount } from "svelte"
 	import { invalidate } from "$app/navigation"
 	import {
 		bundleArraySchema,
 		countryCodeSchema,
+		dbaSchema,
 		newBundleSchema,
 		newScriptArraySchema,
 		scriptArraySchema
@@ -14,16 +15,52 @@
 	import { superForm } from "sveltekit-superforms/client"
 	import { PUBLIC_STRIPE_PUBLISHABLE_KEY } from "$env/static/public"
 	import { browser } from "$app/environment"
+	import type { RealtimeChannel } from "@supabase/supabase-js"
+	import { Tab, TabGroup } from "@skeletonlabs/skeleton"
+	import { FileCode, Landmark, Package } from "lucide-svelte"
+	import type { StripeConnectInstance } from "@stripe/connect-js"
 
 	export let data
 	let { supabaseClient, profile, scripter, stats } = data
 
-	const { form, errors, enhance, allErrors } = superForm(data.countryForm, {
+	const {
+		form: countryForm,
+		errors: countryErrors,
+		enhance: countryEnhance,
+		allErrors: countryAllErrors
+	} = superForm(data.countryForm, {
 		dataType: "json",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors-and-message",
-		validators: countryCodeSchema
+		validators: countryCodeSchema,
+		resetForm: true
 	})
+
+	const {
+		form: dbaForm,
+		errors: dbaErrors,
+		enhance: dbaEnhance,
+		allErrors: dbaAllErrors
+	} = superForm(data.dbaForm, {
+		dataType: "json",
+		multipleSubmits: "prevent",
+		clearOnSubmit: "errors-and-message",
+		validators: dbaSchema,
+		resetForm: true
+	})
+
+	let tabSet: number = 0
+	let subscription: RealtimeChannel | undefined
+
+	let paymentContainer: HTMLElement | undefined
+	let payoutContainer: HTMLElement | undefined
+
+	let stripeConnectInstance: StripeConnectInstance | undefined
+
+	$: if (paymentContainer && stripeConnectInstance)
+		paymentContainer.appendChild(stripeConnectInstance.create("payments"))
+	$: if (payoutContainer && stripeConnectInstance)
+		payoutContainer.appendChild(stripeConnectInstance.create("payouts"))
 
 	onMount(async () => {
 		if (browser && document) {
@@ -34,20 +71,13 @@
 				return data.stripeSession ?? ""
 			}
 
-			const stripeConnectInstance = connectJS.loadConnectAndInitialize({
+			stripeConnectInstance = connectJS.loadConnectAndInitialize({
 				publishableKey: PUBLIC_STRIPE_PUBLISHABLE_KEY,
 				fetchClientSecret: fetchClientSecret
 			})
-			const paymentComponent = stripeConnectInstance.create("payments")
-			const paymentContainer = document.getElementById("stripePaymentsContainer")
-			const payoutComponent = stripeConnectInstance.create("payouts")
-			const payoutContainer = document.getElementById("stripePayoutsContainer")
-
-			if (paymentContainer) paymentContainer.appendChild(paymentComponent)
-			if (payoutContainer) payoutContainer.appendChild(payoutComponent)
 		}
 
-		const subscription = supabaseClient
+		subscription = supabaseClient
 			.channel("products-subscription-changes")
 			.on(
 				"postgres_changes",
@@ -60,8 +90,10 @@
 				() => invalidate("dashboard")
 			)
 			.subscribe()
+	})
 
-		return () => subscription.unsubscribe()
+	onDestroy(async () => {
+		if (subscription) await subscription.unsubscribe()
 	})
 </script>
 
@@ -75,12 +107,17 @@
 		<a href="/scripters/{scripter.url}" class="btn variant-filled-secondary">Scripter profile</a>
 	</div>
 	{#if !scripter.stripe}
-		<form method="POST" action="?/createStripe" class="my-32 grid place-items-center" use:enhance>
+		<form
+			method="POST"
+			action="?/createStripe"
+			class="my-32 grid place-items-center"
+			use:countryEnhance
+		>
 			<h3>Stripe Account</h3>
 
 			<div class="my-4">
 				<label for="code">Choose a country (this cannot be changed later):</label>
-				<select class="select" name="code" id="code" bind:value={$form.code}>
+				<select class="select" name="code" id="code" bind:value={$countryForm.code}>
 					<option value="AU">Australia (AU)</option>
 					<option value="AT">Austria (AT)</option>
 					<option value="BE">Belgium (BE)</option>
@@ -125,18 +162,18 @@
 					<option value="US">United States (US)</option>
 				</select>
 			</div>
-			{#if $errors && $errors.code}
+			{#if $countryErrors && $countryErrors.code}
 				<div
 					class="max-h-24 bg-surface-700 rounded-md overflow-y-scroll overflow-x-hidden text-error-500"
 				>
-					{$errors.code}
+					{$countryErrors.code}
 				</div>
 			{/if}
-			{#if $allErrors}
+			{#if $countryAllErrors}
 				<div
 					class="max-h-24 bg-surface-700 rounded-md overflow-y-scroll overflow-x-hidden text-error-500"
 				>
-					{#each $allErrors as error, i}
+					{#each $countryAllErrors as error, i}
 						{#if i === 0}
 							Errors:
 						{/if}
@@ -149,7 +186,7 @@
 					{/each}
 				</div>
 			{/if}
-			<button disabled={$form.code === ""} class="btn variant-filled-secondary">
+			<button disabled={$countryForm.code === ""} class="btn variant-filled-secondary">
 				Create stripe connected account
 			</button>
 		</form>
@@ -198,57 +235,115 @@
 	</h5>
 
 	{#if scripter.stripe}
-		<h3 class="justify-center text-center my-12">Bundles</h3>
+		<div class="border-surface-500 border-2 rounded-md">
+			<TabGroup
+				justify="justify-center"
+				regionList="max-w-7xl mx-auto my-8"
+				regionPanel="max-w-7xl mx-auto my-8"
+				border="border-0"
+				active="border-b-2 border-primary-500 text-primary-500"
+			>
+				<Tab bind:group={tabSet} name="tab1" value={0}>
+					<div class="flex justify-end"><Landmark />Stripe</div>
+				</Tab>
+				<Tab bind:group={tabSet} name="tab2" value={1}>
+					<div class="flex justify-end"><Package /> Bundles</div>
+				</Tab>
+				<Tab bind:group={tabSet} name="tab3" value={2}>
+					<div class="flex justify-end"><FileCode /> Scripts</div>
+				</Tab>
+				<!-- Tab Panels --->
+				<svelte:fragment slot="panel">
+					{#if tabSet === 0}
+						<form
+							method="POST"
+							action="?/displayName"
+							class="my-32 place-items-center flex"
+							use:dbaEnhance
+						>
+							<div class="my-4">
+								<label for="dba">Invoice display name:</label>
+								<input class="input" name="dba" id="dba" bind:value={$dbaForm.dba} />
+								{#if $dbaErrors && $dbaErrors.dba}
+									<div
+										class="max-h-24 bg-surface-700 rounded-md overflow-y-scroll overflow-x-hidden text-error-500"
+									>
+										{$dbaErrors.dba}
+									</div>
+								{/if}
+								{#if $dbaAllErrors}
+									<div
+										class="max-h-24 bg-surface-700 rounded-md overflow-y-scroll overflow-x-hidden text-error-500"
+									>
+										{#each $dbaAllErrors as error, i}
+											{#if i === 0}
+												Errors:
+											{/if}
+											<small class="mx-8 text-error-500 flex rounded-md">
+												Error path: {error.path}
+												{#each error.messages as messages}
+													{messages}
+												{/each}
+											</small>
+										{/each}
+									</div>
+								{/if}
+							</div>
+							<button class="btn variant-filled-secondary mt-6 mx-4 h-10">Update</button>
+						</form>
 
-		<Table
-			id="bundleEdit"
-			schema={bundleArraySchema}
-			data={data.bundlesForm}
-			headers={[
-				"Title",
-				"Price (Week/Month/Year)",
-				"Subscribers (Week/Month/Year)",
-				"Scripts",
-				"Action"
-			]}
-			subscriptions={[0, 5, 10]}
-			action={"bundleEdit&product"}
-		/>
+						<h5 class="text-center my-4">Payments</h5>
+						<div class="my-8" bind:this={paymentContainer} />
+						<h5 class="text-center my-4">Payouts</h5>
+						<div class="my-8" bind:this={payoutContainer} />
+					{:else if tabSet === 1}
+						<Table
+							id="bundleEdit"
+							schema={bundleArraySchema}
+							data={data.bundlesForm}
+							headers={[
+								"Title",
+								"Price (Week/Month/Year)",
+								"Subscribers (Week/Month/Year)",
+								"Scripts",
+								"Action"
+							]}
+							subscriptions={[0, 5, 10]}
+							action={"bundleEdit&product"}
+						/>
 
-		<Table
-			id="bundleAdd"
-			schema={newBundleSchema}
-			data={data.newBundleForm}
-			headers={["New Bundle", "Price (Week/Month/Year)", "Scripts", "Action"]}
-			action={"bundleAdd"}
-		/>
+						<Table
+							id="bundleAdd"
+							schema={newBundleSchema}
+							data={data.newBundleForm}
+							headers={["New Bundle", "Price (Week/Month/Year)", "Scripts", "Action"]}
+							action={"bundleAdd"}
+						/>
+					{:else if tabSet === 2}
+						<Table
+							id="scriptEdit"
+							schema={scriptArraySchema}
+							data={data.scriptsForm}
+							headers={[
+								"Title",
+								"Price (Week/Month/Year)",
+								"Subscribers (Week/Month/Year)",
+								"Action"
+							]}
+							subscriptions={[0, 5, 10]}
+							action={"scriptEdit&product"}
+						/>
 
-		<h3 class="justify-center text-center mt-32 my-12">Premium scripts</h3>
-
-		<Table
-			id="scriptEdit"
-			schema={scriptArraySchema}
-			data={data.scriptsForm}
-			headers={["Title", "Price (Week/Month/Year)", "Subscribers (Week/Month/Year)", "Action"]}
-			subscriptions={[0, 5, 10]}
-			action={"scriptEdit&product"}
-		/>
-
-		<Table
-			id="scriptAdd"
-			schema={newScriptArraySchema}
-			data={data.newScriptForm}
-			headers={["New Premium Script", "Price (Week/Month/Year)", "Action"]}
-			action={"scriptAdd&script"}
-		/>
-
-		<div class="my-16 mx-auto max-w-7xl">
-			<h3 class="text-center">Stripe Dashboard</h3>
-
-			<h5 class="text-center my-4">Payments</h5>
-			<div id="stripePaymentsContainer" class="my-8" />
-			<h5 class="text-center my-4">Payouts</h5>
-			<div id="stripePayoutsContainer" class="my-8" />
+						<Table
+							id="scriptAdd"
+							schema={newScriptArraySchema}
+							data={data.newScriptForm}
+							headers={["New Premium Script", "Price (Week/Month/Year)", "Action"]}
+							action={"scriptAdd&script"}
+						/>
+					{/if}
+				</svelte:fragment>
+			</TabGroup>
 		</div>
 	{/if}
 </main>
