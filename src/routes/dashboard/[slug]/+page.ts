@@ -92,39 +92,17 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			)
 		}
 
-		const result: {
-			id: string
-			user_id: string
-			name: string
-			username: string
-			bundle: string | null
-			script: string | null
-			active: boolean
-			subs: {
-				id: string
-				price: string
-				cancel: boolean
-			}[]
-			subCount: number
-		}[] = []
-
-		for (let i = 0; i < data.length; i++) {
-			const product = data[i]
-			const subs = await getSubscriptions(product.id)
-			result.push({
+		return data.map((product) => {
+			return {
 				id: product.id,
 				user_id: product.user_id,
 				name: product.name,
 				username: product.bundles?.username ?? product.scripts?.protected.username ?? "",
 				bundle: product.bundle,
 				script: product.script,
-				active: product.active,
-				subs: subs.data,
-				subCount: subs.count ?? 0
-			})
-		}
-
-		return result
+				active: product.active
+			}
+		})
 	}
 
 	async function getStats() {
@@ -213,7 +191,12 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 		bundlesForm.data.bundles = []
 		scriptsForm.data.scripts = []
 
-		products.forEach((product) => {
+		const subscriptionsPromises = []
+
+		for (let index = 0; index < products.length; index++) {
+			const product = products[index]
+			subscriptionsPromises.push(getSubscriptions(product.id))
+
 			const productPrices = [...prices].reduce<Prices[]>((acc, price, i) => {
 				if (acc.length > 2) return acc
 				if (price.product === product.id) {
@@ -282,7 +265,7 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 					tmpScripts.splice(i, 1)
 				}
 			}
-		})
+		}
 
 		newScriptForm.data.scripts = tmpScripts.map((script) => {
 			return {
@@ -307,6 +290,8 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 				active: script.active
 			}
 		})
+
+		return { subscriptions: await Promise.all(subscriptionsPromises) }
 	}
 
 	const promises = await Promise.all([
@@ -342,6 +327,7 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 		newScriptForm,
 		profile,
 		scripter,
-		stats: promises[1]
+		stats: promises[1],
+		subscriptions: promises[2]
 	}
 }

@@ -62,6 +62,10 @@
 	$: if (payoutContainer && stripeConnectInstance)
 		payoutContainer.appendChild(stripeConnectInstance.create("payouts"))
 
+	let totalSubs = 0
+
+	data.subscriptions.subscriptions.forEach((sub) => (totalSubs += sub.count ?? 0))
+
 	onMount(async () => {
 		if (browser && document) {
 			const connectJS = await import("@stripe/connect-js")
@@ -190,12 +194,6 @@
 				Create stripe connected account
 			</button>
 		</form>
-	{:else}
-		<form method="POST" action="?/updateStripe" class="my-32 grid place-items-center">
-			<h3>Stripe Account</h3>
-
-			<button class="btn variant-filled-secondary">Update stripe connected account</button>
-		</form>
 	{/if}
 
 	<h3 class="justify-center text-center my-12">General stats</h3>
@@ -208,9 +206,7 @@
 					"Premium scripts",
 					"Monthly downloads",
 					"Premium monthly downloads",
-					"Weekly subscribers",
-					"Monthly subscribers",
-					"Yearly subscribers"
+					"Subscribers"
 				]}
 			/>
 			<tr class="table-row">
@@ -220,9 +216,7 @@
 				<TableCell>
 					{stats.month_premium_user_downloads} / {stats.month_premium_downloads}
 				</TableCell>
-				<TableCell>0</TableCell>
-				<TableCell>0</TableCell>
-				<TableCell>0</TableCell>
+				<TableCell>{totalSubs}</TableCell>
 			</tr>
 			<tbody />
 		</table>
@@ -255,43 +249,69 @@
 				<!-- Tab Panels --->
 				<svelte:fragment slot="panel">
 					{#if tabSet === 0}
-						<form
-							method="POST"
-							action="?/displayName"
-							class="my-32 place-items-center flex"
-							use:dbaEnhance
-						>
-							<div class="my-4">
-								<label for="dba">Invoice display name:</label>
-								<input class="input" name="dba" id="dba" bind:value={$dbaForm.dba} />
-								{#if $dbaErrors && $dbaErrors.dba}
-									<div
-										class="max-h-24 bg-surface-700 rounded-md overflow-y-scroll overflow-x-hidden text-error-500"
-									>
-										{$dbaErrors.dba}
-									</div>
-								{/if}
-								{#if $dbaAllErrors}
-									<div
-										class="max-h-24 bg-surface-700 rounded-md overflow-y-scroll overflow-x-hidden text-error-500"
-									>
-										{#each $dbaAllErrors as error, i}
-											{#if i === 0}
-												Errors:
-											{/if}
-											<small class="mx-8 text-error-500 flex rounded-md">
-												Error path: {error.path}
-												{#each error.messages as messages}
-													{messages}
-												{/each}
-											</small>
-										{/each}
-									</div>
-								{/if}
-							</div>
-							<button class="btn variant-filled-secondary mt-6 mx-4 h-10">Update</button>
-						</form>
+						<div class="flex justify-around">
+							<form
+								method="POST"
+								action="?/displayName"
+								class="my-32 place-items-center flex"
+								use:dbaEnhance
+							>
+								<div class="my-4">
+									<label for="dba">Invoice display name:</label>
+									<input class="input" name="dba" id="dba" bind:value={$dbaForm.dba} />
+									{#if $dbaErrors && $dbaErrors.dba}
+										<div
+											class="max-h-24 bg-surface-700 rounded-md overflow-y-scroll overflow-x-hidden text-error-500"
+										>
+											{$dbaErrors.dba}
+										</div>
+									{/if}
+									{#if $dbaAllErrors}
+										<div
+											class="max-h-24 bg-surface-700 rounded-md overflow-y-scroll overflow-x-hidden text-error-500"
+										>
+											{#each $dbaAllErrors as error, i}
+												{#if i === 0}
+													Errors:
+												{/if}
+												<small class="mx-8 text-error-500 flex rounded-md">
+													Error path: {error.path}
+													{#each error.messages as messages}
+														{messages}
+													{/each}
+												</small>
+											{/each}
+										</div>
+									{/if}
+								</div>
+								<button class="btn variant-filled-secondary mt-6 mx-4 h-10">Update</button>
+							</form>
 
+							<form method="POST" action="?/updateStripe" class="my-32 block place-items-center">
+								<div class="my-4 grid">
+									<span>Account information</span>
+									<button class="btn variant-filled-secondary h-10 mt-0">
+										Update stripe connected account
+									</button>
+								</div>
+							</form>
+						</div>
+
+						{#if data.stripeAccount?.requirements?.currently_due && data.stripeAccount?.requirements?.currently_due.length > 0}
+							<div class="mb-24">
+								<span class="my-2">Missing account information:</span>
+
+								<div class="my-2 text-error-500 grid bg-surface-700">
+									{#each data.stripeAccount?.requirements?.currently_due as requirement}
+										<small class="w-full mx-auto">{requirement}</small>
+									{/each}
+								</div>
+								<small>
+									This can be updated on the "Update stripe connected account" button. Ask Torwent
+									for help if needed.
+								</small>
+							</div>
+						{/if}
 						<h5 class="text-center my-4">Payments</h5>
 						<div class="my-8" bind:this={paymentContainer} />
 						<h5 class="text-center my-4">Payouts</h5>
@@ -301,14 +321,8 @@
 							id="bundleEdit"
 							schema={bundleArraySchema}
 							data={data.bundlesForm}
-							headers={[
-								"Title",
-								"Price (Week/Month/Year)",
-								"Subscribers (Week/Month/Year)",
-								"Scripts",
-								"Action"
-							]}
-							subscriptions={[0, 5, 10]}
+							headers={["Title", "Price (Week/Month/Year)", "Subscribers", "Scripts", "Action"]}
+							subscriptions={0}
 							action={"bundleEdit&product"}
 						/>
 
@@ -324,13 +338,8 @@
 							id="scriptEdit"
 							schema={scriptArraySchema}
 							data={data.scriptsForm}
-							headers={[
-								"Title",
-								"Price (Week/Month/Year)",
-								"Subscribers (Week/Month/Year)",
-								"Action"
-							]}
-							subscriptions={[0, 5, 10]}
+							headers={["Title", "Price (Week/Month/Year)", "Subscribers", "Action"]}
+							subscriptions={0}
 							action={"scriptEdit&product"}
 						/>
 
