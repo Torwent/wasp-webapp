@@ -2,8 +2,9 @@ import type { Prices, ProductEx, ScriptSimple } from "$lib/types/collection"
 import { error } from "@sveltejs/kit"
 
 export const load = async ({ parent, data }) => {
+	const { supabaseClient } = await parent()
+
 	async function getPrices() {
-		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("prices")
@@ -29,7 +30,6 @@ export const load = async ({ parent, data }) => {
 	}
 
 	async function getProducts() {
-		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("products")
@@ -68,7 +68,6 @@ export const load = async ({ parent, data }) => {
 	}
 
 	async function getScripts() {
-		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("scripts")
@@ -94,7 +93,6 @@ export const load = async ({ parent, data }) => {
 	}
 
 	async function getBundles() {
-		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("bundles")

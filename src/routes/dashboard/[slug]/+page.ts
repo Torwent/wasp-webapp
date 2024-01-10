@@ -18,6 +18,32 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 	const scriptsForm = data.scriptsForm
 	const newScriptForm = data.newScriptForm
 
+	async function getSubscriptions(product: string) {
+		const {
+			data,
+			count,
+			error: err
+		} = await supabaseClient
+			.schema("profiles")
+			.from("subscription")
+			.select("id, price, cancel", { count: "estimated" })
+			.eq("product", product)
+
+		if (err) {
+			console.error(err)
+			throw error(
+				500,
+				`Server error, this is probably not an issue on your end! - SELECT product failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+			)
+		}
+
+		return { data, count }
+	}
+
 	async function getPrices() {
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
@@ -66,17 +92,38 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			)
 		}
 
-		const result = data.map((product) => {
-			return {
+		const result: {
+			id: string
+			user_id: string
+			name: string
+			username: string
+			bundle: string | null
+			script: string | null
+			active: boolean
+			subs: {
+				id: string
+				price: string
+				cancel: boolean
+			}[]
+			subCount: number
+		}[] = []
+
+		for (let i = 0; i < data.length; i++) {
+			const product = data[i]
+			const subs = await getSubscriptions(product.id)
+			result.push({
 				id: product.id,
 				user_id: product.user_id,
 				name: product.name,
 				username: product.bundles?.username ?? product.scripts?.protected.username ?? "",
 				bundle: product.bundle,
 				script: product.script,
-				active: product.active
-			}
-		})
+				active: product.active,
+				subs: subs.data,
+				subCount: subs.count ?? 0
+			})
+		}
+
 		return result
 	}
 
