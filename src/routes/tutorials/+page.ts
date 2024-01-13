@@ -62,7 +62,7 @@ export const load = async ({ url, depends, parent }) => {
 
 		if (!browser && count === 1)
 			throw redirect(303, "/tutorials/" + encodeSEO(data[0].title + " by " + data[0].username))
-		return { data, count }
+		return { data, count: count ?? 0 }
 	}
 
 	return { tutorials: await getTutorials(level, search, start, finish, ascending), range }

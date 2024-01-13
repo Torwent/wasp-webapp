@@ -1,44 +1,45 @@
 <script lang="ts">
 	import { browser } from "$app/environment"
-	import { invalidate } from "$app/navigation"
+	import { goto } from "$app/navigation"
 	import { page } from "$app/stores"
 	import { ChevronLeft, ChevronRight } from "lucide-svelte"
-	import { onMount } from "svelte"
 
-	export let srcData: string
-	export let currentPage: number
+	export let searchParams: URLSearchParams
+	export let pageIdx: number
 	export let range: number
 	export let count: number
 	let totalPages: number
-	let loading = true
-	let pageNumber: number = currentPage
 
-	function replaceQuery(values: Record<string, string>) {
+	async function replaceQuery(values: Record<string, string>) {
 		if (!browser) return
+		let invalidate: boolean = false
 		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") $page.url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else $page.url.searchParams.delete(k)
+			if (!!v && v !== "") searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
+			else searchParams.delete(k)
+
+			invalidate = k === "page"
 		}
 
-		if (loading) return
+		const path = $page.url.origin + $page.url.pathname + "?" + searchParams.toString()
 
-		history.replaceState({}, "", $page.url)
-		invalidate(srcData)
+		await goto(path, {
+			keepFocus: true,
+			noScroll: true,
+			replaceState: !invalidate,
+			invalidateAll: invalidate
+		})
 	}
 
-	onMount(() => (loading = false))
-
 	$: totalPages = Math.ceil(count / range)
-	$: currentPage = pageNumber
 </script>
 
-<nav class="flex justify-between items-center pt-4" aria-label="Table navigation">
-	<span class="text-sm font-normal text-stone-500 dark:text-stone-400">
+<nav class="flex justify-between items-center my-12" aria-label="Scripts pagination">
+	<span class="text-sm font-normal text-surface-500">
 		Showing
-		<span class="font-semibold text-stone-900 dark:text-white">
-			{(pageNumber - 1) * range + 1}-{(pageNumber - 1) * range + range + 1 < count
-				? (pageNumber - 1) * range + range + 1
-				: count}
+		<span class="font-semibold text-surface-900 dark:text-surface-200">
+			{(pageIdx - 1) * range + 1}
+			-
+			{(pageIdx - 1) * range + range + 1 < count ? (pageIdx - 1) * range + range + 1 : count}
 		</span>
 		of
 		<span class="font-semibold text-stone-900 dark:text-white">{count}</span>
@@ -46,13 +47,13 @@
 	<ul class="inline-flex items-center -space-x-px">
 		<li>
 			<button
-				class="block py-2 px-3 ml-0 leading-tight text-stone-500 bg-white rounded-l-lg border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
+				class="block py-2 px-3 ml-0 leading-tight rounded-l-lg variant-ghost-surface"
 				name="Previous"
 				aria-label="Go to the previous page"
-				on:click={() => {
-					pageNumber -= 1
-					if (pageNumber <= 0) pageNumber = 1
-					replaceQuery({ page: pageNumber.toString() })
+				on:click={async () => {
+					pageIdx -= 1
+					if (pageIdx <= 0) pageIdx = 1
+					await replaceQuery({ page: pageIdx.toString() })
 				}}
 			>
 				<ChevronLeft class="w-5 h-5" />
@@ -63,13 +64,13 @@
 			{#each Array(totalPages) as _, idx}
 				<li>
 					<button
-						class="py-2 px-3 leading-tight text-stone-500 bg-white border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
-						on:click={() => {
-							pageNumber = Number(idx + 1)
-							replaceQuery({ page: pageNumber.toString() })
+						class="py-2 px-3 leading-tight variant-ghost-surface"
+						on:click={async () => {
+							pageIdx = Number(idx + 1)
+							await replaceQuery({ page: pageIdx.toString() })
 						}}
-						class:text-primary-500={pageNumber === idx + 1}
-						class:dark:text-primary-400={pageNumber === idx + 1}
+						class:text-primary-500={pageIdx === idx + 1}
+						class:dark:text-primary-400={pageIdx === idx + 1}
 					>
 						{idx + 1}
 					</button>
@@ -79,13 +80,13 @@
 			{#each Array(3) as _, idx}
 				<li>
 					<button
-						class="py-2 px-3 leading-tight text-stone-500 bg-white border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
-						on:click={() => {
-							pageNumber = Number(idx + 1)
-							replaceQuery({ page: pageNumber.toString() })
+						class="py-2 px-3 leading-tight variant-ghost-surface"
+						on:click={async () => {
+							pageIdx = Number(idx + 1)
+							await replaceQuery({ page: pageIdx.toString() })
 						}}
-						class:text-primary-500={pageNumber === idx + 1}
-						class:dark:text-primary-400={pageNumber === idx + 1}
+						class:text-primary-500={pageIdx === idx + 1}
+						class:dark:text-primary-400={pageIdx === idx + 1}
 					>
 						{idx + 1}
 					</button>
@@ -93,17 +94,17 @@
 			{/each}
 
 			{#each Array(5) as _, idx}
-				{@const reverseIdx = pageNumber - 2}
+				{@const reverseIdx = pageIdx - 2}
 				{#if reverseIdx - 2 > 3 && reverseIdx + 2 < totalPages - 3}
 					<li>
 						<button
-							class="py-2 px-3 leading-tight text-stone-500 bg-white border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
-							on:click={() => {
-								pageNumber = Number(reverseIdx + idx)
-								replaceQuery({ page: pageNumber.toString() })
+							class="py-2 px-3 leading-tight variant-ghost-surface"
+							on:click={async () => {
+								pageIdx = Number(reverseIdx + idx)
+								await replaceQuery({ page: pageIdx.toString() })
 							}}
-							class:text-primary-500={pageNumber === reverseIdx + idx}
-							class:dark:text-primary-400={pageNumber === reverseIdx + idx}
+							class:text-primary-500={pageIdx === reverseIdx + idx}
+							class:dark:text-primary-400={pageIdx === reverseIdx + idx}
 						>
 							{reverseIdx + idx}
 						</button>
@@ -115,13 +116,13 @@
 				{@const reverseIdx = 3 - 1 - idx}
 				<li>
 					<button
-						class="py-2 px-3 leading-tight text-stone-500 bg-white border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
-						on:click={() => {
-							pageNumber = Number(totalPages - reverseIdx)
-							replaceQuery({ page: pageNumber.toString() })
+						class="py-2 px-3 leading-tight variant-ghost-surface"
+						on:click={async () => {
+							pageIdx = Number(totalPages - reverseIdx)
+							await replaceQuery({ page: pageIdx.toString() })
 						}}
-						class:text-primary-500={pageNumber === totalPages - reverseIdx - 1}
-						class:dark:text-primary-400={pageNumber === totalPages - reverseIdx}
+						class:text-primary-500={pageIdx === totalPages - reverseIdx - 1}
+						class:dark:text-primary-400={pageIdx === totalPages - reverseIdx}
 					>
 						{totalPages - reverseIdx}
 					</button>
@@ -131,13 +132,13 @@
 
 		<li>
 			<button
-				class="block py-2 px-3 leading-tight text-stone-500 bg-white rounded-r-lg border border-stone-300 hover:bg-stone-100 hover:text-stone-700 dark:bg-stone-800 dark:border-stone-700 dark:text-stone-400 dark:hover:bg-stone-700 dark:hover:text-white"
+				class="block py-2 px-3 leading-tight rounded-r-lg variant-ghost-surface"
 				name="Next"
 				aria-label="Go to the next page"
-				on:click={() => {
-					pageNumber += 1
-					if (pageNumber >= totalPages) pageNumber = totalPages
-					replaceQuery({ page: pageNumber.toString() })
+				on:click={async () => {
+					pageIdx += 1
+					if (pageIdx >= totalPages) pageIdx = totalPages
+					await replaceQuery({ page: pageIdx.toString() })
 				}}
 			>
 				<ChevronRight class="w-5 h-5" />

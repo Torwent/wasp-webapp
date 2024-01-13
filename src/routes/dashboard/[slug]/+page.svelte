@@ -21,7 +21,9 @@
 	import type { StripeConnectInstance } from "@stripe/connect-js"
 
 	export let data
+
 	let { supabaseClient, profile, scripter, stats } = data
+	$: ({ supabaseClient, profile, scripter, stats } = data)
 
 	const {
 		form: countryForm,

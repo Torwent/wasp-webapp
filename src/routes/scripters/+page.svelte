@@ -1,45 +1,48 @@
 <script lang="ts">
-	import { invalidate } from "$app/navigation"
+	import { goto } from "$app/navigation"
 	import { page } from "$app/stores"
-	import { onMount } from "svelte"
 	import { browser } from "$app/environment"
-	import DevCard from "./DevCard.svelte"
+	import ScripterCard from "./ScripterCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
+
 	export let data
 
-	const pageStr = $page.url.searchParams.get("page") || "-1"
+	let { scripters, count, range } = data
+	let { searchParams } = $page.url
+
+	$: ({ searchParams } = $page.url)
+	$: ({ scripters, count, range } = data)
+
+	const pageStr = searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
 	let search: string
 
-	function replaceQuery(values: Record<string, string>) {
-		const currentURL = window.location.toString()
-
-		const url = new URL(currentURL)
+	async function replaceQuery(values: Record<string, string>) {
+		if (!browser) return
+		let invalidate: boolean = false
 		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else url.searchParams.delete(k)
+			if (!!v && v !== "") searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
+			else searchParams.delete(k)
+
+			invalidate = invalidate || v === ""
 		}
-		history.replaceState({}, "", url)
-		invalidate("supabase:developers")
+
+		const path = $page.url.origin + $page.url.pathname + "?" + searchParams.toString()
+
+		await goto(path, {
+			keepFocus: true,
+			noScroll: true,
+			replaceState: true,
+			invalidateAll: invalidate
+		})
 	}
 
-	let { range, developers } = data
-	let count = 0
-
-	$: ({ range, developers } = data)
-	$: count = (data.count as number) || 0
-
-	onMount(() => replaceQuery({ search: search }))
-
-	$: if (browser) replaceQuery({ page: currentPage.toString() })
-	$: if (browser) replaceQuery({ search: search })
-
-	const headTitle = "Developers - WaspScripts"
+	const headTitle = "Scripters - WaspScripts"
 	const headDescription =
-		"List of developers that are behind the project directly and/or indirerectly."
+		"List of scripters and developers that are behind the project directly and/or indirerectly."
 	const headKeywords =
-		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Developers"
+		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Scripters, Developers"
 	const headAuthor = "Torwent"
 	const headImage =
 		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
@@ -87,6 +90,7 @@
 						placeholder="Search username, name, info, ..."
 						class="input"
 						bind:value={search}
+						on:input={async () => await replaceQuery({ page: "1", search: search })}
 					/>
 				</div>
 			</div>
@@ -94,10 +98,10 @@
 	</div>
 
 	<div class="mx-auto max-w-2xl flex-grow">
-		{#each developers as developer}
-			<DevCard bind:scripter={developer} />
+		{#each scripters as scripter}
+			<ScripterCard bind:scripter />
 		{/each}
 	</div>
 
-	<Paginator srcData={"supabase:developers"} bind:currentPage {range} bind:count />
+	<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count />
 </main>

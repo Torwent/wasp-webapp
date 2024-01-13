@@ -2,60 +2,61 @@
 	import { AppShell } from "@skeletonlabs/skeleton"
 	import { ChevronRight } from "lucide-svelte"
 	import { page } from "$app/stores"
-	import { invalidate } from "$app/navigation"
-	import { browser } from "$app/environment"
+	import { goto } from "$app/navigation"
 	import Paginator from "$lib/components/Paginator.svelte"
-	import { onMount } from "svelte"
 	import type { CheckboxType } from "$lib/types/collection"
 	import ScriptCard from "$lib/components/ScriptCard.svelte"
+	import { browser } from "$app/environment"
 
 	export let data
 	const { checkboxes, range } = data
 	let { profile, scripts } = data
+	let count = scripts.count
+	let { searchParams } = $page.url
+
 	$: ({ profile, scripts } = data)
+	$: count = scripts.count
+	$: ({ searchParams } = $page.url)
 
-	let count = 0
-	$: count = (scripts.count as number) || 0
-
-	const pageStr = $page.url.searchParams.get("page") || "-1"
+	const pageStr = searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
-	let search = decodeURIComponent($page.url.searchParams.get("search") || "").trim()
-	let ascending = $page.url.searchParams.get("ascending")?.toLowerCase() === "true"
+	let search = decodeURIComponent(searchParams.get("search") || "").trim()
 	let categories: string[] = []
 	let subcategories: string[] = []
 	let show = false
-	let loading = true
 
-	function handleFilters() {
+	async function replaceQuery(values: Record<string, string>) {
+		if (!browser) return
+		let invalidate: boolean = false
+		for (let [k, v] of Object.entries(values)) {
+			if (!!v && v !== "") searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
+			else searchParams.delete(k)
+
+			invalidate = invalidate || v === ""
+		}
+
+		const path = $page.url.origin + $page.url.pathname + "?" + searchParams.toString()
+
+		await goto(path, {
+			keepFocus: true,
+			noScroll: true,
+			replaceState: true,
+			invalidateAll: invalidate
+		})
+	}
+
+	async function handleFilters() {
 		categories = checkboxes
 			.filter((checkbox: CheckboxType) => checkbox.checked && checkbox.main)
 			.map((checkbox: CheckboxType) => checkbox.name)
 		subcategories = checkboxes
 			.filter((checkbox: CheckboxType) => checkbox.checked && !checkbox.main)
 			.map((checkbox: CheckboxType) => checkbox.name)
+
+		await replaceQuery({ page: "1", categories: categories.toString().replaceAll(",", "-") })
+		await replaceQuery({ page: "1", subcategories: subcategories.toString().replaceAll(",", "-") })
 	}
-
-	function replaceQuery(values: Record<string, string>) {
-		if (!browser) return
-		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") $page.url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else $page.url.searchParams.delete(k)
-		}
-
-		if (loading) return
-
-		history.replaceState({}, "", $page.url)
-		invalidate("supabase:scripts")
-	}
-
-	onMount(() => (loading = false))
-
-	$: replaceQuery({ page: currentPage.toString() })
-	$: replaceQuery({ page: "1", search: search })
-	$: replaceQuery({ page: "1", categories: categories.toString().replaceAll(",", "-") })
-	$: replaceQuery({ page: "1", subcategories: subcategories.toString().replaceAll(",", "-") })
-	$: replaceQuery({ ascending: ascending.toString() })
 
 	const headTitle = "Scripts - WaspScripts"
 	const headDescription =
@@ -104,7 +105,7 @@
 						<div
 							id={"checkboxdiv" + checkbox.id}
 							class:font-thin={!checkbox.main}
-							on:change={() => handleFilters()}
+							on:change={async () => await handleFilters()}
 						>
 							<input
 								class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-primary-500"
@@ -144,10 +145,10 @@
 			{/if}
 			<div class="py-6 flex flex-col text-sm mb-2 max-w-2xl m-auto">
 				<input
-					type="text"
 					placeholder="Search script id, name, categories, author,..."
 					class="input"
 					bind:value={search}
+					on:input={async () => await replaceQuery({ page: "1", search: search })}
 				/>
 			</div>
 
@@ -159,6 +160,6 @@
 				{/each}
 			</div>
 		</div>
-		<Paginator srcData={"supabase:scripts"} bind:currentPage {range} bind:count />
+		<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count />
 	</main>
 </AppShell>

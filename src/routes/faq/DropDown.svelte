@@ -8,10 +8,11 @@
 	export let entries: FAQEntry[] | ErrorEntry[]
 
 	let show = false
+	let searchQuery = ""
+	let filteredEntries: FAQEntry[] | ErrorEntry[] = []
+	let placeholderText = "Search..."
 
-	let searchQuery = "",
-		filteredEntries: FAQEntry[] | ErrorEntry[] = [],
-		placeholderText = "Search..."
+	let form: HTMLFormElement
 
 	const handleSearch = () => {
 		filteredEntries = entries
@@ -29,40 +30,26 @@
 <div>
 	<button
 		type="button"
-		class="inline-flex justify-between w-full rounded-t border shadow-sm px-4 py-2 text-sm font-medium
-		border-stone-200 bg-stone-100 hover:bg-stone-50
-		dark:border-stone-700 dark:bg-stone-800 dark:hover:bg-stone-900"
+		class="inline-flex justify-between w-full rounded-t px-4 py-2 text-sm font-medium variant-ringed-surface hover:variant-ringed-primary"
 		aria-expanded={show}
 		aria-haspopup="true"
 		on:click={() => (show = !show)}
 	>
 		{title}
-		{#if show}
-			<ChevronsDownUp class="h-5" />
-		{:else}
-			<ChevronsUpDown class="h-5" />
-		{/if}
+		{#if show}<ChevronsDownUp class="h-5" />{:else}<ChevronsUpDown class="h-5" />{/if}
 	</button>
 	{#if show}
 		<div in:slide={{ duration: 200 }} out:slide={{ duration: 150 }}>
-			<div>
-				<form class="form" on:submit|preventDefault={handleSearch}>
-					<div class="flex flex-col text-sm">
-						<input
-							type="text"
-							bind:value={searchQuery}
-							name="search"
-							placeholder={placeholderText}
-							autocomplete="off"
-							class="appearance-none border px-4 py-2 focus:outline-none font-semibold
-							border-stone-100 hover:border-stone-200
-							dark:border-stone-600 dark:hover:border-stone-700
-							bg-stone-50 hover:bg-stone-100 dark:bg-stone-700 dark:hover:bg-stone-600
-							placeholder-secondary-500 text-primary-500"
-						/>
-					</div>
-				</form>
-			</div>
+			<form on:submit|preventDefault={handleSearch} bind:this={form}>
+				<input
+					name="search"
+					placeholder={placeholderText}
+					autocomplete="off"
+					class="input font-semibold rounded-none"
+					bind:value={searchQuery}
+					on:input={() => form.requestSubmit()}
+				/>
+			</form>
 			{#if filteredEntries.length !== 0}
 				{#each filteredEntries as entry}
 					<DropDownEntry {entry} />

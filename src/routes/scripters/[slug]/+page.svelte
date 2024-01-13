@@ -5,37 +5,44 @@
 	import EditButton from "$lib/components/EditButton.svelte"
 	import { page } from "$app/stores"
 	import { browser } from "$app/environment"
-	import { invalidate } from "$app/navigation"
+	import { goto } from "$app/navigation"
 	import type { Script } from "$lib/types/collection"
-	import { onMount } from "svelte"
 	import ScriptCard from "$lib/components/ScriptCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
 	export let data
 
 	const { range } = data
 	let { profile, developer, scripts } = data
+	let count = scripts.count
+	let { searchParams } = $page.url
+
 	$: ({ profile, developer, scripts } = data)
+	$: count = scripts.count
+	$: ({ searchParams } = $page.url)
 
-	let count = 0
-	$: count = (scripts.count as number) || 0
+	const parsedPage = Number(searchParams.get("page") || "-1")
+	let currentPage = parsedPage >= 0 ? parsedPage : 1
 
-	const pageStr = $page.url.searchParams.get("page") || "-1"
-	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
+	let search = decodeURIComponent(searchParams.get("search") || "").trim()
 
-	let search = decodeURIComponent($page.url.searchParams.get("search") || "").trim()
-	let loading = true
-
-	function replaceQuery(values: Record<string, string>) {
+	async function replaceQuery(values: Record<string, string>) {
 		if (!browser) return
+		let invalidate: boolean = false
 		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") $page.url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else $page.url.searchParams.delete(k)
+			if (!!v && v !== "") searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
+			else searchParams.delete(k)
+
+			invalidate = invalidate || v === ""
 		}
 
-		if (loading) return
+		const path = $page.url.origin + $page.url.pathname + "?" + searchParams.toString()
 
-		history.replaceState({}, "", $page.url)
-		invalidate("supabase:developer")
+		await goto(path, {
+			keepFocus: true,
+			noScroll: true,
+			replaceState: true,
+			invalidateAll: invalidate
+		})
 	}
 
 	function canSeeScript(script: Script) {
@@ -45,11 +52,6 @@
 		if (profile.roles.moderator) return true
 		return script.protected.author_id === profile.id
 	}
-
-	onMount(() => (loading = false))
-
-	$: replaceQuery({ page: currentPage.toString() })
-	$: replaceQuery({ page: "1", search: search })
 
 	const headTitle = developer.profiles.username + " - WaspScripts"
 	const headDescription = developer.description
@@ -133,6 +135,7 @@
 				placeholder="Search script id, name, categories, author,..."
 				class="input"
 				bind:value={search}
+				on:input={async () => await replaceQuery({ page: "1", search: search })}
 			/>
 		</div>
 
@@ -146,5 +149,5 @@
 			{/each}
 		</div>
 	</div>
-	<Paginator srcData={"supabase:developer"} bind:currentPage {range} bind:count />
+	<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count />
 </main>

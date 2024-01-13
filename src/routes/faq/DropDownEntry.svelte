@@ -11,9 +11,7 @@
 <button
 	type="button"
 	class="inline-flex text-left justify-between w-full border shadow-sm px-4 py-2 text-sm font-medium
-		border-stone-100 bg-stone-50 hover:bg-stone-100 hover:border-stone-200
-		dark:border-stone-600 dark:bg-stone-700
-		dark:hover:bg-stone-600 dark:hover:border-stone-700"
+		border-surface-500 text-surface-500 dark:text-surface-300 hover:variant-ringed-primary"
 	aria-expanded={show}
 	aria-haspopup="true"
 	on:click={() => (show = !show)}
@@ -29,7 +27,7 @@
 	<article
 		in:slide={{ duration: 200 }}
 		out:slide={{ duration: 150 }}
-		class="prose dark:prose-invert p-6 bg-stone-300 dark:bg-surface-800 max-w-full"
+		class="prose dark:prose-invert p-6 max-w-full variant-ringed-surface"
 	>
 		<Markdown src={entry.content} />
 	</article>

@@ -9,7 +9,7 @@ export const load = async ({ parent }) => {
 	if (err)
 		throw error(
 			500,
-			`Server error, this is probably not an issue on your end! - SELECT developers failed
+			`Server error, this is probably not an issue on your end! - SELECT scripters failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -19,5 +19,5 @@ export const load = async ({ parent }) => {
 	if (!browser && data.length === 1)
 		throw redirect(303, "/scripters/" + encodeSEO(data[0].profiles.username))
 
-	return { developers: data, count, range }
+	return { scripters: data, count: count ?? 0, range }
 }

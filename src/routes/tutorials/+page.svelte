@@ -1,62 +1,57 @@
 <script lang="ts">
-	import { invalidate } from "$app/navigation"
+	import { goto } from "$app/navigation"
 	import { page } from "$app/stores"
-	import { onMount } from "svelte"
 	import { browser } from "$app/environment"
 	import TutorialCard from "./TutorialCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
 	import { ArrowDownAZ, ArrowUpZA } from "lucide-svelte"
 	export let data
 
-	const { range } = data
+	let { range, tutorials } = data
+	let { count } = tutorials
+	let { searchParams } = $page.url
 
-	let { tutorials } = data
-	$: ({ tutorials } = data)
+	$: ({ tutorials, range } = data)
+	$: ({ count } = tutorials)
+	$: ({ searchParams } = $page.url)
 
-	const pageStr = $page.url.searchParams.get("page") || "-1"
+	const pageStr = searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
-	let search = decodeURIComponent($page.url.searchParams.get("search") || "").trim()
-	const ascendingStr = $page.url.searchParams.get("ascending")
+	let search = decodeURIComponent(searchParams.get("search") || "").trim()
+	const ascendingStr = searchParams.get("ascending")
 	let ascending = ascendingStr ? ascendingStr.toLowerCase() === "true" : true
 
-	const levelStr = $page.url.searchParams.get("level") || "-1"
-	let level =
-		Number(levelStr) < -1 || Number(levelStr) > 2 || Number.isNaN(Number(levelStr))
-			? -1
-			: Number(levelStr)
+	const parsedLevel = Number(searchParams.get("level") ?? "-1")
 
-	let count = 0
-	$: count = (tutorials.count as number) || 0
-	let loading = true
+	let level = parsedLevel > -1 && parsedLevel < 3 ? parsedLevel : -1
 
-	function replaceQuery(values: Record<string, string>) {
+	const levelColors = ["sky", "orange", "red"]
+	const levelNames = ["Basic", "Intermidiate", "Advanced"]
+
+	async function replaceQuery(values: Record<string, string>) {
 		if (!browser) return
+
 		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") $page.url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else $page.url.searchParams.delete(k)
+			if (!!v && v !== "") searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
+			else searchParams.delete(k)
 		}
 
-		if (loading) return
+		const path = $page.url.origin + $page.url.pathname + "?" + searchParams.toString()
 
-		history.replaceState({}, "", $page.url)
-		invalidate("supabase:tutorials")
-	}
-
-	function sort() {
-		search = ""
-		ascending = !ascending
-		replaceQuery({
-			ascending: ascending ? "true" : "false"
+		await goto(path, {
+			keepFocus: true,
+			noScroll: true,
+			replaceState: true,
+			invalidateAll: true
 		})
 	}
 
-	onMount(() => (loading = false))
-
-	$: replaceQuery({ page: currentPage.toString() })
-	$: replaceQuery({ page: "1", search: search })
-	$: replaceQuery({ ascending: ascending.toString() })
-	$: replaceQuery({ page: "1", level: level.toString() })
+	async function sort() {
+		search = ""
+		ascending = !ascending
+		await replaceQuery({ page: "1", search: search, ascending: ascending ? "true" : "false" })
+	}
 
 	const headTitle = "Tutorials - WaspScripts"
 	const headDescription =
@@ -101,31 +96,22 @@
 		<div class="text-center form my-6">
 			<header class="py-4"><h3>Filter by level or search the a blog post:</h3></header>
 			<div class="justify-center md:flex md:space-x-5 mb-2">
-				<button
-					class="w-full my-2 md:w-auto text-xs py-1 px-8 font-bold rounded-md bg-sky-400 dark:bg-sky-500 border-sky-600 dark:border-sky-300 text-white"
-					class:border-r-8={level === 0}
-					class:pr-6={level === 0}
-					on:click={() => (level === 0 ? (level = -1) : (level = 0))}
-				>
-					Basic tutorial
-				</button>
-				<button
-					class="w-full my-2 md:w-auto text-xs py-1 px-8 font-bold rounded-md bg-orange-400 dark:bg-orange-500 border-orange-600 dark:border-orange-300 text-white"
-					class:border-r-8={level === 1}
-					class:pr-6={level === 1}
-					on:click={() => (level === 1 ? (level = -1) : (level = 1))}
-				>
-					Intermidiate tutorial
-				</button>
-				<button
-					class="w-full my-2 md:w-auto text-xs py-1 px-8 font-bold rounded-md bg-red-400 dark:bg-red-500 border-red-600 dark:border-red-300 text-white"
-					class:border-r-8={level === 2}
-					class:pr-6={level === 2}
-					on:click={() => (level === 2 ? (level = -1) : (level = 2))}
-				>
-					Advanced tutorial
-				</button>
-				<button on:click={sort} aria-label="Sort posts by level">
+				{#each levelNames as name, i}
+					<button
+						class="w-full my-2 md:w-auto text-xs py-1 px-8 font-bold rounded-md text-white
+							   bg-{levelColors[i]}-500 border-{levelColors[i]}-500"
+						class:border-r-8={level === i}
+						class:pr-6={level === i}
+						on:click={async () => {
+							level = level === i ? -1 : i
+							await replaceQuery({ page: "1", level: level.toString() })
+						}}
+					>
+						{name} tutorial
+					</button>
+				{/each}
+
+				<button on:click={async () => await sort()} aria-label="Sort posts by level">
 					{#if ascending}
 						<ArrowDownAZ />
 					{:else}
@@ -140,6 +126,7 @@
 						placeholder="Search script id, name, categories, author,..."
 						class="input"
 						bind:value={search}
+						on:input={async () => await replaceQuery({ page: "1", search: search })}
 					/>
 				</div>
 			</div>
@@ -157,5 +144,5 @@
 		{/each}
 	</div>
 
-	<Paginator srcData={"supabase:tutorials"} bind:currentPage {range} bind:count />
+	<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count />
 </main>

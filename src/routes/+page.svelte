@@ -7,9 +7,8 @@
 	import { onMount } from "svelte"
 	export let data
 
-	const { supabaseClient } = data
-	let { total } = data
-	$: ({ total } = data)
+	let { supabaseClient, total } = data
+	$: ({ supabaseClient, total } = data)
 
 	onMount(() => {
 		const subscription = supabaseClient

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { invalidate } from "$app/navigation"
+	import { goto, invalidate } from "$app/navigation"
 	import { page } from "$app/stores"
 	import { browser } from "$app/environment"
 	import { onMount } from "svelte"
@@ -10,46 +10,59 @@
 
 	export let data
 
-	const pageStr = $page.url.searchParams.get("page") || "-1"
+	let {
+		supabaseClient,
+		stats: { count },
+		range
+	} = data
+
+	let { searchParams } = $page.url
+	$: ({ searchParams } = $page.url)
+	$: ({
+		supabaseClient,
+		stats: { count },
+		range
+	} = data)
+
+	const pageStr = searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
-	let search = decodeURIComponent($page.url.searchParams.get("search") || "").trim()
-	let ascending = $page.url.searchParams.get("ascending")?.toLowerCase() === "true"
+	let search = decodeURIComponent(searchParams.get("search") || "").trim()
+	let ascending = searchParams.get("ascending")?.toLowerCase() === "true"
 	let headers: (keyof Stats)[] = ["username", "experience", "gold", "levels", "runtime"]
-	let selectedHeader: keyof Stats =
-		($page.url.searchParams.get("order") as keyof Stats) || "experience"
-	let loading = true
+	let selectedHeader: keyof Stats = (searchParams.get("order") as keyof Stats) || "experience"
 
-	function replaceQuery(values: Record<string, string>) {
+	async function replaceQuery(values: Record<string, string>) {
 		if (!browser) return
+		let invalidate: boolean = false
 		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") $page.url.searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else $page.url.searchParams.delete(k)
+			if (!!v && v !== "") searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
+			else searchParams.delete(k)
+
+			invalidate = invalidate || v === ""
 		}
 
-		if (loading) return
+		const path = $page.url.origin + $page.url.pathname + "?" + searchParams.toString()
 
-		history.replaceState({}, "", $page.url)
-		invalidate("supabase:stats")
+		await goto(path, {
+			keepFocus: true,
+			noScroll: true,
+			replaceState: true,
+			invalidateAll: invalidate
+		})
 	}
 
-	function sortBy(header: keyof Stats) {
+	async function sortBy(header: keyof Stats) {
 		search = ""
 		ascending = selectedHeader === header ? !ascending : false
 		selectedHeader = header
-		replaceQuery({
+		await replaceQuery({
 			ascending: ascending ? "true" : "false",
 			order: header
 		})
 	}
 
-	const { range, supabaseClient } = data
-
-	let { count } = data.stats
-	$: ({ count } = data.stats)
-
 	onMount(() => {
-		loading = false
 		const subscription = supabaseClient
 			.channel("stats-changed")
 			.on(
@@ -65,12 +78,6 @@
 
 		return () => subscription.unsubscribe()
 	})
-
-	$: if (browser) replaceQuery({ search: search })
-
-	$: replaceQuery({ page: currentPage.toString() })
-	$: replaceQuery({ page: "1", search: search })
-	$: replaceQuery({ ascending: ascending.toString() })
 
 	const headTitle = "Stats - WaspScripts"
 	const headDescription = "WaspScripts usage stats."
@@ -104,7 +111,7 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main class="overflow-x-auto relative shadow-md sm:rounded-lg my-4 mx-12 md:mx-16 lg:mx-24">
+<main class="overflow-x-auto relative sm:rounded-lg my-4 mx-12 md:mx-16 lg:mx-24">
 	<header class="">
 		<h5 class="py-4 px-6 font-bold text-center whitespace-nowrap">
 			Total experience:
@@ -128,14 +135,20 @@
 	</header>
 
 	<div class="mx-auto lg:w-[80%] flex flex-col mb-2">
-		<input type="text" placeholder="Search UUID or username..." class="input" bind:value={search} />
+		<input
+			type="text"
+			placeholder="Search UUID or username..."
+			class="input"
+			bind:value={search}
+			on:input={async () => await replaceQuery({ page: "1", search: search })}
+		/>
 	</div>
 
-	<table class="w-full text-sm text-left text-stone-500 dark:text-stone-400">
-		<thead class="text-xs text-primary-500 uppercase bg-stone-50 dark:bg-stone-700">
+	<table class="w-full text-sm text-left table table-hover">
+		<thead class="text-xs uppercase text-primary-700 dark:text-primary-500">
 			<tr>
 				{#each headers as header}
-					<th scope="col" class="py-3 px-6" on:click={() => sortBy(header)}>
+					<th scope="col" class="py-3 px-6" on:click={async () => await sortBy(header)}>
 						<div class="flex justify-between text-sm">
 							<span class="align-middle h-full my-auto">
 								{header}
@@ -158,9 +171,7 @@
 		</thead>
 		<tbody>
 			{#each data.stats.stats as entry}
-				<tr
-					class="bg-white border-b dark:bg-stone-800 dark:border-stone-700 hover:bg-stone-50 dark:hover:bg-stone-600"
-				>
+				<tr>
 					<th
 						scope="row"
 						class="py-4 px-6 font-medium text-stone-900 whitespace-nowrap dark:text-white w-96"
@@ -176,5 +187,5 @@
 		</tbody>
 	</table>
 
-	<Paginator srcData={"supabase:stats"} bind:currentPage {range} bind:count />
+	<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count />
 </main>

@@ -1,6 +1,6 @@
 import { error, type Handle } from "@sveltejs/kit"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
-import { createSupabaseServerClient } from "@supabase/auth-helpers-sveltekit"
+import { createServerClient } from "@supabase/ssr"
 import type { Profile } from "$lib/types/collection"
 
 export const handle: Handle = async ({ event, resolve }) => {
@@ -8,10 +8,16 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 	const { url, locals } = event
 
-	locals.supabaseServer = createSupabaseServerClient({
-		supabaseUrl: PUBLIC_SUPABASE_URL,
-		supabaseKey: PUBLIC_SUPABASE_ANON_KEY,
-		event
+	locals.supabaseServer = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+		cookies: {
+			get: (key) => event.cookies.get(key),
+			set: (key, value, options) => {
+				event.cookies.set(key, value, options)
+			},
+			remove: (key, options) => {
+				event.cookies.delete(key, options)
+			}
+		}
 	})
 
 	locals.getSession = async () => {
@@ -21,11 +27,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 		return session
 	}
 
-	locals.getProfile = async () => {
-		const session = await locals.getSession()
-		if (!session) return null
+	locals.getUser = async () => {
+		const {
+			data: { user }
+		} = await locals.supabaseServer.auth.getUser()
+		return user
+	}
 
-		const id = session.user.id
+	locals.getProfile = async () => {
+		const user = await locals.getUser()
+		if (!user) return null
+
+		const id = user.id
 		const { data, error: err } = await locals.supabaseServer
 			.schema("profiles")
 			.from("profiles")

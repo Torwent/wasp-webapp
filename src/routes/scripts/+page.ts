@@ -61,7 +61,7 @@ export const load = async ({ url, parent, depends }) => {
 
 		if (!browser && data.length === 1) throw redirect(303, "/scripts/" + data[0].url)
 
-		return { data, count }
+		return { data, count: count ?? 0 }
 	}
 
 	async function getCheckBoxes() {
