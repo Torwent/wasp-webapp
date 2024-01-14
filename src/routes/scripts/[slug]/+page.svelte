@@ -192,11 +192,16 @@
 							and place it in the respective folder.
 						</h4>
 					{:else}
-						<h4 class="py-2">This is a premium script and you are not premium.</h4>
+						<h4 class="py-2">
+							This is a <span class="text-secondary-500">premium</span>
+							 script that you don't have access to.
+						</h4>
 						<h5>
-							To be able to download this script join
-							<a href="/premium" class="font-semibold text-primary-500 hover:underline">Premium</a>
-							!
+							To be able to download this script buy a
+							<a href="/subscriptions" class="font-semibold text-secondary-500 hover:underline">
+								subscription
+							</a>
+							that gives you access to it!
 						</h5>
 					{/if}
 				{/await}
