@@ -266,19 +266,23 @@ export async function upsertSubscription(subscription: ProfileSubscription) {
 		if (!adminLoggedIn) return false
 	}
 
-	console.log("UPSERT profile.subscription for user: ", subscription.id)
+	console.log("UPDATE profile.subscription for user: ", subscription.id)
 
-	const { data, error: errSub } = await supabaseAdmin
+	const { data: activeData, error: errSub } = await supabaseAdmin
 		.schema("profiles")
 		.from("subscription")
-		.upsert(subscription, { onConflict: "subscription" })
+		.update({
+			date_end: subscription.date_end,
+			date_start: subscription.date_start,
+			cancel: subscription.cancel
+		})
 		.eq("subscription", subscription.subscription)
 		.select()
 		.single()
 
-	if (!data) {
+	if (!activeData) {
 		console.log("UPDATE profile.subscriptions_old for user: ", subscription.id)
-		const { error: errSubOld } = await supabaseAdmin
+		const { data: oldData, error: errSubOld } = await supabaseAdmin
 			.schema("profiles")
 			.from("subscriptions_old")
 			.update({
@@ -290,13 +294,27 @@ export async function upsertSubscription(subscription: ProfileSubscription) {
 			.select()
 			.single()
 
-		if (errSubOld) {
-			console.error("errSub: " + errSub)
-			console.error("errSubOld: " + errSubOld)
-			throw error(
-				500,
-				"errSub: " + JSON.stringify(errSub) + "errSubOld: " + JSON.stringify(errSubOld)
-			)
+		if (!oldData) {
+			console.log("INSERT profile.subscriptions_old for user: ", subscription.id)
+			const { error: errInsert } = await supabaseAdmin
+				.schema("profiles")
+				.from("subscriptions_old")
+				.insert(subscription)
+
+			if (errInsert) {
+				console.error("errSub: " + errSub)
+				console.error("errSubOld: " + errSubOld)
+				console.error("errInsert: " + errInsert)
+				throw error(
+					500,
+					"errSub: " +
+						JSON.stringify(errSub) +
+						"errSubOld: " +
+						JSON.stringify(errSubOld) +
+						"errInsert: " +
+						JSON.stringify(errInsert)
+				)
+			}
 		}
 	}
 
