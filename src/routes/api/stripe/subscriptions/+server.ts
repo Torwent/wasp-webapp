@@ -3,7 +3,7 @@ import {
 	stripe,
 	insertSubscription,
 	deleteSubscription,
-	updateSubscription
+	upsertSubscription
 } from "$lib/backend/supabase.server"
 import { error, json } from "@sveltejs/kit"
 import type Stripe from "stripe"
@@ -26,26 +26,9 @@ export const POST = async ({ request }) => {
 	console.log(type)
 
 	switch (type) {
-		case "customer.subscription.deleted":
-			const subscriptionDeleted = data.object as Stripe.Subscription
-			await deleteSubscription(subscriptionDeleted.id)
-			break
-
-		case "customer.subscription.updated":
-			const subscriptionUpdated = data.object as Stripe.Subscription
-			await updateSubscription({
-				subscription: subscriptionUpdated.id,
-				id: subscriptionUpdated.metadata.user_id,
-				product: subscriptionUpdated.items.data[0].price.product.toString(),
-				price: subscriptionUpdated.items.data[0].price.id,
-				date_end: new Date(subscriptionUpdated.current_period_end * 1000).toISOString(),
-				date_start: new Date(subscriptionUpdated.start_date * 1000).toISOString(),
-				cancel: subscriptionUpdated.cancel_at_period_end
-			})
-			break
-
 		case "customer.subscription.created":
 			const subscriptionCreated = data.object as Stripe.Subscription
+			if (subscriptionCreated.status !== "active") break
 
 			await insertSubscription({
 				subscription: subscriptionCreated.id,
@@ -57,6 +40,24 @@ export const POST = async ({ request }) => {
 				cancel: subscriptionCreated.cancel_at_period_end
 			})
 
+			break
+
+		case "customer.subscription.updated":
+			const subscriptionUpdated = data.object as Stripe.Subscription
+			await upsertSubscription({
+				subscription: subscriptionUpdated.id,
+				id: subscriptionUpdated.metadata.user_id,
+				product: subscriptionUpdated.items.data[0].price.product.toString(),
+				price: subscriptionUpdated.items.data[0].price.id,
+				date_end: new Date(subscriptionUpdated.current_period_end * 1000).toISOString(),
+				date_start: new Date(subscriptionUpdated.start_date * 1000).toISOString(),
+				cancel: subscriptionUpdated.cancel_at_period_end
+			})
+			break
+
+		case "customer.subscription.deleted":
+			const subscriptionDeleted = data.object as Stripe.Subscription
+			await deleteSubscription(subscriptionDeleted.id)
 			break
 
 		default:

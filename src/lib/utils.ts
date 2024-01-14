@@ -191,3 +191,8 @@ export function getCurrentPrice(prices: Price[]) {
 	const price = getActivePrice(prices)
 	if (price) return getPriceAmount(price)
 }
+
+export const profileQuery = `id, discord, username, avatar, customer_id,
+							 private!private_id_fkey (email, warning),
+							 roles!roles_id_fkey (banned, premium, vip, tester, scripter, moderator, administrator),
+							 subscription!subscription_id_fkey (subscription, product, price, date_start, date_end, cancel)`

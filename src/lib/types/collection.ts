@@ -1,4 +1,4 @@
-import type { Database } from "$lib/types/supabase"
+import type { Database } from "./supabase"
 
 export type Prices = Database["scripts"]["Tables"]["prices"]["Row"]
 export type Product = Database["scripts"]["Tables"]["products"]["Row"]
@@ -30,6 +30,8 @@ export interface Profile extends ProfileBase {
 		moderator: Boolean
 		scripter: Boolean
 		tester: Boolean
+		vip: Boolean
+		premium: Boolean
 		banned: Boolean
 	}
 	subscription: ProfileSubscriptions

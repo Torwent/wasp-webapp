@@ -2,6 +2,7 @@ import { error, type Handle } from "@sveltejs/kit"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import { createServerClient } from "@supabase/ssr"
 import type { Profile } from "$lib/types/collection"
+import { profileQuery } from "$lib/utils"
 
 export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
@@ -42,12 +43,7 @@ export const handle: Handle = async ({ event, resolve }) => {
 		const { data, error: err } = await locals.supabaseServer
 			.schema("profiles")
 			.from("profiles")
-			.select(
-				`id, discord, username, avatar, customer_id,
-				 private!private_id_fkey (email, warning),
-				 roles!roles_id_fkey (banned, tester, scripter, moderator, administrator),
-				 subscription!subscription_id_fkey (subscription, product, price, date_start, date_end, cancel)`
-			)
+			.select(profileQuery)
 			.eq("id", id)
 			.limit(1)
 			.limit(1, { foreignTable: "private" })

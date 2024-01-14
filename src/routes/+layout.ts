@@ -1,6 +1,7 @@
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import type { Profile } from "$lib/types/collection"
 import type { Database } from "$lib/types/supabase"
+import { profileQuery } from "$lib/utils"
 import { createBrowserClient, isBrowser, parse } from "@supabase/ssr"
 import type { Session, SupabaseClient } from "@supabase/supabase-js"
 import { error } from "@sveltejs/kit"
@@ -10,12 +11,7 @@ async function getProfile(supabase: SupabaseClient, session: Session) {
 	const { data: profileData, error: err } = await supabase
 		.schema("profiles")
 		.from("profiles")
-		.select(
-			`id, discord, username, avatar, customer_id,
-				 private!private_id_fkey (email, warning),
-				 roles!roles_id_fkey (banned, tester, scripter, moderator, administrator),
-				 subscription!subscription_id_fkey (subscription, product, price, date_start, date_end, cancel)`
-		)
+		.select(profileQuery)
 		.eq("id", id)
 		.limit(1)
 		.limit(1, { foreignTable: "private" })

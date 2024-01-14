@@ -241,44 +241,6 @@ export interface Database {
           }
         ]
       }
-      subscriptions: {
-        Row: {
-          cancel: boolean
-          date_end: string
-          date_start: string
-          external: boolean
-          id: string
-          price_id: string
-          subscription_id: string | null
-        }
-        Insert: {
-          cancel?: boolean
-          date_end?: string
-          date_start?: string
-          external?: boolean
-          id: string
-          price_id?: string
-          subscription_id?: string | null
-        }
-        Update: {
-          cancel?: boolean
-          date_end?: string
-          date_start?: string
-          external?: boolean
-          id?: string
-          price_id?: string
-          subscription_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "subscriptions_price_id_fkey"
-            columns: ["price_id"]
-            isOneToOne: false
-            referencedRelation: "prices"
-            referencedColumns: ["stripe_id"]
-          }
-        ]
-      }
       subscriptions_bak: {
         Row: {
           cancel: boolean
@@ -407,6 +369,44 @@ export interface Database {
           }
         ]
       }
+      subscriptions_uc_duplicate: {
+        Row: {
+          cancel: boolean
+          date_end: string
+          date_start: string
+          external: boolean
+          id: string
+          price_id: string
+          subscription_id: string | null
+        }
+        Insert: {
+          cancel?: boolean
+          date_end?: string
+          date_start?: string
+          external?: boolean
+          id: string
+          price_id?: string
+          subscription_id?: string | null
+        }
+        Update: {
+          cancel?: boolean
+          date_end?: string
+          date_start?: string
+          external?: boolean
+          id?: string
+          price_id?: string
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subscriptions_uc_duplicate_price_id_fkey"
+            columns: ["price_id"]
+            isOneToOne: false
+            referencedRelation: "prices"
+            referencedColumns: ["stripe_id"]
+          }
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -444,6 +444,13 @@ export interface Database {
             }
             Returns: boolean
           }
+      can_view_subscription: {
+        Args: {
+          accesser: string
+          product: string
+        }
+        Returns: boolean
+      }
       cron_check_subscriptions: {
         Args: Record<PropertyKey, never>
         Returns: undefined
@@ -499,20 +506,6 @@ export interface Database {
               user_id: string
             }
             Returns: string
-          }
-      has_access:
-        | {
-            Args: {
-              script_id: string
-            }
-            Returns: boolean
-          }
-        | {
-            Args: {
-              user_id: string
-              script_id: string
-            }
-            Returns: boolean
           }
       is_role:
         | {

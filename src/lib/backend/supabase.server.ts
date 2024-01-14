@@ -4,6 +4,7 @@ import { ADMIN_USER, ADMIN_PASS, PRIVATE_STRIPE_KEY } from "$env/static/private"
 import type { Price, Product, Profile, ProfileSubscription } from "$lib/types/collection"
 import { error } from "@sveltejs/kit"
 import Stripe from "stripe"
+import { profileQuery } from "$lib/utils"
 
 const credentials = { email: ADMIN_USER, password: ADMIN_PASS }
 const options = { auth: { autoRefreshToken: true, persistSession: false } }
@@ -47,12 +48,7 @@ export async function getProfile(id: string) {
 	const { data, error } = await supabaseAdmin
 		.schema("profiles")
 		.from("profiles")
-		.select(
-			`id, discord, username, avatar, customer_id,
-			private!private_id_fkey (email, warning),
-			roles!roles_id_fkey (banned, tester, scripter, moderator, administrator),
-			subscription!subscription_id_fkey (subscription, product, price, date_start, date_end, cancel)`
-		)
+		.select(profileQuery)
 		.eq("id", id)
 		.limit(1)
 		.limit(1, { foreignTable: "private" })
@@ -258,28 +254,24 @@ export async function insertSubscription(subscription: ProfileSubscription) {
 		if (!adminLoggedIn) return false
 	}
 
-	console.log("Updating profile.subscription for user: ", subscription.id)
+	console.log("INSERT profile.subscription for user: ", subscription.id)
 
 	const { error } = await supabaseAdmin.schema("profiles").from("subscription").insert(subscription)
 	return { error }
 }
 
-export async function updateSubscription(subscription: ProfileSubscription) {
+export async function upsertSubscription(subscription: ProfileSubscription) {
 	if (!adminLoggedIn) {
 		await login(false)
 		if (!adminLoggedIn) return false
 	}
 
-	console.log("UPDATE profile.subscription for user: ", subscription.id)
+	console.log("UPSERT profile.subscription for user: ", subscription.id)
 
 	const { data, error: errSub } = await supabaseAdmin
 		.schema("profiles")
 		.from("subscription")
-		.update({
-			date_end: subscription.date_end,
-			date_start: subscription.date_start,
-			cancel: subscription.cancel
-		})
+		.upsert(subscription, { onConflict: "subscription" })
 		.eq("subscription", subscription.subscription)
 		.select()
 		.single()

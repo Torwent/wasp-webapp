@@ -8,7 +8,7 @@ import type {
 	ScripterDashboard,
 	ScripterWithProfile
 } from "$lib/types/collection"
-import { pad } from "$lib/utils"
+import { pad, profileQuery } from "$lib/utils"
 import type { Provider, SupabaseClient } from "@supabase/supabase-js"
 import { error, redirect } from "@sveltejs/kit"
 import { stripe } from "./supabase.server"
@@ -217,12 +217,7 @@ export async function getProfile(supabase: SupabaseClient, id: string) {
 	const { data, error } = await supabase
 		.schema("profiles")
 		.from("profiles")
-		.select(
-			`id, discord, username, avatar, email, customer_id,
-			private!private_id_fkey (email, warning),
-			roles!roles_id_fkey (banned, tester, scripter, moderator, administrator),
-			subscription!subscription_id_fkey (subscription, product, price, date_start, date_end, cancel)`
-		)
+		.select(profileQuery)
 		.eq("id", id)
 		.limit(1)
 		.limit(1, { foreignTable: "private" })
