@@ -11,7 +11,7 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 	if (profile.id !== slug && !profile.roles.administrator)
 		throw error(403, "You cannot access another scripter dashboard.")
 
-	depends("dashboard")
+	depends("waspscripts:dashboard")
 
 	const bundlesForm = data.bundlesForm
 	const newBundleForm = data.newBundleForm

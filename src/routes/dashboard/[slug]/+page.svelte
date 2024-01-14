@@ -93,7 +93,7 @@
 					table: "prices",
 					filter: "active=eq.true"
 				},
-				() => invalidate("dashboard")
+				() => invalidate("waspscripts:dashboard")
 			)
 			.subscribe()
 	})

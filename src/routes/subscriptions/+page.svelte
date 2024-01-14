@@ -151,7 +151,11 @@
 						{#each profile.subscription as subscription}
 							{@const price = getPrice(subscription.price, prices)}
 							{#await getBundle(subscription.product)}
-								<tr><TableCell padding={0}>...</TableCell></tr>
+								<tr>
+									<td colspan="7">
+										<span class="flex justify-center text-center py-3">...</span>
+									</td>
+								</tr>
 							{:then bundle}
 								{#if bundle}
 									{@const isTenYearSub =

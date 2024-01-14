@@ -4,9 +4,7 @@ import { error, redirect } from "@sveltejs/kit"
 import { get, writable } from "svelte/store"
 const checkboxesStore = writable<CheckboxType[] | null>(null)
 
-export const load = async ({ url, parent, depends }) => {
-	depends("supabase:scripts")
-
+export const load = async ({ url, parent }) => {
 	const pageStr = url.searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 

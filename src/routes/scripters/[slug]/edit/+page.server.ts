@@ -1,10 +1,10 @@
 import { setError, superValidate } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
-import { developerSchema } from "$lib/backend/schemas"
+import { scripterSchema } from "$lib/backend/schemas"
 import { canEdit } from "$lib/backend/data"
 
 export const load = async (event) => {
-	return { form: await superValidate(event, developerSchema) }
+	return { form: await superValidate(event, scripterSchema) }
 }
 
 export const actions = {
@@ -12,16 +12,16 @@ export const actions = {
 		const setup = await Promise.all([getProfile(), request.formData()])
 		const profile = setup[0]
 
-		const form = await superValidate(setup[1], developerSchema)
+		const form = await superValidate(setup[1], scripterSchema)
 
 		if (!profile) {
-			const msg = "You need to login to edit a developer."
+			const msg = "You need to login to edit a scripter."
 			console.error(msg)
 			return setError(form, "", msg)
 		}
 
 		if (!canEdit(profile, form.data.id)) {
-			const msg = "You can't edit another developer profile."
+			const msg = "You can't edit another scripter profile."
 			console.error(msg)
 			return setError(form, "", msg)
 		}

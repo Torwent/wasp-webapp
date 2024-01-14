@@ -1,8 +1,6 @@
 import type { ScripterWithProfile } from "$lib/types/collection"
 
 export const load = async ({ url: { searchParams }, params: { slug }, parent, depends }) => {
-	depends("supabase:developers")
-
 	const pageStr = searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 	const search = decodeURIComponent(searchParams.get("search") || "").trim()

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import { developerSchema } from "$lib/backend/schemas"
+	import { scripterSchema } from "$lib/backend/schemas"
 	import { focusTrap } from "@skeletonlabs/skeleton"
 	import { superForm } from "sveltekit-superforms/client"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
@@ -21,7 +21,7 @@
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
-		validators: developerSchema
+		validators: scripterSchema
 	})
 
 	$form.id = developer.id

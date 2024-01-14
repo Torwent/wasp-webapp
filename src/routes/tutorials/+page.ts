@@ -3,9 +3,7 @@ import { browser } from "$app/environment"
 import { encodeSEO } from "$lib/utils"
 import type { Tutorial } from "$lib/types/collection.js"
 
-export const load = async ({ url, depends, parent }) => {
-	depends("supabase:tutorials")
-
+export const load = async ({ url, parent }) => {
 	const pageStr = url.searchParams.get("page") || "-1"
 	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 

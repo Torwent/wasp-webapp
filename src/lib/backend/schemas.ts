@@ -144,7 +144,7 @@ export const profileSchema = z.object({
 		.optional()
 })
 
-export const developerSchema = z.object({
+export const scripterSchema = z.object({
 	id: z.string().uuid("ID must be a valid UUIDv4."),
 	realname: z
 		.string()
