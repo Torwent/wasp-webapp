@@ -64,6 +64,9 @@ export const POST = async ({ request, locals }) => {
 
 		case "customer.subscription.updated":
 			const subscriptionUpdated = data.object as Stripe.Subscription
+			if (subscriptionUpdated.status !== "active" && subscriptionUpdated.status !== "canceled")
+				break
+
 			await upsertSubscription({
 				subscription: subscriptionUpdated.id,
 				id: subscriptionUpdated.metadata.user_id,
