@@ -93,7 +93,7 @@ export const actions = {
 
 		if (!validFiles.success) return fail(400, { form })
 
-		const { error } = await updateScript(
+		const { error: err } = await updateScript(
 			supabaseServer,
 			script,
 			validFiles.data.script,
@@ -101,9 +101,9 @@ export const actions = {
 			validFiles.data.banner
 		)
 
-		if (error) {
-			console.error(error)
-			return setError(form, "", error)
+		if (err) {
+			console.error(err)
+			return setError(form, "", err)
 		}
 
 		throw redirect(303, "/scripts/" + encodeSEO(script.title + " by " + script.protected.username))

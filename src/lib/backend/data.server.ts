@@ -66,8 +66,12 @@ async function updateScriptFile(file: File, id: string, revision: number) {
 }
 
 async function uploadFile(supabase: SupabaseClient, bucket: string, path: string, file: File) {
-	const { error } = await supabase.storage.from(bucket).upload(path, file, { upsert: true })
-	if (error) console.error("storage " + bucket + " UPLOAD " + path + " failed: " + error.message)
+	const { error: err } = await supabase.storage.from(bucket).upload(path, file, { upsert: true })
+	if (err) {
+		const msg = "storage " + bucket + " UPLOAD " + path + " failed with the following error: "
+		console.error(msg + JSON.stringify(err))
+		return err
+	}
 }
 
 export async function uploadScript(
@@ -115,7 +119,7 @@ export async function uploadScript(
 	if (error) {
 		console.log("scripts.scripts INSERT failed: ")
 		console.error(error)
-		return { error: error.message }
+		return { error: JSON.stringify(error) }
 	}
 
 	script.id = data[0].id
@@ -125,13 +129,22 @@ export async function uploadScript(
 	//rename all scripts to script so we can always fetch them later regardless of name changes.
 	const path = script.id + "/" + pad(1, 9) + "/script.simba"
 
-	await Promise.all([
+	const promises = await Promise.all([
 		uploadFile(supabase, "scripts", path, scriptFile),
 		uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile),
 		uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
 	])
 
-	return { url: data[0].url, error: undefined }
+	let err: string | undefined
+
+	for (let i = 0; i < promises.length; i++) {
+		if (promises[i]) {
+			err = "File upload failed " + JSON.stringify(promises[i])
+			break
+		}
+	}
+
+	return { url: data[0].url, error: err }
 }
 
 export async function updateScript(
@@ -165,7 +178,7 @@ export async function updateScript(
 	if (error) {
 		console.log("scripts.scripts UPDATE failed: ")
 		console.error(error)
-		return { error: error.message }
+		return { error: JSON.stringify(error) }
 	}
 
 	const promises = []
@@ -187,9 +200,16 @@ export async function updateScript(
 		promises.push(uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile))
 	}
 
-	if (promises.length > 0) await Promise.all(promises)
+	const awaitedPromises = promises.length > 0 ? await Promise.all(promises) : []
+	let err: string | undefined
+	for (let i = 0; i < awaitedPromises.length; i++) {
+		if (awaitedPromises[i]) {
+			err = "File upload failed " + JSON.stringify(promises[i])
+			break
+		}
+	}
 
-	return { error: undefined }
+	return { error: err }
 }
 
 export async function getSignedURLServer(
