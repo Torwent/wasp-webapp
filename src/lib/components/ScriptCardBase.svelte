@@ -41,10 +41,10 @@
 	</header>
 	<section class="p-4">
 		<header class="h-12">
-			<h5 class="font-semibold text-primary-600 dark:text-primary-500 whitespace-nowrap">
+			<div class="font-semibold text-primary-600 dark:text-primary-500 whitespace-nowrap">
 				{script.title}
-			</h5>
-			<span class="text-xs whitespace-nowrap text-primary-600 dark:text-secondary-500 drop-shadow">
+			</div>
+			<div class="text-xs whitespace-nowrap text-primary-600 dark:text-secondary-500 drop-shadow">
 				by
 				<a
 					href="/scripters/{encodeSEO(script.protected.username.normalize('NFKC'))}"
@@ -53,7 +53,7 @@
 					{script.protected.username}
 				</a>
 				{#if !script.published}<small class="text-error-500">Unpublished</small>{/if}
-			</span>
+			</div>
 		</header>
 		<article class="h-20 mt-4 dark:text-surface-300 text-surface-600 text-sm break-words">
 			{cropString(script.description, 80)}

@@ -21,22 +21,28 @@ async function checkClientImageDimensions(file: any, w: number, h: number): Prom
 	})
 }
 
+const title = z
+	.string()
+	.min(4, "Must be more than 3 characters long.")
+	.max(31, "Must be less than 31 characters long.")
+
+const description = z
+	.string()
+	.min(10, "Must be more than 9 characters long.")
+	.max(160, "Must be less than 160 characters long.")
+	.includes(" ", { message: "You have no spaces, this is supposed to be a sentence." })
+
+const content = z.string().min(10).includes(" ", {
+	message:
+		"You have no spaces, this is supposed to be at least a couple of words, ideally a few sentences."
+})
+
 export const scriptSchema = z
 	.object({
 		id: z.string().uuid("ID must be a valid UUIDv4").optional(),
-		title: z
-			.string()
-			.min(4, "Must be more than 3 characters long.")
-			.max(46, "Must be less than 47 characters long."),
-		description: z
-			.string()
-			.min(10, "Must be more than 9 characters long.")
-			.max(160, "Must be less than 160 characters long.")
-			.includes(" ", { message: "You have no spaces, this is supposed to be a sentence." }),
-		content: z
-			.string()
-			.min(10)
-			.includes(" ", { message: "You have no spaces, this is supposed to be a sentence." }),
+		title: title,
+		description: description,
+		content: content,
 		categories: z
 			.array(z.string())
 			.min(3, "You should have at least 3 categories.")
@@ -110,19 +116,9 @@ export const scriptSchema = z
 
 export const postSchema = z.object({
 	id: z.string().uuid("ID must be a valid UUID.").optional(),
-	title: z
-		.string()
-		.min(4, "Must be more than 3 characters long.")
-		.max(46, "Must be less than 47 characters long."),
-	description: z
-		.string()
-		.min(10, "Must be more than 9 characters long.")
-		.max(160, "Must be less than 160 characters long.")
-		.includes(" ", { message: "You have no spaces, this is supposed to be a sentence." }),
-	content: z
-		.string()
-		.min(10)
-		.includes(" ", { message: "You have no spaces, this is supposed to be a sentence." }),
+	title: title,
+	description: description,
+	content: content,
 	level: z
 		.number()
 		.int("Level has to be between 0 and 2")
@@ -167,7 +163,7 @@ export const scripterSchema = z.object({
 			"The paypal ID seems to have the wrong length. If you put the correct ID please contact Torwent."
 		)
 		.nullable(),
-	content: z.string().includes(" ", { message: "This should be a couple of words." }).nullable()
+	content: content.nullable()
 })
 
 export const subscriptionsSchema = z.object({
