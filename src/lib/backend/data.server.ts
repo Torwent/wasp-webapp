@@ -284,6 +284,58 @@ export async function createStripeCustomer(
 	return customer.id
 }
 
+export async function createCheckoutSession(
+	id: string,
+	customer: string,
+	stripeUser: string | null,
+	price: string,
+	origin: string
+) {
+	let session: Stripe.Checkout.Session
+
+	try {
+		session = await stripe.checkout.sessions.create({
+			line_items: [{ price: price, quantity: 1 }],
+			customer: customer,
+			customer_update: { address: "auto", shipping: "auto" },
+			mode: "subscription",
+			billing_address_collection: "auto",
+			automatic_tax: { enabled: stripeUser == null },
+			payment_method_collection: "always",
+			allow_promotion_codes: true,
+			subscription_data: {
+				on_behalf_of: stripeUser ?? undefined,
+				application_fee_percent: stripeUser ? 20 : undefined,
+				transfer_data: stripeUser ? { destination: stripeUser } : undefined,
+				metadata: { user_id: id }
+			},
+			success_url: origin + "/api/stripe/checkout/success?session_id={CHECKOUT_SESSION_ID}",
+			cancel_url: origin + "/api/stripe/checkout/cancel?session_id={CHECKOUT_SESSION_ID}"
+		})
+	} catch (err: any) {
+		console.error(err)
+		return null
+	}
+
+	return session.url
+}
+
+export async function createCustomerPortal(customer: string, origin: string) {
+	let portal: Stripe.BillingPortal.Session
+
+	try {
+		portal = await stripe.billingPortal.sessions.create({
+			customer: customer,
+			return_url: origin + "/subscriptions"
+		})
+	} catch (error) {
+		console.error(error)
+		return null
+	}
+
+	return portal.url
+}
+
 export async function createStripeConnectAccount(
 	supabase: SupabaseClient,
 	baseURL: string,
@@ -350,7 +402,7 @@ export async function createStripeConnectAccount(
 	return accountLink.url
 }
 
-export async function finishStripeAccountSetup(baseURL: string, account: string) {
+export async function finishStripeConnectAccountSetup(baseURL: string, account: string) {
 	let accountLink: Stripe.Response<Stripe.AccountLink>
 
 	try {
@@ -368,7 +420,7 @@ export async function finishStripeAccountSetup(baseURL: string, account: string)
 	return accountLink.url
 }
 
-export async function getStripeAccount(id: string) {
+export async function getStripeConnectAccount(id: string) {
 	let stripeAccount: Stripe.Response<Stripe.Account> | null = null
 
 	try {
@@ -383,11 +435,9 @@ export async function getStripeAccount(id: string) {
 	return stripeAccount
 }
 
-export async function updateStripeAccount(id: string, dba: string) {
-	let stripeAccount: Stripe.Response<Stripe.Account> | null = null
-
+export async function updateStripeConnectAccount(id: string, dba: string) {
 	try {
-		stripeAccount = await stripe.accounts.update(id, { business_profile: { name: dba } })
+		await stripe.accounts.update(id, { business_profile: { name: dba } })
 	} catch (error) {
 		console.error(
 			"An error occurred when calling the Stripe API to create an account session",

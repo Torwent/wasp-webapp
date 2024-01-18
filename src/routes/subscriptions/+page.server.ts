@@ -1,9 +1,8 @@
 import { PUBLIC_SUPER_USER_ID } from "$env/static/public"
-import { doLogin } from "$lib/backend/data.server"
+import { createCheckoutSession, createCustomerPortal, doLogin } from "$lib/backend/data.server"
 import { subscriptionsSchema, checkoutSchema } from "$lib/backend/schemas"
 import { stripe, updateCustomerID } from "$lib/backend/supabase.server"
 import { error, redirect } from "@sveltejs/kit"
-import type Stripe from "stripe"
 import { setError, superValidate } from "sveltekit-superforms/server"
 
 export const load = async (event) => {
@@ -96,8 +95,6 @@ export const actions = {
 			)
 		}
 
-		let session: Stripe.Checkout.Session
-
 		const { data, error: productError } = await supabaseServer
 			.schema("scripts")
 			.from("products")
@@ -114,33 +111,54 @@ export const actions = {
 		}
 
 		const stripeUser = data.user_id !== PUBLIC_SUPER_USER_ID ? data.stripe_user : null
+		const url = await createCheckoutSession(
+			profile.id,
+			profile.customer_id,
+			stripeUser,
+			selectedPrice.id,
+			origin
+		)
 
-		try {
-			session = await stripe.checkout.sessions.create({
-				line_items: [{ price: selectedPrice.id, quantity: 1 }],
-				customer: profile.customer_id,
-				customer_update: { address: "auto", shipping: "auto" },
-				mode: "subscription",
-				billing_address_collection: "auto",
-				automatic_tax: { enabled: stripeUser == null },
-				payment_method_collection: "always",
-				allow_promotion_codes: true,
-				subscription_data: {
-					on_behalf_of: stripeUser ?? undefined,
-					application_fee_percent: stripeUser ? 20 : undefined,
-					transfer_data: stripeUser ? { destination: stripeUser } : undefined,
-					metadata: { user_id: profile.id }
-				},
-				success_url: origin + "/api/stripe/checkout/success?session_id={CHECKOUT_SESSION_ID}",
-				cancel_url: origin + "/api/stripe/checkout/cancel?session_id={CHECKOUT_SESSION_ID}"
-			})
-		} catch (err: any) {
-			console.error(err)
-			return setError(form, "", err)
+		if (url) throw redirect(303, url)
+		return setError(form, "", "Something went wrong!")
+	},
+
+	portal: async ({ locals: { supabaseServer, getSession, getProfile }, url: { origin } }) => {
+		const promises = await Promise.all([getSession(), getProfile()])
+		const profile = promises[1]
+
+		if (!promises[0] || !profile) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
-		if (session && session.url) throw redirect(303, session.url)
-		return setError(form, "", "Something went wrong!")
+		if (!profile.customer_id) {
+			const customerSearch = await stripe.customers.search({ query: 'name: "' + profile.id + '"' })
+
+			if (customerSearch.data.length !== 1)
+				throw error(
+					404,
+					`You don't seem to have a customer_id assign for some reason. This shouldn't happen and has to be fixed manually.
+					Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com and send the following:
+					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${profile.private.email} username: ${profile.username}`
+				)
+
+			profile.customer_id = customerSearch.data[0].id
+
+			const updateCustomer = await updateCustomerID(profile.id, profile.customer_id)
+
+			if (!updateCustomer)
+				return error(
+					404,
+					`You don't seem to have a customer_id assign for some reason and one couldn't be created. This shouldn't happen and has to be fixed manually.
+					Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com and send the following:
+					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${profile.private.email}  username: ${profile.username}`
+				)
+		}
+
+		const url = await createCustomerPortal(profile.customer_id, origin)
+
+		if (url) throw redirect(303, url)
+		throw error(404, "Something went wrong!")
 	},
 
 	subscriptions: async ({

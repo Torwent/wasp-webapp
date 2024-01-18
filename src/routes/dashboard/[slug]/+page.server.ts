@@ -5,12 +5,12 @@ import {
 	createStripePrice,
 	createStripeScriptProduct,
 	doLogin,
-	finishStripeAccountSetup,
+	finishStripeConnectAccountSetup,
 	updateStripePrice,
 	updateStripeProduct,
 	getStripeSession,
-	getStripeAccount,
-	updateStripeAccount
+	getStripeConnectAccount,
+	updateStripeConnectAccount
 } from "$lib/backend/data.server"
 import {
 	bundleArraySchema,
@@ -50,7 +50,7 @@ export const load = async (event) => {
 
 	const scripter = promises[6]
 
-	const stripeAccount = scripter.stripe ? await getStripeAccount(scripter.stripe) : null
+	const stripeAccount = scripter.stripe ? await getStripeConnectAccount(scripter.stripe) : null
 	const stripeSession = scripter.stripe ? await getStripeSession(scripter.stripe) : null
 
 	return {
@@ -112,7 +112,7 @@ export const actions = {
 		const scripter = await getScripterDashboard(supabaseServer, slug)
 		if (!scripter.stripe) throw error(403, "You need a linked stripe account to edit it.")
 
-		const link = await finishStripeAccountSetup(origin, scripter.stripe)
+		const link = await finishStripeConnectAccountSetup(origin, scripter.stripe)
 
 		if (link) throw redirect(303, link)
 		return
@@ -141,7 +141,7 @@ export const actions = {
 		if (!form.valid) return setError(form, "", "The name you set is not valid!")
 		if (!scripter.stripe) return setError(form, "", "The user is missing a stripe profile!")
 
-		const success = await updateStripeAccount(scripter.stripe, form.data.dba)
+		const success = await updateStripeConnectAccount(scripter.stripe, form.data.dba)
 		if (!success) return setError(form, "", "Failed to update stripe's business name")
 		return
 	},

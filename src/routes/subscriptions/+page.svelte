@@ -342,6 +342,10 @@
 				</table>
 			</div>
 		</form>
+
+		<form method="POST" action="?/portal" class="mt-8 mb-32 grid place-items-center">
+			<button class="btn variant-filled-secondary">Customer portal</button>
+		</form>
 	{/if}
 
 	<form method="POST" class="my-8 items-center justify-center" use:checkoutEnhance>
