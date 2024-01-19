@@ -12,6 +12,7 @@ const config = {
 			directives: {
 				"frame-src": [
 					"self",
+					"https://stripe-data-exports.s3.amazonaws.com/",
 					"https://connect-js.stripe.com",
 					"https://js.stripe.com",
 					"https://www.youtube.com/"
