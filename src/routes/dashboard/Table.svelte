@@ -16,7 +16,13 @@
 	export let schema: BundleArraySchema | NewBundleSchema | ScriptArraySchema | NewScriptArraySchema
 	export let data: SuperValidated<typeof schema>
 	export let headers: string[]
-	export let subscriptions: number | undefined = undefined
+	interface Subscriptions {
+		count: number
+		cancelling: number
+	}
+
+	export let subscriptions: Subscriptions[] | undefined = undefined
+
 	export let action: string
 
 	const { form, errors, enhance, allErrors } = superForm(data, {
@@ -60,7 +66,10 @@
 							/>
 						</TableCell>
 
-						{#if subscriptions !== undefined}<TableCell>{subscriptions}</TableCell>{/if}
+						{#if subscriptions !== undefined}
+							<TableCell>{subscriptions[i].count}</TableCell>
+							<TableCell>{subscriptions[i].cancelling}</TableCell>
+						{/if}
 
 						<TableCell padding={0}>
 							<button
@@ -98,7 +107,10 @@
 							/>
 						</TableCell>
 
-						{#if subscriptions !== undefined}<TableCell>{subscriptions}</TableCell>{/if}
+						{#if subscriptions !== undefined}
+							<TableCell>{subscriptions[i].count}</TableCell>
+							<TableCell>{subscriptions[i].cancelling}</TableCell>
+						{/if}
 
 						<TableCell padding={0}>
 							<button

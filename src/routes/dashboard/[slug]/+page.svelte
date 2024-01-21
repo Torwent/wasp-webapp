@@ -64,10 +64,6 @@
 	$: if (payoutContainer && stripeConnectInstance)
 		payoutContainer.appendChild(stripeConnectInstance.create("payouts"))
 
-	let totalSubs = 0
-
-	data.subscriptions.subscriptions.forEach((sub) => (totalSubs += sub.count ?? 0))
-
 	onMount(async () => {
 		if (browser && document) {
 			const connectJS = await import("@stripe/connect-js")
@@ -208,7 +204,8 @@
 					"Premium scripts",
 					"Monthly downloads",
 					"Premium monthly downloads",
-					"Subscribers"
+					"Subscribers",
+					"Cancelling"
 				]}
 			/>
 			<tr class="table-row">
@@ -218,7 +215,8 @@
 				<TableCell>
 					{stats.month_premium_user_downloads} / {stats.month_premium_downloads}
 				</TableCell>
-				<TableCell>{totalSubs}</TableCell>
+				<TableCell>{data.subscriptions.total.subscribers}</TableCell>
+				<TableCell>{data.subscriptions.total.cancelling}</TableCell>
 			</tr>
 			<tbody />
 		</table>
@@ -323,8 +321,15 @@
 							id="bundleEdit"
 							schema={bundleArraySchema}
 							data={data.bundlesForm}
-							headers={["Title", "Price (Week/Month/Year)", "Subscribers", "Scripts", "Action"]}
-							subscriptions={0}
+							headers={[
+								"Title",
+								"Price (Week/Month/Year)",
+								"Subscribers",
+								"Cancelling",
+								"Scripts",
+								"Action"
+							]}
+							subscriptions={data.subscriptions.bundles}
 							action={"bundleEdit&product"}
 						/>
 
@@ -340,8 +345,8 @@
 							id="scriptEdit"
 							schema={scriptArraySchema}
 							data={data.scriptsForm}
-							headers={["Title", "Price (Week/Month/Year)", "Subscribers", "Action"]}
-							subscriptions={0}
+							headers={["Title", "Price (Week/Month/Year)", "Subscribers", "Cancelling", "Action"]}
+							subscriptions={data.subscriptions.scripts}
 							action={"scriptEdit&product"}
 						/>
 

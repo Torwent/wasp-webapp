@@ -26,7 +26,7 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 		} = await supabaseClient
 			.schema("profiles")
 			.from("subscription")
-			.select("id, price, cancel", { count: "estimated" })
+			.select("id, product, price, cancel", { count: "estimated" })
 			.eq("product", product)
 
 		if (err) {
@@ -41,7 +41,12 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			)
 		}
 
-		return { data, count }
+		let cancelling = 0
+		data.forEach((sub) => {
+			if (sub.cancel) cancelling += 1
+		})
+
+		return { product: product, data, count: count ?? 0, cancelling }
 	}
 
 	async function getPrices() {
@@ -191,11 +196,11 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 		bundlesForm.data.bundles = []
 		scriptsForm.data.scripts = []
 
-		const subscriptionsPromises = []
+		const bundleSubsPromises = []
+		const scriptSubsPromises = []
 
 		for (let index = 0; index < products.length; index++) {
 			const product = products[index]
-			subscriptionsPromises.push(getSubscriptions(product.id))
 
 			const productPrices = [...prices].reduce<Prices[]>((acc, price, i) => {
 				if (acc.length > 2) return acc
@@ -232,6 +237,7 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			}
 
 			if (product.bundle) {
+				bundleSubsPromises.push(getSubscriptions(product.id))
 				const i = bundles.findIndex((bundle) => bundle.product === product.id)
 				bundlesForm.data.bundles.push({
 					id: product.id,
@@ -251,6 +257,7 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 				})
 				bundles.splice(i, 1)
 			} else if (product.script) {
+				scriptSubsPromises.push(getSubscriptions(product.id))
 				const i = tmpScripts.findIndex((script) => script.id === product.script)
 				if (i > -1) {
 					scriptsForm.data.scripts.push({
@@ -291,7 +298,28 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			}
 		})
 
-		return { subscriptions: await Promise.all(subscriptionsPromises) }
+		const awaitedSubs = await Promise.all([
+			Promise.all(bundleSubsPromises),
+			Promise.all(scriptSubsPromises)
+		])
+
+		const totalSubs = { subscribers: 0, cancelling: 0 }
+
+		awaitedSubs[0].forEach((sub) => {
+			totalSubs.subscribers += sub.count
+			totalSubs.cancelling += sub.cancelling
+		})
+
+		awaitedSubs[1].forEach((sub) => {
+			totalSubs.subscribers += sub.count
+			totalSubs.cancelling += sub.cancelling
+		})
+
+		return {
+			total: totalSubs,
+			bundles: awaitedSubs[0],
+			scripts: awaitedSubs[1]
+		}
 	}
 
 	const promises = await Promise.all([
