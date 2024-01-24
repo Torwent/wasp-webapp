@@ -17,7 +17,7 @@
 	import { browser } from "$app/environment"
 	import type { RealtimeChannel } from "@supabase/supabase-js"
 	import { Tab, TabGroup } from "@skeletonlabs/skeleton"
-	import { FileCode, Landmark, Package } from "lucide-svelte"
+	import { Currency, FileCode, Landmark, Package } from "lucide-svelte"
 	import type { StripeConnectInstance } from "@stripe/connect-js"
 
 	export let data
@@ -249,6 +249,10 @@
 				<!-- Tab Panels --->
 				<svelte:fragment slot="panel">
 					{#if tabSet === 0}
+						{@const available = data.stripeBalance?.available[0].amount ?? 0}
+						{@const pending = data.stripeBalance?.pending[0].amount ?? 0}
+						{@const currency = data.stripeBalance?.available[0].currency ?? ""}
+
 						<div class="flex justify-around">
 							<form
 								method="POST"
@@ -297,6 +301,15 @@
 							</form>
 						</div>
 
+						<div class="flex justify-around my-8">
+							<h4>
+								Balance: {(available + pending) / 100}
+								{currency}
+							</h4>
+							<h4>Available: {available / 100} {currency}</h4>
+							<h4>Settling: {pending / 100} {currency}</h4>
+						</div>
+
 						{#if data.stripeAccount?.requirements?.currently_due && data.stripeAccount?.requirements?.currently_due.length > 0}
 							<div class="mb-24">
 								<span class="my-2">Missing account information:</span>
@@ -312,7 +325,8 @@
 								</small>
 							</div>
 						{/if}
-						<h5 class="text-center my-4">Payments</h5>
+
+						<h5 class="text-center mt-12 mb-4">Payments</h5>
 						<div class="my-8" bind:this={paymentContainer} />
 						<h5 class="text-center my-4">Payouts</h5>
 						<div class="my-8" bind:this={payoutContainer} />

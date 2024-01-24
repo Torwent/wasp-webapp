@@ -366,7 +366,7 @@ export async function createStripeConnectAccount(
 			},
 			metadata: { id: scripter.id, username: scripter.profiles.username },
 			settings: {
-				payouts: { schedule: { interval: "weekly", delay_days: 10, weekly_anchor: "monday" } }
+				payouts: { schedule: { interval: "weekly", delay_days: 7, weekly_anchor: "monday" } }
 			}
 		})
 	} catch (error) {
@@ -421,7 +421,7 @@ export async function finishStripeConnectAccountSetup(baseURL: string, account: 
 }
 
 export async function getStripeConnectAccount(id: string) {
-	let stripeAccount: Stripe.Response<Stripe.Account> | null = null
+	let stripeAccount: Stripe.Account | null = null
 
 	try {
 		stripeAccount = await stripe.accounts.retrieve(id)
@@ -432,7 +432,19 @@ export async function getStripeConnectAccount(id: string) {
 		)
 	}
 
-	return stripeAccount
+	let stripeBalance: Stripe.Balance | null = null
+	try {
+		stripeBalance = await stripe.balance.retrieve({
+			stripeAccount: id
+		})
+	} catch (error) {
+		console.error(
+			"An error occurred when calling the Stripe API to create an account session",
+			error
+		)
+	}
+
+	return { stripeAccount, stripeBalance }
 }
 
 export async function updateStripeConnectAccount(id: string, dba: string) {

@@ -339,13 +339,15 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 		{ amount: 50, currency: "eur", interval: "year" }
 	]
 
-	const stripeAccount = data.stripeAccount
+	const stripeAccount = data.stripeAccount?.stripeAccount ?? null
+	const stripeBalance = data.stripeAccount?.stripeBalance ?? null
 	const dbaForm = data.dbaForm
 
 	dbaForm.data.dba = stripeAccount?.business_profile?.name ?? ""
 
 	return {
 		stripeAccount,
+		stripeBalance,
 		stripeSession: data.stripeSession,
 		countryForm: data.countryForm,
 		dbaForm,
