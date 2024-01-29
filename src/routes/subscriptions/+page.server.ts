@@ -77,11 +77,18 @@ export const actions = {
 			)
 		}
 
-		if (profile.subscription.find((subscription) => subscription.id === productID)) {
+		if (profile.subscription.find((subscription) => subscription.product === productID)) {
 			return setError(
 				form,
 				"",
-				"Something went wrong! Seems like are already subscribed to this script. If this is not the case and this keeps occuring please contact support@waspscripts.com Erorr message:"
+				"Something went wrong! Seems like are already subscribed to this product. If this is not the case and this keeps occuring please contact support@waspscripts.com"
+			)
+		}
+		if (profile.free_access.find((access) => access.product === productID)) {
+			return setError(
+				form,
+				"",
+				"Something went wrong! Seems like already have free access to this product. If this is not the case and this keeps occuring please contact support@waspscripts.com"
 			)
 		}
 
