@@ -285,101 +285,100 @@
 					</table>
 				</div>
 			</form>
-
-			{#if profile.free_access.length > 0}
-				<div class="my-4 items-center justify-center">
-					<h3 class="justify-center text-center my-12">Free access</h3>
-
-					<div class="table-container max-w-md md:max-w-3xl lg:max-w-6xl xl:mx-w-7xl mx-auto">
-						<table class="table table-hover border-separate space-y-6 text-xs">
-							<TableHeader headers={["Product", "Type", "Start date", "End date"]} />
-							<tbody>
-								{#each profile.free_access as access}
-									{#await getBundle(access.product)}
-										<tr>
-											<td colspan="7">
-												<span class="flex justify-center text-center py-3">...</span>
-											</td>
-										</tr>
-									{:then bundle}
-										{#if bundle}
-											<tr class="table-row">
-												<TableCell alignment="left" padding={0}>
-													<div class="mx-3">
-														<div>{bundle.name}</div>
-														<div class="text-xs text-left">by {bundle.username}</div>
-													</div>
-												</TableCell>
-
-												<TableCell padding={0}>
-													<button
-														class="btn hover:cursor-pointer hover:text-primary-500"
-														on:click|preventDefault={() => (bundle.open = !bundle.open)}
-													>
-														{#if bundle.open}
-															<PanelBottomOpen size={16} />{:else}<PanelTopOpen size={16} />
-														{/if}
-
-														<span>Bundle</span>
-													</button>
-												</TableCell>
-
-												<TableCell>
-													{new Date(access.date_start).toLocaleString(userLocale)}
-												</TableCell>
-
-												<TableCell>
-													{new Date(access.date_end).toLocaleString(userLocale)}
-												</TableCell>
-											</tr>
-											{#if bundle.open}
-												<ScriptLinks scripts={bundle.scripts} colspan={5} />
-											{/if}
-										{:else}
-											{#await getScript(access.product)}
-												<tr><TableCell padding={0}>...</TableCell></tr>
-											{:then script}
-												{#if script}
-													<tr class="table-row">
-														<TableCell alignment="left" padding={0}>
-															<div class="mx-3">
-																<div>{script.name}</div>
-																<div class="text-xs text-left">by {script.username}</div>
-															</div>
-														</TableCell>
-
-														<TableCell padding={0}>
-															<a href="/scripts/{script.url}" class="permalink">
-																<button class="btn hover:cursor-pointer hover:text-primary-500">
-																	<ExternalLink size={16} />
-																	<span>Script</span>
-																</button>
-															</a>
-														</TableCell>
-
-														<TableCell>
-															{new Date(access.date_start).toLocaleString(userLocale)}
-														</TableCell>
-
-														<TableCell>
-															{new Date(access.date_end).toLocaleString(userLocale)}
-														</TableCell>
-													</tr>
-												{/if}
-											{/await}
-										{/if}
-									{/await}
-								{/each}
-							</tbody>
-						</table>
-					</div>
-				</div>
-			{/if}
-
-			<form method="POST" action="?/portal" class="mt-8 mb-32 grid place-items-center">
-				<button class="btn variant-filled-secondary">Customer portal</button>
-			</form>
 		{/if}
+		{#if profile.free_access.length > 0}
+			<div class="my-4 items-center justify-center">
+				<h3 class="justify-center text-center my-12">Free access</h3>
+
+				<div class="table-container max-w-md md:max-w-3xl lg:max-w-6xl xl:mx-w-7xl mx-auto">
+					<table class="table table-hover border-separate space-y-6 text-xs">
+						<TableHeader headers={["Product", "Type", "Start date", "End date"]} />
+						<tbody>
+							{#each profile.free_access as access}
+								{#await getBundle(access.product)}
+									<tr>
+										<td colspan="7">
+											<span class="flex justify-center text-center py-3">...</span>
+										</td>
+									</tr>
+								{:then bundle}
+									{#if bundle}
+										<tr class="table-row">
+											<TableCell alignment="left" padding={0}>
+												<div class="mx-3">
+													<div>{bundle.name}</div>
+													<div class="text-xs text-left">by {bundle.username}</div>
+												</div>
+											</TableCell>
+
+											<TableCell padding={0}>
+												<button
+													class="btn hover:cursor-pointer hover:text-primary-500"
+													on:click|preventDefault={() => (bundle.open = !bundle.open)}
+												>
+													{#if bundle.open}
+														<PanelBottomOpen size={16} />{:else}<PanelTopOpen size={16} />
+													{/if}
+
+													<span>Bundle</span>
+												</button>
+											</TableCell>
+
+											<TableCell>
+												{new Date(access.date_start).toLocaleString(userLocale)}
+											</TableCell>
+
+											<TableCell>
+												{new Date(access.date_end).toLocaleString(userLocale)}
+											</TableCell>
+										</tr>
+										{#if bundle.open}
+											<ScriptLinks scripts={bundle.scripts} colspan={5} />
+										{/if}
+									{:else}
+										{#await getScript(access.product)}
+											<tr><TableCell padding={0}>...</TableCell></tr>
+										{:then script}
+											{#if script}
+												<tr class="table-row">
+													<TableCell alignment="left" padding={0}>
+														<div class="mx-3">
+															<div>{script.name}</div>
+															<div class="text-xs text-left">by {script.username}</div>
+														</div>
+													</TableCell>
+
+													<TableCell padding={0}>
+														<a href="/scripts/{script.url}" class="permalink">
+															<button class="btn hover:cursor-pointer hover:text-primary-500">
+																<ExternalLink size={16} />
+																<span>Script</span>
+															</button>
+														</a>
+													</TableCell>
+
+													<TableCell>
+														{new Date(access.date_start).toLocaleString(userLocale)}
+													</TableCell>
+
+													<TableCell>
+														{new Date(access.date_end).toLocaleString(userLocale)}
+													</TableCell>
+												</tr>
+											{/if}
+										{/await}
+									{/if}
+								{/await}
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			</div>
+		{/if}
+
+		<form method="POST" action="?/portal" class="mt-8 mb-32 grid place-items-center">
+			<button class="btn variant-filled-secondary">Customer portal</button>
+		</form>
 	{/if}
 
 	<form method="POST" class="my-8 items-center justify-center" use:checkoutEnhance>
