@@ -7,7 +7,7 @@
 	import { ExternalLink, PanelBottomOpen, PanelTopOpen } from "lucide-svelte"
 	import TableHeader from "$lib/components/tables/TableHeader.svelte"
 	import TableCell from "$lib/components/tables/TableCell.svelte"
-	import ScriptLinkRow from "./ScriptLinkRow.svelte"
+	import ScriptLinks from "./ScriptLinks.svelte"
 	import type { Price } from "$lib/types/collection"
 	import {
 		getCurrentPrice,
@@ -147,7 +147,7 @@
 				<div class="table-container max-w-md md:max-w-3xl lg:max-w-6xl xl:mx-w-7xl mx-auto">
 					<table class="table table-hover border-separate space-y-6 text-xs">
 						<TableHeader
-							headers={["Product", "Type", "Price", "Interval", "Start date", "End date", "Cancel"]}
+							headers={["Product", "Type", "Price", "Interval", "Start date", "End date", "Renew"]}
 						/>
 						<tbody>
 							{#each profile.subscription as subscription}
@@ -174,9 +174,7 @@
 													on:click|preventDefault={() => (bundle.open = !bundle.open)}
 												>
 													{#if bundle.open}
-														<PanelBottomOpen size={16} />
-													{:else}
-														<PanelTopOpen size={16} />
+														<PanelBottomOpen size={16} />{:else}<PanelTopOpen size={16} />
 													{/if}
 
 													<span>Bundle</span>
@@ -192,58 +190,32 @@
 											</TableCell>
 
 											<TableCell>
+												{subscription.cancel ? "Cancels on " : "Renews on "}
 												{new Date(subscription.date_end).toLocaleString(userLocale)}
 											</TableCell>
 
 											<TableCell>
-												{#if subscription.disabled}
-													<SlideToggle
-														name="{subscription.subscription}-slider"
-														checked={true}
-														size="sm"
-														disabled
-														active="variant-filled-error"
-														background="variant-filled-success"
-														class="disabled"
-													>
-														<span class="inline-block w-[60px] text-left">
-															{subscription.cancel ? "Cancel" : "Renew"}
-														</span>
-													</SlideToggle>
-												{:else}
-													<SlideToggle
-														name="{subscription.subscription}-slider"
-														bind:checked={subscription.cancel}
-														size="sm"
-														active="variant-filled-error"
-														background="variant-filled-success"
-														on:click={() => {
-															subsform.setAttribute(
-																"action",
-																"?/subscriptions&product=" + subscription.subscription
-															)
-															subsform.requestSubmit()
-														}}
-													>
-														<span class="inline-block w-[60px] text-left">
-															{subscription.cancel ? "Cancel" : "Renew"}
-														</span>
-													</SlideToggle>
-												{/if}
+												<SlideToggle
+													name="{subscription.subscription}-slider"
+													checked={!subscription.cancel}
+													size="sm"
+													active="variant-filled-success"
+													background="variant-filled-surface"
+													disabled={subscription.disabled}
+													class={subscription.disabled ? "disabled" : ""}
+													on:click={() => {
+														if (subscription.disabled) return
+														subsform.setAttribute(
+															"action",
+															"?/subscriptions&product=" + subscription.subscription
+														)
+														subsform.requestSubmit()
+													}}
+												/>
 											</TableCell>
 										</tr>
 										{#if bundle.open}
-											<tr class="table-row">
-												<td colspan="7">
-													<table class="table table-compact">
-														<tbody>
-															{#each bundle.scripts as script}
-																<ScriptLinkRow url={script.url} title={script.title} />
-															{/each}
-														</tbody>
-													</table>
-												</td>
-											</tr>
+											<ScriptLinks scripts={bundle.scripts} colspan={7} />
 										{/if}
 									{:else}
 										{#await getScript(subscription.product)}
@@ -280,28 +252,28 @@
 													</TableCell>
 
 													<TableCell>
+														{subscription.cancel ? "Cancels on " : "Renews on "}
 														{new Date(subscription.date_end).toLocaleString(userLocale)}
 													</TableCell>
 
 													<TableCell>
 														<SlideToggle
 															name="{subscription.subscription}-slider"
-															bind:checked={subscription.cancel}
+															checked={!subscription.cancel}
 															size="sm"
-															active="variant-filled-error"
-															background="variant-filled-success"
+															active="variant-filled-success"
+															background="variant-filled-surface"
+															disabled={subscription.disabled}
+															class={subscription.disabled ? "disabled" : ""}
 															on:click={() => {
+																if (subscription.disabled) return
 																subsform.setAttribute(
 																	"action",
 																	"?/subscriptions&product=" + subscription.subscription
 																)
 																subsform.requestSubmit()
 															}}
-														>
-															<span class="inline-block w-[60px] text-left">
-																{subscription.cancel ? "Cancel" : "Renew"}
-															</span>
-														</SlideToggle>
+														/>
 													</TableCell>
 												</tr>
 											{/if}
@@ -345,9 +317,7 @@
 														on:click|preventDefault={() => (bundle.open = !bundle.open)}
 													>
 														{#if bundle.open}
-															<PanelBottomOpen size={16} />
-														{:else}
-															<PanelTopOpen size={16} />
+															<PanelBottomOpen size={16} />{:else}<PanelTopOpen size={16} />
 														{/if}
 
 														<span>Bundle</span>
@@ -363,17 +333,7 @@
 												</TableCell>
 											</tr>
 											{#if bundle.open}
-												<tr class="table-row">
-													<td colspan="7">
-														<table class="table table-compact">
-															<tbody>
-																{#each bundle.scripts as script}
-																	<ScriptLinkRow url={script.url} title={script.title} />
-																{/each}
-															</tbody>
-														</table>
-													</td>
-												</tr>
+												<ScriptLinks scripts={bundle.scripts} colspan={5} />
 											{/if}
 										{:else}
 											{#await getScript(access.product)}
@@ -445,10 +405,9 @@
 										on:click|preventDefault={() => (bundle.open = !bundle.open)}
 									>
 										{#if bundle.open}
-											<PanelBottomOpen size={16} />
-										{:else}
-											<PanelTopOpen size={16} />
+											<PanelBottomOpen size={16} />{:else}<PanelTopOpen size={16} />
 										{/if}
+
 										<span>Bundle</span>
 									</button>
 								</TableCell>
@@ -485,17 +444,7 @@
 								</TableCell>
 							</tr>
 							{#if bundle.open}
-								<tr class="table-row">
-									<td colspan="5">
-										<table class="table table-compact">
-											<tbody>
-												{#each bundle.scripts as script}
-													<ScriptLinkRow url={script.url} title={script.title} />
-												{/each}
-											</tbody>
-										</table>
-									</td>
-								</tr>
+								<ScriptLinks scripts={bundle.scripts} colspan={5} />
 							{/if}
 						{/if}
 					{/each}

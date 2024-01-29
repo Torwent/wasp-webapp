@@ -1,4 +1,4 @@
-import type { Prices, ProductEx, ScriptSimple } from "$lib/types/collection"
+import type { ScriptSimple } from "$lib/types/collection"
 import { error } from "@sveltejs/kit"
 
 export const load = async ({ parent, data }) => {
@@ -8,11 +8,9 @@ export const load = async ({ parent, data }) => {
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("prices")
-			.select(`id, product, amount, currency, interval`)
+			.select(`id, product, amount, currency, interval, active`)
 			.order("product", { ascending: true })
 			.order("amount", { ascending: true })
-			.filter("active", "eq", true)
-			.returns<Prices[]>()
 
 		if (err) {
 			console.error(err)
@@ -133,8 +131,8 @@ export const load = async ({ parent, data }) => {
 			let scriptURL: string = ""
 
 			for (let j = 0; j < tmpPrices.length; j++) {
-				if (tmpPrices[j].product !== product.id) continue
-				//if (!prices[j].active) continue
+				if (!tmpPrices[j].active || tmpPrices[j].product !== product.id) continue
+
 				productPrices.push({
 					id: tmpPrices[j].id,
 					product: tmpPrices[j].product,
