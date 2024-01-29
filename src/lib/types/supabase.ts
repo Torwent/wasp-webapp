@@ -34,6 +34,51 @@ export interface Database {
   }
   profiles: {
     Tables: {
+      free_access: {
+        Row: {
+          cancel: boolean
+          date_end: string
+          date_start: string
+          disabled: boolean
+          id: string
+          product: string
+          user_id: string
+        }
+        Insert: {
+          cancel?: boolean
+          date_end?: string
+          date_start?: string
+          disabled?: boolean
+          id?: string
+          product: string
+          user_id: string
+        }
+        Update: {
+          cancel?: boolean
+          date_end?: string
+          date_start?: string
+          disabled?: boolean
+          id?: string
+          product?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "free_access_product_fkey"
+            columns: ["product"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "free_access_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       private: {
         Row: {
           email: string
@@ -194,6 +239,7 @@ export interface Database {
           cancel: boolean
           date_end: string
           date_start: string
+          disabled: boolean
           id: string
           price: string
           product: string
@@ -203,6 +249,7 @@ export interface Database {
           cancel?: boolean
           date_end?: string
           date_start?: string
+          disabled?: boolean
           id: string
           price: string
           product: string
@@ -212,6 +259,7 @@ export interface Database {
           cancel?: boolean
           date_end?: string
           date_start?: string
+          disabled?: boolean
           id?: string
           price?: string
           product?: string
@@ -362,44 +410,6 @@ export interface Database {
         Relationships: [
           {
             foreignKeyName: "subscriptions_uc_price_id_fkey"
-            columns: ["price_id"]
-            isOneToOne: false
-            referencedRelation: "prices"
-            referencedColumns: ["stripe_id"]
-          }
-        ]
-      }
-      subscriptions_uc_duplicate: {
-        Row: {
-          cancel: boolean
-          date_end: string
-          date_start: string
-          external: boolean
-          id: string
-          price_id: string
-          subscription_id: string | null
-        }
-        Insert: {
-          cancel?: boolean
-          date_end?: string
-          date_start?: string
-          external?: boolean
-          id: string
-          price_id?: string
-          subscription_id?: string | null
-        }
-        Update: {
-          cancel?: boolean
-          date_end?: string
-          date_start?: string
-          external?: boolean
-          id?: string
-          price_id?: string
-          subscription_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "subscriptions_uc_duplicate_price_id_fkey"
             columns: ["price_id"]
             isOneToOne: false
             referencedRelation: "prices"

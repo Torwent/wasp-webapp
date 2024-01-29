@@ -7,6 +7,7 @@
 	import { ExternalLink, PanelBottomOpen, PanelTopOpen } from "lucide-svelte"
 	import TableHeader from "$lib/components/tables/TableHeader.svelte"
 	import TableCell from "$lib/components/tables/TableCell.svelte"
+	import ScriptLinkRow from "./ScriptLinkRow.svelte"
 	import type { Price } from "$lib/types/collection"
 	import {
 		getCurrentPrice,
@@ -124,195 +125,92 @@
 </svelte:head>
 
 <main class="grid my-8">
-	{#if profile && profile.subscription.length > 0}
-		<form
-			method="POST"
-			class="my-8 items-center justify-center"
-			use:subscriptionEnhance
-			bind:this={subsform}
-			action="?/subscriptions"
-		>
-			<h3 class="justify-center text-center my-12">Current subscriptions</h3>
+	{#if profile}
+		{#if profile.subscription.length > 0}
+			<form
+				method="POST"
+				class="my-4 items-center justify-center"
+				use:subscriptionEnhance
+				bind:this={subsform}
+				action="?/subscriptions"
+			>
+				<h3 class="justify-center text-center my-12">Current subscriptions</h3>
 
-			{#if $subscriptionsErrors._errors}
-				<div class="w-full my-8 text-center mx-auto">
-					{#each $subscriptionsErrors._errors as err}
-						<span class="text-error-500">{err}</span>
-					{/each}
-				</div>
-			{/if}
+				{#if $subscriptionsErrors._errors}
+					<div class="w-full my-8 text-center mx-auto">
+						{#each $subscriptionsErrors._errors as err}
+							<span class="text-error-500">{err}</span>
+						{/each}
+					</div>
+				{/if}
 
-			<div class="table-container max-w-md md:max-w-3xl lg:max-w-6xl xl:mx-w-7xl mx-auto">
-				<table class="table table-hover border-separate space-y-6 text-xs">
-					<TableHeader
-						headers={["Product", "Type", "Price", "Interval", "Start date", "End date", "Cancel"]}
-					/>
-					<tbody>
-						{#each profile.subscription as subscription}
-							{@const price = getPrice(subscription.price, prices)}
-							{#await getBundle(subscription.product)}
-								<tr>
-									<td colspan="7">
-										<span class="flex justify-center text-center py-3">...</span>
-									</td>
-								</tr>
-							{:then bundle}
-								{#if bundle}
-									{@const isTenYearSub =
-										bundle.name.includes("Legacy") &&
-										dateDiff(subscription.date_start, subscription.date_end) > 9}
-									<tr class="table-row">
-										<TableCell alignment="left" padding={0}>
-											<div class="mx-3">
-												<div>{bundle.name}</div>
-												<div class="text-xs text-left">by {bundle.username}</div>
-											</div>
-										</TableCell>
-
-										<TableCell padding={0}>
-											<button
-												class="btn hover:cursor-pointer hover:text-primary-500"
-												on:click|preventDefault={() => (bundle.open = !bundle.open)}
-											>
-												{#if bundle.open}
-													<PanelBottomOpen size={16} />
-												{:else}
-													<PanelTopOpen size={16} />
-												{/if}
-
-												<span>Bundle</span>
-											</button>
-										</TableCell>
-
-										<TableCell>
-											{#if isTenYearSub}
-												-
-											{:else if price}
-												{getPriceAmount(price)}
-											{:else}
-												...
-											{/if}
-										</TableCell>
-
-										<TableCell>
-											{#if isTenYearSub}
-												-
-											{:else if price}
-												{getPriceIntervalEx(price)}
-											{:else}
-												...
-											{/if}
-										</TableCell>
-
-										<TableCell>
-											{new Date(subscription.date_start).toLocaleString(userLocale)}
-										</TableCell>
-
-										<TableCell>
-											{new Date(subscription.date_end).toLocaleString(userLocale)}
-										</TableCell>
-
-										<TableCell>
-											{#if isTenYearSub}
-												<SlideToggle
-													name="{subscription.subscription}-slider"
-													checked={true}
-													size="sm"
-													disabled
-													active="variant-filled-error"
-													background="variant-filled-success"
-													class="disabled"
-												>
-													<span class="inline-block w-[60px] text-left">
-														{subscription.cancel ? "Cancel" : "Renew"}
-													</span>
-												</SlideToggle>
-											{:else}
-												<SlideToggle
-													name="{subscription.subscription}-slider"
-													bind:checked={subscription.cancel}
-													size="sm"
-													active="variant-filled-error"
-													background="variant-filled-success"
-													on:click={() => {
-														subsform.setAttribute(
-															"action",
-															"?/subscriptions&product=" + subscription.subscription
-														)
-														subsform.requestSubmit()
-													}}
-												>
-													<span class="inline-block w-[60px] text-left">
-														{subscription.cancel ? "Cancel" : "Renew"}
-													</span>
-												</SlideToggle>
-											{/if}
-										</TableCell>
+				<div class="table-container max-w-md md:max-w-3xl lg:max-w-6xl xl:mx-w-7xl mx-auto">
+					<table class="table table-hover border-separate space-y-6 text-xs">
+						<TableHeader
+							headers={["Product", "Type", "Price", "Interval", "Start date", "End date", "Cancel"]}
+						/>
+						<tbody>
+							{#each profile.subscription as subscription}
+								{@const price = getPrice(subscription.price, prices)}
+								{#await getBundle(subscription.product)}
+									<tr>
+										<td colspan="7">
+											<span class="flex justify-center text-center py-3">...</span>
+										</td>
 									</tr>
-									{#if bundle.open}
+								{:then bundle}
+									{#if bundle}
 										<tr class="table-row">
-											<td colspan="7">
-												<table class="table table-compact">
-													<tbody>
-														{#each bundle.scripts as script}
-															<tr>
-																<a
-																	href="/scripts/{script.url}"
-																	class="flex permalink h-full w-full"
-																>
-																	<td class="text-xs">
-																		<div class="flex align-items-center ml-3">
-																			<ExternalLink size={16} class="mr-4" />
-																			{script.title}
-																		</div>
-																	</td>
-																</a>
-															</tr>
-														{/each}
-													</tbody>
-												</table>
-											</td>
-										</tr>
-									{/if}
-								{:else}
-									{#await getScript(subscription.product)}
-										<tr><TableCell padding={0}>...</TableCell></tr>
-									{:then script}
-										{#if script}
-											<tr class="table-row">
-												<TableCell alignment="left" padding={0}>
-													<div class="mx-3">
-														<div>{script.name}</div>
-														<div class="text-xs text-left">by {script.username}</div>
-													</div>
-												</TableCell>
+											<TableCell alignment="left" padding={0}>
+												<div class="mx-3">
+													<div>{bundle.name}</div>
+													<div class="text-xs text-left">by {bundle.username}</div>
+												</div>
+											</TableCell>
 
-												<TableCell padding={0}>
-													<a href="/scripts/{script.url}" class="permalink">
-														<button class="btn hover:cursor-pointer hover:text-primary-500">
-															<ExternalLink size={16} />
-															<span>Script</span>
-														</button>
-													</a>
-												</TableCell>
+											<TableCell padding={0}>
+												<button
+													class="btn hover:cursor-pointer hover:text-primary-500"
+													on:click|preventDefault={() => (bundle.open = !bundle.open)}
+												>
+													{#if bundle.open}
+														<PanelBottomOpen size={16} />
+													{:else}
+														<PanelTopOpen size={16} />
+													{/if}
 
-												<TableCell>
-													{#if price} {getPriceAmount(price)} {:else} ... {/if}
-												</TableCell>
+													<span>Bundle</span>
+												</button>
+											</TableCell>
 
-												<TableCell>
-													{#if price} {getPriceIntervalEx(price)} {:else} ... {/if}
-												</TableCell>
+											<TableCell>{price ? getPriceAmount(price) : "..."}</TableCell>
 
-												<TableCell>
-													{new Date(subscription.date_start).toLocaleString(userLocale)}
-												</TableCell>
+											<TableCell>{price ? getPriceIntervalEx(price) : "..."}</TableCell>
 
-												<TableCell>
-													{new Date(subscription.date_end).toLocaleString(userLocale)}
-												</TableCell>
+											<TableCell>
+												{new Date(subscription.date_start).toLocaleString(userLocale)}
+											</TableCell>
 
-												<TableCell>
+											<TableCell>
+												{new Date(subscription.date_end).toLocaleString(userLocale)}
+											</TableCell>
+
+											<TableCell>
+												{#if subscription.disabled}
+													<SlideToggle
+														name="{subscription.subscription}-slider"
+														checked={true}
+														size="sm"
+														disabled
+														active="variant-filled-error"
+														background="variant-filled-success"
+														class="disabled"
+													>
+														<span class="inline-block w-[60px] text-left">
+															{subscription.cancel ? "Cancel" : "Renew"}
+														</span>
+													</SlideToggle>
+												{:else}
 													<SlideToggle
 														name="{subscription.subscription}-slider"
 														bind:checked={subscription.cancel}
@@ -331,21 +229,197 @@
 															{subscription.cancel ? "Cancel" : "Renew"}
 														</span>
 													</SlideToggle>
-												</TableCell>
+												{/if}
+											</TableCell>
+										</tr>
+										{#if bundle.open}
+											<tr class="table-row">
+												<td colspan="7">
+													<table class="table table-compact">
+														<tbody>
+															{#each bundle.scripts as script}
+																<ScriptLinkRow url={script.url} title={script.title} />
+															{/each}
+														</tbody>
+													</table>
+												</td>
 											</tr>
 										{/if}
-									{/await}
-								{/if}
-							{/await}
-						{/each}
-					</tbody>
-				</table>
-			</div>
-		</form>
+									{:else}
+										{#await getScript(subscription.product)}
+											<tr><TableCell padding={0}>...</TableCell></tr>
+										{:then script}
+											{#if script}
+												<tr class="table-row">
+													<TableCell alignment="left" padding={0}>
+														<div class="mx-3">
+															<div>{script.name}</div>
+															<div class="text-xs text-left">by {script.username}</div>
+														</div>
+													</TableCell>
 
-		<form method="POST" action="?/portal" class="mt-8 mb-32 grid place-items-center">
-			<button class="btn variant-filled-secondary">Customer portal</button>
-		</form>
+													<TableCell padding={0}>
+														<a href="/scripts/{script.url}" class="permalink">
+															<button class="btn hover:cursor-pointer hover:text-primary-500">
+																<ExternalLink size={16} />
+																<span>Script</span>
+															</button>
+														</a>
+													</TableCell>
+
+													<TableCell>
+														{#if price} {getPriceAmount(price)} {:else} ... {/if}
+													</TableCell>
+
+													<TableCell>
+														{#if price} {getPriceIntervalEx(price)} {:else} ... {/if}
+													</TableCell>
+
+													<TableCell>
+														{new Date(subscription.date_start).toLocaleString(userLocale)}
+													</TableCell>
+
+													<TableCell>
+														{new Date(subscription.date_end).toLocaleString(userLocale)}
+													</TableCell>
+
+													<TableCell>
+														<SlideToggle
+															name="{subscription.subscription}-slider"
+															bind:checked={subscription.cancel}
+															size="sm"
+															active="variant-filled-error"
+															background="variant-filled-success"
+															on:click={() => {
+																subsform.setAttribute(
+																	"action",
+																	"?/subscriptions&product=" + subscription.subscription
+																)
+																subsform.requestSubmit()
+															}}
+														>
+															<span class="inline-block w-[60px] text-left">
+																{subscription.cancel ? "Cancel" : "Renew"}
+															</span>
+														</SlideToggle>
+													</TableCell>
+												</tr>
+											{/if}
+										{/await}
+									{/if}
+								{/await}
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			</form>
+
+			{#if profile.free_access.length > 0}
+				<div class="my-4 items-center justify-center">
+					<h3 class="justify-center text-center my-12">Free access</h3>
+
+					<div class="table-container max-w-md md:max-w-3xl lg:max-w-6xl xl:mx-w-7xl mx-auto">
+						<table class="table table-hover border-separate space-y-6 text-xs">
+							<TableHeader headers={["Product", "Type", "Start date", "End date"]} />
+							<tbody>
+								{#each profile.free_access as access}
+									{#await getBundle(access.product)}
+										<tr>
+											<td colspan="7">
+												<span class="flex justify-center text-center py-3">...</span>
+											</td>
+										</tr>
+									{:then bundle}
+										{#if bundle}
+											<tr class="table-row">
+												<TableCell alignment="left" padding={0}>
+													<div class="mx-3">
+														<div>{bundle.name}</div>
+														<div class="text-xs text-left">by {bundle.username}</div>
+													</div>
+												</TableCell>
+
+												<TableCell padding={0}>
+													<button
+														class="btn hover:cursor-pointer hover:text-primary-500"
+														on:click|preventDefault={() => (bundle.open = !bundle.open)}
+													>
+														{#if bundle.open}
+															<PanelBottomOpen size={16} />
+														{:else}
+															<PanelTopOpen size={16} />
+														{/if}
+
+														<span>Bundle</span>
+													</button>
+												</TableCell>
+
+												<TableCell>
+													{new Date(access.date_start).toLocaleString(userLocale)}
+												</TableCell>
+
+												<TableCell>
+													{new Date(access.date_end).toLocaleString(userLocale)}
+												</TableCell>
+											</tr>
+											{#if bundle.open}
+												<tr class="table-row">
+													<td colspan="7">
+														<table class="table table-compact">
+															<tbody>
+																{#each bundle.scripts as script}
+																	<ScriptLinkRow url={script.url} title={script.title} />
+																{/each}
+															</tbody>
+														</table>
+													</td>
+												</tr>
+											{/if}
+										{:else}
+											{#await getScript(access.product)}
+												<tr><TableCell padding={0}>...</TableCell></tr>
+											{:then script}
+												{#if script}
+													<tr class="table-row">
+														<TableCell alignment="left" padding={0}>
+															<div class="mx-3">
+																<div>{script.name}</div>
+																<div class="text-xs text-left">by {script.username}</div>
+															</div>
+														</TableCell>
+
+														<TableCell padding={0}>
+															<a href="/scripts/{script.url}" class="permalink">
+																<button class="btn hover:cursor-pointer hover:text-primary-500">
+																	<ExternalLink size={16} />
+																	<span>Script</span>
+																</button>
+															</a>
+														</TableCell>
+
+														<TableCell>
+															{new Date(access.date_start).toLocaleString(userLocale)}
+														</TableCell>
+
+														<TableCell>
+															{new Date(access.date_end).toLocaleString(userLocale)}
+														</TableCell>
+													</tr>
+												{/if}
+											{/await}
+										{/if}
+									{/await}
+								{/each}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			{/if}
+
+			<form method="POST" action="?/portal" class="mt-8 mb-32 grid place-items-center">
+				<button class="btn variant-filled-secondary">Customer portal</button>
+			</form>
+		{/if}
 	{/if}
 
 	<form method="POST" class="my-8 items-center justify-center" use:checkoutEnhance>
@@ -416,16 +490,7 @@
 										<table class="table table-compact">
 											<tbody>
 												{#each bundle.scripts as script}
-													<tr>
-														<a href="/scripts/{script.url}" class="flex permalink h-full w-full">
-															<td class="text-xs">
-																<div class="flex align-items-center ml-3">
-																	<ExternalLink size={16} class="mr-4" />
-																	{script.title}
-																</div>
-															</td>
-														</a>
-													</tr>
+													<ScriptLinkRow url={script.url} title={script.title} />
 												{/each}
 											</tbody>
 										</table>

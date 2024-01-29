@@ -22,6 +22,7 @@ export type ProfileRoles = Database["profiles"]["Tables"]["roles"]["Row"]
 export type ProfilePrivate = Database["profiles"]["Tables"]["private"]["Row"]
 export type ProfileSubscription = Database["profiles"]["Tables"]["subscription"]["Row"]
 export type ProfileSubscriptions = ProfileSubscription[]
+export type ProfileFreeAccess = Database["profiles"]["Tables"]["free_access"]["Row"][]
 
 export interface Profile extends ProfileBase {
 	private: ProfilePrivate
@@ -35,6 +36,7 @@ export interface Profile extends ProfileBase {
 		banned: Boolean
 	}
 	subscription: ProfileSubscriptions
+	free_access: ProfileFreeAccess
 }
 
 export type Stats = Database["public"]["Tables"]["stats"]["Row"]
@@ -89,7 +91,7 @@ export interface ScriptSimple {
 	id: Database["scripts"]["Tables"]["scripts"]["Row"]["id"]
 	title: Database["scripts"]["Tables"]["scripts"]["Row"]["title"]
 	username: Database["scripts"]["Tables"]["protected"]["Row"]["username"]
-	url: Database["scripts"]["Tables"]["scripts"]["Row"]["url"]
+	url: string
 	product: Database["scripts"]["Tables"]["scripts"]["Row"]["product"]
 }
 

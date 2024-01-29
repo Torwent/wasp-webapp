@@ -34,12 +34,14 @@ export const load = async ({ parent, data }) => {
 			.schema("scripts")
 			.from("products")
 			.select(
-				`id, user_id, name, bundle, bundles!products_bundle_fkey (username), script, scripts!products_script_fkey (url, protected!protected_id_fkey (username)), active`
+				`id, user_id, name, bundle,
+				 bundles!products_bundle_fkey (username), script,
+				 scripts!products_script_fkey (url, protected!protected_id_fkey (username)),
+				 active`
 			)
 			.order("bundle", { ascending: true })
 			.order("user_id", { ascending: true })
 			.order("name", { ascending: true })
-			.returns<ProductEx[]>()
 
 		if (err) {
 			console.error(err)
@@ -58,7 +60,7 @@ export const load = async ({ parent, data }) => {
 				id: product.id,
 				user_id: product.user_id,
 				name: product.name,
-				username: product.bundles?.username ?? product.scripts?.protected.username ?? "",
+				username: product.bundles?.username ?? product.scripts?.protected?.username ?? "",
 				bundle: product.bundle,
 				script: product.script,
 				active: product.active
@@ -109,7 +111,6 @@ export const load = async ({ parent, data }) => {
 			Error hint: ${err.message}`
 			)
 		}
-
 		return data
 	}
 
