@@ -1,3 +1,4 @@
+import { getStatsTotal } from "$lib/backend/data"
 import type { Stats } from "$lib/types/collection"
 import { UUID_V4_REGEX } from "$lib/utils"
 import { error } from "@sveltejs/kit"
@@ -20,29 +21,6 @@ export const load = async ({ url, depends, parent }) => {
 
 	const { supabaseClient } = await parent()
 
-	async function getTotal() {
-		const { data, error: err } = await supabaseClient.rpc("get_stats_total").returns<Stats[]>()
-
-		if (err)
-			throw error(
-				500,
-				`Server error, this is probably not an issue on your end! - SELECT get_stats_total postgres function failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
-			)
-
-		const total = {
-			experience: data[0].experience ?? 0,
-			gold: data[0].gold ?? 0,
-			levels: data[0].levels ?? 0,
-			runtime: data[0].runtime ?? 0
-		}
-
-		return total
-	}
-
 	async function getStats() {
 		const query = supabaseClient
 			.from("stats")
@@ -59,7 +37,7 @@ export const load = async ({ url, depends, parent }) => {
 			query.ilike("username", "%" + search.replaceAll("%", "") + "%")
 		}
 
-		const { data, count, error: err } = await query.returns<Stats[]>()
+		const { data, count, error: err } = await query
 
 		if (err)
 			throw error(
@@ -74,6 +52,6 @@ export const load = async ({ url, depends, parent }) => {
 		return { stats: data, count: count || totalEntries }
 	}
 
-	const promises = await Promise.all([getTotal(), getStats()])
+	const promises = await Promise.all([getStatsTotal(supabaseClient), getStats()])
 	return { total: promises[0], stats: promises[1], range: range }
 }

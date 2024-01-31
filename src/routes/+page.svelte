@@ -2,30 +2,10 @@
 	import Discord from "$lib/components/Discord.svelte"
 	import CanvasAnimation from "./CanvasAnimation.svelte"
 	import { convertTime, formatRSNumber } from "$lib/utils"
-	import { invalidate } from "$app/navigation"
 	import { page } from "$app/stores"
-	import { onMount } from "svelte"
 	export let data
 
-	let { supabaseClient, total } = data
-	$: ({ supabaseClient, total } = data)
-
-	onMount(() => {
-		const subscription = supabaseClient
-			.channel("home-stats-changed")
-			.on(
-				"postgres_changes",
-				{
-					event: "UPDATE",
-					schema: "public",
-					table: "stats"
-				},
-				() => invalidate("supabase:home_stats_total")
-			)
-			.subscribe()
-
-		return () => subscription.unsubscribe()
-	})
+	let { total } = data
 
 	const headTitle = "WaspScripts"
 	const headDescription =
@@ -79,7 +59,7 @@
 			Total Gold Earned: {formatRSNumber(total.gold)}
 		</h2>
 		<h2 class="mx-6 font-bold whitespace-nowrap text-center">
-			Total Levels Earned: {total.levels}
+			Total Levels Earned: {formatRSNumber(total.levels)}
 		</h2>
 		<h2 class="mb-4 mx-6 font-bold whitespace-nowrap text-center">
 			Total Runtime: {convertTime(total.runtime)}

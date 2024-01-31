@@ -318,3 +318,16 @@ export async function canDownload(
 
 	return data ?? false
 }
+
+export async function getStatsTotal(supabase: SupabaseClient) {
+	const { data, error: err } = await supabase.rpc("get_stats_total").single()
+
+	if (err)
+		throw error(
+			500,
+			"Server error, this is probably not an issue on your end! - SELECT get_stats_total postgres function failed! Error: " +
+				JSON.stringify(err)
+		)
+
+	return data
+}

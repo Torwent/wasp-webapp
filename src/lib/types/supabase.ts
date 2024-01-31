@@ -36,28 +36,22 @@ export interface Database {
     Tables: {
       free_access: {
         Row: {
-          cancel: boolean
           date_end: string
           date_start: string
-          disabled: boolean
           id: string
           product: string
           user_id: string
         }
         Insert: {
-          cancel?: boolean
           date_end?: string
           date_start?: string
-          disabled?: boolean
           id?: string
           product: string
           user_id: string
         }
         Update: {
-          cancel?: boolean
           date_end?: string
           date_start?: string
-          disabled?: boolean
           id?: string
           product?: string
           user_id?: string
@@ -332,6 +326,7 @@ export interface Database {
           cancel: boolean
           date_end: string
           date_start: string
+          disabled: boolean
           id: string
           price: string
           product: string
@@ -341,6 +336,7 @@ export interface Database {
           cancel?: boolean
           date_end?: string
           date_start?: string
+          disabled?: boolean
           id: string
           price: string
           product: string
@@ -350,6 +346,7 @@ export interface Database {
           cancel?: boolean
           date_end?: string
           date_start?: string
+          disabled?: boolean
           id?: string
           price?: string
           product?: string
@@ -731,7 +728,15 @@ export interface Database {
       }
     }
     Views: {
-      [_ in never]: never
+      mv_stats_total: {
+        Row: {
+          experience: number | null
+          gold: number | null
+          levels: number | null
+          runtime: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       _array_remove: {

@@ -125,7 +125,7 @@
 			</span>
 			<wbr />
 			Total levels:
-			<span class="py-4 pr-6">{data.total.levels}</span>
+			<span class="py-4 pr-6">{formatRSNumber(data.total.levels)}</span>
 			<wbr />
 			Total runtime:
 			<span class="py-4 pr-6">
@@ -180,7 +180,7 @@
 					</th>
 					<td class="py-4 px-6 w-64">{formatRSNumber(entry.experience ?? 0)}</td>
 					<td class="py-4 px-6 w-64">{formatRSNumber(entry.gold ?? 0)}</td>
-					<td class="py-4 px-6 w-64">{entry.levels}</td>
+					<td class="py-4 px-6 w-64">{formatRSNumber(entry.levels)}</td>
 					<td class="py-4 px-6 w-64">{convertTime(entry.runtime ?? 0)}</td>
 				</tr>
 			{/each}
