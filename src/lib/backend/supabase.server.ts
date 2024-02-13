@@ -251,7 +251,7 @@ export async function updateReporters(script: string, user: string) {
 export async function insertSubscription(subscription: ProfileSubscription) {
 	if (!adminLoggedIn) {
 		await login(false)
-		if (!adminLoggedIn) return false
+		if (!adminLoggedIn) return { error: null }
 	}
 
 	console.log("INSERT profile.subscription for user: ", subscription.id)
@@ -263,7 +263,7 @@ export async function insertSubscription(subscription: ProfileSubscription) {
 export async function upsertSubscription(subscription: ProfileSubscription) {
 	if (!adminLoggedIn) {
 		await login(false)
-		if (!adminLoggedIn) return false
+		if (!adminLoggedIn) return { error: null }
 	}
 
 	console.log("UPDATE profile.subscription for user: ", subscription.id)
@@ -305,26 +305,25 @@ export async function upsertSubscription(subscription: ProfileSubscription) {
 				console.error("errSub: " + errSub)
 				console.error("errSubOld: " + errSubOld)
 				console.error("errInsert: " + errInsert)
-				throw error(
-					500,
-					"errSub: " +
+				return {
+					error:
 						JSON.stringify(errSub) +
 						"errSubOld: " +
 						JSON.stringify(errSubOld) +
 						"errInsert: " +
 						JSON.stringify(errInsert)
-				)
+				}
 			}
 		}
 	}
 
-	return true
+	return { error: null }
 }
 
 export async function deleteSubscription(id: string) {
 	if (!adminLoggedIn) {
 		await login(false)
-		if (!adminLoggedIn) return false
+		if (!adminLoggedIn) return { error: null }
 	}
 
 	console.log("DELETE profile.subscription: ", id)
@@ -337,10 +336,10 @@ export async function deleteSubscription(id: string) {
 
 	if (errSubscription) {
 		console.error(errSubscription)
-		throw error(500, errSubscription)
+		return { error: errSubscription }
 	}
 
-	return true
+	return { error: null }
 }
 
 export async function insertProduct(product: Product) {

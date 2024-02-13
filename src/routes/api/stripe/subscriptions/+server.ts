@@ -30,15 +30,18 @@ export const POST = async ({ request }) => {
 			const subscriptionCreated = data.object as Stripe.Subscription
 			if (subscriptionCreated.status !== "active") break
 
-			await insertSubscription({
+			const { error: errInsert } = await insertSubscription({
 				subscription: subscriptionCreated.id,
 				id: subscriptionCreated.metadata.user_id,
 				product: subscriptionCreated.items.data[0].price.product.toString(),
 				price: subscriptionCreated.items.data[0].price.id,
 				date_end: new Date(subscriptionCreated.current_period_end * 1000).toISOString(),
 				date_start: new Date(subscriptionCreated.start_date * 1000).toISOString(),
-				cancel: subscriptionCreated.cancel_at_period_end
+				cancel: subscriptionCreated.cancel_at_period_end,
+				disabled: false
 			})
+
+			if (errInsert) throw error(404, "Error inserting subscription: " + JSON.stringify(errInsert))
 
 			break
 
@@ -46,20 +49,25 @@ export const POST = async ({ request }) => {
 			const subscriptionUpdated = data.object as Stripe.Subscription
 			if (subscriptionUpdated.status !== "active" && subscriptionUpdated.status !== "canceled")
 				break
-			await upsertSubscription({
+			const { error: errUpsert } = await upsertSubscription({
 				subscription: subscriptionUpdated.id,
 				id: subscriptionUpdated.metadata.user_id,
 				product: subscriptionUpdated.items.data[0].price.product.toString(),
 				price: subscriptionUpdated.items.data[0].price.id,
 				date_end: new Date(subscriptionUpdated.current_period_end * 1000).toISOString(),
 				date_start: new Date(subscriptionUpdated.start_date * 1000).toISOString(),
-				cancel: subscriptionUpdated.cancel_at_period_end
+				cancel: subscriptionUpdated.cancel_at_period_end,
+				disabled: false
 			})
+
+			if (errUpsert) throw error(404, "Error inserting subscription: " + errUpsert)
+
 			break
 
 		case "customer.subscription.deleted":
 			const subscriptionDeleted = data.object as Stripe.Subscription
-			await deleteSubscription(subscriptionDeleted.id)
+			const { error: errDelete } = await deleteSubscription(subscriptionDeleted.id)
+			if (errDelete) throw error(404, "Error deleting subscription: " + errDelete)
 			break
 
 		default:
