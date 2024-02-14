@@ -13,7 +13,7 @@
 		tutorial.username
 	const headAuthor = tutorial.username
 	const headImage =
-		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
 
 <svelte:head>

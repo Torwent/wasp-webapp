@@ -30,7 +30,7 @@
 	})
 
 	const defaultBanner =
-		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/default/banner.jpg"
+		"https://db.waspscripts.com/storage/v1/object/public/imgs/scripts/default/banner.jpg"
 	let coverElement: HTMLImageElement | undefined
 	let bannerElement: HTMLImageElement | undefined
 
@@ -201,7 +201,7 @@ You need quest ABC completed to use this.
 	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba"
 	const headAuthor = "Torwent"
 	const headImage =
-		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
 
 <svelte:head>

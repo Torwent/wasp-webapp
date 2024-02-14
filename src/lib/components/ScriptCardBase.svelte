@@ -10,7 +10,7 @@
 	export let imgElement: HTMLImageElement | undefined = browser ? new Image() : undefined
 
 	const defaultCover =
-		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/scripts/default/cover.jpg"
+		"https://db.waspscripts.com/storage/v1/object/public/imgs/scripts/default/cover.jpg"
 
 	const getPopup = (target: string): PopupSettings => {
 		return {

@@ -60,7 +60,7 @@
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide"
 	const headAuthor = "Torwent"
 	const headImage =
-		"https://enqlpchobniylwpsjcqc.supabase.co/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
 
 <svelte:head>
