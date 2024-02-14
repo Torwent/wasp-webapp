@@ -19,6 +19,7 @@ const config = {
 				],
 				"script-src": [
 					"self",
+					"https://db.waspscripts.com/",
 					"https://enqlpchobniylwpsjcqc.supabase.co/",
 					"https://js.stripe.com/",
 					"https://connect-js.stripe.com",
