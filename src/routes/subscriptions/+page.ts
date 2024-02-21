@@ -16,7 +16,7 @@ export const load = async ({ parent, data }) => {
 			console.error(err)
 			throw error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT prices failed
+				`Server error, this is probably not an issue on your end! - SELECT scripts.prices failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -81,7 +81,7 @@ export const load = async ({ parent, data }) => {
 		if (err) {
 			throw error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT prices failed
+				`Server error, this is probably not an issue on your end! - SELECT scripts.scripts failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}
@@ -102,7 +102,7 @@ export const load = async ({ parent, data }) => {
 		if (err) {
 			throw error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT prices failed
+				`Server error, this is probably not an issue on your end! - SELECT scripts.bundles failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}

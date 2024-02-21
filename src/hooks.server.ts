@@ -1,4 +1,4 @@
-import { error, type Handle } from "@sveltejs/kit"
+import { error, redirect, type Handle } from "@sveltejs/kit"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import { createServerClient } from "@supabase/ssr"
 import type { Profile } from "$lib/types/collection"
@@ -8,6 +8,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
 
 	const { url, locals } = event
+
+	if (url.pathname === "/clear-cookies") {
+		console.log("Clearing cookies...")
+		event.cookies.getAll().forEach((cookie) => {
+			event.cookies.delete(cookie.name, { path: "/" })
+		})
+		throw redirect(303, "/")
+	}
 
 	locals.supabaseServer = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
 		cookies: {
@@ -69,6 +77,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const loadTime = performance.now() - start
 	if (loadTime < 3000) console.log(`🚀 ${url} took ${loadTime.toFixed(2)} ms to load!`)
 	else console.log(`🐌 ${url} took ${loadTime.toFixed(2)} ms to load!`)
+
+	if (response.status === 509) {
+		throw redirect(303, "/clear-cookies")
+	}
 
 	return response
 }

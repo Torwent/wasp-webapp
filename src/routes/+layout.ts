@@ -21,8 +21,8 @@ async function getProfile(supabase: SupabaseClient, session: Session) {
 	if (err) {
 		console.error(err)
 		throw error(
-			500,
-			`Server error, this is probably not an issue on your end! - SELECT prices failed
+			509,
+			`Server error, this is probably not an issue on your end! - SELECT profiles.profiles failed
 			Error code: ${err.code}
 			Error hint: ${err.hint}
 			Error details: ${err.details}

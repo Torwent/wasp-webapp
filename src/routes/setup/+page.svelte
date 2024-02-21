@@ -143,7 +143,7 @@
 				<p class="text-center pt-40">
 					For a Windows install script you can get it here:
 					<a
-						href="https://github.com/torwent/wasp-setup/releases/latest/download/setup.{currentOS.Extension}"
+						href="https://github.com/torwent/wasp-setup/releases/latest/download/simba-setup.{currentOS.Extension}"
 						class="font-semibold hover:underline text-primary-400 dark:text-primary-100"
 					>
 						setup.{currentOS.Extension}
@@ -163,7 +163,7 @@
 			<p class="text-center pt-24">
 				For a {secondaryOS.OS} install script you can get it here:
 				<a
-					href="https://github.com/torwent/wasp-setup/releases/latest/download/setup.{secondaryOS.Extension}"
+					href="https://github.com/torwent/wasp-setup/releases/latest/download/simba-setup.{secondaryOS.Extension}"
 					class="font-semibold hover:underline text-primary-400 dark:text-primary-100"
 				>
 					setup.{secondaryOS.Extension}

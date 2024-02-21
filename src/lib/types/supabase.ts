@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   graphql_public: {
     Tables: {
       [_ in never]: never
@@ -40,21 +40,18 @@ export interface Database {
           date_start: string
           id: string
           product: string
-          user_id: string
         }
         Insert: {
           date_end?: string
           date_start?: string
-          id?: string
+          id: string
           product: string
-          user_id: string
         }
         Update: {
           date_end?: string
           date_start?: string
           id?: string
           product?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -66,7 +63,7 @@ export interface Database {
           },
           {
             foreignKeyName: "free_access_user_id_fkey"
-            columns: ["user_id"]
+            columns: ["id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -670,6 +667,39 @@ export interface Database {
         }
         Relationships: []
       }
+      stats_backup: {
+        Row: {
+          experience: number | null
+          gold: number | null
+          id: string
+          levels: number
+          password: string
+          runtime: number | null
+          updated_at: string | null
+          username: string
+        }
+        Insert: {
+          experience?: number | null
+          gold?: number | null
+          id: string
+          levels?: number
+          password?: string
+          runtime?: number | null
+          updated_at?: string | null
+          username?: string
+        }
+        Update: {
+          experience?: number | null
+          gold?: number | null
+          id?: string
+          levels?: number
+          password?: string
+          runtime?: number | null
+          updated_at?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
       tutorials: {
         Row: {
           author_id: string
@@ -1167,6 +1197,50 @@ export interface Database {
         Relationships: [
           {
             foreignKeyName: "stats_simba_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      stats_simba_BAK: {
+        Row: {
+          experience: number
+          gold: number
+          id: string
+          levels: number
+          online_users: Json[]
+          online_users_total: number
+          runtime: number
+          unique_users: string[]
+          unique_users_total: number
+        }
+        Insert: {
+          experience?: number
+          gold?: number
+          id: string
+          levels?: number
+          online_users?: Json[]
+          online_users_total?: number
+          runtime?: number
+          unique_users?: string[]
+          unique_users_total?: number
+        }
+        Update: {
+          experience?: number
+          gold?: number
+          id?: string
+          levels?: number
+          online_users?: Json[]
+          online_users_total?: number
+          runtime?: number
+          unique_users?: string[]
+          unique_users_total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scripts_stats_simba_BAK_id_fkey"
             columns: ["id"]
             isOneToOne: true
             referencedRelation: "scripts"
