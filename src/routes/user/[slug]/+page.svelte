@@ -8,6 +8,8 @@
 	import { page } from "$app/stores"
 
 	export let data
+	export let form
+
 	const { profile } = data
 	if (!profile) throw redirect(303, "/")
 
@@ -15,15 +17,19 @@
 	let password: string = ""
 	let isFocused: boolean = true
 
-	const { form, errors, enhance } = superForm(data.form, {
+	const {
+		form: authForm,
+		errors,
+		enhance
+	} = superForm(data.form, {
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: null,
 		validators: profileSchema
 	})
 
-	$: $form.email = email === "" ? undefined : email
-	$: $form.password = password === "" ? undefined : password
+	$: $authForm.email = email === "" ? undefined : email
+	$: $authForm.password = password === "" ? undefined : password
 
 	const headTitle = profile.username + " - WaspScripts"
 	const headDescription = "Information about " + profile.username + " in WaspScripts"
@@ -81,6 +87,13 @@
 			{#each $errors._errors as error}
 				<small class="flex text-error-500">{error}</small>
 			{/each}
+		{/if}
+
+		{#if form?.email}
+			<small class="text-success-500">You've received a link on your email to confirm it.</small>
+		{/if}
+		{#if form?.password}
+			<small class="text-success-500">Your password has been updated.</small>
 		{/if}
 
 		<FormInput title="Email" bind:value={email} bind:errors={$errors.email} />

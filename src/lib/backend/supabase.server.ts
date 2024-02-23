@@ -314,7 +314,9 @@ export async function upsertSubscription(subscription: ProfileSubscription) {
 						"errSubOld: " +
 						JSON.stringify(errSubOld) +
 						"errInsert: " +
-						JSON.stringify(errInsert)
+						JSON.stringify(errInsert) +
+						"subscriptionData:" +
+						JSON.stringify(subscription)
 				}
 			}
 		}

@@ -15,27 +15,27 @@ export const load = async (event) => {
 export const actions = {
 	default: async ({ request, locals: { getProfile, supabaseServer } }) => {
 		const profile = await getProfile()
+
 		const formData = await request.formData()
 
-		if (formData.get("email") == "") formData.delete("email")
-		if (formData.get("password") == "") formData.delete("password")
+		const mailEdit = formData.get("email") !== ""
+		const passEdit = formData.get("password") !== ""
+
+		if (!mailEdit) formData.delete("email")
+		if (!passEdit) formData.delete("password")
 
 		const form = await superValidate(formData, profileSchema)
 
 		if (!profile) {
 			const msg = "You need to login to add a script."
-			console.error(msg)
 			return setError(form, "", msg)
 		}
 
 		if (!form.valid) return fail(400, { form })
 
 		const { error } = await supabaseServer.auth.updateUser(form.data)
-		if (error) {
-			console.error("User data UPDATE failed: " + error.message)
-			return setError(form, "", error.message)
-		}
+		if (error) return setError(form, "", error.message)
 
-		return { form }
+		return { form, email: mailEdit, password: passEdit }
 	}
 }
