@@ -295,10 +295,10 @@ export async function upsertSubscription(subscription: ProfileSubscription) {
 			.single()
 
 		if (!oldData) {
-			console.log("INSERT profile.subscriptions_old for user: ", subscription.id)
+			console.log("UPSERT profile.subscription for user: ", subscription.id)
 			const { error: errInsert } = await supabaseAdmin
 				.schema("profiles")
-				.from("subscriptions_old")
+				.from("subscription")
 				.insert(subscription)
 
 			if (errInsert) {
@@ -307,6 +307,9 @@ export async function upsertSubscription(subscription: ProfileSubscription) {
 				console.error("errInsert: " + errInsert)
 				return {
 					error:
+						"id: " +
+						subscription.id +
+						"errSub:" +
 						JSON.stringify(errSub) +
 						"errSubOld: " +
 						JSON.stringify(errSubOld) +

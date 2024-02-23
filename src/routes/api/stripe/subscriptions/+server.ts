@@ -49,6 +49,13 @@ export const POST = async ({ request }) => {
 			const subscriptionUpdated = data.object as Stripe.Subscription
 			if (subscriptionUpdated.status !== "active" && subscriptionUpdated.status !== "canceled")
 				break
+
+			if (!subscriptionUpdated.metadata.user_id)
+				return json({
+					success: "true",
+					message: "Upgrade.Chat user."
+				})
+
 			const { error: errUpsert } = await upsertSubscription({
 				subscription: subscriptionUpdated.id,
 				id: subscriptionUpdated.metadata.user_id,
@@ -60,7 +67,7 @@ export const POST = async ({ request }) => {
 				disabled: false
 			})
 
-			if (errUpsert) throw error(404, "Error inserting subscription: " + errUpsert)
+			if (errUpsert) throw error(404, "Error upserting subscription: " + errUpsert)
 
 			break
 
