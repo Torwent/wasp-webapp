@@ -13,37 +13,22 @@ export const supabaseAdmin = createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_A
 
 export let adminLoggedIn = false //login cache.
 
-async function login(cacheOnly = true) {
-	if (adminLoggedIn && cacheOnly) {
-		login(false) //make a full async run, this should relog if needed.
-		return true
-	}
-
+async function loginAdmin() {
 	const { data, error: err } = await supabaseAdmin.auth.getSession()
 
-	if (err) {
-		adminLoggedIn = false
-		throw error(403, err)
-	}
+	if (err) return { error: err }
 
 	if (data.session == null) {
 		console.log("Logging in as admin user!")
 		const { error: err } = await supabaseAdmin.auth.signInWithPassword(credentials)
-		if (err) {
-			adminLoggedIn = false
-			throw error(403, err)
-		}
+		if (err) return { error: err }
 	}
-
-	if (!adminLoggedIn) adminLoggedIn = true
-	return true
+	return { error: null }
 }
 
 export async function getProfile(id: string) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	const { data, error } = await supabaseAdmin
 		.schema("profiles")
@@ -60,10 +45,8 @@ export async function getProfile(id: string) {
 }
 
 export async function getPrivateProfile(id: string) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	console.log("Updating profiles.profiles for user: ", id)
 
@@ -83,10 +66,8 @@ export async function getPrivateProfile(id: string) {
 }
 
 export async function updateCustomerID(id: string, customer_id: string) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	console.log("Updating profiles.profiles for user: ", id)
 
@@ -105,10 +86,8 @@ export async function updateCustomerID(id: string, customer_id: string) {
 }
 
 export async function updateScripterAccount(id: string, account_id: string) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	console.log("Updating profiles.profiles for user: ", id)
 
@@ -127,10 +106,8 @@ export async function updateScripterAccount(id: string, account_id: string) {
 }
 
 export async function updateProfileRoles(profile: Profile) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	console.log("Updating profile.roles for user: ", profile.id, " current roles: ", profile.roles)
 
@@ -152,10 +129,8 @@ export async function updateProfileRoles(profile: Profile) {
 }
 
 export async function removeScriptBroken(id: string) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	console.log("Updating scripts.protected.broken for script: ", id)
 
@@ -175,10 +150,8 @@ export async function removeScriptBroken(id: string) {
 }
 
 export async function updateScriptNotification(id: string) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	console.log("Updating scripts.stats_site.notified for script: ", id)
 
@@ -196,11 +169,10 @@ export async function updateScriptNotification(id: string) {
 
 	return true
 }
+
 export async function updateDownloaders(script: string, user: string) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	const { error: err } = await supabaseAdmin
 		.schema("scripts")
@@ -223,10 +195,8 @@ export async function updateDownloaders(script: string, user: string) {
 }
 
 export async function updateReporters(script: string, user: string) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	const { error: err } = await supabaseAdmin
 		.schema("scripts")
@@ -249,10 +219,8 @@ export async function updateReporters(script: string, user: string) {
 }
 
 export async function insertSubscription(subscription: ProfileSubscription) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return { error: null }
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return { error: adminErr }
 
 	console.log("INSERT profile.subscription for user: ", subscription.id)
 
@@ -261,10 +229,8 @@ export async function insertSubscription(subscription: ProfileSubscription) {
 }
 
 export async function upsertSubscription(subscription: ProfileSubscription) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return { error: null }
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return { error: JSON.stringify(adminErr) }
 
 	console.log("UPDATE profile.subscription for user: ", subscription.id)
 
@@ -326,10 +292,8 @@ export async function upsertSubscription(subscription: ProfileSubscription) {
 }
 
 export async function deleteSubscription(id: string) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return { error: null }
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return { error: adminErr }
 
 	console.log("DELETE profile.subscription: ", id)
 
@@ -348,10 +312,9 @@ export async function deleteSubscription(id: string) {
 }
 
 export async function insertProduct(product: Product) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
+
 	console.log("INSERT scripts.products: ", product.id)
 	const { error: errProducts } = await supabaseAdmin.schema("scripts").from("products").insert({
 		id: product.id,
@@ -372,10 +335,8 @@ export async function insertProduct(product: Product) {
 }
 
 export async function updateProduct(id: string, name: string) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	console.log("UPDATE scripts.products: ", id)
 
@@ -396,10 +357,8 @@ export async function updateProduct(id: string, name: string) {
 }
 
 export async function deleteProduct(id: string) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	console.log("DELETE scripts.products: ", id)
 
@@ -418,10 +377,8 @@ export async function deleteProduct(id: string) {
 }
 
 export async function insertPrice(price: Price) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	function sleep(ms: number) {
 		return new Promise((resolve) => {
@@ -451,10 +408,8 @@ export async function insertPrice(price: Price) {
 }
 
 export async function updatePrice(price: Price) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	console.log("UPDATE scripts.prices: ", price.id)
 
@@ -474,10 +429,8 @@ export async function updatePrice(price: Price) {
 }
 
 export async function deletePrice(id: string) {
-	if (!adminLoggedIn) {
-		await login(false)
-		if (!adminLoggedIn) return false
-	}
+	const { error: adminErr } = await loginAdmin()
+	if (adminErr) return false
 
 	console.log("DELETE scripts.prices: ", id)
 
