@@ -91,7 +91,7 @@ export const actions = {
 			return setError(form, "", err)
 		}
 
-		if (script_url) throw redirect(303, "./" + script_url)
+		if (script_url) throw redirect(303, "../" + script_url)
 		throw redirect(303, "./" + url)
 	}
 }
