@@ -11,13 +11,13 @@
 		newScriptArraySchema,
 		scriptArraySchema
 	} from "$lib/backend/schemas"
-	import Table from "../Table.svelte"
+	import Table from "./Table.svelte"
 	import { superForm } from "sveltekit-superforms/client"
 	import { PUBLIC_STRIPE_PUBLISHABLE_KEY } from "$env/static/public"
 	import { browser } from "$app/environment"
 	import type { RealtimeChannel } from "@supabase/supabase-js"
 	import { Tab, TabGroup } from "@skeletonlabs/skeleton"
-	import { Currency, FileCode, Landmark, Package } from "lucide-svelte"
+	import { FileCode, Landmark, Package } from "lucide-svelte"
 	import type { StripeConnectInstance } from "@stripe/connect-js"
 
 	export let data
@@ -205,7 +205,8 @@
 					"Monthly downloads",
 					"Premium monthly downloads",
 					"Subscribers",
-					"Cancelling"
+					"Cancelling",
+					"Free access"
 				]}
 			/>
 			<tr class="table-row">
@@ -217,6 +218,7 @@
 				</TableCell>
 				<TableCell>{data.subscriptions.total.subscribers}</TableCell>
 				<TableCell>{data.subscriptions.total.cancelling}</TableCell>
+				<TableCell>{data.subscriptions.total.free_access}</TableCell>
 			</tr>
 			<tbody />
 		</table>
@@ -340,6 +342,7 @@
 								"Price (Week/Month/Year)",
 								"Subscribers",
 								"Cancelling",
+								"Free Access",
 								"Scripts",
 								"Action"
 							]}
@@ -359,7 +362,14 @@
 							id="scriptEdit"
 							schema={scriptArraySchema}
 							data={data.scriptsForm}
-							headers={["Title", "Price (Week/Month/Year)", "Subscribers", "Cancelling", "Action"]}
+							headers={[
+								"Title",
+								"Price (Week/Month/Year)",
+								"Subscribers",
+								"Cancelling",
+								"Free Access",
+								"Action"
+							]}
 							subscriptions={data.subscriptions.scripts}
 							action={"scriptEdit&product"}
 						/>

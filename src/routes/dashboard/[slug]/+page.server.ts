@@ -10,10 +10,14 @@ import {
 	updateStripeProduct,
 	getStripeSession,
 	getStripeConnectAccount,
-	updateStripeConnectAccount
+	updateStripeConnectAccount,
+	addFreeAccess,
+	cancelFreeAccess,
+	userControlsProduct
 } from "$lib/backend/data.server"
 import {
 	bundleArraySchema,
+	nullSchema,
 	countryCodeSchema,
 	dbaSchema,
 	newBundleSchema,
@@ -417,9 +421,8 @@ export const actions = {
 			await createStripePrice(currentPrice, product.id)
 		}
 
-		return
+		return { form }
 	},
-
 	scriptAdd: async ({
 		request,
 		locals: { supabaseServer, getSession, getProfile },
@@ -456,7 +459,7 @@ export const actions = {
 			)
 		}
 
-		const script = form.data.scripts.find((script) => script.id === productID)
+		const script = form.data.newScripts.find((script) => script.id === productID)
 
 		if (!script) {
 			return setError(
@@ -488,6 +491,182 @@ export const actions = {
 
 		await createStripeScriptProduct(script, protectedData.author_id)
 
+		return { form }
+	},
+
+	addFreeAccessB: async ({
+		request,
+		locals: { supabaseServer, getSession, getProfile },
+		url: { origin, searchParams },
+		params: { slug }
+	}) => {
+		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
+		const profile = promises[1]
+
+		if (!promises[0] || !profile) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
+
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
+		const data = promises[2]
+
+		const form = await superValidate(data, bundleArraySchema)
+		if (!form.valid) return setError(form, "", "The form is not valid!")
+
+		const product = searchParams.get("product")
+		if (!product) return setError(form, "", "Product not specified.")
+
+		if (!profile.roles.administrator) {
+			const userCanEdit = await userControlsProduct(supabaseServer, profile.id, product)
+			if (!userCanEdit) return setError(form, "", "You cannot give free access to this product.")
+		}
+
+		const id = data.get(product + "_new_free_access_user_id")?.toString()
+		if (!id || id === "") return setError(form, "", "User ID not specified.")
+		if (!UUID_V4_REGEX.test(id)) return setError(form, "", "User ID is not a valid UUID.")
+
+		const date_end_str = data.get(product + "_new_free_access_end_date")?.toString()
+		if (!date_end_str || date_end_str === "") return setError(form, "", "End date not specified.")
+
+		const date_end = new Date(date_end_str).toISOString().toLocaleString()
+
+		const err = await addFreeAccess(supabaseServer, id, product, date_end)
+
+		if (err) {
+			console.error(err)
+			throw error(403, err.message)
+		}
+		return { form }
+	},
+
+	cancelFreeAccessB: async ({
+		request,
+		locals: { supabaseServer, getSession, getProfile },
+		url: { origin, searchParams },
+		params: { slug }
+	}) => {
+		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
+		const profile = promises[1]
+
+		if (!promises[0] || !profile) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
+
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
+		const form = await superValidate(promises[2], bundleArraySchema)
+
+		const product = searchParams.get("product")
+		if (!product) return setError(form, "", "Product not specified.")
+
+		if (!profile.roles.administrator) {
+			const userCanEdit = await userControlsProduct(supabaseServer, profile.id, product)
+			if (!userCanEdit) return setError(form, "", "You cannot give free access to this product.")
+		}
+
+		const id = searchParams.get("id")
+		if (!id || id === "") return setError(form, "", "User ID not specified.")
+		if (!UUID_V4_REGEX.test(id)) return setError(form, "", "User ID is not a valid UUID.")
+
+		const err = await cancelFreeAccess(supabaseServer, id, product)
+
+		if (err) {
+			console.error(err)
+			return setError(form, "", err.message)
+		}
+		return { form }
+	},
+
+	addFreeAccessS: async ({
+		request,
+		locals: { supabaseServer, getSession, getProfile },
+		url: { origin, searchParams },
+		params: { slug }
+	}) => {
+		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
+		const profile = promises[1]
+
+		if (!promises[0] || !profile) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
+
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
+		const data = promises[2]
+
+		const form = await superValidate(data, scriptArraySchema)
+		if (!form.valid) return setError(form, "", "The form is not valid!")
+
+		const product = searchParams.get("product")
+		if (!product) return setError(form, "", "Product not specified.")
+
+		if (!profile.roles.administrator) {
+			const userCanEdit = await userControlsProduct(supabaseServer, profile.id, product)
+			if (!userCanEdit) return setError(form, "", "You cannot give free access to this product.")
+		}
+
+		const id = data.get(product + "_new_free_access_user_id")?.toString()
+		if (!id || id === "") return setError(form, "", "User ID not specified.")
+		if (!UUID_V4_REGEX.test(id)) return setError(form, "", "User ID is not a valid UUID.")
+
+		const date_end_str = data.get(product + "_new_free_access_end_date")?.toString()
+		if (!date_end_str || date_end_str === "") return setError(form, "", "End date not specified.")
+
+		const date_end = new Date(date_end_str).toISOString().toLocaleString()
+
+		const err = await addFreeAccess(supabaseServer, id, product, date_end)
+
+		if (err) {
+			console.error(err)
+			throw error(403, err.message)
+		}
+		return { form }
+	},
+
+	cancelFreeAccessS: async ({
+		request,
+		locals: { supabaseServer, getSession, getProfile },
+		url: { origin, searchParams },
+		params: { slug }
+	}) => {
+		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
+		const profile = promises[1]
+
+		if (!promises[0] || !profile) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
+
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
+		const form = await superValidate(promises[2], scriptArraySchema)
+
+		const product = searchParams.get("product")
+		if (!product) return setError(form, "", "Product not specified.")
+
+		if (!profile.roles.administrator) {
+			const userCanEdit = await userControlsProduct(supabaseServer, profile.id, product)
+			if (!userCanEdit) return setError(form, "", "You cannot give free access to this product.")
+		}
+
+		const id = searchParams.get("id")
+		if (!id || id === "") return setError(form, "", "User ID not specified.")
+		if (!UUID_V4_REGEX.test(id)) return setError(form, "", "User ID is not a valid UUID.")
+
+		const err = await cancelFreeAccess(supabaseServer, id, product)
+
+		if (err) {
+			console.error(err)
+			return setError(form, "", err.message)
+		}
 		return { form }
 	}
 }

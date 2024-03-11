@@ -46,7 +46,25 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			if (sub.cancel) cancelling += 1
 		})
 
-		return { product: product, data, count: count ?? 0, cancelling }
+		const { count: freeCount, error: freeErr } = await supabaseClient
+			.schema("profiles")
+			.from("free_access")
+			.select("id", { count: "estimated" })
+			.eq("product", product)
+
+		if (freeErr) {
+			console.error(freeErr)
+			throw error(
+				500,
+				`Server error, this is probably not an issue on your end! - SELECT product failed
+			Error code: ${freeErr.code}
+			Error hint: ${freeErr.hint}
+			Error details: ${freeErr.details}
+			Error hint: ${freeErr.message}`
+			)
+		}
+
+		return { product: product, data, count: count ?? 0, cancelling, free: freeCount ?? 0 }
 	}
 
 	async function getPrices() {
@@ -274,7 +292,7 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			}
 		}
 
-		newScriptForm.data.scripts = tmpScripts.map((script) => {
+		newScriptForm.data.newScripts = tmpScripts.map((script) => {
 			return {
 				id: script.id,
 				name: script.name,
@@ -303,16 +321,18 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			Promise.all(scriptSubsPromises)
 		])
 
-		const totalSubs = { subscribers: 0, cancelling: 0 }
+		const totalSubs = { subscribers: 0, cancelling: 0, free_access: 0 }
 
 		awaitedSubs[0].forEach((sub) => {
 			totalSubs.subscribers += sub.count
 			totalSubs.cancelling += sub.cancelling
+			totalSubs.free_access += sub.free
 		})
 
 		awaitedSubs[1].forEach((sub) => {
 			totalSubs.subscribers += sub.count
 			totalSubs.cancelling += sub.cancelling
+			totalSubs.free_access += sub.free
 		})
 
 		return {

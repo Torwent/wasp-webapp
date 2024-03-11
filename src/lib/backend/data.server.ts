@@ -248,6 +248,42 @@ export async function getProfile(supabase: SupabaseClient, id: string) {
 	return data[0]
 }
 
+export async function userControlsProduct(supabase: SupabaseClient, id: string, product: string) {
+	const { data, error } = await supabase
+		.schema("scripts")
+		.from("products")
+		.select("id, user_id")
+		.single()
+
+	if (error) return false
+	return product === data.id && id === data.user_id
+}
+
+export async function addFreeAccess(
+	supabase: SupabaseClient,
+	id: string,
+	product: string,
+	date_end: string
+) {
+	const { data, error } = await supabase
+		.schema("profiles")
+		.from("free_access")
+		.insert({ product: product, id: id, date_end: date_end })
+
+	return error
+}
+
+export async function cancelFreeAccess(supabase: SupabaseClient, id: string, product: string) {
+	const { error } = await supabase
+		.schema("profiles")
+		.from("free_access")
+		.delete()
+		.eq("id", id)
+		.eq("product", product)
+
+	return error
+}
+
 export async function createStripeCustomer(
 	id: string,
 	email: string,

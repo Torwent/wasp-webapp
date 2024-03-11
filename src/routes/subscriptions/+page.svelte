@@ -85,13 +85,6 @@
 		userLocale = navigator.language
 	})
 
-	function dateDiff(start: string, end: string) {
-		const dateStart = new Date(start).getFullYear()
-		const dateEnd = new Date(end).getFullYear()
-
-		return dateEnd - dateStart
-	}
-
 	const headTitle = "Subscriptions - WaspScripts"
 	const headDescription =
 		"Get access to exclusive scripts. With access to premium scripts you have scripts for nearly all skills in OSRS."

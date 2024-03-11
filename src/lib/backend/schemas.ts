@@ -255,7 +255,9 @@ const bundleSchema = z.object({
 			return true
 		}, "Bundle prices are not in order"),
 	bundledScripts: z.array(bundledScriptSchema).min(2, "A bundle must have at least 2 scripts!"),
-	open: z.boolean()
+	open: z.boolean(),
+	subsOpen: z.boolean().default(false).optional(),
+	freeOpen: z.boolean().default(false).optional()
 })
 
 export const bundleArraySchema = z.object({
@@ -314,7 +316,9 @@ const premiumScriptSchema = z.object({
 				if (prices[i].amount >= prices[i + 1].amount) return false
 			}
 			return true
-		}, "Script prices are not in order")
+		}, "Script prices are not in order"),
+	subsOpen: z.boolean().default(false).optional(),
+	freeOpen: z.boolean().default(false).optional()
 })
 
 export const scriptArraySchema = z.object({
@@ -348,7 +352,7 @@ export const newScriptSchema = z.object({
 })
 
 export const newScriptArraySchema = z.object({
-	scripts: z.array(newScriptSchema)
+	newScripts: z.array(newScriptSchema)
 })
 
 export const countryCodeSchema = z.object({
@@ -359,6 +363,8 @@ export const dbaSchema = z.object({
 	dba: z.string().min(3, "Your name needs to be longer")
 })
 
+export const nullSchema = z.object({})
+
 export type PriceSchema = z.infer<typeof priceSchema>
 export type BundleSchema = z.infer<typeof newBundleSchema>
 export type NewScriptSchema = z.infer<typeof newScriptSchema>
@@ -367,3 +373,8 @@ export type BundleArraySchema = typeof bundleArraySchema
 export type NewBundleSchema = typeof newBundleSchema
 export type ScriptArraySchema = typeof scriptArraySchema
 export type NewScriptArraySchema = typeof newScriptArraySchema
+
+export type TBundleArraySchema = z.infer<BundleArraySchema>
+export type TNewBundleSchema = z.infer<NewBundleSchema>
+export type TScriptArraySchema = z.infer<ScriptArraySchema>
+export type TNewScriptArraySchema = z.infer<NewScriptArraySchema>
