@@ -191,7 +191,6 @@ const productSchema = z.object({
 	id: z.string().startsWith("prod_"),
 	prices: z
 		.array(priceSchema)
-		.min(1, "You need to pass at least 1 price!")
 		.max(3, "You passed more than 3 prices!")
 		.refine((prices) => {
 			prices.sort((priceA, priceB) => {

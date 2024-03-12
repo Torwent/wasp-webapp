@@ -188,7 +188,7 @@ export const load = async ({ parent, data }) => {
 					bundle: product.bundle,
 					prices: productPrices,
 					scripts: bundledScripts,
-					active: product.active,
+					active: product.active && productPrices.length > 0,
 					open: false
 				})
 			} else if (product.script) {
@@ -199,7 +199,7 @@ export const load = async ({ parent, data }) => {
 					username: product.username,
 					url: scriptURL,
 					prices: productPrices,
-					active: product.active
+					active: product.active && productPrices.length > 0
 				})
 			}
 		}

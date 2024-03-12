@@ -12,8 +12,7 @@ import {
 	getStripeConnectAccount,
 	updateStripeConnectAccount,
 	addFreeAccess,
-	cancelFreeAccess,
-	userControlsProduct
+	cancelFreeAccess
 } from "$lib/backend/data.server"
 import {
 	bundleArraySchema,
@@ -519,11 +518,6 @@ export const actions = {
 		const product = searchParams.get("product")
 		if (!product) return setError(form, "", "Product not specified.")
 
-		if (!profile.roles.administrator) {
-			const userCanEdit = await userControlsProduct(supabaseServer, profile.id, product)
-			if (!userCanEdit) return setError(form, "", "You cannot give free access to this product.")
-		}
-
 		const id = data.get(product + "_new_free_access_user_id")?.toString()
 		if (!id || id === "") return setError(form, "", "User ID not specified.")
 		if (!UUID_V4_REGEX.test(id)) return setError(form, "", "User ID is not a valid UUID.")
@@ -537,7 +531,7 @@ export const actions = {
 
 		if (err) {
 			console.error(err)
-			throw error(403, err.message)
+			return setError(form, "", err.message)
 		}
 		return { form }
 	},
@@ -563,11 +557,6 @@ export const actions = {
 
 		const product = searchParams.get("product")
 		if (!product) return setError(form, "", "Product not specified.")
-
-		if (!profile.roles.administrator) {
-			const userCanEdit = await userControlsProduct(supabaseServer, profile.id, product)
-			if (!userCanEdit) return setError(form, "", "You cannot give free access to this product.")
-		}
 
 		const id = searchParams.get("id")
 		if (!id || id === "") return setError(form, "", "User ID not specified.")
@@ -607,11 +596,6 @@ export const actions = {
 		const product = searchParams.get("product")
 		if (!product) return setError(form, "", "Product not specified.")
 
-		if (!profile.roles.administrator) {
-			const userCanEdit = await userControlsProduct(supabaseServer, profile.id, product)
-			if (!userCanEdit) return setError(form, "", "You cannot give free access to this product.")
-		}
-
 		const id = data.get(product + "_new_free_access_user_id")?.toString()
 		if (!id || id === "") return setError(form, "", "User ID not specified.")
 		if (!UUID_V4_REGEX.test(id)) return setError(form, "", "User ID is not a valid UUID.")
@@ -625,7 +609,7 @@ export const actions = {
 
 		if (err) {
 			console.error(err)
-			throw error(403, err.message)
+			return setError(form, "", err.message)
 		}
 		return { form }
 	},
@@ -651,11 +635,6 @@ export const actions = {
 
 		const product = searchParams.get("product")
 		if (!product) return setError(form, "", "Product not specified.")
-
-		if (!profile.roles.administrator) {
-			const userCanEdit = await userControlsProduct(supabaseServer, profile.id, product)
-			if (!userCanEdit) return setError(form, "", "You cannot give free access to this product.")
-		}
 
 		const id = searchParams.get("id")
 		if (!id || id === "") return setError(form, "", "User ID not specified.")
