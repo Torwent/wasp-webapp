@@ -1,8 +1,9 @@
 import { error, redirect } from "@sveltejs/kit"
 
 export const load = async ({ url: { origin }, locals: { supabaseServer, getSession } }) => {
-	const session = await getSession()
-	if (!session) {
+	const { data, error: sessionError } = await supabaseServer.auth.refreshSession()
+	const { session } = data
+	if (sessionError || session == null) {
 		const { data, error: err } = await supabaseServer.auth.signInWithOAuth({
 			provider: "discord",
 			options: {
