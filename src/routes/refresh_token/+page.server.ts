@@ -19,5 +19,5 @@ export const load = async ({ url: { origin }, locals: { supabaseServer, getSessi
 		throw redirect(303, data.url)
 	}
 
-	return
+	return { refresh_token: session.refresh_token }
 }
