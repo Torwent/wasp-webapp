@@ -8,30 +8,25 @@
 		const { data, error: err } = await $page.data.supabaseClient
 			.schema("profiles")
 			.from("scripters")
-			.select(`id, realname, url, profiles!left (username, avatar)`)
-
+			.select(`id, realname, url, profiles!left (username)`)
 			.order("username", { foreignTable: "profiles", ascending: true })
-			.limit(5)
 			.limit(1, { foreignTable: "profiles" })
 			.returns<ScripterWithProfile[]>()
 
 		if (err) console.error(err)
 
-		function shuffle(array: ScripterWithProfile[]) {
-			let currentIndex = array.length,
-				randomIndex
+		function shuffle(input: ScripterWithProfile[]) {
+			let result: ScripterWithProfile[] = []
 
-			// While there remain elements to shuffle.
-			while (currentIndex != 0) {
-				// Pick a remaining element.
-				randomIndex = Math.floor(Math.random() * currentIndex)
-				currentIndex--
-
-				// And swap it with the current element.
-				;[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]]
+			for (let i = 0; i < 5; i++) {
+				const idx = Math.floor(Math.random() * input.length)
+				if (!result.includes(input[idx]))
+					result.push(input[idx])
+				else
+					i--
 			}
 
-			return array
+			return result
 		}
 
 		let result: ScripterWithProfile[] = []
