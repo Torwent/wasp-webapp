@@ -276,7 +276,6 @@ export const actions = {
 		url: { origin },
 		params: { slug }
 	}) => {
-		console.log("bundleAdd")
 		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
 		const profile = promises[1]
 

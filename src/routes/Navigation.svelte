@@ -66,40 +66,6 @@
 				break
 		}
 	}
-
-	let touchX: number
-	let touchY: number
-	let touchTime: number
-
-	function onTouchStart(e: TouchEvent) {
-		touchX = e.touches[0].clientX
-		touchY = e.touches[0].clientY
-		touchTime = Date.now()
-	}
-
-	function onTouchEnd(e: TouchEvent) {
-		const { clientX, clientY } = e.changedTouches[0]
-
-		if (clientY <= touchY - 120 || clientY >= touchY + 120) return
-		if (clientX >= touchX - 50 && clientX <= touchX + 50) return
-		if (Date.now() - touchTime >= 500) return
-
-		if (clientX > touchX) {
-			for (let i = 0; i < routeArray.length; i++) {
-				if (currentPage === routeArray[i]) {
-					if (i <= 0) goto(getLink(routeArray[routeArray.length - 1]))
-					else goto(getLink(routeArray[i - 1]))
-				}
-			}
-		} else {
-			for (let i = 0; i < routeArray.length; i++) {
-				if (currentPage === routeArray[i]) {
-					if (i >= routeArray.length - 1) goto(getLink(routeArray[0]))
-					else goto(getLink(routeArray[i + 1]))
-				}
-			}
-		}
-	}
 </script>
 
 <svelte:window on:keydown={onKeyDown} />

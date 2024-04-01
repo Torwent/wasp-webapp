@@ -74,6 +74,15 @@ async function uploadFile(supabase: SupabaseClient, bucket: string, path: string
 	}
 }
 
+async function updateImgFile(supabase: SupabaseClient, bucket: string, path: string, file: File) {
+	const { error: err } = await supabase.storage.from(bucket).update(path, file, { upsert: true })
+	if (err) {
+		const msg = "storage " + bucket + " UPLOAD " + path + " failed with the following error: "
+		console.error(msg + JSON.stringify(err))
+		return err
+	}
+}
+
 export async function uploadScript(
 	supabase: SupabaseClient,
 	script: ScriptBase,
@@ -193,11 +202,14 @@ export async function updateScript(
 
 	if (coverFile) {
 		console.log("Updating script cover")
-		promises.push(uploadFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile))
+		promises.push(updateImgFile(supabase, "imgs", "scripts/" + script.id + "/cover.jpg", coverFile))
 	}
+
 	if (bannerFile) {
 		console.log("Updating script banner")
-		promises.push(uploadFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile))
+		promises.push(
+			updateImgFile(supabase, "imgs", "scripts/" + script.id + "/banner.jpg", bannerFile)
+		)
 	}
 
 	const awaitedPromises = promises.length > 0 ? await Promise.all(promises) : []
