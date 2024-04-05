@@ -155,9 +155,7 @@
 			<div
 				class="grid gap-8 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 justify-center justify-items-center"
 			>
-				{#each scripts.data as script}
-					<ScriptCard {script} />
-				{/each}
+				{#each scripts.data as script} <ScriptCard {script} /> {/each}
 			</div>
 		</div>
 		<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count />
