@@ -107,20 +107,7 @@
 						</a>
 					</div>
 
-					<p class="text-lg text-center pt-4">Manual install guide by @Daxious:</p>
-					<iframe
-						class="mx-auto mt-4 mb-8"
-						width="560"
-						height="315"
-						src="https://www.youtube.com/embed/UIotrmSpeds"
-						title="Simba and WaspScripts Setup"
-						frameborder="0"
-						allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-						allowfullscreen
-						loading="lazy"
-					/>
-
-					<p class="text-center pb-24">
+					<small class="text-center pb-24">
 						For a manual instalation guide for {currentOS.OS} you can go
 						<a
 							href="/tutorials/{currentOS.tutorialID}"
@@ -129,7 +116,7 @@
 							here
 						</a>
 						.
-					</p>
+					</small>
 				{:else}
 					<p class="text-lg text-center pt-4">Simba doesn't work with M1 Macs.</p>
 					<p class="text-lg text-center pt-4">
