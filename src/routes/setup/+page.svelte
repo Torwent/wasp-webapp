@@ -107,7 +107,7 @@
 						</a>
 					</div>
 
-					<small class="text-center pb-24">
+					<p class="text-xs text-center pb-24">
 						For a manual instalation guide for {currentOS.OS} you can go
 						<a
 							href="/tutorials/{currentOS.tutorialID}"
@@ -116,7 +116,7 @@
 							here
 						</a>
 						.
-					</small>
+					</p>
 				{:else}
 					<p class="text-lg text-center pt-4">Simba doesn't work with M1 Macs.</p>
 					<p class="text-lg text-center pt-4">
