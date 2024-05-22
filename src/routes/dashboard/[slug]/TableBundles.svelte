@@ -25,7 +25,7 @@
 		const { data, error } = await $page.data.supabaseClient
 			.schema("profiles")
 			.from("free_access")
-			.select("id, date_start, date_end")
+			.select("id, date_start, date_end, profiles(username)")
 			.eq("product", id)
 
 		if (error) {
@@ -33,7 +33,51 @@
 			return []
 		}
 
-		return data
+		return data.map((access) => {
+			return {
+				id: access.id,
+				date_start: access.date_start,
+				date_end: access.date_end,
+				username: access.profiles?.username ?? "Null"
+			}
+		})
+	}
+
+	async function getSubscriptions(id: string) {
+		const { data: subData, error: subError } = await $page.data.supabaseClient
+			.schema("profiles")
+			.from("subscription")
+			.select("id, price, date_start, date_end, cancel, profiles(username)")
+			.eq("product", id)
+
+		if (subError) {
+			console.error(subError)
+			return []
+		}
+
+		const { data: priceData, error: priceError } = await $page.data.supabaseClient
+			.schema("scripts")
+			.from("prices")
+			.select("id, amount, interval")
+			.eq("product", id)
+
+		if (priceError) {
+			console.error(priceError)
+			return []
+		}
+
+		return subData.map((sub) => {
+			const i = priceData.findIndex((price) => price.id, sub.price)
+			return {
+				id: sub.id,
+				username: sub.profiles?.username ?? "Null",
+				date_start: sub.date_start,
+				date_end: sub.date_end,
+				price: priceData[i].amount,
+				interval: priceData[i].interval,
+				state: sub.cancel
+			}
+		})
 	}
 
 	let userLocale = "pt-PT"
@@ -147,7 +191,62 @@
 				<tr class="table-row">
 					<td colspan={headers.length}>
 						<table class="table table-compact">
-							<tbody>TODO...</tbody>
+							<thead class="font-bold text-lg variant-outline-surface rounded-t-md">
+								<tr>
+									<th><span class="flex justify-center text-center">WaspScripts ID</span></th>
+									<th><span class="flex justify-center text-center">Username</span></th>
+									<th><span class="flex justify-center text-center">Start Date</span></th>
+									<th><span class="flex justify-center text-center">End Date</span></th>
+									<th><span class="flex justify-center text-center">Price</span></th>
+									<th><span class="flex justify-center text-center">Interval</span></th>
+									<th><span class="flex justify-center text-center">State</span></th>
+									<th><span class="flex justify-center text-center">Action</span></th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td colspan="8">
+										<span class="flex justify-center text-center py-0">
+											<button
+												id="{products[i].id}-cancel-all-subs-button"
+												type="submit"
+												class="btn variant-outline-error hover:text-error-500"
+												disabled
+												formaction="?/cancelAllSubs&product={products[i].id}"
+											>
+												Cancel All Subscriptions (Can't be undone!)
+											</button>
+										</span>
+									</td>
+								</tr>
+								{#await getSubscriptions(products[i].id) then subscriptionRows}
+									{#each subscriptionRows as row}
+										<tr>
+											<TableCell>{row.id}</TableCell>
+											<TableCell>{row.username}</TableCell>
+
+											<TableCell>{new Date(row.date_start).toLocaleString(userLocale)}</TableCell>
+											<TableCell>{new Date(row.date_end).toLocaleString(userLocale)}</TableCell>
+											<TableCell>{Number(row.price / 100).toLocaleString(userLocale)} €</TableCell>
+
+											<TableCell>{row.interval + "ly"}</TableCell>
+											<TableCell>{row.state ? "Canceling" : "Active"}</TableCell>
+
+											<TableCell padding={0}>
+												<button
+													id="{products[i].id}-cancel-sub-{row.id}-button"
+													type="submit"
+													class="btn variant-outline-error"
+													disabled
+													formaction="?/cancelSub&product={products[i].id}&id={row.id}"
+												>
+													Cancel
+												</button>
+											</TableCell>
+										</tr>
+									{/each}
+								{/await}
+							</tbody>
 						</table>
 					</td>
 				</tr>
@@ -158,6 +257,7 @@
 							<thead class="font-bold text-lg variant-outline-surface rounded-t-md">
 								<tr>
 									<th><span class="flex justify-center text-center">WaspScripts ID</span></th>
+									<th><span class="flex justify-center text-center">Username</span></th>
 									<th><span class="flex justify-center text-center">Start Date</span></th>
 									<th><span class="flex justify-center text-center">End Date</span></th>
 									<th><span class="flex justify-center text-center">Action</span></th>
@@ -176,6 +276,7 @@
 										</div>
 									</TableCell>
 
+									<TableCell>-</TableCell>
 									<TableCell>-</TableCell>
 									<TableCell padding={0}>
 										<div class="mx-3">
@@ -203,6 +304,7 @@
 									{#each freeAccessRows as row}
 										<tr>
 											<TableCell>{row.id}</TableCell>
+											<TableCell>{row.username}</TableCell>
 
 											<TableCell>{new Date(row.date_start).toLocaleString(userLocale)}</TableCell>
 											<TableCell>{new Date(row.date_end).toLocaleString(userLocale)}</TableCell>
