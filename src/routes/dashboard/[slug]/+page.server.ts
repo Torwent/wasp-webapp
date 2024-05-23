@@ -23,6 +23,7 @@ import {
 	newScriptArraySchema,
 	scriptArraySchema
 } from "$lib/backend/schemas"
+import { stripe } from "$lib/backend/supabase.server"
 import { UUID_V4_REGEX } from "$lib/utils"
 import { error, redirect } from "@sveltejs/kit"
 import { setError, superValidate } from "sveltekit-superforms/server"
@@ -646,5 +647,109 @@ export const actions = {
 			return setError(form, "", err.message)
 		}
 		return { form }
+	},
+
+	cancelSub: async ({
+		request,
+		locals: { supabaseServer, getSession, getProfile },
+		url: { origin, searchParams },
+		params: { slug }
+	}) => {
+		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
+		const profile = promises[1]
+
+		if (!promises[0] || !profile) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
+
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
+		const subscription = searchParams.get("subscription")
+		if (!subscription) throw error(403, "Subscription not specified.")
+
+		let success = true
+
+		try {
+			await stripe.subscriptions.update(subscription, { cancel_at_period_end: true })
+		} catch (error) {
+			success = false
+		}
+
+		if (!success) throw error(503, "Failed to update subscription on stripe side.")
+
+		const { error: err } = await supabaseServer
+			.schema("profiles")
+			.from("subscription")
+			.update({ disabled: true })
+			.eq("subscription", subscription)
+
+		if (err) {
+			console.error(err)
+			throw error(
+				503,
+				"Please contact Torwent and give him this message, Error: " +
+					err.message +
+					" sub: " +
+					subscription
+			)
+		}
+
+		return { success: true }
+	},
+
+	cancelAllSubs: async ({
+		request,
+		locals: { supabaseServer, getSession, getProfile },
+		url: { origin, searchParams },
+		params: { slug }
+	}) => {
+		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
+		const profile = promises[1]
+
+		if (!promises[0] || !profile) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
+
+		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
+		if (profile.id !== slug && !profile.roles.administrator)
+			throw error(403, "You cannot access another scripter dashboard.")
+
+		const product = searchParams.get("product")
+		if (!product) throw error(403, "Product not specified.")
+
+		const { data, error: err } = await supabaseServer
+			.schema("profiles")
+			.from("subscription")
+			.update({ disabled: true })
+			.eq("product", product)
+			.select("subscription")
+
+		if (err) {
+			console.error(err)
+			throw error(
+				503,
+				"Please contact Torwent and give him this message, Error: " +
+					err.message +
+					" prodcut: " +
+					product
+			)
+		}
+
+		data.forEach(async (sub) => {
+			let success = true
+
+			try {
+				await stripe.subscriptions.update(sub.subscription, { cancel_at_period_end: true })
+			} catch (error) {
+				success = false
+			}
+
+			if (!success)
+				throw error(503, "Failed to update subscription: " + sub.subscription + " on stripe side.")
+		})
+
+		return { success: true }
 	}
 }
