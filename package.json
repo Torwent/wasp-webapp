@@ -16,7 +16,7 @@
 		"stripe": "stripe listen --forward-to http://localhost:5173/api/stripe/webhooks --forward-connect-to http://localhost:5173/api/stripe/webhooks"
 	},
 	"devDependencies": {
-		"@playwright/test": "^1.44.0",
+		"@playwright/test": "^1.44.1",
 		"@skeletonlabs/skeleton": "^1.12.0",
 		"@sveltejs/kit": "^1.30.4",
 		"@tailwindcss/forms": "^0.5.7",
@@ -51,7 +51,7 @@
 		"@floating-ui/dom": "^1.6.5",
 		"@stripe/connect-js": "^3.3.5",
 		"@supabase/ssr": "^0.0.10",
-		"@supabase/supabase-js": "^2.43.2",
+		"@supabase/supabase-js": "^2.43.4",
 		"@sveltejs/adapter-vercel": "^3.1.0",
 		"file-saver": "^2.0.5",
 		"highlight.js": "^11.9.0",

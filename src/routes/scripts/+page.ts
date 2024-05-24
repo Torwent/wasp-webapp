@@ -5,8 +5,8 @@ import { get, writable } from "svelte/store"
 const checkboxesStore = writable<CheckboxType[] | null>(null)
 
 export const load = async ({ url, parent }) => {
-	const pageStr = url.searchParams.get("page") || "-1"
-	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
+	const pageN = Number(url.searchParams.get("page") || "-1")
+	const page = pageN < 0 || Number.isNaN(pageN) ? 1 : pageN
 
 	const search = decodeURIComponent(url.searchParams.get("search") || "").trim()
 	const ascending = url.searchParams.get("ascending")?.toLowerCase() !== "true"
@@ -62,6 +62,30 @@ export const load = async ({ url, parent }) => {
 		return { data, count: count ?? 0 }
 	}
 
+	async function getFeatured() {
+		const { supabaseClient } = await parent()
+
+		const { data, error: err } = await supabaseClient
+			.schema("scripts")
+			.from("featured")
+			.select(
+				`scripts (url, title, description, tooltip_emojis, protected (assets, username, avatar))`
+			)
+
+		if (err) {
+			throw error(
+				500,
+				`Server error, this is probably not an issue on your end! - SELECT scripts failed
+			Error code: ${err.code}
+			Error hint: ${err.hint}
+			Error details: ${err.details}
+			Error hint: ${err.message}`
+			)
+		}
+
+		return data.map((scripts) => scripts.scripts)
+	}
+
 	async function getCheckBoxes() {
 		let result = get(checkboxesStore)
 		if (!result) {
@@ -97,12 +121,14 @@ export const load = async ({ url, parent }) => {
 
 	const promises = await Promise.all([
 		getScripts(search, ascending, start, finish),
-		getCheckBoxes()
+		getCheckBoxes(),
+		getFeatured()
 	])
 
 	return {
 		scripts: promises[0],
 		checkboxes: promises[1],
+		featured: promises[2],
 		range
 	}
 }

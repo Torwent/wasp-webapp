@@ -10,8 +10,8 @@ export const load = async ({ url, depends, parent }) => {
 	const ascending = url.searchParams.get("ascending")?.toLowerCase() === "true"
 	const search = decodeURIComponent(url.searchParams.get("search") || "").trim()
 
-	const pageStr = url.searchParams.get("page") || "-1"
-	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
+	const pageN = Number(url.searchParams.get("page") || "-1")
+	const page = pageN < 0 || Number.isNaN(pageN) ? 1 : pageN
 
 	const range = 20
 	const start = (page - 1) * range

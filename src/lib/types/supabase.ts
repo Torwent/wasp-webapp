@@ -67,7 +67,43 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
+        ]
+      }
+      free_access_old: {
+        Row: {
+          date_end: string
+          date_start: string
+          id: string
+          product: string
+        }
+        Insert: {
+          date_end?: string
+          date_start?: string
+          id: string
+          product: string
+        }
+        Update: {
+          date_end?: string
+          date_start?: string
+          id?: string
+          product?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_free_access_old_id_fkey"
+            columns: ["id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "profiles_free_access_old_product_fkey"
+            columns: ["product"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
         ]
       }
       private: {
@@ -93,7 +129,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       profiles: {
@@ -125,7 +161,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       roles: {
@@ -175,7 +211,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       scripters: {
@@ -222,7 +258,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       subscription: {
@@ -277,7 +313,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       subscriptions_bak: {
@@ -315,7 +351,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "prices"
             referencedColumns: ["stripe_id"]
-          }
+          },
         ]
       }
       subscriptions_old: {
@@ -370,7 +406,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       subscriptions_uc: {
@@ -408,7 +444,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "prices"
             referencedColumns: ["stripe_id"]
-          }
+          },
         ]
       }
     }
@@ -753,7 +789,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
@@ -792,7 +828,7 @@ export type Database = {
         Args: {
           a: string[]
         }
-        Returns: unknown
+        Returns: string[]
       }
       delete_user: {
         Args: {
@@ -818,14 +854,14 @@ export type Database = {
             Args: {
               text_array: string[]
             }
-            Returns: unknown
+            Returns: string[]
           }
         | {
             Args: {
               text_array: string[]
               limit_val: number
             }
-            Returns: unknown
+            Returns: string[]
           }
       get_stats_total: {
         Args: Record<PropertyKey, never>
@@ -873,29 +909,29 @@ export type Database = {
     }
     CompositeTypes: {
       profile_data_type: {
-        id: string
-        username: string
-        avatar_url: string
-        updated_at: string
-        discord_id: string
-        developer: boolean
-        premium: boolean
-        vip: boolean
-        tester: boolean
-        moderator: boolean
-        administrator: boolean
-        unlocked_ips: number
-        scripter: boolean
-        timeout: boolean
-        subscription_external: boolean
-        subscription_start: string
-        subscription_end: string
-        subscription_id: string
-        cancel_at_period_end: boolean
-        customer_id: string
-        price_id: string
-        dismissed_warning: boolean
-        email: string
+        id: string | null
+        username: string | null
+        avatar_url: string | null
+        updated_at: string | null
+        discord_id: string | null
+        developer: boolean | null
+        premium: boolean | null
+        vip: boolean | null
+        tester: boolean | null
+        moderator: boolean | null
+        administrator: boolean | null
+        unlocked_ips: number | null
+        scripter: boolean | null
+        timeout: boolean | null
+        subscription_external: boolean | null
+        subscription_start: string | null
+        subscription_end: string | null
+        subscription_id: string | null
+        cancel_at_period_end: boolean | null
+        customer_id: string | null
+        price_id: string | null
+        dismissed_warning: boolean | null
+        email: string | null
       }
     }
   }
@@ -936,7 +972,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "products"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       categories: {
@@ -953,6 +989,29 @@ export type Database = {
           name?: string
         }
         Relationships: []
+      }
+      featured: {
+        Row: {
+          id: string
+          name: string
+        }
+        Insert: {
+          id?: string
+          name: string
+        }
+        Update: {
+          id?: string
+          name?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "featured_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       prices: {
         Row: {
@@ -986,7 +1045,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "products"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       products: {
@@ -1038,7 +1097,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "scripters"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       protected: {
@@ -1086,7 +1145,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "scripts"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       scripts: {
@@ -1157,7 +1216,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "products"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       stats_simba: {
@@ -1201,7 +1260,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "scripts"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       stats_simba_BAK: {
@@ -1245,7 +1304,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "scripts"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       stats_site: {
@@ -1292,7 +1351,7 @@ export type Database = {
             isOneToOne: true
             referencedRelation: "scripts"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       stats_site_past: {
@@ -1327,7 +1386,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "scripts"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       subcategories: {
@@ -1353,7 +1412,7 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "categories"
             referencedColumns: ["name"]
-          }
+          },
         ]
       }
     }
@@ -1389,19 +1448,23 @@ export type Database = {
         }
         Returns: boolean
       }
+      cron_refresh_featured: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       fix_categories:
         | {
             Args: {
               categories: string[]
             }
-            Returns: unknown
+            Returns: string[]
           }
         | {
             Args: {
               user_id: string
               categories: string[]
             }
-            Returns: unknown
+            Returns: string[]
           }
       get_assets: {
         Args: {
@@ -1413,7 +1476,7 @@ export type Database = {
         Args: {
           ids: string[]
         }
-        Returns: unknown
+        Returns: string[]
       }
       get_month_downloads_total: {
         Args: Record<PropertyKey, never>
@@ -1456,14 +1519,14 @@ export type Database = {
           categories: string[]
           subcategories: string[]
         }
-        Returns: unknown
+        Returns: string[]
       }
       get_tooltip_names: {
         Args: {
           categories: string[]
           subcategories: string[]
         }
-        Returns: unknown
+        Returns: string[]
       }
       get_user_scripts: {
         Args: {
@@ -1516,6 +1579,12 @@ export type Database = {
         Returns: boolean
       }
       storage_can_edit: {
+        Args: {
+          file_path: string
+        }
+        Returns: boolean
+      }
+      storage_img_can_edit: {
         Args: {
           file_path: string
         }
@@ -1638,7 +1707,102 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "buckets"
             referencedColumns: ["id"]
-          }
+          },
+        ]
+      }
+      s3_multipart_uploads: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          id: string
+          in_progress_size: number
+          key: string
+          owner_id: string | null
+          upload_signature: string
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          id: string
+          in_progress_size?: number
+          key: string
+          owner_id?: string | null
+          upload_signature: string
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          id?: string
+          in_progress_size?: number
+          key?: string
+          owner_id?: string | null
+          upload_signature?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      s3_multipart_uploads_parts: {
+        Row: {
+          bucket_id: string
+          created_at: string
+          etag: string
+          id: string
+          key: string
+          owner_id: string | null
+          part_number: number
+          size: number
+          upload_id: string
+          version: string
+        }
+        Insert: {
+          bucket_id: string
+          created_at?: string
+          etag: string
+          id?: string
+          key: string
+          owner_id?: string | null
+          part_number: number
+          size?: number
+          upload_id: string
+          version: string
+        }
+        Update: {
+          bucket_id?: string
+          created_at?: string
+          etag?: string
+          id?: string
+          key?: string
+          owner_id?: string | null
+          part_number?: number
+          size?: number
+          upload_id?: string
+          version?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
+            columns: ["bucket_id"]
+            isOneToOne: false
+            referencedRelation: "buckets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
+            columns: ["upload_id"]
+            isOneToOne: false
+            referencedRelation: "s3_multipart_uploads"
+            referencedColumns: ["id"]
+          },
         ]
       }
     }
@@ -1671,13 +1835,44 @@ export type Database = {
         Args: {
           name: string
         }
-        Returns: unknown
+        Returns: string[]
       }
       get_size_by_bucket: {
         Args: Record<PropertyKey, never>
         Returns: {
           size: number
           bucket_id: string
+        }[]
+      }
+      list_multipart_uploads_with_delimiter: {
+        Args: {
+          bucket_id: string
+          prefix_param: string
+          delimiter_param: string
+          max_keys?: number
+          next_key_token?: string
+          next_upload_token?: string
+        }
+        Returns: {
+          key: string
+          id: string
+          created_at: string
+        }[]
+      }
+      list_objects_with_delimiter: {
+        Args: {
+          bucket_id: string
+          prefix_param: string
+          delimiter_param: string
+          max_keys?: number
+          start_after?: string
+          next_token?: string
+        }
+        Returns: {
+          name: string
+          id: string
+          metadata: Json
+          updated_at: string
         }[]
       }
       search: {
@@ -1710,14 +1905,16 @@ export type Database = {
   }
 }
 
+type PublicSchema = Database[Extract<keyof Database, "public">]
+
 export type Tables<
   PublicTableNameOrOptions extends
-    | keyof (Database["public"]["Tables"] & Database["public"]["Views"])
+    | keyof (PublicSchema["Tables"] & PublicSchema["Views"])
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
         Database[PublicTableNameOrOptions["schema"]]["Views"])
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
       Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
@@ -1725,67 +1922,67 @@ export type Tables<
     }
     ? R
     : never
-  : PublicTableNameOrOptions extends keyof (Database["public"]["Tables"] &
-      Database["public"]["Views"])
-  ? (Database["public"]["Tables"] &
-      Database["public"]["Views"])[PublicTableNameOrOptions] extends {
-      Row: infer R
-    }
-    ? R
+  : PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] &
+        PublicSchema["Views"])
+    ? (PublicSchema["Tables"] &
+        PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
     : never
-  : never
 
 export type TablesInsert<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Insert: infer I
-    }
-    ? I
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
     : never
-  : never
 
 export type TablesUpdate<
   PublicTableNameOrOptions extends
-    | keyof Database["public"]["Tables"]
+    | keyof PublicSchema["Tables"]
     | { schema: keyof Database },
   TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
-    : never = never
+    : never = never,
 > = PublicTableNameOrOptions extends { schema: keyof Database }
   ? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : PublicTableNameOrOptions extends keyof Database["public"]["Tables"]
-  ? Database["public"]["Tables"][PublicTableNameOrOptions] extends {
-      Update: infer U
-    }
-    ? U
+  : PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
+    ? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
     : never
-  : never
 
 export type Enums<
   PublicEnumNameOrOptions extends
-    | keyof Database["public"]["Enums"]
+    | keyof PublicSchema["Enums"]
     | { schema: keyof Database },
   EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
     ? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
-    : never = never
+    : never = never,
 > = PublicEnumNameOrOptions extends { schema: keyof Database }
   ? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : PublicEnumNameOrOptions extends keyof Database["public"]["Enums"]
-  ? Database["public"]["Enums"][PublicEnumNameOrOptions]
-  : never
+  : PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
+    ? PublicSchema["Enums"][PublicEnumNameOrOptions]
+    : never

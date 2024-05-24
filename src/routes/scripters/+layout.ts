@@ -1,8 +1,9 @@
 import type { ScripterWithProfile } from "$lib/types/collection"
 
 export const load = async ({ url: { searchParams }, params: { slug }, parent, depends }) => {
-	const pageStr = searchParams.get("page") || "-1"
-	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
+	const pageN = Number(searchParams.get("page") || "-1")
+	const page = pageN < 0 || Number.isNaN(pageN) ? 1 : pageN
+
 	const search = decodeURIComponent(searchParams.get("search") || "").trim()
 	const range = 10
 
@@ -19,13 +20,10 @@ export const load = async ({ url: { searchParams }, params: { slug }, parent, de
 			{ count: "estimated" }
 		)
 
-	if (search === "") {
-		query = query
-			.order("username", { foreignTable: "profiles", ascending: true })
-			.range(start, finish)
-	} else {
-		query = query.ilike("search", "%" + search + "%")
-	}
+	query =
+		search === ""
+			? query.order("username", { foreignTable: "profiles", ascending: true }).range(start, finish)
+			: query.ilike("search", "%" + search + "%")
 
 	const scripters = await query.returns<ScripterWithProfile[]>()
 

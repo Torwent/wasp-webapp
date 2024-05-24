@@ -1,15 +1,16 @@
 <script lang="ts">
 	import { AppShell } from "@skeletonlabs/skeleton"
-	import { ChevronRight } from "lucide-svelte"
+	import { ArrowLeft, ArrowRight, ChevronRight } from "lucide-svelte"
 	import { page } from "$app/stores"
 	import { goto } from "$app/navigation"
 	import Paginator from "$lib/components/Paginator.svelte"
 	import type { CheckboxType } from "$lib/types/collection"
 	import ScriptCard from "$lib/components/ScriptCard.svelte"
 	import { browser } from "$app/environment"
+	import { onMount } from "svelte"
 
 	export let data
-	const { checkboxes, range } = data
+	const { checkboxes, range, featured } = data
 	let { profile, scripts } = data
 	let count = scripts.count
 	let { searchParams } = $page.url
@@ -57,6 +58,31 @@
 		await replaceQuery({ page: "1", categories: categories.toString().replaceAll(",", "-") })
 		await replaceQuery({ page: "1", subcategories: subcategories.toString().replaceAll(",", "-") })
 	}
+
+	let carousel: HTMLDivElement
+
+	function carouselLeft(): void {
+		if (carousel === undefined) return
+		const x =
+			carousel.scrollLeft === 0
+				? carousel.clientWidth * carousel.childElementCount // loop
+				: carousel.scrollLeft - carousel.clientWidth // step left
+		carousel.scroll(x, 0)
+	}
+
+	function carouselRight(): void {
+		if (carousel === undefined) return
+		const x =
+			carousel.scrollLeft === carousel.scrollWidth - carousel.clientWidth
+				? 0 // loop
+				: carousel.scrollLeft + carousel.clientWidth // step right
+		carousel.scroll(x, 0)
+	}
+
+	onMount(() => {
+		const autoplay = setInterval(() => carouselRight(), 5000)
+		return () => clearInterval(autoplay)
+	})
 
 	const headTitle = "Scripts - WaspScripts"
 	const headDescription =
@@ -135,6 +161,46 @@
 			</button>
 		</div>
 	</svelte:fragment>
+
+	<div class="p-4 grid grid-cols-[auto_1fr_auto] gap-5 items-center">
+		<!-- Button: Left -->
+		<button type="button" class="btn-icon variant-filled-surface" on:click={carouselLeft}>
+			<ArrowLeft />
+		</button>
+		<!-- Full Images -->
+		<div
+			bind:this={carousel}
+			class="snap-x snap-mandatory scroll-smooth flex overflow-x-auto hide-scrollbar"
+		>
+			{#each featured as f}
+				<a href="/scripts/{f?.url}" class="relative snap-center shrink-0 w-full text-center">
+					<img
+						class="object-cover w-full rounded-container-token brightness-90"
+						src="{f?.protected?.assets}/banner.jpg"
+						alt={f?.title}
+						loading="lazy"
+					/>
+					<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+						<h1 class="font-bold text-sm text-shadow-strong drop-shadow-2xl">
+							{f?.title}
+						</h1>
+						<h2 class="text-xl">
+							<a
+								href="/scripters/{f?.protected?.username}"
+								class="font-semibold text-xl text-shadow-strong drop-shadow-2xl"
+							>
+								by {f?.protected?.username}
+							</a>
+						</h2>
+					</div>
+				</a>
+			{/each}
+		</div>
+		<!-- Button: Right -->
+		<button type="button" class="btn-icon variant-filled-surface" on:click={carouselRight}>
+			<ArrowRight />
+		</button>
+	</div>
 
 	<main class="container mt-8 mx-auto flex-grow w-[95%] max-h-screen overflow-y-visible">
 		<div>

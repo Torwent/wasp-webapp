@@ -6,12 +6,7 @@
 	import ZipDownload from "$lib/components/ZIPDownload.svelte"
 
 	import EditButton from "$lib/components/EditButton.svelte"
-	import {
-		modalStore,
-		type ModalSettings,
-		type ToastSettings,
-		toastStore
-	} from "@skeletonlabs/skeleton"
+	import { modalStore, type ModalSettings, toastStore } from "@skeletonlabs/skeleton"
 	import { page } from "$app/stores"
 	import ScriptHeader from "../ScriptHeader.svelte"
 	import ScriptArticle from "../ScriptArticle.svelte"
@@ -76,11 +71,15 @@
 		return await canDownload(supabaseClient, profile, script.id)
 	}
 
-	const t: ToastSettings = {
-		message: "Please login to be able to download this script."
+	if (!profile) {
+		toastStore.trigger({
+			message: "Please login to be able to download this script.",
+			action: {
+				label: "Login",
+				response: async () => goto("/login")
+			}
+		})
 	}
-
-	if (!profile) toastStore.trigger(t)
 
 	const scriptStats = getScriptsStats(supabaseClient, script.id)
 
@@ -194,7 +193,7 @@
 					{:else}
 						<h4 class="py-2">
 							This is a <span class="text-secondary-500">premium</span>
-							 script that you don't have access to.
+							script that you don't have access to.
 						</h4>
 						<h5>
 							To be able to download this script buy a

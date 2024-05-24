@@ -4,19 +4,16 @@ import { encodeSEO } from "$lib/utils"
 import type { Tutorial } from "$lib/types/collection.js"
 
 export const load = async ({ url, parent }) => {
-	const pageStr = url.searchParams.get("page") || "-1"
-	const page = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
+	const pageN = Number(url.searchParams.get("page") || "-1")
+	const page = pageN < 0 || Number.isNaN(pageN) ? 1 : pageN
 
 	const ascendingStr = url.searchParams.get("ascending")
 	const ascending = ascendingStr ? ascendingStr.toLowerCase() === "true" : true
 
 	const search = decodeURIComponent(url.searchParams.get("search") || "").trim()
 
-	const levelStr = url.searchParams.get("level") || "-1"
-	const level =
-		Number(levelStr) < -1 || Number(levelStr) > 2 || Number.isNaN(Number(levelStr))
-			? -1
-			: Number(levelStr)
+	const levelN = Number(url.searchParams.get("level") || "-1")
+	const level = levelN < -1 || levelN > 2 || Number.isNaN(levelN) ? -1 : levelN
 
 	const range = 10
 
@@ -48,7 +45,7 @@ export const load = async ({ url, parent }) => {
 
 		const { data, count, error: err } = await query.returns<Tutorial[]>()
 
-		if (err)
+		if (err) {
 			throw error(
 				500,
 				`Server error, this is probably not an issue on your end! - SELECT tutorials failed
@@ -57,6 +54,7 @@ export const load = async ({ url, parent }) => {
 			Error details: ${err.details}
 			Error hint: ${err.message}`
 			)
+		}
 
 		if (!browser && count === 1)
 			throw redirect(303, "/tutorials/" + encodeSEO(data[0].title + " by " + data[0].username))

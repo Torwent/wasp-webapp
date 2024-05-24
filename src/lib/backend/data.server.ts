@@ -21,25 +21,22 @@ export async function doLogin(
 	searchParams: URLSearchParams
 ) {
 	const provider = searchParams.get("provider") as Provider
+	if (!provider) throw error(403, "Failed to login! Provider not specified!")
 
-	if (provider) {
-		const { data, error: err } = await supabase.auth.signInWithOAuth({
-			provider: provider,
-			options: {
-				redirectTo: origin + "/api/auth/callback/",
-				scopes: "identify email guilds guilds.members.read"
-			}
-		})
-
-		if (err) {
-			console.error("Login failed: " + err.message)
-			throw error(400, { message: "Something went wrong logging you in!" })
+	const { data, error: err } = await supabase.auth.signInWithOAuth({
+		provider: provider,
+		options: {
+			redirectTo: origin + "/api/auth/callback/",
+			scopes: "identify email guilds guilds.members.read"
 		}
+	})
 
-		throw redirect(303, data.url)
+	if (err) {
+		console.error("Login failed: " + err.message)
+		throw error(400, { message: "Something went wrong logging you in!" })
 	}
 
-	throw error(403, "Failed to login! Provider not specified!")
+	throw redirect(303, data.url)
 }
 
 function updateID(str: string, id: string) {
