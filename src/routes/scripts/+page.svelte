@@ -162,7 +162,7 @@
 		</div>
 	</svelte:fragment>
 
-	<div class="p-4 grid grid-cols-[auto_1fr_auto] gap-5 items-center">
+	<div class="p-4 md:44 lg:h-64 grid grid-cols-[auto_1fr_auto] gap-5 items-center">
 		<!-- Button: Left -->
 		<button type="button" class="btn-icon variant-filled-surface" on:click={carouselLeft}>
 			<ArrowLeft />
@@ -175,23 +175,25 @@
 			{#each featured as f}
 				<a href="/scripts/{f?.url}" class="relative snap-center shrink-0 w-full text-center">
 					<img
-						class="object-cover w-full rounded-container-token brightness-90"
+						class="md:44 lg:h-64 object-fill w-full rounded-container-token brightness-90"
 						src="{f?.protected?.assets}/banner.jpg"
 						alt={f?.title}
 						loading="lazy"
 					/>
-					<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-						<h1 class="font-bold text-sm text-shadow-strong drop-shadow-2xl">
+					<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid">
+						<span
+							class="font-bold text-md lg:text-lg xl:text-4xl text-shadow-strong drop-shadow-2xl"
+						>
 							{f?.title}
-						</h1>
-						<h2 class="text-xl">
+						</span>
+						<span class="text-xs lg:text-md xl:text-lg">
 							<a
 								href="/scripters/{f?.protected?.username}"
-								class="font-semibold text-xl text-shadow-strong drop-shadow-2xl"
+								class="font-semibold text-shadow-strong drop-shadow-2xl"
 							>
 								by {f?.protected?.username}
 							</a>
-						</h2>
+						</span>
 					</div>
 				</a>
 			{/each}
