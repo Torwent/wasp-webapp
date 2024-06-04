@@ -88,7 +88,7 @@
 					id="{products[index].id}_new_free_access_button"
 					type="submit"
 					class="btn variant-outline-primary"
-					formaction="?/addFreeAccessS&product={products[index].id}"
+					formaction="?/addFreeAccess&product={products[index].id}"
 				>
 					{btnText}
 				</button>
@@ -108,7 +108,7 @@
 							id="button-{products[index].id}"
 							type="submit"
 							class="btn variant-outline-error"
-							formaction="?/cancelFreeAccessS&product={products[index].id}&id={row.id}"
+							formaction="?/cancelFreeAccess&product={products[index].id}&id={row.id}"
 						>
 							Cancel
 						</button>

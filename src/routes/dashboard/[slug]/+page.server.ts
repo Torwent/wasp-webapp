@@ -493,7 +493,7 @@ export const actions = {
 		return { form }
 	},
 
-	addFreeAccessB: async ({
+	addFreeAccess: async ({
 		request,
 		locals: { supabaseServer, getSession, getProfile },
 		url: { origin, searchParams },
@@ -512,18 +512,15 @@ export const actions = {
 
 		const data = promises[2]
 
-		const form = await superValidate(data, bundleArraySchema)
-		if (!form.valid) return setError(form, "", "The form is not valid!")
-
 		const product = searchParams.get("product")
-		if (!product) return setError(form, "", "Product not specified.")
+		if (!product) throw error(403, "Product not specified.")
 
 		const id = data.get(product + "_new_free_access_user_id")?.toString()
-		if (!id || id === "") return setError(form, "", "User ID not specified.")
-		if (!UUID_V4_REGEX.test(id)) return setError(form, "", "User ID is not a valid UUID.")
+		if (!id || id === "") throw error(403, "User ID not specified.")
+		if (!UUID_V4_REGEX.test(id)) throw error(403, "User ID is not a valid UUID.")
 
 		const date_end_str = data.get(product + "_new_free_access_end_date")?.toString()
-		if (!date_end_str || date_end_str === "") return setError(form, "", "End date not specified.")
+		if (!date_end_str || date_end_str === "") throw error(403, "End date not specified.")
 
 		const date_end = new Date(date_end_str).toISOString().toLocaleString()
 
@@ -531,12 +528,17 @@ export const actions = {
 
 		if (err) {
 			console.error(err)
-			return setError(form, "", err.message)
+			throw error(403, err.message)
 		}
+
+		const formBundle = await superValidate(data, bundleArraySchema)
+		const formScripts = await superValidate(data, scriptArraySchema)
+
+		const form = formBundle.valid ? formBundle : formScripts
 		return { form }
 	},
 
-	cancelFreeAccessB: async ({
+	cancelFreeAccess: async ({
 		request,
 		locals: { supabaseServer, getSession, getProfile },
 		url: { origin, searchParams },
@@ -553,99 +555,25 @@ export const actions = {
 		if (profile.id !== slug && !profile.roles.administrator)
 			throw error(403, "You cannot access another scripter dashboard.")
 
-		const form = await superValidate(promises[2], bundleArraySchema)
-
 		const product = searchParams.get("product")
-		if (!product) return setError(form, "", "Product not specified.")
+		if (!product) throw error(403, "Product not specified.")
 
 		const id = searchParams.get("id")
-		if (!id || id === "") return setError(form, "", "User ID not specified.")
-		if (!UUID_V4_REGEX.test(id)) return setError(form, "", "User ID is not a valid UUID.")
+		if (!id || id === "") throw error(403, "User ID not specified.")
+		if (!UUID_V4_REGEX.test(id)) throw error(403, "User ID is not a valid UUID.")
 
 		const err = await cancelFreeAccess(supabaseServer, id, product)
 
 		if (err) {
 			console.error(err)
-			return setError(form, "", err.message)
+			throw error(403, err.message)
 		}
-		return { form }
-	},
-
-	addFreeAccessS: async ({
-		request,
-		locals: { supabaseServer, getSession, getProfile },
-		url: { origin, searchParams },
-		params: { slug }
-	}) => {
-		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
-		const profile = promises[1]
-
-		if (!promises[0] || !profile) {
-			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
-		}
-
-		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
-		if (profile.id !== slug && !profile.roles.administrator)
-			throw error(403, "You cannot access another scripter dashboard.")
 
 		const data = promises[2]
+		const formBundle = await superValidate(data, bundleArraySchema)
+		const formScripts = await superValidate(data, scriptArraySchema)
 
-		const form = await superValidate(data, scriptArraySchema)
-		if (!form.valid) return setError(form, "", "The form is not valid!")
-
-		const product = searchParams.get("product")
-		if (!product) return setError(form, "", "Product not specified.")
-
-		const id = data.get(product + "_new_free_access_user_id")?.toString()
-		if (!id || id === "") return setError(form, "", "User ID not specified.")
-		if (!UUID_V4_REGEX.test(id)) return setError(form, "", "User ID is not a valid UUID.")
-
-		const date_end_str = data.get(product + "_new_free_access_end_date")?.toString()
-		if (!date_end_str || date_end_str === "") return setError(form, "", "End date not specified.")
-
-		const date_end = new Date(date_end_str).toISOString().toLocaleString()
-
-		const err = await addFreeAccess(supabaseServer, id, product, date_end)
-
-		if (err) {
-			console.error(err)
-			return setError(form, "", err.message)
-		}
-		return { form }
-	},
-
-	cancelFreeAccessS: async ({
-		request,
-		locals: { supabaseServer, getSession, getProfile },
-		url: { origin, searchParams },
-		params: { slug }
-	}) => {
-		const promises = await Promise.all([getSession(), getProfile(), request.formData()])
-		const profile = promises[1]
-
-		if (!promises[0] || !profile) {
-			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
-		}
-
-		if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
-		if (profile.id !== slug && !profile.roles.administrator)
-			throw error(403, "You cannot access another scripter dashboard.")
-
-		const form = await superValidate(promises[2], scriptArraySchema)
-
-		const product = searchParams.get("product")
-		if (!product) return setError(form, "", "Product not specified.")
-
-		const id = searchParams.get("id")
-		if (!id || id === "") return setError(form, "", "User ID not specified.")
-		if (!UUID_V4_REGEX.test(id)) return setError(form, "", "User ID is not a valid UUID.")
-
-		const err = await cancelFreeAccess(supabaseServer, id, product)
-
-		if (err) {
-			console.error(err)
-			return setError(form, "", err.message)
-		}
+		const form = formBundle.valid ? formBundle : formScripts
 		return { form }
 	},
 
