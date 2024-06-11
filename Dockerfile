@@ -11,7 +11,6 @@ WORKDIR /usr/src/app
 COPY . .
 COPY --from=deps /usr/src/app/node_modules ./node_modules
 RUN npx pnpm run build
-RUN dir -s
 
 # Production image, copy all the files and run next
 FROM node:20-alpine AS runner
