@@ -18,6 +18,7 @@
 	"devDependencies": {
 		"@playwright/test": "^1.44.1",
 		"@skeletonlabs/skeleton": "^1.12.0",
+		"@sveltejs/adapter-node": "v1.3.1",
 		"@sveltejs/kit": "^1.30.4",
 		"@tailwindcss/forms": "^0.5.7",
 		"@tailwindcss/typography": "^0.5.13",
@@ -52,7 +53,6 @@
 		"@stripe/connect-js": "^3.3.5",
 		"@supabase/ssr": "^0.0.10",
 		"@supabase/supabase-js": "^2.43.4",
-		"@sveltejs/adapter-vercel": "^3.1.0",
 		"file-saver": "^2.0.5",
 		"highlight.js": "^11.9.0",
 		"jimp": "^0.22.12",
