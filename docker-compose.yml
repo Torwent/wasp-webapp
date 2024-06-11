@@ -1,0 +1,6 @@
+services:
+  webapp:
+    container_name: webapp
+    build:
+      context: .
+    restart: unless-stopped
