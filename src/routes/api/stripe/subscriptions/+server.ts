@@ -75,6 +75,15 @@ export const POST = async ({ request }) => {
 			const subscriptionDeleted = data.object as Stripe.Subscription
 			const { error: errDelete } = await deleteSubscription(subscriptionDeleted.id)
 			if (errDelete) throw error(404, "Error deleting subscription: " + errDelete)
+			const last_invoice = subscriptionDeleted.latest_invoice
+			if (last_invoice) {
+				try {
+					stripe.invoices.voidInvoice(last_invoice.toString())
+				} catch (err) {
+					console.error(err)
+					throw error(404, "Failed to void invoce: " + last_invoice + " for sub: " + subscriptionDeleted.id + "  Error: " + err)
+				}
+			}
 			break
 
 		default:
