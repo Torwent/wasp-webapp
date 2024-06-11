@@ -1,38 +1,25 @@
 <script lang="ts">
 	import { Github, Globe } from "lucide-svelte"
 	import Logo from "./Logo.svelte"
-	import type { ScripterWithProfile } from "$lib/types/collection"
 	import { page } from "$app/stores"
 
-	async function getScripters() {
+	async function getRandomScripters() {
+		const start = performance.now()
 		const { data, error: err } = await $page.data.supabaseClient
 			.schema("profiles")
-			.from("scripters")
-			.select(`id, realname, url, profiles!left (username)`)
-			.order("username", { foreignTable: "profiles", ascending: true })
+			.from("random_scripters")
+			.select(`id, realname, url, profiles!inner (username)`)
+			.limit(5)
 			.limit(1, { foreignTable: "profiles" })
-			.returns<ScripterWithProfile[]>()
+			.order("id", { ascending: true })
 
-		if (err) console.error(err)
-
-		function shuffle(input: ScripterWithProfile[]) {
-			let result: ScripterWithProfile[] = []
-
-			for (let i = 0; i < 5; i++) {
-				const idx = Math.floor(Math.random() * input.length)
-				if (!result.includes(input[idx]))
-					result.push(input[idx])
-				else
-					i--
-			}
-
-			return result
+		console.log(`💻 Scripters loaded in ${(performance.now() - start).toFixed(2)} ms!`)
+		if (err) {
+			console.error(err)
+			return []
 		}
 
-		let result: ScripterWithProfile[] = []
-		if (data) result = shuffle(data)
-
-		return result
+		return data
 	}
 </script>
 
@@ -65,7 +52,7 @@
 				<nav>
 					<span class="mb-6 text-sm font-semibold uppercase">Special thanks:</span>
 					<ul>
-						{#await getScripters()}
+						{#await getRandomScripters()}
 							<li>Loading...</li>
 							<li>Loading...</li>
 							<li>Loading...</li>
@@ -73,9 +60,8 @@
 							{#each scripters as scripter}
 								<li><a href="/scripters/{scripter.url}">{scripter.profiles.username}</a></li>
 							{/each}
+							<li><a href="/scripters">Many more devs...</a></li>
 						{/await}
-
-						<li><a href="/scripters">Many more devs...</a></li>
 					</ul>
 				</nav>
 				<nav>

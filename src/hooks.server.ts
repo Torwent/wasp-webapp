@@ -1,86 +1,120 @@
-import { error, redirect, type Handle } from "@sveltejs/kit"
-import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
 import { createServerClient } from "@supabase/ssr"
-import type { Profile } from "$lib/types/collection"
+import { type Handle, redirect } from "@sveltejs/kit"
+import { sequence } from "@sveltejs/kit/hooks"
+
+import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from "$env/static/public"
 import { profileQuery } from "$lib/utils"
+import type { Profile } from "$lib/types/collection"
 
-export const handle: Handle = async ({ event, resolve }) => {
+const redirects: Handle = async ({ event, resolve }) => {
 	const start = performance.now()
-
-	const { url, locals } = event
-
-	if (url.pathname === "/clear-cookies") {
-		console.log("Clearing cookies...")
-		event.cookies.getAll().forEach((cookie) => {
-			event.cookies.delete(cookie.name, { path: "/" })
-		})
-		throw redirect(303, "/")
+	if (event.url.pathname.startsWith("/refresh_token")) {
+		return redirect(303, "/auth/refresh-token")
 	}
-
-	locals.supabaseServer = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
-		cookies: {
-			get: (key) => event.cookies.get(key),
-			set: (key, value, options) => {
-				event.cookies.set(key, value, options)
-			},
-			remove: (key, options) => {
-				event.cookies.delete(key, options)
-			}
-		}
-	})
-
-	locals.getSession = async () => {
-		const {
-			data: { session }
-		} = await locals.supabaseServer.auth.getSession()
-		return session
-	}
-
-	locals.getUser = async () => {
-		const {
-			data: { user }
-		} = await locals.supabaseServer.auth.getUser()
-		return user
-	}
-
-	locals.getProfile = async () => {
-		const user = await locals.getUser()
-		if (!user) return null
-
-		const id = user.id
-		const { data, error: err } = await locals.supabaseServer
-			.schema("profiles")
-			.from("profiles")
-			.select(profileQuery)
-			.eq("id", id)
-			.limit(1)
-			.limit(1, { foreignTable: "private" })
-			.limit(1, { foreignTable: "roles" })
-			.returns<Profile[]>()
-
-		if (err || data.length < 1) return null
-
-		const profile = data[0]
-		if (profile.roles.banned) throw error(403, "You've been banned!")
-
-		return profile
-	}
-
-	const response = await resolve(event, {
-		filterSerializedResponseHeaders(name) {
-			return name === "content-range"
-		}
-	})
-
-	response.headers.delete("link")
-
-	const loadTime = performance.now() - start
-	if (loadTime < 3000) console.log(`🚀 ${url} took ${loadTime.toFixed(2)} ms to load!`)
-	else console.log(`🐌 ${url} took ${loadTime.toFixed(2)} ms to load!`)
-
-	if (response.status === 509) {
-		throw redirect(303, "/clear-cookies")
-	}
+	const response = resolve(event)
+	console.log(`🔗 Redirects took ${(performance.now() - start).toFixed(2)} ms to handle!`)
 
 	return response
 }
+
+const supabase: Handle = async ({ event, resolve }) => {
+	event.locals.supabaseServer = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+		cookies: {
+			get: (key) => event.cookies.get(key),
+			set: (key, value, options) => event.cookies.set(key, value, { ...options, path: "/" }),
+			remove: (key, options) => event.cookies.delete(key, { ...options, path: "/" })
+		}
+	})
+
+	event.locals.safeGetSession = async () => {
+		let start = performance.now()
+		const {
+			data: { session }
+		} = await event.locals.supabaseServer.auth.getSession()
+		if (!session) return { session: null, user: null, getProfile: null }
+		console.log(`📜 session took ${(performance.now() - start).toFixed(2)} ms to check!`)
+
+		start = performance.now()
+		const {
+			data: { user },
+			error
+		} = await event.locals.supabaseServer.auth.getUser()
+		if (error) return { session: null, user: null, getProfile: null }
+		console.log(`🔥 user took ${(performance.now() - start).toFixed(2)} ms to check!`)
+
+		const getProfile = async () => {
+			if (!user) return null
+			start = performance.now()
+			const { data, error: err } = await event.locals.supabaseServer
+				.schema("profiles")
+				.from("profiles")
+				.select("id, discord, username, avatar, customer_id")
+				.eq("id", user.id)
+				.single()
+
+			console.log(`⚡ Profile took ${(performance.now() - start).toFixed(2)} ms to check!`)
+			if (err) return null
+			return data
+		}
+
+		const getRoles = async () => {
+			if (!user) return null
+			start = performance.now()
+			const { data, error: err } = await event.locals.supabaseServer
+				.schema("profiles")
+				.from("roles")
+				.select("banned, premium, vip, tester, scripter, moderator, administrator")
+				.eq("id", user.id)
+				.single()
+
+			console.log(`⛑️ Roles took ${(performance.now() - start).toFixed(2)} ms to check!`)
+			if (err) return null
+			return data
+		}
+
+		// @ts-expect-error
+		delete session.user
+
+		return {
+			session: Object.assign({}, session, { user }),
+			user,
+			getProfile: getProfile(),
+			getRoles: getRoles()
+		}
+	}
+
+	return resolve(event, {
+		filterSerializedResponseHeaders(name) {
+			return name === "content-range" || name === "x-supabase-api-version"
+		}
+	})
+}
+
+const authGuard: Handle = async ({ event, resolve }) => {
+	const start = performance.now()
+	const { session, user, getProfile, getRoles } = await event.locals.safeGetSession()
+	event.locals.session = session
+	event.locals.user = user
+	event.locals.getProfile = getProfile
+	event.locals.getRoles = getRoles
+
+	if (!event.locals.session && event.url.pathname.startsWith("/dashboard")) {
+		return redirect(303, "/auth")
+	}
+
+	const response = resolve(event)
+	console.log(`🤖 Auth took ${(performance.now() - start).toFixed(2)} ms to check!`)
+
+	return response
+}
+
+const performanceCheck: Handle = async ({ event, resolve }) => {
+	const start = performance.now()
+	const { url } = event
+	const response = await resolve(event)
+	const loadTime = performance.now() - start
+	console.log(`🚀 ${url} took ${loadTime.toFixed(2)} ms to load!`)
+	return response
+}
+
+export const handle: Handle = sequence(redirects, supabase, authGuard, performanceCheck)

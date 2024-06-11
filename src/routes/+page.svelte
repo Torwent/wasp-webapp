@@ -1,11 +1,11 @@
 <script lang="ts">
 	import Discord from "$lib/components/Discord.svelte"
 	import CanvasAnimation from "./CanvasAnimation.svelte"
-	import { convertTime, formatRSNumber } from "$lib/utils"
+	import { formatTime, formatNumber } from "$lib/utils"
 	import { page } from "$app/stores"
 	export let data
 
-	let { total } = data
+	const { total } = data
 
 	const headTitle = "WaspScripts"
 	const headDescription =
@@ -52,18 +52,27 @@
 	</header>
 
 	<header class="text-lg sm:text-xl md:text-2xl">
-		<h2 class="mt-6 mx-6 font-bold whitespace-nowrap text-center">
-			Total Experience Earned: {formatRSNumber(total.experience)}
-		</h2>
-		<h2 class="mx-6 font-bold whitespace-nowrap text-center">
-			Total Gold Earned: {formatRSNumber(total.gold)}
-		</h2>
-		<h2 class="mx-6 font-bold whitespace-nowrap text-center">
-			Total Levels Earned: {formatRSNumber(total.levels)}
-		</h2>
-		<h2 class="mb-4 mx-6 font-bold whitespace-nowrap text-center">
-			Total Runtime: {convertTime(total.runtime)}
-		</h2>
+		{#await total}
+			<h2 class="mt-6 mx-6 font-bold whitespace-nowrap text-center">
+				Total Experience Earned: ...
+			</h2>
+			<h2 class="mx-6 font-bold whitespace-nowrap text-center">Total Gold Earned:...</h2>
+			<h2 class="mx-6 font-bold whitespace-nowrap text-center">Total Levels Earned: ...</h2>
+			<h2 class="mb-4 mx-6 font-bold whitespace-nowrap text-center">Total Runtime: ...</h2>
+		{:then total}
+			<h2 class="mt-6 mx-6 font-bold whitespace-nowrap text-center">
+				Total Experience Earned: {formatNumber(total.experience)}
+			</h2>
+			<h2 class="mx-6 font-bold whitespace-nowrap text-center">
+				Total Gold Earned: {formatNumber(total.gold)}
+			</h2>
+			<h2 class="mx-6 font-bold whitespace-nowrap text-center">
+				Total Levels Earned: {formatNumber(total.levels)}
+			</h2>
+			<h2 class="mb-4 mx-6 font-bold whitespace-nowrap text-center">
+				Total Runtime: {formatTime(total.runtime)}
+			</h2>
+		{/await}
 	</header>
 
 	<p class="my-12 text-center">

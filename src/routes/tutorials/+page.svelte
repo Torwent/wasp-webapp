@@ -5,14 +5,14 @@
 	import TutorialCard from "./TutorialCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
 	import { ArrowDownAZ, ArrowUpZA } from "lucide-svelte"
+	import { replaceQuery } from "$lib/client/utils"
+	import type { Tutorial } from "$lib/types/collection"
 	export let data
 
-	let { range, tutorials } = data
-	let { count } = tutorials
+	let { profile, roles, range, tutorials } = data
 	let { searchParams } = $page.url
 
-	$: ({ tutorials, range } = data)
-	$: ({ count } = tutorials)
+	$: ({ profile, roles, tutorials, range } = data)
 	$: ({ searchParams } = $page.url)
 
 	const pageStr = searchParams.get("page") || "-1"
@@ -29,29 +29,23 @@
 	const levelColors = ["sky", "orange", "red"]
 	const levelNames = ["Basic", "Intermidiate", "Advanced"]
 
-	async function replaceQuery(values: Record<string, string>) {
-		if (!browser) return
-
-		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else searchParams.delete(k)
-		}
-
-		const path = $page.url.origin + $page.url.pathname + "?" + searchParams.toString()
-
-		await goto(path, {
-			keepFocus: true,
-			noScroll: true,
-			replaceState: true,
-			invalidateAll: true
-		})
-	}
-
 	async function sort() {
 		search = ""
 		ascending = !ascending
-		await replaceQuery({ page: "1", search: search, ascending: ascending ? "true" : "false" })
+		await replaceQuery($page.url.origin + $page.url.pathname, searchParams, {
+			page: "1",
+			search: search,
+			ascending: ascending ? "true" : "false"
+		})
 	}
+
+	let resolvedPromise: Tutorial[] | null = null
+	let resolvedCount: number = 0
+
+	$: tutorials.then((tutorials) => {
+		resolvedPromise = tutorials.tutorials
+		resolvedCount = tutorials.count
+	})
 
 	const headTitle = "Tutorials - WaspScripts"
 	const headDescription =
@@ -104,7 +98,10 @@
 						class:pr-6={level === i}
 						on:click={async () => {
 							level = level === i ? -1 : i
-							await replaceQuery({ page: "1", level: level.toString() })
+							await replaceQuery($page.url.origin + $page.url.pathname, searchParams, {
+								page: "1",
+								level: level.toString()
+							})
 						}}
 					>
 						{name} tutorial
@@ -126,23 +123,35 @@
 						placeholder="Search script id, name, categories, author,..."
 						class="input"
 						bind:value={search}
-						on:input={async () => await replaceQuery({ page: "1", search: search })}
+						on:input={async () =>
+							await replaceQuery($page.url.origin + $page.url.pathname, searchParams, {
+								page: "1",
+								search: search
+							})}
 					/>
 				</div>
 			</div>
 		</div>
-		{#if data.profile && data.profile.roles.administrator}
+		{#if profile && roles?.administrator}
 			<a href="/tutorials/add" class="flex mx-auto">
 				<button class="btn variant-filled-secondary flex mx-auto">Add Post</button>
 			</a>
 		{/if}
 	</div>
 
-	<div class="mx-auto max-w-2xl flex-grow">
-		{#each tutorials.data as tutorial}
-			<TutorialCard bind:tutorial />
-		{/each}
-	</div>
+	{#if resolvedPromise}
+		<div class="mx-auto max-w-2xl flex-grow">
+			{#each resolvedPromise as tutorial}
+				<TutorialCard bind:tutorial />
+			{/each}
+		</div>
+	{:else}
+		<div class="mx-auto max-w-2xl flex-grow">
+			{#each Array(10) as _}
+				<TutorialCard />
+			{/each}
+		</div>
+	{/if}
 
-	<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count />
+	<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count={resolvedCount} />
 </main>

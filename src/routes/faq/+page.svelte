@@ -45,9 +45,12 @@
 		<h2>Welcome to the Frequently Asked Questions and Common Errors section.</h2>
 	</header>
 
-	<DropDown title="❓ Frequently Asked Questions" entries={questions} />
-	<DropDown title="⚠️ Common Errors" entries={errors} />
-
+	{#await questions then questions}
+		<DropDown title="❓ Frequently Asked Questions" entries={questions} />
+	{/await}
+	{#await errors then errors}
+		<DropDown title="⚠️ Common Errors" entries={errors} />
+	{/await}
 	<header class="py-12 text-center">
 		<p class="py-6">
 			Hopefully you found what you were looking for here, if not feel free to join the discord

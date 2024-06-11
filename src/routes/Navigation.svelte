@@ -6,6 +6,9 @@
 	import { goto } from "$app/navigation"
 	export let large: boolean
 
+	let { roles } = $page.data
+	$: ({ roles } = $page.data)
+
 	let showMenu = false
 
 	const routeArray = [
@@ -104,7 +107,7 @@
 							<Logo selected={route === currentPage} />
 						{/if}
 					{:else if route === "Dashboard"}
-						{#if $page.data.profile?.roles.scripter}
+						{#if roles?.scripter}
 							{route}
 						{/if}
 					{:else}

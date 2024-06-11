@@ -45,6 +45,6 @@ export const actions = {
 			return setError(form, "", err.message)
 		}
 
-		throw redirect(303, "./")
+		redirect(303, "./")
 	}
 }

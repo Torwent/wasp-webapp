@@ -1,18 +1,18 @@
 <script lang="ts">
-	import markdownIt from "markdown-it"
-	import hljs from "highlight.js"
-	//import "highlight.js/styles/github-dark.css"
+	import markdownit from "markdown-it"
+	import { storeHighlightJs } from "@skeletonlabs/skeleton"
+	import { full as emoji } from "markdown-it-emoji"
+	import { imgLazyload } from "@mdit/plugin-img-lazyload"
 
 	export let src: string
 
-	function mdHighLight(str: string, lang: string) {
+	function highlight(str: string, lang: string) {
 		lang = lang.toLowerCase()
-		if (lang.includes("simba") || lang.includes("freepascal") || lang.includes("lape"))
-			lang = "pascal"
+		if (lang === "simba" || lang === "freepascal" || lang === "lape") lang = "pascal"
 
-		if (hljs.getLanguage(lang)) {
+		if ($storeHighlightJs.getLanguage(lang)) {
 			try {
-				return hljs.highlight(str, { language: lang }).value
+				return $storeHighlightJs.highlight(str, { language: lang, ignoreIllegals: true }).value
 			} catch (error) {
 				console.error("Failed to highlight " + lang + ": " + error)
 			}
@@ -21,14 +21,14 @@
 		return ""
 	}
 
-	const options: markdownIt.Options = {
+	const md = new markdownit("commonmark", {
 		langPrefix: "language-",
-		highlight: mdHighLight
-	}
-
-	const md = new markdownIt("commonmark", options)
-
-	$: html = md.render(src)
+		linkify: true,
+		typographer: true,
+		highlight: highlight
+	})
+		.use(emoji)
+		.use(imgLazyload)
 </script>
 
-{@html html}
+{@html md.render(src)}

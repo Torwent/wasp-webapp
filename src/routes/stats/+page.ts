@@ -1,6 +1,6 @@
-import { getStatsTotal } from "$lib/backend/data"
-import type { Stats } from "$lib/types/collection"
-import { UUID_V4_REGEX } from "$lib/utils"
+import { getStatsTotal } from "$lib/client/data"
+import { UUID_V4_REGEX, formatError } from "$lib/utils"
+import type { SupabaseClient } from "@supabase/supabase-js"
 import { error } from "@sveltejs/kit"
 
 export const load = async ({ url, depends, parent }) => {
@@ -21,8 +21,8 @@ export const load = async ({ url, depends, parent }) => {
 
 	const { supabaseClient } = await parent()
 
-	async function getStats() {
-		const query = supabaseClient
+	async function getStats(supabase: SupabaseClient) {
+		const query = supabase
 			.from("stats")
 			.select("username, experience, gold, levels, runtime", { count: "exact" })
 
@@ -40,18 +40,15 @@ export const load = async ({ url, depends, parent }) => {
 		const { data, count, error: err } = await query
 
 		if (err)
-			throw error(
+			error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT stats failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"<p>Server error, this is probably not an issue on your end!</p>" +
+					"<p>SELECT stats failed</p>" +
+					formatError(err)
 			)
 
 		return { stats: data, count: count || totalEntries }
 	}
 
-	const promises = await Promise.all([getStatsTotal(supabaseClient), getStats()])
-	return { total: promises[0], stats: promises[1], range: range }
+	return { total: getStatsTotal(supabaseClient), stats: getStats(supabaseClient), range: range }
 }

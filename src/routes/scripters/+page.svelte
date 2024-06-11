@@ -1,42 +1,30 @@
 <script lang="ts">
-	import { goto } from "$app/navigation"
 	import { page } from "$app/stores"
-	import { browser } from "$app/environment"
 	import ScripterCard from "./ScripterCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
+	import type { ScripterBase } from "$lib/types/collection"
+	import { replaceQuery } from "$lib/client/utils"
 
 	export let data
 
-	let { scripters, count, range } = data
+	let { scripters, range } = data
 	let { searchParams } = $page.url
 
+	$: ({ scripters, range } = data)
 	$: ({ searchParams } = $page.url)
-	$: ({ scripters, count, range } = data)
 
 	const pageStr = searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
 	let search: string
 
-	async function replaceQuery(values: Record<string, string>) {
-		if (!browser) return
-		let invalidate: boolean = false
-		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else searchParams.delete(k)
+	let resolvedPromise: ScripterBase[] | null = null
+	let resolvedCount: number = 0
 
-			invalidate = invalidate || v === ""
-		}
-
-		const path = $page.url.origin + $page.url.pathname + "?" + searchParams.toString()
-
-		await goto(path, {
-			keepFocus: true,
-			noScroll: true,
-			replaceState: true,
-			invalidateAll: invalidate
-		})
-	}
+	$: scripters.then((scripters) => {
+		resolvedPromise = scripters.scripters
+		resolvedCount = scripters.count
+	})
 
 	const headTitle = "Scripters - WaspScripts"
 	const headDescription =
@@ -90,18 +78,30 @@
 						placeholder="Search username, name, info, ..."
 						class="input"
 						bind:value={search}
-						on:input={async () => await replaceQuery({ page: "1", search: search })}
+						on:input={async () =>
+							await replaceQuery($page.url.origin + $page.url.pathname, searchParams, {
+								page: "1",
+								search: search
+							})}
 					/>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div class="mx-auto max-w-2xl flex-grow">
-		{#each scripters as scripter}
-			<ScripterCard bind:scripter />
-		{/each}
-	</div>
+	{#if resolvedPromise}
+		<div class="mx-auto max-w-2xl flex-grow">
+			{#each resolvedPromise as scripter}
+				<ScripterCard bind:scripter />
+			{/each}
+		</div>
+	{:else}
+		<div class="mx-auto max-w-2xl flex-grow">
+			{#each Array(11) as _}
+				<ScripterCard />
+			{/each}
+		</div>
+	{/if}
 
-	<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count />
+	<Paginator {searchParams} pageIdx={currentPage} {range} bind:count={resolvedCount} />
 </main>

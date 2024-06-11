@@ -1,113 +1,77 @@
 import type { Database } from "./supabase"
 
-export type Prices = Database["scripts"]["Tables"]["prices"]["Row"]
-export type Product = Database["scripts"]["Tables"]["products"]["Row"]
-
-export interface ProductEx {
-	id: string
-	user_id: string
-	name: string
-	bundle: string | null
-	script: string | null
-	bundles: { username: string } | null
-	scripts: {
-		url: string
-		protected: { username: string }
-	} | null
-	active: boolean
-}
-
+//profile
 export type ProfileBase = Database["profiles"]["Tables"]["profiles"]["Row"]
-export type ProfileRoles = Database["profiles"]["Tables"]["roles"]["Row"]
-export type ProfilePrivate = Database["profiles"]["Tables"]["private"]["Row"]
-export type ProfileSubscription = Database["profiles"]["Tables"]["subscription"]["Row"]
-export type ProfileSubscriptions = ProfileSubscription[]
-export type ProfileFreeAccess = Database["profiles"]["Tables"]["free_access"]["Row"][]
-
+export interface ProfileRoles {
+	administrator: Boolean
+	moderator: Boolean
+	scripter: Boolean
+	tester: Boolean
+	vip: Boolean
+	premium: Boolean
+	banned: Boolean
+}
 export interface Profile extends ProfileBase {
-	private: ProfilePrivate
-	roles: {
-		administrator: Boolean
-		moderator: Boolean
-		scripter: Boolean
-		tester: Boolean
-		vip: Boolean
-		premium: Boolean
-		banned: Boolean
-	}
-	subscription: ProfileSubscriptions
-	free_access: ProfileFreeAccess
+	private: Database["profiles"]["Tables"]["private"]["Row"]
+	roles: ProfileRoles
+	subscription: Database["profiles"]["Tables"]["subscription"]["Row"][]
+	free_access: Database["profiles"]["Tables"]["free_access"]["Row"][]
 }
 
-export type Stats = Database["public"]["Tables"]["stats"]["Row"]
-
-export type FAQEntry = Database["public"]["Tables"]["faq_questions"]["Row"]
-export type ErrorEntry = Database["public"]["Tables"]["faq_errors"]["Row"]
-
-export type Tutorial = Database["public"]["Tables"]["tutorials"]["Row"]
-
-export type Scripter = Database["profiles"]["Tables"]["scripters"]["Row"]
-export interface ScripterWithProfile extends Scripter {
-	profiles: ProfileBase
-}
-
-export interface ScripterWithProfile extends Scripter {
-	profiles: ProfileBase
-}
-
-export interface ScripterDashboard {
-	id: string
+export interface ScripterBase {
+	realname: string | undefined
+	description: string | undefined
 	url: string
-	realname: string | null
-	github: string | null
-	paypal_id: string | null
-	stripe: string | null
 	profiles: {
 		username: string
 		avatar: string
-		private: {
-			email: string
-		}
 	}
 }
 
-export type Category = Database["scripts"]["Tables"]["categories"]["Row"]
-export type SubCategory = Database["scripts"]["Tables"]["subcategories"]["Row"]
-
-export interface EmojiTooltip {
-	emoji: string
-	name: string
+export interface Scripter extends ScripterBase {
+	id: string
+	github: string | undefined
+	paypal_id: string | undefined
+	content: string | undefined
 }
 
-export interface CheckboxType {
-	id: number
-	name: string
-	emoji: string
-	main: boolean
-	checked: boolean
+//stats
+export type StatsTotal = Database["public"]["Functions"]["get_stats_total"]["Returns"][number]
+export type Stats = {
+	username: string
+	experience: number
+	gold: number
+	levels: number
+	runtime: number
 }
 
-export interface ScriptSimple {
-	id: Database["scripts"]["Tables"]["scripts"]["Row"]["id"]
-	title: Database["scripts"]["Tables"]["scripts"]["Row"]["title"]
-	username: Database["scripts"]["Tables"]["protected"]["Row"]["username"]
+//info
+export type FAQEntry = {
+	content: string
+	title: string
+}
+
+export type Tutorial = {
+	title: string
+	description: string
+	content: string
+	level: number
+	username: string
 	url: string
-	product: Database["scripts"]["Tables"]["scripts"]["Row"]["product"]
+	published: boolean
 }
 
-export type ScriptBase = Database["scripts"]["Tables"]["scripts"]["Row"]
-
-export type ScriptProtected = Database["scripts"]["Tables"]["protected"]["Row"]
-
-export type StatsSimba = Database["scripts"]["Tables"]["stats_simba"]["Row"]
-export type StatsSite = Database["scripts"]["Tables"]["stats_site"]["Row"]
-
-export type Interval = "week" | "month" | "year"
-
-export type Price = Database["scripts"]["Tables"]["prices"]["Row"]
-
-export interface Script extends ScriptBase {
-	protected: ScriptProtected
+//scripts
+export interface ScriptBase {
+	title: string
+	description: string
+	published: boolean
+	url: string
+	tooltip_emojis: string
+	tooltip_names: string
+	protected: {
+		assets: string
+		username: string
+		avatar: string
+	}
 }
-
-export type Bundle = Database["scripts"]["Tables"]["bundles"]["Row"]

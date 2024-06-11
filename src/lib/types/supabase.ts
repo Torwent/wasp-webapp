@@ -7,23 +7,167 @@ export type Json =
   | Json[]
 
 export type Database = {
-  graphql_public: {
+  info: {
     Tables: {
-      [_ in never]: never
+      errors: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: number | null
+          title: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: number | null
+          title?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: number | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      privacy_policy: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          version: number
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          version?: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      questions: {
+        Row: {
+          content: string | null
+          created_at: string | null
+          id: number | null
+          title: string | null
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string | null
+          id?: number | null
+          title?: string | null
+        }
+        Update: {
+          content?: string | null
+          created_at?: string | null
+          id?: number | null
+          title?: string | null
+        }
+        Relationships: []
+      }
+      scripter_tos: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          version: number
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          version?: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          version?: number
+        }
+        Relationships: []
+      }
+      tutorials: {
+        Row: {
+          author_id: string | null
+          content: string | null
+          created_at: string | null
+          description: string | null
+          fts: unknown | null
+          id: string | null
+          level: number | null
+          order: number | null
+          published: boolean | null
+          search: string | null
+          title: string | null
+          url: string | null
+          username: string | null
+        }
+        Insert: {
+          author_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          description?: string | null
+          fts?: unknown | null
+          id?: string | null
+          level?: number | null
+          order?: number | null
+          published?: boolean | null
+          search?: string | null
+          title?: string | null
+          url?: string | null
+          username?: string | null
+        }
+        Update: {
+          author_id?: string | null
+          content?: string | null
+          created_at?: string | null
+          description?: string | null
+          fts?: unknown | null
+          id?: string | null
+          level?: number | null
+          order?: number | null
+          published?: boolean | null
+          search?: string | null
+          title?: string | null
+          url?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
+      user_tos: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          version: number
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          version?: number
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          version?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      graphql: {
-        Args: {
-          operationName?: string
-          query?: string
-          variables?: Json
-          extensions?: Json
-        }
-        Returns: Json
-      }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
@@ -108,17 +252,17 @@ export type Database = {
       }
       private: {
         Row: {
-          email: string
+          email: string | null
           id: string
           warning: boolean
         }
         Insert: {
-          email?: string
+          email?: string | null
           id: string
           warning?: boolean
         }
         Update: {
-          email?: string
+          email?: string | null
           id?: string
           warning?: boolean
         }
@@ -449,7 +593,29 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      random_scripters: {
+        Row: {
+          content: string | null
+          description: string | null
+          fts: unknown | null
+          github: string | null
+          id: string | null
+          paypal_id: string | null
+          realname: string | null
+          search: string | null
+          stripe: string | null
+          url: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scripters_id_fkey"
+            columns: ["id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       auth_get_avatar: {
@@ -1089,6 +1255,13 @@ export type Database = {
             columns: ["script"]
             isOneToOne: true
             referencedRelation: "scripts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "products_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "random_scripters"
             referencedColumns: ["id"]
           },
           {

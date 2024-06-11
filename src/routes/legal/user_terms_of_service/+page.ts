@@ -12,7 +12,7 @@ export const load = async ({ parent }) => {
 		.order("version", { ascending: false })
 
 	if (infoError) {
-		throw error(
+		error(
 			500,
 			`Server error, this is probably not an issue on your end! - SELECT ${schema}.${table} failed
 			Error code: ${infoError.code}

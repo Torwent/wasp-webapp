@@ -1,4 +1,4 @@
-import type { Price, Script } from "./types/collection"
+import { type AuthError, type PostgrestError } from "@supabase/supabase-js"
 
 export const API_URL = "https://api.waspscripts.com" //http://localhost:8080
 export const UUID_V4_REGEX =
@@ -7,49 +7,41 @@ export const UUID_V4_REGEX =
 export const MB_SIZE = 1000000
 export const ACCEPTED_IMAGE_TYPES = ["image/jpeg", "image/jpg"]
 
-export const loadError = (page = "") => {
-	if (page == null) page = "page"
-	return {
-		status: 404,
-		error: new Error(page + " not found.")
+export const profileQuery = `id, discord, username, avatar, customer_id,
+							 private (email, warning),
+							 roles (banned, premium, vip, tester, scripter, moderator, administrator),
+							 subscription (subscription, product, price, date_start, date_end, cancel, disabled),
+							 free_access (id, product, date_start, date_end)`
+
+export function formatError(err: AuthError): string
+export function formatError(err: PostgrestError): string
+export function formatError(err: AuthError | PostgrestError) {
+	console.error(err)
+	let message = ""
+	const authErr = err as AuthError
+	const pgErr = err as PostgrestError
+
+	if (authErr.name) {
+		message += "<h3>Authentication Error</h3>"
+		message += "<p>Error: " + authErr.name + "</p>"
+		message += "<p>Code: " + authErr.code + "</p>"
+		message += "<p>Status: " + authErr.status + "</p>"
+		message += "<p>Message: " + authErr.message + "</p>"
+
+		if (authErr.cause) message += "<p>Cause: " + authErr.cause + "</p>"
+		if (authErr.stack) message += "<p>Stack: " + authErr.stack + "</p>"
+	} else if (pgErr.details) {
+		message += "<h3>Database Error</h3>"
+		message += "<p>Code: " + pgErr.code + "</p>"
+		message += "<p>Details: " + pgErr.details + "</p>"
+		message += "<p>Message: " + pgErr.message + "</p>"
+		message += "<p>Hint: " + pgErr.hint + "</p>"
 	}
+
+	return message
 }
 
-export const pad = (n: number, size: number) => {
-	let s = n + ""
-	while (s.length < size) s = "0" + s
-	return s
-}
-
-export const search = (content: string, search: string) => {
-	content = content.toLowerCase()
-	search = search.toLowerCase()
-	let i = 0,
-		n = -1,
-		l: string
-
-	for (; (l = search[i++]); ) {
-		if (!~(n = content.indexOf(l, n + 1))) {
-			return false
-		}
-	}
-	return true
-}
-
-export const validateEmail = (input: string) => {
-	return input.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/)
-}
-
-export const validateIp = (input: string) => {
-	const ipv4 =
-		"(([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])"
-
-	const ipv6 = "((([0-9a-fA-F]){1,4})\\:){7}([0-9a-fA-F]){1,4}"
-
-	return input.match(ipv4) || input.match(ipv6)
-}
-
-export function convertTime(t: number): string {
+export function formatTime(t: number): string {
 	let result = ""
 
 	const total_seconds = Math.floor(t / 1000)
@@ -74,7 +66,7 @@ export function convertTime(t: number): string {
 	return result
 }
 
-export function formatRSNumber(n: number): string {
+export function formatNumber(n: number): string {
 	let i = 0
 	let f: number = n
 	const arr: string[] = ["", "K", "M", "B", "T"]
@@ -85,23 +77,6 @@ export function formatRSNumber(n: number): string {
 	}
 
 	return parseFloat(f.toFixed(2)).toString() + " " + arr[i]
-}
-
-export function capitalizeString(string: string): string {
-	return string.charAt(0).toUpperCase() + string.slice(1)
-}
-
-export function randomString() {
-	const n = Math.random() + 1
-	return n.toString(36).substring(7)
-}
-
-export function cropString(str: string, length = 80) {
-	if (str.length > length) {
-		str = str.substring(0, length) + "..."
-	}
-
-	return str
 }
 
 export function encodeSEO(url: string) {
@@ -115,85 +90,10 @@ export function encodeSEO(url: string) {
 	return url
 }
 
-export function replaceScriptContent(script: Script) {
-	const placeholders: { [key: string]: string } = {
-		id: script.id,
-		title: script.title,
-		description: script.description,
-		author: script.protected.username,
-		revision: script.protected.revision.toString(),
-		revision_full_date: new Date(script.protected.revision_date).toLocaleString("pt-PT"),
-		last_revision_full_date: new Date(script.protected.revision_date).toLocaleString("pt-PT"),
-		revision_date: new Date(script.protected.revision_date).toLocaleString("pt-PT", {
-			day: "2-digit",
-			month: "2-digit",
-			year: "numeric"
-		}),
-		last_revision_date: new Date(script.protected.revision_date).toLocaleString("pt-PT", {
-			day: "2-digit",
-			month: "2-digit",
-			year: "numeric"
-		}),
-		last_revision_time: new Date(script.protected.revision_date).toLocaleString("pt-PT", {
-			hour: "2-digit",
-			minute: "2-digit",
-			second: "2-digit",
-			hour12: false
-		}),
-		revision_time: new Date(script.protected.revision_date).toLocaleString("pt-PT", {
-			hour: "2-digit",
-			minute: "2-digit",
-			second: "2-digit",
-			hour12: false
-		}),
-		min_xp: formatRSNumber(Number(script.min_xp * 12)),
-		max_xp: formatRSNumber(Number(script.max_xp * 12)),
-		min_gp: formatRSNumber(Number(script.min_gp * 12)),
-		max_gp: formatRSNumber(Number(script.max_gp * 12))
+export function cropString(str: string, length = 80) {
+	if (str.length > length) {
+		str = str.substring(0, length) + "..."
 	}
 
-	const result = script.content.replace(/\{\$([^{}\s$]+)\}/g, (match, placeholder) => {
-		const value = placeholders[placeholder]
-		return value !== undefined ? value : match
-	})
-
-	return result
+	return str
 }
-
-export function getPriceInterval(interval: string) {
-	return interval.slice(0)[0].toUpperCase() + interval.slice(1) + "ly"
-}
-export function getPriceIntervalEx(price: Price) {
-	return getPriceInterval(price.interval)
-}
-
-export function setPriceInterval(index: number, prices: Price[]) {
-	for (let i = 0; i < prices.length; i++) prices[i].active = false
-	prices[index].active = true
-}
-
-export function getPriceAmount(price: Price) {
-	return new Intl.NumberFormat("pt-PT", {
-		style: "currency",
-		currency: price.currency
-	}).format(price.amount / 100)
-}
-
-export function getPrice(id: string, prices: Price[]) {
-	return prices.find((price) => price.id === id)
-}
-
-export function getActivePrice(prices: Price[]) {
-	return prices.find((price) => price.active)
-}
-
-export function getCurrentPrice(prices: Price[]) {
-	const price = getActivePrice(prices)
-	if (price) return getPriceAmount(price)
-}
-
-export const profileQuery = `id, discord, username, avatar, customer_id,
-							 private!private_id_fkey (email, warning),
-							 roles!roles_id_fkey (banned, premium, vip, tester, scripter, moderator, administrator),
-							 subscription!subscription_id_fkey (subscription, product, price, date_start, date_end, cancel, disabled),
-							 free_access!free_access_user_id_fkey (id, product, date_start, date_end)`

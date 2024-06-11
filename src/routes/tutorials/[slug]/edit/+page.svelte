@@ -1,17 +1,15 @@
 <script lang="ts">
 	import Markdown from "$lib/Markdown.svelte"
-	import { postSchema } from "$lib/backend/schemas"
+	import { postSchema } from "$lib/client/schemas"
 	import { focusTrap } from "@skeletonlabs/skeleton"
 	import { superForm } from "sveltekit-superforms/client"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
 	import TutorialLevel from "$lib/components/forms/TutorialLevel.svelte"
 	import { page } from "$app/stores"
+	import { zodClient } from "sveltekit-superforms/adapters"
 
 	export let data
-
-	let { tutorial } = data
-	$: ({ tutorial } = data)
 
 	let show: boolean = false
 	let isFocused: boolean = true
@@ -21,22 +19,14 @@
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
-		validators: postSchema
+		validators: zodClient(postSchema)
 	})
 
-	$form.id = tutorial.id
-	$form.title = tutorial.title
-	$form.description = tutorial.description
-	$form.content = tutorial.content
-	$form.level = tutorial.level
-	$form.order = tutorial.order
-
-	const headTitle = "Edit " + tutorial.title + " - WaspScripts"
-	const headDescription = "Edit " + tutorial.title + " in WaspScripts."
+	const headTitle = "Edit tutorial - WaspScripts"
+	const headDescription = "Edit tutorial in WaspScripts."
 	const headKeywords =
-		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide, " +
-		tutorial.username
-	const headAuthor = tutorial.username
+		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide"
+	const headAuthor = ""
 	const headImage =
 		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
 </script>
@@ -78,7 +68,7 @@
 		</div>
 	{/if}
 
-	{#if data.profile && data.profile.roles.administrator}
+	{#if data.profile && data.roles?.administrator}
 		<div class="flex">
 			<button class="btn variant-filled-secondary mx-auto" on:click={() => (show = !show)}>
 				{#if show}Hide{:else}Show{/if} Post Preview
@@ -132,7 +122,7 @@
 						id="published"
 						name="published"
 						class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-primary-500"
-						bind:checked={tutorial.published}
+						bind:checked={$form.published}
 					/>
 				</label>
 			</div>

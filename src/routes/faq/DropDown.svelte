@@ -1,20 +1,34 @@
 <script lang="ts">
 	import { slide } from "svelte/transition"
 	import DropDownEntry from "./DropDownEntry.svelte"
-	import { search } from "$lib/utils"
 	import { ChevronsDownUp, ChevronsUpDown } from "lucide-svelte"
-	import type { ErrorEntry, FAQEntry } from "$lib/types/collection"
+	import type { FAQEntry } from "$lib/types/collection"
 	export let title: string
-	export let entries: FAQEntry[] | ErrorEntry[]
+	export let entries: FAQEntry[]
 
 	let show = false
 	let searchQuery = ""
-	let filteredEntries: FAQEntry[] | ErrorEntry[] = []
+	let filteredEntries: FAQEntry[] = []
 	let placeholderText = "Search..."
 
 	let form: HTMLFormElement
 
-	const handleSearch = () => {
+	function search(content: string, search: string) {
+		content = content.toLowerCase()
+		search = search.toLowerCase()
+		let i = 0,
+			n = -1,
+			l: string
+
+		for (; (l = search[i++]); ) {
+			if (!~(n = content.indexOf(l, n + 1))) {
+				return false
+			}
+		}
+		return true
+	}
+
+	function handleSearch() {
 		filteredEntries = entries
 		placeholderText = "Search..."
 		if (searchQuery === "" || entries == null) return
@@ -55,9 +69,15 @@
 					<DropDownEntry {entry} />
 				{/each}
 			{:else}
-				{#each entries as entry}
-					<DropDownEntry {entry} />
-				{/each}
+				{#await entries}
+					{#each Array(5) as entry}
+						<DropDownEntry {entry} />
+					{/each}
+				{:then entries}
+					{#each entries as entry}
+						<DropDownEntry {entry} />
+					{/each}
+				{/await}
 			{/if}
 		</div>
 	{/if}

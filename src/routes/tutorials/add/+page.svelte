@@ -1,6 +1,7 @@
 <script lang="ts">
+	import { zodClient } from "sveltekit-superforms/adapters"
 	import Markdown from "$lib/Markdown.svelte"
-	import { postSchema } from "$lib/backend/schemas"
+	import { postSchema } from "$lib/client/schemas"
 	import { focusTrap } from "@skeletonlabs/skeleton"
 	import { superForm } from "sveltekit-superforms/client"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
@@ -17,7 +18,7 @@
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
-		validators: postSchema
+		validators: zodClient(postSchema)
 	})
 
 	const headTitle = "Add Tutorial - WaspScripts"
@@ -66,7 +67,7 @@
 		</div>
 	{/if}
 
-	{#if data.profile && data.profile.roles.administrator}
+	{#if data.profile && data.roles?.administrator}
 		<div class="flex">
 			<button class="btn variant-filled-secondary mx-auto" on:click={() => (show = !show)}>
 				{#if show}Hide{:else}Show{/if} Post Preview

@@ -1,29 +1,28 @@
 <script lang="ts">
 	import { Avatar, popup, type PopupSettings } from "@skeletonlabs/skeleton"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
-	import { randomString } from "$lib/utils"
 	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
-	import { LogOut, RotateCcw, User2 } from "lucide-svelte"
+	import { LogOut, RotateCcw, UserRound } from "lucide-svelte"
 	import { enhance } from "$app/forms"
-
 	export let large: boolean
 
 	let { profile } = $page.data
 	$: ({ profile } = $page.data)
 
-	let src = profile
-		? profile.avatar
-		: "https://api.dicebear.com/6.x/bottts/svg?seed=" + randomString()
+	function randomString() {
+		return (Math.random() + 1).toString(36).substring(7)
+	}
+
+	const rnd = "https://api.dicebear.com/6.x/bottts/svg?seed=" + randomString()
+	let src = rnd
+	$: src = profile ? profile.avatar : rnd
 
 	let popupSettings: PopupSettings = {
 		event: "click",
 		target: "userPanelPopup",
 		placement: "bottom-end"
 	}
-
-	$: if (profile) src = profile.avatar
-	$: if (!profile) src = "https://api.dicebear.com/6.x/bottts/svg?seed=" + randomString()
 </script>
 
 {#if large && profile}
@@ -61,7 +60,7 @@
 						aria-label="Open profile page"
 						class="btn variant-filled-secondary flex mx-auto"
 					>
-						<User2 />
+						<UserRound />
 						Profile
 					</button>
 				</a>
@@ -71,7 +70,7 @@
 		<section class="p-4">
 			<h3 class="text-center py-2">Roles</h3>
 			<div class="flex pt-2 pb-8">
-				<RoleBadges {profile} />
+				<RoleBadges />
 				<button
 					name="Refresh"
 					aria-label="Refresh roles"
@@ -87,7 +86,7 @@
 				name="Logout"
 				aria-label="Logout"
 				class="btn variant-filled-secondary mx-auto"
-				formaction="/?/logout"
+				formaction="/auth?/logout"
 			>
 				<LogOut />
 				Logout
@@ -103,7 +102,7 @@
 				name="Login"
 				aria-label="Login to your account"
 				class="btn variant-filled-secondary"
-				formaction="/?/login&provider=discord"
+				formaction="/auth?/login&provider=discord"
 			>
 				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="w-4 h-4">
 					<path
