@@ -1,34 +1,31 @@
+import { formatError } from "$lib/utils"
 import { error, redirect } from "@sveltejs/kit"
 
 export const GET = async ({ url: { searchParams }, locals: { supabaseServer } }) => {
-	console.log("Logging in with Simba")
+	console.log("🦁 Logging in with Simba")
 
-	const code = searchParams.get("code")
 	const err = searchParams.get("error")
+
 	if (err) {
-		let msg = "Authentication error!\n\n"
-		msg += "Error name:" + decodeURI(err) + "\n"
+		let message = ""
+		message += "<h3>Authentication Error</h3>"
+		message += "<p>Error: " + decodeURI(err) + "</p>"
+
 		const description = searchParams.get("error_description")
 		if (description) {
-			msg += "Error message: " + decodeURI(description) + "\n\n"
-			msg += description.includes("email") ? "Make sure you have your email linked to discord!" : ""
+			message += "<p>Message: " + decodeURI(description) + "</p>"
+			if (description.includes("email"))
+				message += "<p>Make sure you have your email linked to discord!</p>"
 		}
-		throw error(401, msg)
+
+		error(401, message)
 	}
 
+	const code = searchParams.get("code")
 	if (code) {
 		const { error: err } = await supabaseServer.auth.exchangeCodeForSession(code)
-		if (err)
-			throw error(
-				401,
-				`Authentication error!
-			Error name: ${err.name}
-			Error status: ${err.status}
-			Error stack: ${err.stack}
-			Error cause: ${err.cause}
-			Error message: ${err.message}`
-			)
+		if (err) error(401, formatError(err))
 	}
 
-	throw redirect(303, "/refresh_token")
+	redirect(303, "/auth/refresh-token")
 }

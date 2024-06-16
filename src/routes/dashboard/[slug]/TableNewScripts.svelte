@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TNewScriptArraySchema } from "$lib/backend/schemas"
+	import type { TNewScriptArraySchema } from "$lib/client/schemas"
 	import TableHeader from "$lib/components/tables/TableHeader.svelte"
 	import TableCell from "$lib/components/tables/TableCell.svelte"
 	import PricesCell from "./PricesCell.svelte"

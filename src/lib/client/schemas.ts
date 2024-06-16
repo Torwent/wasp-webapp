@@ -1,25 +1,6 @@
 import { z } from "zod"
-import { browser } from "$app/environment"
 import { ACCEPTED_IMAGE_TYPES, MB_SIZE } from "$lib/utils"
-
-async function checkClientImageDimensions(file: any, w: number, h: number): Promise<boolean> {
-	if (!browser) return false
-	if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) return false
-
-	return new Promise((resolve) => {
-		const reader = new FileReader()
-		const img = new Image()
-
-		reader.onload = function () {
-			img.src = reader.result as string
-		}
-		img.onload = function () {
-			resolve(img.width === w && img.height === h)
-		}
-
-		reader.readAsDataURL(file)
-	})
-}
+import { checkClientImageDimensions } from "./utils"
 
 const title = z
 	.string()
@@ -37,73 +18,75 @@ const content = z.string().min(10).includes(" ", {
 		"You have no spaces, this is supposed to be at least a couple of words, ideally a few sentences."
 })
 
-export const scriptSchema = z
-	.object({
-		id: z.string().uuid("ID must be a valid UUIDv4").optional(),
-		title: title,
-		description: description,
-		content: content,
-		categories: z
-			.array(z.string())
-			.min(3, "You should have at least 3 categories.")
-			.refine(
-				(categories) => categories.includes("Official") || categories.includes("Community"),
-				"Scripts need to have either 🎫Official or 🚀Community category."
-			)
-			.refine(
-				(categories) => !categories.includes("Official") || !categories.includes("Community"),
-				"Scripts can't have both 🎫Official and 🚀Community categories."
-			)
-			.refine(
-				(categories) => categories.includes("Free") || categories.includes("Premium"),
-				"Scripts need to have either 🎈Free or 👑Premium category."
-			)
-			.refine(
-				(categories) => !categories.includes("Free") || !categories.includes("Premium"),
-				"Scripts can't have both 🎈Free and 👑Premium categories."
-			),
-		subcategories: z.array(z.string()).min(1, "You should have at least 1 subcategory."),
-		min_xp: z
-			.number()
-			.int("Only whole numbers are allowed.")
-			.gte(0, "There's no way to lose experience in OSRS."),
-		max_xp: z
-			.number()
-			.int("Only whole numbers are allowed.")
-			.max(60000, "That exceeds the reasonable limit."),
-		min_gp: z
-			.number()
-			.int("Only whole numbers are allowed.")
-			.gte(-200000, "That exceeds the reasonable loss limit."),
-		max_gp: z
-			.number()
-			.int("Only whole numbers are allowed.")
-			.max(250000, "That exceeds the reasonable profit limit."),
-		cover: z
-			.any()
-			.refine((file) => file.size <= 3 * MB_SIZE, "Max image size is 3MB.")
-			.refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), "Only .jpg formats are allwoed.")
-			.refine(
-				async (file) => await checkClientImageDimensions(file, 300, 200),
-				"The image must be 300 by 200 pixels."
-			)
-			.optional(),
+export const baseScriptSchema = z.object({
+	title: title,
+	description: description,
+	content: content,
+	categories: z
+		.array(z.string())
+		.min(3, "You should have at least 3 categories.")
+		.refine(
+			(categories) => categories.includes("Official") || categories.includes("Community"),
+			"Scripts need to have either 🎫Official or 🚀Community category."
+		)
+		.refine(
+			(categories) => !categories.includes("Official") || !categories.includes("Community"),
+			"Scripts can't have both 🎫Official and 🚀Community categories."
+		)
+		.refine(
+			(categories) => categories.includes("Free") || categories.includes("Premium"),
+			"Scripts need to have either 🎈Free or 👑Premium category."
+		)
+		.refine(
+			(categories) => !categories.includes("Free") || !categories.includes("Premium"),
+			"Scripts can't have both 🎈Free and 👑Premium categories."
+		),
+	subcategories: z.array(z.string()).min(1, "You should have at least 1 subcategory."),
+	published: z.boolean(),
+	min_xp: z
+		.number()
+		.int("Only whole numbers are allowed.")
+		.gte(0, "There's no way to lose experience in OSRS."),
+	max_xp: z
+		.number()
+		.int("Only whole numbers are allowed.")
+		.max(60000, "That exceeds the reasonable limit."),
+	min_gp: z
+		.number()
+		.int("Only whole numbers are allowed.")
+		.gte(-200000, "That exceeds the reasonable loss limit."),
+	max_gp: z
+		.number()
+		.int("Only whole numbers are allowed.")
+		.max(250000, "That exceeds the reasonable profit limit.")
+})
 
-		banner: z
-			.any()
-			.refine((file) => file.size <= 5 * MB_SIZE, "Max image size is 5MB.")
-			.refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), "Only .jpg formats are allowed.")
-			.refine(
-				async (file) => await checkClientImageDimensions(file, 1920, 768),
-				"The image must be 1920 by 768 pixels."
-			)
-			.optional(),
+export const coverImage = z
+	.instanceof(File, { message: "Please upload a file." })
+	.refine((file) => file.size <= 3 * MB_SIZE, "Max image size is 3MB.")
+	.refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), "Only .jpg formats are allwoed.")
 
-		script: z
-			.any()
-			.refine((file) => file.size <= 2 * MB_SIZE, `Max script size is 2MB.`)
-			.refine((file) => file.name.endsWith(".simba"), "Only .simba files are allowed.")
-			.optional()
+export const bannerImage = z
+	.instanceof(File, { message: "Please upload a file." })
+	.refine((file) => file.size <= 5 * MB_SIZE, "Max image size is 5MB.")
+	.refine((file) => ACCEPTED_IMAGE_TYPES.includes(file.type), "Only .jpg formats are allowed.")
+
+export const scriptFile = z
+	.instanceof(File, { message: "Please upload a file." })
+	.refine((file) => file.size <= 5 * MB_SIZE, "Max script size is 5MB.")
+	.refine((file) => file.name.endsWith(".simba"), "Only .simba files are allowed.")
+
+export const addScriptClientSchema = baseScriptSchema
+	.extend({
+		cover: coverImage.refine(
+			async (file) => await checkClientImageDimensions(file, 300, 200),
+			"The image must be 300 by 200 pixels."
+		),
+		banner: bannerImage.refine(
+			async (file) => await checkClientImageDimensions(file, 1920, 768),
+			"The image must be 1920 by 768 pixels."
+		),
+		script: scriptFile
 	})
 	.refine(
 		(schema) => schema.min_xp <= schema.max_xp,
@@ -114,8 +97,36 @@ export const scriptSchema = z
 		"Minimum gold cannot exceed the maximum gold."
 	)
 
+export type AddScriptSchema = z.infer<typeof addScriptClientSchema>
+
+export const updateScriptClientSchema = baseScriptSchema
+	.extend({
+		cover: coverImage
+			.refine(
+				async (file) => await checkClientImageDimensions(file, 300, 200),
+				"The image must be 300 by 200 pixels."
+			)
+			.optional(),
+		banner: bannerImage
+			.refine(
+				async (file) => await checkClientImageDimensions(file, 1920, 768),
+				"The image must be 1920 by 768 pixels."
+			)
+			.optional(),
+		script: scriptFile.optional()
+	})
+	.refine(
+		(schema) => schema.min_xp <= schema.max_xp,
+		"Minimum experience cannot exceed the maximum experience."
+	)
+	.refine(
+		(schema) => schema.min_gp <= schema.max_gp,
+		"Minimum gold cannot exceed the maximum gold."
+	)
+
+export type UpdateScriptSchema = z.infer<typeof updateScriptClientSchema>
+
 export const postSchema = z.object({
-	id: z.string().uuid("ID must be a valid UUID.").optional(),
 	title: title,
 	description: description,
 	content: content,
@@ -128,7 +139,8 @@ export const postSchema = z.object({
 		.number()
 		.int("Order has to be a whole number.")
 		.min(0, "Order has to be positive.")
-		.max(1000, "Order has to be less than 1000.")
+		.max(1000, "Order has to be less than 1000."),
+	published: z.boolean()
 })
 
 export const profileSchema = z.object({

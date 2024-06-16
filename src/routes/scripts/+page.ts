@@ -1,8 +1,8 @@
 import { browser } from "$app/environment"
-import type { CheckboxType, Script } from "$lib/types/collection"
+import { streamedErrorHandler } from "$lib/client/utils"
+import type { ScriptBase, ScriptFeatured } from "$lib/types/collection"
+import { formatError } from "$lib/utils"
 import { error, redirect } from "@sveltejs/kit"
-import { get, writable } from "svelte/store"
-const checkboxesStore = writable<CheckboxType[] | null>(null)
 
 export const load = async ({ url, parent }) => {
 	const pageN = Number(url.searchParams.get("page") || "-1")
@@ -27,15 +27,10 @@ export const load = async ({ url, parent }) => {
 			.schema("scripts")
 			.from("scripts")
 			.select(
-				`id, url, title, description, content, categories, subcategories, published, min_xp, max_xp, min_gp, max_gp,
-				tooltip_emojis, tooltip_names,
-				protected (assets, author_id, revision, username, avatar),
-				stats_simba (experience, gold, runtime, levels, unique_users_total, online_users_total)`,
+				`title, description, url, published, tooltip_emojis, tooltip_names, protected!inner (assets, username, avatar)`,
 				{ count: "estimated" }
 			)
 			.eq("published", true)
-			.limit(1, { foreignTable: "protected" })
-			.limit(1, { foreignTable: "stats_simba" })
 			.contains("categories", categoriesFilter)
 			.contains("subcategories", subcategoriesFilter)
 
@@ -45,90 +40,85 @@ export const load = async ({ url, parent }) => {
 			query = query.ilike("search", "%" + search.replaceAll(" ", "%") + "%")
 		}
 
-		const { data, error: err, count } = await query.returns<Script[]>()
+		const { data, error: err, count } = await query.returns<ScriptBase[]>()
 
-		if (err)
-			throw error(
+		if (err) {
+			error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT scripts failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"Server error, this is probably not an issue on your end!" +
+					"SELECT scripts failed!\n\n" +
+					formatError(err)
 			)
+		}
 
-		if (!browser && data.length === 1) throw redirect(303, "/scripts/" + data[0].url)
+		if (!browser && data.length === 1) redirect(303, "/scripts/" + data[0].url)
 
-		return { data, count: count ?? 0 }
+		return { scripts: data, count: count ?? 0 }
 	}
 
 	async function getFeatured() {
 		const { supabaseClient } = await parent()
-
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("featured")
 			.select(
-				`scripts (url, title, description, tooltip_emojis, protected (assets, username, avatar))`
+				"scripts (url, title, description, tooltip_emojis, protected (assets, username, avatar))"
 			)
+			.returns<ScriptFeatured[]>()
 
 		if (err) {
-			throw error(
+			error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT scripts failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT scripts.featured failed!\n\n" +
+					formatError(err)
 			)
 		}
 
-		return data.map((scripts) => scripts.scripts)
+		return data.map(async (scripts) => scripts.scripts)
 	}
 
 	async function getCheckBoxes() {
-		let result = get(checkboxesStore)
-		if (!result) {
-			result = []
-			let id = 0
-			const { categories, subcategories } = await parent()
-			for (const category of categories) {
-				result.push({
-					id: id++,
-					name: category.name,
-					emoji: category.emoji,
-					main: true,
-					checked: false
-				})
+		const checkboxes = []
+		let id = 0
+		const { categoriesPromise, subcategoriesPromise } = await parent()
 
-				for (const subcategory of subcategories) {
-					if (category.name === subcategory.category) {
-						result.push({
-							id: id++,
-							name: subcategory.name,
-							emoji: subcategory.emoji,
-							main: false,
-							checked: false
-						})
-					}
+		const categories = await categoriesPromise
+
+		for (const category of categories) {
+			checkboxes.push({
+				id: id++,
+				name: category.name,
+				emoji: category.emoji,
+				main: true,
+				checked: false
+			})
+
+			const subcategories = await subcategoriesPromise
+
+			for (const subcategory of subcategories) {
+				if (category.name === subcategory.category) {
+					checkboxes.push({
+						id: id++,
+						name: subcategory.name,
+						emoji: subcategory.emoji,
+						main: false,
+						checked: false
+					})
 				}
 			}
-			checkboxesStore.set(result)
 		}
 
-		return result
+		return checkboxes
 	}
 
-	const promises = await Promise.all([
-		getScripts(search, ascending, start, finish),
-		getCheckBoxes(),
-		getFeatured()
-	])
+	const scriptsPromise = getScripts(search, ascending, start, finish)
+	const featuredPromise = getFeatured()
+	const checkboxesPromise = getCheckBoxes()
 
-	return {
-		scripts: promises[0],
-		checkboxes: promises[1],
-		featured: promises[2],
-		range
-	}
+	scriptsPromise.catch((err) => streamedErrorHandler(err))
+	featuredPromise.catch((err) => streamedErrorHandler(err))
+	checkboxesPromise.catch((err) => streamedErrorHandler(err))
+
+	return { scriptsPromise, featuredPromise, checkboxesPromise, range }
 }

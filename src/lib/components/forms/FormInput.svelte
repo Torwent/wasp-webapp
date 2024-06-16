@@ -1,7 +1,7 @@
 <script lang="ts">
 	export let title: string
 	export let extraTitle: string = ""
-	export let value: string | number | null
+	export let value: string | number | null | undefined
 	export let errors: string[] | undefined = undefined
 	export let type: string = "text"
 

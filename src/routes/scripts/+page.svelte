@@ -2,21 +2,27 @@
 	import { AppShell } from "@skeletonlabs/skeleton"
 	import { ArrowLeft, ArrowRight, ChevronRight } from "lucide-svelte"
 	import { page } from "$app/stores"
-	import { goto } from "$app/navigation"
 	import Paginator from "$lib/components/Paginator.svelte"
-	import type { CheckboxType } from "$lib/types/collection"
 	import ScriptCard from "$lib/components/ScriptCard.svelte"
-	import { browser } from "$app/environment"
+	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
 	import { onMount } from "svelte"
+	import { replaceQuery } from "$lib/client/utils"
+	import type { CheckboxType, ScriptBase } from "$lib/types/collection"
 
 	export let data
-	const { checkboxes, range, featured } = data
-	let { profile, scripts } = data
-	let count = scripts.count
-	let { searchParams } = $page.url
+	const { checkboxesPromise, range, featuredPromise } = data
+	let { roles, scriptsPromise } = data
 
-	$: ({ profile, scripts } = data)
-	$: count = scripts.count
+	let scripts: ScriptBase[] | null = null
+	let count: number = 0
+
+	$: scriptsPromise.then((awaited) => {
+		scripts = awaited.scripts
+		count = awaited.count
+	})
+
+	$: ({ profile, scriptsPromise } = data)
+	let { searchParams } = $page.url
 	$: ({ searchParams } = $page.url)
 
 	const pageStr = searchParams.get("page") || "-1"
@@ -27,36 +33,22 @@
 	let subcategories: string[] = []
 	let show = false
 
-	async function replaceQuery(values: Record<string, string>) {
-		if (!browser) return
-		let invalidate: boolean = false
-		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else searchParams.delete(k)
-
-			invalidate = invalidate || v === ""
-		}
-
-		const path = $page.url.origin + $page.url.pathname + "?" + searchParams.toString()
-
-		await goto(path, {
-			keepFocus: true,
-			noScroll: true,
-			replaceState: true,
-			invalidateAll: invalidate
-		})
-	}
-
 	async function handleFilters() {
-		categories = checkboxes
+		categories = (await checkboxesPromise)
 			.filter((checkbox: CheckboxType) => checkbox.checked && checkbox.main)
 			.map((checkbox: CheckboxType) => checkbox.name)
-		subcategories = checkboxes
+		subcategories = (await checkboxesPromise)
 			.filter((checkbox: CheckboxType) => checkbox.checked && !checkbox.main)
 			.map((checkbox: CheckboxType) => checkbox.name)
 
-		await replaceQuery({ page: "1", categories: categories.toString().replaceAll(",", "-") })
-		await replaceQuery({ page: "1", subcategories: subcategories.toString().replaceAll(",", "-") })
+		await replaceQuery($page.url, {
+			page: "1",
+			categories: categories.toString().replaceAll(",", "-")
+		})
+		await replaceQuery($page.url, {
+			page: "1",
+			subcategories: subcategories.toString().replaceAll(",", "-")
+		})
 	}
 
 	let carousel: HTMLDivElement
@@ -89,8 +81,7 @@
 		"Large script collection to bot OldSchool RuneScape with Simba, SRL and WaspLib. Get that 99 on osrs today!"
 	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba"
 	const headAuthor = "Torwent"
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -123,35 +114,55 @@
 				   no-scrollbar font-semibold text-sm"
 		>
 			<div class="sm:grid w-60 justify-center my-4" class:hidden={!show}>
-				{#each checkboxes as checkbox}
-					<div class="flex py-0.5">
-						{#if !checkbox.main}
-							<div class="w-4 h-2" />
-						{/if}
-						<div
-							id={"checkboxdiv" + checkbox.id}
-							class:font-thin={!checkbox.main}
-							on:change={async () => await handleFilters()}
-						>
-							<input
-								class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-primary-500"
-								type="checkbox"
-								id={"checkbox" + checkbox.id}
-								bind:checked={checkbox.checked}
-							/>
-							<label
-								class="form-check-label inline-block cursor-pointer hover:text-primary-200"
-								for={"checkbox" + checkbox.id}
-								class:text-amber-500={checkbox.checked}
-							>
-								{checkbox.name + checkbox.emoji}
-							</label>
+				{#await checkboxesPromise}
+					{#each Array(10) as _, idx}
+						<div class="flex py-0.5">
+							<div>
+								<input
+									class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-primary-500"
+									type="checkbox"
+									id={"loading_checkbox_" + idx}
+								/>
+								<label
+									class="form-check-label inline-block cursor-pointer hover:text-primary-200"
+									for={"loading_checkbox_" + idx}
+								>
+									🕝Loading...
+								</label>
+							</div>
 						</div>
-					</div>
-					{#if checkbox.id === 3}
-						<br />
-					{/if}
-				{/each}
+					{/each}
+				{:then checkboxes}
+					{#each checkboxes as checkbox}
+						<div class="flex py-0.5">
+							{#if !checkbox.main}
+								<div class="w-4 h-2" />
+							{/if}
+							<div
+								id={"checkboxdiv" + checkbox.id}
+								class:font-thin={!checkbox.main}
+								on:change={async () => await handleFilters()}
+							>
+								<input
+									class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-primary-500"
+									type="checkbox"
+									id={"checkbox" + checkbox.id}
+									bind:checked={checkbox.checked}
+								/>
+								<label
+									class="form-check-label inline-block cursor-pointer hover:text-primary-200"
+									for={"checkbox" + checkbox.id}
+									class:text-amber-500={checkbox.checked}
+								>
+									{checkbox.name + checkbox.emoji}
+								</label>
+							</div>
+						</div>
+						{#if checkbox.id === 3}
+							<br />
+						{/if}
+					{/each}
+				{/await}
 			</div>
 			<button
 				class="grid sm:hidden fill-white content-center justify-items-center justify-center h-full"
@@ -167,37 +178,85 @@
 		<button type="button" class="btn-icon variant-filled-surface" on:click={carouselLeft}>
 			<ArrowLeft />
 		</button>
-		<!-- Full Images -->
-		<div
-			bind:this={carousel}
-			class="snap-x snap-mandatory scroll-smooth flex overflow-x-auto hide-scrollbar"
-		>
-			{#each featured as f}
-				<a href="/scripts/{f?.url}" class="relative snap-center shrink-0 w-full text-center">
+		{#await featuredPromise}
+			<!-- Full Images -->
+			<div class="snap-x snap-mandatory scroll-smooth flex overflow-x-auto hide-scrollbar">
+				<div class="relative snap-center shrink-0 w-full text-center">
 					<img
 						class="md:44 lg:h-64 object-fill w-full rounded-container-token brightness-90"
-						src="{f?.protected?.assets}/banner.jpg"
-						alt={f?.title}
+						src="/banner.jpg"
+						alt="Loading featured..."
 						loading="lazy"
 					/>
 					<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid">
 						<span
 							class="font-bold text-md lg:text-lg xl:text-4xl text-shadow-strong drop-shadow-2xl"
 						>
-							{f?.title}
+							Loading...
 						</span>
 						<span class="text-xs lg:text-md xl:text-lg">
-							<a
-								href="/scripters/{f?.protected?.username}"
-								class="font-semibold text-shadow-strong drop-shadow-2xl"
-							>
-								by {f?.protected?.username}
-							</a>
+							<span class="font-semibold text-shadow-strong drop-shadow-2xl"> by Loading... </span>
 						</span>
 					</div>
-				</a>
-			{/each}
-		</div>
+				</div>
+			</div>
+		{:then featured}
+			<!-- Full Images -->
+			<div
+				bind:this={carousel}
+				class="snap-x snap-mandatory scroll-smooth flex overflow-x-auto hide-scrollbar"
+			>
+				{#each featured as feat}
+					{#await feat}
+						<div class="relative snap-center shrink-0 w-full text-center">
+							<img
+								class="md:44 lg:h-64 object-fill w-full rounded-container-token brightness-90"
+								src="/banner.jpg"
+								alt="Loading featured..."
+								loading="lazy"
+							/>
+							<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid">
+								<span
+									class="font-bold text-md lg:text-lg xl:text-4xl text-shadow-strong drop-shadow-2xl"
+								>
+									Loading...
+								</span>
+								<span class="text-xs lg:text-md xl:text-lg">
+									<span class="font-semibold text-shadow-strong drop-shadow-2xl">
+										by Loading...
+									</span>
+								</span>
+							</div>
+						</div>
+					{:then feat}
+						<a href="/scripts/{feat?.url}" class="relative snap-center shrink-0 w-full text-center">
+							<img
+								class="md:44 lg:h-64 object-fill w-full rounded-container-token brightness-90"
+								src="{feat?.protected?.assets}/banner.jpg"
+								alt={feat?.title}
+								loading="lazy"
+							/>
+							<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid">
+								<span
+									class="font-bold text-md lg:text-lg xl:text-4xl text-shadow-strong drop-shadow-2xl"
+								>
+									{feat?.title}
+								</span>
+								<span class="text-xs lg:text-md xl:text-lg">
+									<a
+										href="/scripters/{feat?.protected?.username}"
+										class="font-semibold text-shadow-strong drop-shadow-2xl"
+									>
+										by {feat?.protected?.username}
+									</a>
+								</span>
+							</div>
+						</a>
+					{/await}
+				{/each}
+			</div>
+		{/await}
+
 		<!-- Button: Right -->
 		<button type="button" class="btn-icon variant-filled-surface" on:click={carouselRight}>
 			<ArrowRight />
@@ -206,7 +265,7 @@
 
 	<main class="container mt-8 mx-auto flex-grow w-[95%] max-h-screen overflow-y-visible">
 		<div>
-			{#if profile && profile.roles.scripter}
+			{#if roles?.scripter}
 				<a href="/scripts/add" class="block mx-auto w-fit">
 					<button class="btn variant-filled-secondary inline-block">Add Script</button>
 				</a>
@@ -216,14 +275,22 @@
 					placeholder="Search script id, name, categories, author,..."
 					class="input"
 					bind:value={search}
-					on:input={async () => await replaceQuery({ page: "1", search: search })}
+					on:input={async () => await replaceQuery($page.url, { page: "1", search: search })}
 				/>
 			</div>
 
 			<div
 				class="grid gap-8 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 justify-center justify-items-center"
 			>
-				{#each scripts.data as script} <ScriptCard {script} /> {/each}
+				{#if scripts}
+					{#each scripts as script}
+						<ScriptCard bind:script />
+					{/each}
+				{:else}
+					{#each Array(8) as _}
+						<ScriptCardBase />
+					{/each}
+				{/if}
 			</div>
 		</div>
 		<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count />

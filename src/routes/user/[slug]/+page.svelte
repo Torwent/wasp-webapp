@@ -1,20 +1,19 @@
 <script lang="ts">
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
 	import { redirect } from "@sveltejs/kit"
-	import { profileSchema } from "$lib/backend/schemas"
+	import { profileSchema } from "$lib/client/schemas"
 	import { superForm } from "sveltekit-superforms/client"
 	import { focusTrap } from "@skeletonlabs/skeleton"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import { page } from "$app/stores"
+	import { zodClient } from "sveltekit-superforms/adapters"
 
 	export let data
 	export let form
 
 	const { profile } = data
-	if (!profile) throw redirect(303, "/")
+	if (!profile) redirect(303, "/")
 
-	let email = data.email ?? ""
-	let password: string = ""
 	let isFocused: boolean = true
 
 	const {
@@ -25,11 +24,8 @@
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: null,
-		validators: profileSchema
+		validators: zodClient(profileSchema)
 	})
-
-	$: $authForm.email = email === "" ? undefined : email
-	$: $authForm.password = password === "" ? undefined : password
 
 	const headTitle = profile.username + " - WaspScripts"
 	const headDescription = "Information about " + profile.username + " in WaspScripts"
@@ -37,8 +33,7 @@
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, " +
 		profile.username
 	const headAuthor = profile.username
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -68,7 +63,7 @@
 	<h3 class="mb-4 font-bold text-3xl">Username: {profile.username}</h3>
 	<h4 class="font-semibold leading-normal mb-4">ID: {profile.id}</h4>
 
-	<RoleBadges {profile} />
+	<RoleBadges />
 
 	<h5 class="py-8">
 		If you want you can change your email/password already anyway. This can be used to login without
@@ -96,10 +91,10 @@
 			<small class="text-success-500">Your password has been updated.</small>
 		{/if}
 
-		<FormInput title="Email" bind:value={email} bind:errors={$errors.email} />
+		<FormInput title="Email" bind:value={$authForm.email} bind:errors={$errors.email} />
 		<FormInput
 			title="Password"
-			bind:value={password}
+			bind:value={$authForm.password}
 			bind:errors={$errors.password}
 			type={"password"}
 		/>

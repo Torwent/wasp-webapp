@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { popup, type PopupSettings } from "@skeletonlabs/skeleton"
 	import JsZip from "jszip"
-	import { saveAs } from "file-saver"
-	import { canDownload, getScripts, getSignedURL } from "$lib/backend/data"
-	import type { Profile } from "$lib/types/collection"
-	import { pad } from "$lib/utils"
+	import { WaspProfile, canDownload, getSignedURL } from "$lib/client/supabase"
+	import { pad } from "$lib/client/utils"
 	import { slide } from "svelte/transition"
 	import { ChevronDown, FileArchive } from "lucide-svelte"
 	import { page } from "$app/stores"
-	import type { Script } from "$lib/types/collection"
+	import { error } from "@sveltejs/kit"
+	import { formatError } from "$lib/utils"
 
-	export let profile: Profile
+	export let id: string | null = null
 	export let noDownload: boolean = false
+
+	const { supabaseClient, profile, roles } = $page.data
 
 	const ALL_ZIPS = [
 		"wasp-premium.zip",
@@ -24,9 +25,49 @@
 		"all.zip"
 	]
 
-	$: hasPermissions = canDownload(profile)
-	$: dismissed = profile.private.warning
-	$: zipName = hasPermissions ? "wasp-premium.zip" : "wasp-free.zip"
+	const permissionsPromise = canDownload(supabaseClient, roles, id)
+
+	let dismissed = false
+	$: WaspProfile.getWarning(supabaseClient, profile?.id).then((state) => (dismissed = state))
+
+	let zipName = "Loading..."
+	let permited = false
+	$: permissionsPromise.then((awaited) => {
+		permited = awaited
+		zipName = permited ? "wasp-premium.zip" : "wasp-free.zip"
+	})
+
+	async function getScripts() {
+		let query = supabaseClient
+			.schema("scripts")
+			.from("scripts")
+			.select(`id, title, categories, protected!inner (revision)`)
+			.order("title", { ascending: true })
+			.eq("published", true)
+			.eq("protected.broken", false)
+
+		const { data, error: err } = await query
+
+		if (err) {
+			error(
+				500,
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT scripts.scripts failed!\n\n" +
+					formatError(err)
+			)
+		}
+
+		if (data.length === 0) {
+			error(
+				500,
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT scripts.scripts returned empty!\n\n"
+			)
+		}
+		return data
+	}
+
+	const scripts = getScripts()
 
 	function availableZIPs(hasPermissions: boolean, dismissed: boolean) {
 		let zips: string[] = ["wasp-free.zip"]
@@ -37,7 +78,7 @@
 		return zips
 	}
 
-	$: zipsAvailable = availableZIPs(hasPermissions, dismissed)
+	$: zipsAvailable = availableZIPs(permited, dismissed)
 
 	let progress: number = -1
 
@@ -51,7 +92,10 @@
 		return await response.blob()
 	}
 
-	async function downloadGroup(scripts: Script[], urls: (string | false)[]) {
+	async function downloadGroup(
+		scripts: Awaited<ReturnType<typeof getScripts>>,
+		urls: (string | false)[]
+	) {
 		let promises = []
 		let fileNames = []
 		for (let i = 0; i < urls.length; i++) {
@@ -67,6 +111,7 @@
 
 	async function exportZip(blobs: Blob[], fileNames: string[]) {
 		const zip = JsZip()
+
 		for (let i = 0; i < blobs.length; i++) {
 			zip.file(fileNames[i], blobs[i])
 		}
@@ -74,39 +119,40 @@
 		const zipBlob = await zip.generateAsync({ type: "blob" })
 		progress = 1
 		setTimeout(async () => (progress = -1), 2000)
-
-		return saveAs(zipBlob, zipName)
+		const FileSaver = await require("file-saver")
+		return FileSaver.saveAs(zipBlob, zipName)
 	}
 
 	async function downloadAndZip() {
-		let scripts = await getScripts($page.data.supabaseClient)
-		if (!scripts) return console.error("Failed to retrieve scripts information!")
+		let awaitedScripts = await scripts
 
-		scripts = scripts.filter((script) => {
-			if (script.protected && !script.protected.broken) {
-				if (ALL_ZIPS[0] === zipName) {
-					return script.categories.includes("Official") && script.categories.includes("Premium")
-				} else if (ALL_ZIPS[1] === zipName)
-					return script.categories.includes("Official") && script.categories.includes("Free")
-				else if (ALL_ZIPS[2] === zipName) return script.categories.includes("Official")
-				else if (ALL_ZIPS[3] === zipName)
-					return script.categories.includes("Community") && script.categories.includes("Premium")
-				else if (ALL_ZIPS[4] === zipName)
-					return script.categories.includes("Community") && script.categories.includes("Free")
-				else if (ALL_ZIPS[5] === zipName) return script.categories.includes("Premium")
-				else if (ALL_ZIPS[6] === zipName) return script.categories.includes("Free")
-				else return true
-			}
+		awaitedScripts = awaitedScripts.filter((script) => {
+			if (ALL_ZIPS[0] === zipName) {
+				return script.categories.includes("Official") && script.categories.includes("Premium")
+			} else if (ALL_ZIPS[1] === zipName)
+				return script.categories.includes("Official") && script.categories.includes("Free")
+			else if (ALL_ZIPS[2] === zipName) return script.categories.includes("Official")
+			else if (ALL_ZIPS[3] === zipName)
+				return script.categories.includes("Community") && script.categories.includes("Premium")
+			else if (ALL_ZIPS[4] === zipName)
+				return script.categories.includes("Community") && script.categories.includes("Free")
+			else if (ALL_ZIPS[5] === zipName) return script.categories.includes("Premium")
+			else if (ALL_ZIPS[6] === zipName) return script.categories.includes("Free")
+			else return true
 		})
 
 		let urls: (string | false)[] = []
 		let promises = []
 		let scriptIds = []
 
-		for (let script of scripts) {
+		for (const script of awaitedScripts) {
 			console.log(script.title)
 			promises.push(
 				new Promise<string | false>(async (resolve) => {
+					if (!script.protected?.revision) {
+						error(500, "Failed to get script revision of script id: " + script.id)
+					}
+
 					const result = await getSignedURL(
 						$page.data.supabaseClient,
 						"scripts",
@@ -122,7 +168,7 @@
 
 		urls = await Promise.all(promises)
 
-		const { blobs, fileNames } = await downloadGroup(scripts, urls)
+		const { blobs, fileNames } = await downloadGroup(awaitedScripts, urls)
 		await fetch("/api/scripts", { body: JSON.stringify({ ids: scriptIds }), method: "POST" }).catch(
 			(error) => console.error(error)
 		)

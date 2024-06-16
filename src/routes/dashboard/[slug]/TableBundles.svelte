@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TBundleArraySchema } from "$lib/backend/schemas"
+	import type { TBundleArraySchema } from "$lib/client/schemas"
 	import TableHeader from "$lib/components/tables/TableHeader.svelte"
 	import TableCell from "$lib/components/tables/TableCell.svelte"
 	import PricesCell from "./PricesCell.svelte"
@@ -19,6 +19,7 @@
 	export let errors: string[] | undefined
 
 	export let subscriptions: Subscriptions[]
+
 	export let action: string
 
 	const btnText = action.includes("dd") ? "Add" : "Save"

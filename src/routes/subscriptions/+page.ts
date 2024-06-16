@@ -1,10 +1,13 @@
-import type { ScriptSimple } from "$lib/types/collection"
+import { streamedErrorHandler } from "$lib/client/utils.js"
+import type { ProductData, ScriptSimple } from "$lib/types/collection"
+import { formatError } from "$lib/utils.js"
 import { error } from "@sveltejs/kit"
 
 export const load = async ({ parent, data }) => {
-	const { supabaseClient } = await parent()
+	const { subscriptionsform, checkoutForm } = data
 
 	async function getPrices() {
+		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("prices")
@@ -13,61 +16,85 @@ export const load = async ({ parent, data }) => {
 			.order("amount", { ascending: true })
 
 		if (err) {
-			console.error(err)
 			throw error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT scripts.prices failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT scripts.prices failed!\n\n" +
+					formatError(err)
 			)
 		}
 
 		return data
 	}
 
-	async function getProducts() {
+	interface User {
+		id: string
+		username: string
+	}
+	const cachedUsers: User[] = []
+
+	async function getProfile(id: string) {
+		const user = cachedUsers.find((user) => user.id === id)
+		if (user) return user.username
+
+		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
-			.schema("scripts")
-			.from("products")
-			.select(
-				`id, user_id, name, bundle,
-				 bundles!products_bundle_fkey (username), script,
-				 scripts!products_script_fkey (url, protected!protected_id_fkey (username)),
-				 active`
-			)
-			.order("bundle", { ascending: true })
-			.order("user_id", { ascending: true })
-			.order("name", { ascending: true })
+			.schema("profiles")
+			.from("profiles")
+			.select(`username`)
+			.eq("id", id)
+			.single()
 
 		if (err) {
-			console.error(err)
 			throw error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT product failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT profiles.profiles failed!\n\n" +
+					formatError(err)
 			)
 		}
 
-		const result = data.map((product) => {
-			return {
-				id: product.id,
-				user_id: product.user_id,
-				name: product.name,
-				username: product.bundles?.username ?? product.scripts?.protected?.username ?? "",
-				bundle: product.bundle,
-				script: product.script,
-				active: product.active
-			}
-		})
-		return result
+		cachedUsers.push({ id: id, username: data.username })
+		return data.username
+	}
+
+	async function getProducts() {
+		const { supabaseClient } = await parent()
+		const { data, error: err } = await supabaseClient
+			.schema("scripts")
+			.from("products")
+			.select(`id, user_id, name, bundle, script, active`)
+			.order("bundle", { ascending: true })
+			.order("user_id", { ascending: true })
+			.order("name", { ascending: true })
+			.returns<ProductData[]>()
+
+		if (err) {
+			throw error(
+				500,
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT scripts.products failed!\n\n" +
+					formatError(err)
+			)
+		}
+
+		return await Promise.all(
+			data.map(async (product) => {
+				return {
+					id: product.id,
+					user_id: product.user_id,
+					name: product.name,
+					username: getProfile(product.user_id),
+					bundle: product.bundle,
+					script: product.script,
+					active: product.active
+				}
+			})
+		)
 	}
 
 	async function getScripts() {
+		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("scripts")
@@ -81,11 +108,9 @@ export const load = async ({ parent, data }) => {
 		if (err) {
 			throw error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT scripts.scripts failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT scripts.scripts failed!\n\n" +
+					formatError(err)
 			)
 		}
 
@@ -93,6 +118,7 @@ export const load = async ({ parent, data }) => {
 	}
 
 	async function getBundles() {
+		const { supabaseClient } = await parent()
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("bundles")
@@ -102,23 +128,25 @@ export const load = async ({ parent, data }) => {
 		if (err) {
 			throw error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT scripts.bundles failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT scripts.bundles failed!\n\n" +
+					formatError(err)
 			)
 		}
+
 		return data
 	}
 
+	const pricesPromise = getPrices()
+	pricesPromise.catch((err) => streamedErrorHandler(err))
+
 	async function getData() {
-		const promises = await Promise.all([getPrices(), getProducts(), getBundles(), getScripts()])
-		const prices = promises[0]
+		const promises = await Promise.all([getProducts(), getBundles(), getScripts()])
+		const prices = await pricesPromise
 		const tmpPrices = [...prices]
-		const products = promises[1]
-		const bundles = promises[2]
-		const scripts = promises[3]
+		const products = promises[0]
+		const bundles = promises[1]
+		const scripts = promises[2]
 
 		const bundleProduct = []
 		const scriptProduct = []
@@ -204,12 +232,18 @@ export const load = async ({ parent, data }) => {
 			}
 		}
 
-		return { bundles: bundleProduct, scripts: scriptProduct, prices }
+		return { bundles: bundleProduct, scripts: scriptProduct }
 	}
 
+	const pageDataPromise = getData()
+	pageDataPromise.catch((err) => streamedErrorHandler(err))
+
 	return {
-		subscriptionsform: data.subscriptionsform,
-		checkoutForm: data.checkoutForm,
-		data: await getData()
+		subscriptionsform,
+		checkoutForm,
+		pageDataPromise,
+		pricesPromise,
+		subscriptionsPromise: data.subscriptions,
+		freeAccessPromise: data.freeAccess
 	}
 }

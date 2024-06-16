@@ -1,3 +1,4 @@
+import { formatError } from "$lib/utils.js"
 import { error, redirect } from "@sveltejs/kit"
 
 export const load = async ({ url: { origin }, locals: { supabaseServer } }) => {
@@ -12,13 +13,9 @@ export const load = async ({ url: { origin }, locals: { supabaseServer } }) => {
 			}
 		})
 
-		if (err) {
-			console.error("Login failed: " + err.message)
-			throw error(400, { message: "Something went wrong logging you in!" })
-		}
-
-		throw redirect(303, data.url)
+		if (err) error(400, formatError(err))
+		redirect(303, data.url)
 	}
 
-	return { refresh_token: session.refresh_token }
+	return { token: session.refresh_token }
 }

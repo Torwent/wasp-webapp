@@ -1,14 +1,15 @@
 import { error } from "@sveltejs/kit"
 
-export const load = async ({ params, data, parent }) => {
-	const { session, profile } = await parent()
-	if (!session || !profile) throw error(401, "You must be logged in to access this page")
+export const load = async ({ params: { slug }, data, parent }) => {
+	const { session, roles } = await parent()
+	if (!session) error(401, "You must be logged in to access this page")
 
-	const email = session.user.email
-	const { slug } = params
+	if (session.user.id != slug && !roles?.administrator)
+		error(403, "You can only view and edit your own profile")
+	const { form, email } = data
 
-	if (profile.id != slug || !data) throw error(403, "You can only view and edit your own profile")
-	const { address, form } = data
+	if (!form) error(500, "Something went wrong when fetching information from the server!")
 
-	return { form, email, address }
+	form.data.email = email
+	return { form }
 }

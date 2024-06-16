@@ -1,36 +1,42 @@
 <script lang="ts">
 	import { superForm } from "sveltekit-superforms/client"
 	import { FileDropzone, SlideToggle, focusTrap } from "@skeletonlabs/skeleton"
-	import { cropString, replaceScriptContent } from "$lib/utils"
-	import { scriptSchema } from "$lib/backend/schemas"
+	import { cropString } from "$lib/utils"
+	import { addScriptClientSchema } from "$lib/client/schemas"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
 	import MultiSelect from "$lib/components/forms/MultiSelect.svelte"
 	import { FileCode, ImagePlus } from "lucide-svelte"
 	import { browser } from "$app/environment"
 	import { page } from "$app/stores"
-	import type { Script } from "$lib/types/collection"
 	import ScriptHeader from "../ScriptHeader.svelte"
 	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
 	import ZipDownload from "$lib/components/ZIPDownload.svelte"
 	import ScriptArticle from "../ScriptArticle.svelte"
 	import StatsHeader from "../StatsHeader.svelte"
-	import { addToolTips } from "$lib/backend/data"
 	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
+	import { zodClient } from "sveltekit-superforms/adapters"
+	import { replaceScriptContent } from "$lib/client/utils"
+
+	import type { ScriptReplace, Tooltip } from "$lib/types/collection"
 
 	export let data
 
-	let { categories, subcategories, profile } = data
-	$: ({ profile } = data)
+	const { categoriesPromise, subcategoriesPromise, profile } = data
+
+	let categories: Tooltip[] = []
+	$: categoriesPromise.then((categoriesPromise) => (categories = categoriesPromise))
+
+	let subcategories: Tooltip[] = []
+	$: subcategoriesPromise.then((subcategoriesPromise) => (subcategories = subcategoriesPromise))
 
 	const { form, errors, enhance, validate } = superForm(data.form, {
 		multipleSubmits: "prevent",
 		taintedMessage: "Are you sure you want to leave?",
-		validators: scriptSchema
+		validators: zodClient(addScriptClientSchema)
 	})
 
-	const defaultBanner =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/scripts/default/banner.jpg"
+	const defaultBanner = "/banner.jpg"
 	let coverElement: HTMLImageElement | undefined
 	let bannerElement: HTMLImageElement | undefined
 
@@ -47,85 +53,48 @@
 	let showSearchResult: boolean = false
 
 	let isFocused: boolean = true
-	let script: Script = {
-		title: "",
-		description: "",
-		content: "",
-		categories: [],
-		subcategories: [],
-		published: false,
-		min_xp: 0,
-		max_xp: 0,
-		min_gp: 0,
-		max_gp: 0,
-		id: "",
+
+	const scriptReplace: ScriptReplace = {
+		id: "UUID_NOT_GENERATED_YET",
+		title: $form.title,
+		description: $form.description,
+		content: $form.content,
 		protected: {
-			assets: "",
-			author_id: "",
-			id: "",
-			revision: 0,
 			username: profile?.username ?? "",
-			avatar: profile?.avatar ?? "",
-			revision_date: "",
-			broken: false
+			revision: 1,
+			revision_date: Number(new Date())
 		},
-		fts: undefined,
-		search: "",
+		min_xp: $form.min_xp,
+		max_xp: $form.max_xp,
+		min_gp: $form.min_gp,
+		max_gp: $form.max_gp
+	}
+
+	$: scriptReplace.title = $form.title
+	$: scriptReplace.description = $form.description
+	$: scriptReplace.content = $form.content
+	$: scriptReplace.min_xp = $form.min_xp
+	$: scriptReplace.max_xp = $form.max_xp
+	$: scriptReplace.min_gp = $form.min_gp
+	$: scriptReplace.max_gp = $form.max_gp
+
+	const scriptBase = {
+		title: $form.title,
+		description: $form.description,
+		published: $form.published,
+		url: "",
 		tooltip_emojis: [],
 		tooltip_names: [],
-		url: "",
-		created_at: "",
-		product: null
+		protected: {
+			assets: "",
+			username: profile?.username ?? "",
+			avatar: profile?.avatar ?? ""
+		}
 	}
-	$form.content = `### {$title} by {$author}
 
-Script ID: {$id}
-
-Latest revision: {$revision}
-
-Updated at: {$last_revision_full_date}
-
-Date updated at: {$revision_date}
-
-Time of update: {$last_revision_time}
-
-{$description}
-
-Can get {$min_xp}-{$max_xp} xp/h and {$min_gp}-{$max_gp} gp/h.
-
-#### Required Setup:
-- Item A visible in bank
-- Item B visible in bank
-
-#### Features:
-- Does this cool task
-- Supports X method
-- Supports Y method
-
-#### Known Issues:
-- Buggy at doing Z.
-
-#### Additional information:
-You need quest ABC completed to use this.
-`
-
-	$: addToolTips(script, categories, subcategories)
-
-	$: if (
-		$form.categories ||
-		$form.subcategories ||
-		$form.min_xp ||
-		$form.max_xp ||
-		$form.min_gp ||
-		$form.max_gp
-	)
-		validate()
-
-	$: {
-		script.categories = $form.categories
-		script.subcategories = $form.subcategories
-		addToolTips(script, categories, subcategories)
-	}
+	$: scriptBase.title = $form.title
+	$: scriptBase.description = $form.description
+	$: scriptBase.published = $form.published
 
 	function onChangeCover(e: Event): void {
 		if (coverFiles.length === 0) {
@@ -190,18 +159,11 @@ You need quest ABC completed to use this.
 		})
 	}
 
-	$: script.title = $form.title
-	$: script.description = $form.description
-	$: script.content = $form.content
-	$: script.categories = $form.categories
-	$: script.subcategories = $form.subcategories
-
 	const headTitle = "WaspScripts - Add Script"
 	const headDescription = "Add a new script to WaspScripts."
 	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba"
 	const headAuthor = "Torwent"
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -235,7 +197,7 @@ You need quest ABC completed to use this.
 					bind:this={bannerElement}
 					class="z-0 absolute object-cover h-full w-full"
 					src={defaultBanner}
-					alt="{script.title} header image"
+					alt="{$form.title} header image"
 				/>
 			</ScriptHeader>
 
@@ -246,25 +208,13 @@ You need quest ABC completed to use this.
 					</h3>
 				</header>
 
-				<StatsHeader
-					stats={{
-						id: "",
-						experience: Math.random() * 1000000,
-						gold: Math.random() * 1000000,
-						runtime: Math.random() * 1000000000,
-						levels: 0,
-						online_users: [],
-						online_users_total: 0,
-						unique_users: [],
-						unique_users_total: 0
-					}}
-				/>
+				<StatsHeader />
 
 				{#if profile}
 					<div class="text-center">
 						<div class="py-12 grid justify-center justify-items-center gap-8">
-							<AdvancedButton {script} noDownload={true} rev={5} />
-							<ZipDownload bind:profile noDownload={true} />
+							<AdvancedButton title={$form.title} rev={1} />
+							<ZipDownload noDownload={true} />
 						</div>
 
 						<h4 class="pt-4">
@@ -275,7 +225,7 @@ You need quest ABC completed to use this.
 					</div>
 				{/if}
 
-				<ScriptArticle content={replaceScriptContent(script)} />
+				<ScriptArticle content={replaceScriptContent(scriptReplace)} />
 			</div>
 		</div>
 	{/if}
@@ -283,7 +233,7 @@ You need quest ABC completed to use this.
 	{#if showScriptCard}
 		<div class="max-w-2x m-8">
 			<div class="grid grid-cols-1 justify-items-center">
-				<ScriptCardBase bind:script bind:imgElement={coverElement} />
+				<ScriptCardBase script={scriptBase} bind:imgElement={coverElement} />
 			</div>
 		</div>
 	{/if}
@@ -308,12 +258,8 @@ You need quest ABC completed to use this.
 					</div>
 				</div>
 				<div>
-					<span class="text-lg font-semibold text-blue-400">
-						{script.title} - WaspScripts
-					</span>
-					<p>
-						{cropString("RuneScape OSRS Color Bot - " + script.description, 160)}
-					</p>
+					<span class="text-lg font-semibold text-blue-400">{$form.title} - WaspScripts</span>
+					<p>{cropString("RuneScape OSRS Color Bot - " + $form.description, 160)}</p>
 				</div>
 			</div>
 			<div class="w-[40rem] my-8 mx-auto">
@@ -365,11 +311,11 @@ You need quest ABC completed to use this.
 					<div class="my-8">
 						<SlideToggle
 							name="published"
-							bind:checked={script.published}
+							bind:checked={$form.published}
 							background="bg-error-500"
 							active="bg-primary-500"
 						>
-							{#if script.published}Public{:else}Hidden{/if}
+							{#if $form.published}Public{:else}Hidden{/if}
 						</SlideToggle>
 					</div>
 				</div>
@@ -393,14 +339,14 @@ You need quest ABC completed to use this.
 					title="Categories"
 					bind:value={$form.categories}
 					errors={$errors.categories?._errors}
-					entries={categories}
+					tooltips={categories}
 				/>
 
 				<MultiSelect
 					title="Subcategories"
 					bind:value={$form.subcategories}
 					errors={$errors.subcategories?._errors}
-					entries={subcategories}
+					tooltips={subcategories}
 				/>
 
 				<header class="text-center my-8">
@@ -436,12 +382,8 @@ You need quest ABC completed to use this.
 								<span>Must be exactly 300x200 pixels and JPG format.</span>
 							{:else if coverStyle === 1}
 								<span class="text-success-500">{$form.cover.name}</span>
-							{:else if $errors.cover && $errors.cover.length > 0}
-								{#each $errors.cover as error}
-									{#if error}
-										<small class="flex justify-center text-error-500">{error}</small>
-									{/if}
-								{/each}
+							{:else if $errors.cover}
+								<small class="flex justify-center text-error-500">{$errors.cover}</small>
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>
@@ -475,12 +417,8 @@ You need quest ABC completed to use this.
 								<span>Must be exactly 1920x768 pixels and JPG format.</span>
 							{:else if bannerStyle === 1}
 								<span class="text-success-500">{$form.banner.name}</span>
-							{:else if $errors.banner && $errors.banner.length > 0}
-								{#each $errors.banner as error}
-									{#if error}
-										<small class="flex justify-center text-error-500">{error}</small>
-									{/if}
-								{/each}
+							{:else if $errors.banner}
+								<small class="flex justify-center text-error-500">{$errors.banner}</small>
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>
@@ -514,12 +452,8 @@ You need quest ABC completed to use this.
 								<span>Must be a Simba script file.</span>
 							{:else if scriptStyle === 1}
 								<span class="text-success-500">{$form.script.name}</span>
-							{:else if $errors.script && $errors.script.length > 0}
-								{#each $errors.script as error}
-									{#if error}
-										<small class="flex justify-center text-error-500">{error}</small>
-									{/if}
-								{/each}
+							{:else if $errors.script}
+								<small class="flex justify-center text-error-500">{$errors.script}</small>
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>

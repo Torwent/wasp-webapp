@@ -1,6 +1,7 @@
 <script lang="ts">
-	import Markdown from "$lib/Markdown.svelte"
-	import { postSchema } from "$lib/backend/schemas"
+	import { zodClient } from "sveltekit-superforms/adapters"
+	import Markdown from "$lib/components/Markdown.svelte"
+	import { postSchema } from "$lib/client/schemas"
 	import { focusTrap } from "@skeletonlabs/skeleton"
 	import { superForm } from "sveltekit-superforms/client"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
@@ -17,7 +18,7 @@
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
-		validators: postSchema
+		validators: zodClient(postSchema)
 	})
 
 	const headTitle = "Add Tutorial - WaspScripts"
@@ -25,8 +26,7 @@
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide"
 	const headAuthor = "Torwent"
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -66,7 +66,7 @@
 		</div>
 	{/if}
 
-	{#if data.profile && data.profile.roles.administrator}
+	{#if data.profile && data.roles?.administrator}
 		<div class="flex">
 			<button class="btn variant-filled-secondary mx-auto" on:click={() => (show = !show)}>
 				{#if show}Hide{:else}Show{/if} Post Preview

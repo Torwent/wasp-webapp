@@ -1,65 +1,69 @@
+import { createBrowserClient, createServerClient, isBrowser, parse } from "@supabase/ssr"
+
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
-import type { Profile } from "$lib/types/collection"
-import type { Database } from "$lib/types/supabase"
-import { profileQuery } from "$lib/utils"
-import { createBrowserClient, isBrowser, parse } from "@supabase/ssr"
-import type { Session, SupabaseClient } from "@supabase/supabase-js"
-import { error } from "@sveltejs/kit"
-
-async function getProfile(supabase: SupabaseClient, session: Session) {
-	const id = session.user.id
-	const { data: profileData, error: err } = await supabase
-		.schema("profiles")
-		.from("profiles")
-		.select(profileQuery)
-		.eq("id", id)
-		.limit(1)
-		.limit(1, { foreignTable: "private" })
-		.limit(1, { foreignTable: "roles" })
-		.returns<Profile[]>()
-
-	if (err) {
-		console.error(err)
-		throw error(
-			509,
-			`Server error, this is probably not an issue on your end! - SELECT profiles.profiles failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
-		)
-	}
-
-	return profileData.length === 1 ? profileData[0] : null
-}
-
-export const load = async ({ fetch, data, depends }) => {
+export const load = async ({ data, depends, fetch }) => {
 	depends("supabase:auth")
-	const supabaseClient = createBrowserClient<Database>(
-		PUBLIC_SUPABASE_URL,
-		PUBLIC_SUPABASE_ANON_KEY,
-		{
-			global: {
-				fetch
-			},
-			cookies: {
-				get(key) {
-					if (!isBrowser()) {
+
+	const supabaseClient = isBrowser()
+		? createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+				global: {
+					fetch
+				},
+				cookies: {
+					get(key) {
+						const cookie = parse(document.cookie)
+						return cookie[key]
+					}
+				}
+			})
+		: createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+				global: {
+					fetch
+				},
+				cookies: {
+					get() {
 						return JSON.stringify(data.session)
 					}
-
-					const cookie = parse(document.cookie)
-					return cookie[key]
 				}
-			}
-		}
-	)
+			})
 
 	const {
 		data: { session }
 	} = await supabaseClient.auth.getSession()
 
-	let profile = session ? await getProfile(supabaseClient, session) : null
+	const {
+		data: { user }
+	} = await supabaseClient.auth.getUser()
 
-	return { supabaseClient, session, profile: profile }
+	const getProfile = async () => {
+		if (!user) return null
+		const { data, error: err } = await supabaseClient
+			.schema("profiles")
+			.from("profiles")
+			.select(`id, discord, username, avatar, customer_id`)
+			.eq("id", user.id)
+			.single()
+
+		if (err) return null
+
+		return data
+	}
+
+	const getRoles = async () => {
+		if (!user) return null
+		const { data, error: err } = await supabaseClient
+			.schema("profiles")
+			.from("roles")
+			.select("banned, premium, vip, tester, scripter, moderator, administrator")
+			.eq("id", user.id)
+			.single()
+
+		if (err) return null
+
+		return data
+	}
+
+	const promises = await Promise.all([getProfile(), getRoles()])
+
+	return { supabaseClient, session, user, profile: promises[0], roles: promises[1] }
 }

@@ -1,23 +1,26 @@
 <script lang="ts">
 	import { page } from "$app/stores"
-	import Markdown from "$lib/Markdown.svelte"
-	import AdvancedButton from "../AdvancedButton.svelte"
+	import Markdown from "$lib/components/Markdown.svelte"
+	import AdvancedButton from "./AdvancedButton.svelte"
 	export let data
 
-	const { terms } = data
+	let { policiesPromise } = data
+	$: ({ policiesPromise } = data)
 
+	let policies: Awaited<typeof policiesPromise> | null = null
+	let currentPolicy: Awaited<typeof policiesPromise>[number] | null = null
 	let index = 0
-	let currentTerms = terms[index]
-	let userLocale = "pt-PT"
-	$: currentTerms = terms[index]
 
-	const headTitle = "User Terms of Service - WaspScripts"
-	const headDescription = "WaspScripts User Terms of Service"
+	let userLocale = "pt-PT"
+	$: policiesPromise.then((awaited) => (policies = awaited))
+	$: if (policies) currentPolicy = policies[index]
+
+	const headTitle = "Terms and Conditions - WaspScripts"
+	const headDescription = "WaspScripts Terms and Conditions"
 	const headKeywords =
-		"OldSchool, RuneScape, OSRS, 2007, Color, Bot, Wasp, Scripts, Simba, Privacy, Policy"
+		"OldSchool, RuneScape, OSRS, 2007, Color, Bot, Wasp, Scripts, Simba, Privacy, Policy, Terms, Conditions"
 	const headAuthor = "Torwent"
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -46,10 +49,14 @@
 <main class="container mx-auto my-6 max-w-4xl flex-grow">
 	<div class="grid mx-auto max-w-4xl">
 		<div class="flex mx-auto my-6">
-			<AdvancedButton bind:index total={terms.length} />
+			{#if policies}
+				<AdvancedButton bind:index bind:total={policies.length} />
+			{/if}
 		</div>
 		<div class="flex mx-auto my-6">
-			Updated on: {new Date(currentTerms.created_at).toLocaleString(userLocale)}
+			Updated on: {currentPolicy
+				? new Date(currentPolicy.created_at).toLocaleString(userLocale)
+				: "Loading..."}
 		</div>
 
 		{#if index !== 0}
@@ -65,6 +72,6 @@
 		{/if}
 	</div>
 	<article class="max-w-md md:max-w-4xl mx-auto prose dark:prose-invert py-6">
-		<Markdown src={currentTerms.content} />
+		<Markdown src={currentPolicy?.content ?? "Loading..."} />
 	</article>
 </main>

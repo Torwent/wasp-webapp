@@ -1,18 +1,19 @@
 <script lang="ts">
-	import Markdown from "$lib/Markdown.svelte"
-	import { scripterSchema } from "$lib/backend/schemas"
+	import Markdown from "$lib/components/Markdown.svelte"
+	import { scripterSchema } from "$lib/client/schemas"
 	import { focusTrap } from "@skeletonlabs/skeleton"
 	import { superForm } from "sveltekit-superforms/client"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
 	import PayPal from "../PayPal.svelte"
 	import { Github } from "lucide-svelte"
-	import { canEdit } from "$lib/backend/data"
+	import { canEdit } from "$lib/client/supabase"
 	import { page } from "$app/stores"
+	import { zodClient } from "sveltekit-superforms/adapters"
 
 	export let data
 
-	let { developer } = data
+	let { scripterPromise: scripter } = data
 	let show: boolean = false
 	let isFocused: boolean = true
 
@@ -21,24 +22,31 @@
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
-		validators: scripterSchema
+		validators: zodClient(scripterSchema)
 	})
 
-	$form.id = developer.id
-	$: $form.realname = developer.realname
-	$: $form.description = developer.description
-	$: $form.content = developer.content
-	$: $form.github = developer.github
-	$: $form.paypal_id = developer.paypal_id
+	let headTitle = ""
+	let headDescription = ""
+	let headKeywords = ""
+	let headAuthor = ""
 
-	const headTitle = "Edit " + developer.profiles.username + " - WaspScripts"
-	const headDescription = "Edit " + developer.profiles.username + " developer page."
-	const headKeywords =
-		"OldSchool, RuneScape, OSRS, 2007, Color, Colour, Bot, Wasp, Scripts, Simba, Developer, " +
-		developer.profiles.username
-	const headAuthor = developer.profiles.username
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	$: scripter.then((scripter) => {
+		$form.id = scripter.id
+		$form.realname = scripter.realname ?? null
+		$form.description = scripter.description ?? null
+		$form.content = scripter.content ?? null
+		$form.github = scripter.github ?? null
+		$form.paypal_id = scripter.paypal_id ?? null
+
+		headTitle = "Edit " + scripter.profiles.username + " - WaspScripts"
+		headDescription = "Edit " + scripter.profiles.username + " developer page."
+		headKeywords =
+			"OldSchool, RuneScape, OSRS, 2007, Color, Colour, Bot, Wasp, Scripts, Simba, Developer, " +
+			scripter.profiles.username
+		headAuthor = scripter.profiles.username
+	})
+
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -71,34 +79,40 @@
 				<div class="flex my-auto">
 					<header>
 						<h3 class="font-bold text-2xl">
-							{#if developer.realname && developer.realname != ""} {developer.realname} / {/if}
-							{developer.profiles.username}
+							{#if $form.realname && $form.realname != ""}
+								{$form.realname} /
+							{/if}
+							{#await scripter then scripter}
+								{scripter.profiles.username}
+							{/await}
 						</h3>
 					</header>
 				</div>
 				<div class="flex my-auto">
-					<a href={developer.github}>
+					<a href={$form.github}>
 						<button class="text-secondary-500 mx-5 h-full">
 							<Github />
 						</button>
 					</a>
-					{#if developer.paypal_id && developer.paypal_id != ""}
+					{#if $form.paypal_id && $form.paypal_id != ""}
 						<div class="w-full mx-auto">
-							<PayPal paypal_id={developer.paypal_id} username={developer.profiles.username} />
+							{#await scripter then scripter}
+								<PayPal paypal_id={$form.paypal_id} username={scripter.profiles.username} />
+							{/await}
 						</div>
 					{/if}
 				</div>
 			</div>
-			<h4 class="my-4">{developer.description}</h4>
+			<h4 class="my-4">{$form.description}</h4>
 			<article
 				class="prose dark:prose-invert py-6 border-t-2 border-stone-300 dark:border-stone-800 mx-auto"
 			>
-				<Markdown src={developer.content || ""} />
+				<Markdown src={$form.content || ""} />
 			</article>
 		</div>
 	{/if}
 
-	{#if canEdit(data.profile, developer.id)}
+	{#if canEdit(data.profile?.id, data.roles, $form.id)}
 		<div class="flex">
 			<button class="btn variant-filled-secondary mx-auto" on:click={() => (show = !show)}>
 				{#if show}Hide{:else}Show{/if} Preview
@@ -106,28 +120,23 @@
 		</div>
 
 		<form method="POST" use:focusTrap={isFocused} use:enhance>
-			<FormInput title="Name" bind:value={developer.realname} bind:errors={$errors.realname} />
-			<FormInput title="Username" bind:value={developer.profiles.username} />
+			<FormInput title="Name" bind:value={$form.realname} bind:errors={$errors.realname} />
 
 			<FormInput
 				title="Description"
-				bind:value={developer.description}
+				bind:value={$form.description}
 				bind:errors={$errors.description}
 			/>
 
 			<FormTextarea
 				title="Content"
-				bind:value={developer.content}
+				bind:value={$form.content}
 				bind:errors={$errors.content}
 				h={"h-64"}
 			/>
 
-			<FormInput title="GitHub" bind:value={developer.github} bind:errors={$errors.github} />
-			<FormInput
-				title="PaypalID"
-				bind:value={developer.paypal_id}
-				bind:errors={$errors.paypal_id}
-			/>
+			<FormInput title="GitHub" bind:value={$form.github} bind:errors={$errors.github} />
+			<FormInput title="PaypalID" bind:value={$form.paypal_id} bind:errors={$errors.paypal_id} />
 
 			<div class="flex justify-between">
 				<a href="./" class="btn variant-filled-secondary">Back</a>

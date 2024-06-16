@@ -10,7 +10,7 @@
 		newBundleSchema,
 		newScriptArraySchema,
 		scriptArraySchema
-	} from "$lib/backend/schemas"
+	} from "$lib/client/schemas"
 	import Table from "./Table.svelte"
 	import { superForm } from "sveltekit-superforms/client"
 	import { PUBLIC_STRIPE_PUBLISHABLE_KEY } from "$env/static/public"
@@ -19,22 +19,45 @@
 	import { Tab, TabGroup } from "@skeletonlabs/skeleton"
 	import { FileCode, Landmark, Package } from "lucide-svelte"
 	import type { StripeConnectInstance } from "@stripe/connect-js"
+	import { zodClient } from "sveltekit-superforms/adapters"
+	import TablePlaceholder from "./TablePlaceholder.svelte"
 
 	export let data
 
-	let { supabaseClient, profile, scripter, stats } = data
-	$: ({ supabaseClient, profile, scripter, stats } = data)
+	let {
+		supabaseClient,
+		profile,
+		scripterPromise,
+		statsPromise,
+		subscriptionsPromise,
+		stripeData,
+		forms: { country, dba }
+	} = data
+	$: ({
+		supabaseClient,
+		profile,
+		scripterPromise,
+		statsPromise,
+		subscriptionsPromise,
+		stripeData,
+		forms: { country, dba }
+	} = data)
+
+	let scripter: Awaited<typeof scripterPromise> | null = null
+	$: scripterPromise.then((awaited) => (scripter = awaited))
+
+	$: stripeData.account?.then((acc) => ($dbaForm.dba = acc?.business_profile?.name ?? ""))
 
 	const {
 		form: countryForm,
 		errors: countryErrors,
 		enhance: countryEnhance,
 		allErrors: countryAllErrors
-	} = superForm(data.countryForm, {
+	} = superForm(country, {
 		dataType: "json",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors-and-message",
-		validators: countryCodeSchema,
+		validators: zodClient(countryCodeSchema),
 		resetForm: true
 	})
 
@@ -43,17 +66,16 @@
 		errors: dbaErrors,
 		enhance: dbaEnhance,
 		allErrors: dbaAllErrors
-	} = superForm(data.dbaForm, {
+	} = superForm(dba, {
 		dataType: "json",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors-and-message",
-		validators: dbaSchema,
+		validators: zodClient(dbaSchema),
 		resetForm: true
 	})
 
 	let tabSet: number = 0
 	let subscription: RealtimeChannel | undefined
-
 	let paymentContainer: HTMLElement | undefined
 	let payoutContainer: HTMLElement | undefined
 
@@ -68,9 +90,11 @@
 		if (browser && document) {
 			const connectJS = await import("@stripe/connect-js")
 
-			const fetchClientSecret = async () => {
+			async function fetchClientSecret() {
 				invalidate("dashboard:stripe_session")
-				return data.stripeSession ?? ""
+				if (!stripeData.session) return ""
+				const stripeSession = await stripeData.session
+				return stripeSession ?? ""
 			}
 
 			stripeConnectInstance = connectJS.loadConnectAndInitialize({
@@ -101,14 +125,16 @@
 
 <main class="m-4">
 	<h3 class="text-center">
-		Current user: {profile.username}
-		<small>({profile.id})</small>
+		Current user: {profile ? profile.username : "Loading..."}
+		<small>({profile ? profile.id : "Loading..."})</small>
 	</h3>
 
 	<div class="my-8 grid place-items-center">
-		<a href="/scripters/{scripter.url}" class="btn variant-filled-secondary">Scripter profile</a>
+		<a href="/scripters/{scripter ? scripter.url : ''}" class="btn variant-filled-secondary">
+			{scripter ? "Scripter profile" : "Loading..."}</a
+		>
 	</div>
-	{#if !scripter.stripe}
+	{#if !scripter?.stripe}
 		<form
 			method="POST"
 			action="?/createStripe"
@@ -210,15 +236,28 @@
 				]}
 			/>
 			<tr class="table-row">
-				<TableCell>{stats.total_user_scripts} / {stats.total_scripts}</TableCell>
-				<TableCell>{stats.total_user_premium_scripts} / {stats.total_premium_scripts}</TableCell>
-				<TableCell>{stats.month_user_downloads} / {stats.month_downloads}</TableCell>
-				<TableCell>
-					{stats.month_premium_user_downloads} / {stats.month_premium_downloads}
-				</TableCell>
-				<TableCell>{data.subscriptions.total.subscribers}</TableCell>
-				<TableCell>{data.subscriptions.total.cancelling}</TableCell>
-				<TableCell>{data.subscriptions.total.free_access}</TableCell>
+				{#await statsPromise}
+					{#each Array(4) as _}
+						<TableCell>Loading...</TableCell>
+					{/each}
+				{:then stats}
+					<TableCell>{stats.total_user_scripts} / {stats.total_scripts}</TableCell>
+					<TableCell>{stats.total_user_premium_scripts} / {stats.total_premium_scripts}</TableCell>
+					<TableCell>{stats.month_user_downloads} / {stats.month_downloads}</TableCell>
+					<TableCell>
+						{stats.month_premium_user_downloads} / {stats.month_premium_downloads}
+					</TableCell>
+				{/await}
+
+				{#await subscriptionsPromise}
+					{#each Array(3) as _}
+						<TableCell>Loading...</TableCell>
+					{/each}
+				{:then subscriptions}
+					<TableCell>{subscriptions.total.subscribers}</TableCell>
+					<TableCell>{subscriptions.total.cancelling}</TableCell>
+					<TableCell>{subscriptions.total.free_access}</TableCell>
+				{/await}
 			</tr>
 			<tbody />
 		</table>
@@ -226,11 +265,11 @@
 
 	<h5 class="my-24 text-center">
 		By making premium scripts you automatically accept the
-		<a href="/legal/scripter_terms_of_service">scripter terms or service</a>
+		<a href="/legal/scripter_tos">scripter terms or service</a>
 		.
 	</h5>
 
-	{#if scripter.stripe}
+	{#if scripter?.stripe}
 		<div class="border-surface-500 border-2 rounded-md">
 			<TabGroup
 				justify="justify-center"
@@ -251,10 +290,6 @@
 				<!-- Tab Panels --->
 				<svelte:fragment slot="panel">
 					{#if tabSet === 0}
-						{@const available = data.stripeBalance?.available[0].amount ?? 0}
-						{@const pending = data.stripeBalance?.pending[0].amount ?? 0}
-						{@const currency = data.stripeBalance?.available[0].currency ?? ""}
-
 						<div class="flex justify-around">
 							<form
 								method="POST"
@@ -303,24 +338,39 @@
 							</form>
 						</div>
 
-						<div class="flex justify-around my-8">
-							<h4>
-								Balance: {(available + pending) / 100}
-								{currency}
-							</h4>
-							<h4>Available: {available / 100} {currency}</h4>
-							<h4>Settling: {pending / 100} {currency}</h4>
-						</div>
+						{#if stripeData.balance}
+							<div class="flex justify-around my-8">
+								{#await stripeData.balance}
+									<h4>Balance: Loading...</h4>
+									<h4>Available: Loading...</h4>
+									<h4>Settling: Loading...</h4>
+								{:then balance}
+									{@const available = balance?.available[0].amount ?? 0}
+									{@const pending = balance?.pending[0].amount ?? 0}
+									{@const currency = balance?.available[0].currency ?? ""}
+									<h4>
+										Balance: {(available + pending) / 100}
+										{currency}
+									</h4>
+									<h4>Available: {available / 100} {currency}</h4>
+									<h4>Settling: {pending / 100} {currency}</h4>
+								{/await}
+							</div>
+						{/if}
 
-						{#if data.stripeAccount?.requirements?.currently_due && data.stripeAccount?.requirements?.currently_due.length > 0}
+						{#if stripeData.account}
 							<div class="mb-24">
 								<span class="my-2">Missing account information:</span>
 
-								<div class="my-2 text-error-500 grid bg-surface-700">
-									{#each data.stripeAccount?.requirements?.currently_due as requirement}
-										<small class="w-full mx-auto">{requirement}</small>
-									{/each}
-								</div>
+								{#await stripeData.account then account}
+									{#if account?.requirements?.currently_due && account?.requirements?.currently_due.length > 0}
+										<div class="my-2 text-error-500 grid bg-surface-700">
+											{#each account?.requirements?.currently_due as requirement}
+												<small class="w-full mx-auto">{requirement}</small>
+											{/each}
+										</div>
+									{/if}
+								{/await}
 								<small>
 									This can be updated on the "Update stripe connected account" button. Ask Torwent
 									for help if needed.
@@ -333,51 +383,74 @@
 						<h5 class="text-center my-4">Payouts</h5>
 						<div class="my-8" bind:this={payoutContainer} />
 					{:else if tabSet === 1}
-						<Table
-							id="bundleEdit"
-							schema={bundleArraySchema}
-							data={data.bundlesForm}
-							headers={[
-								"Title",
-								"Price (Week/Month/Year)",
-								"Subscribers",
-								"Cancelling",
-								"Free Access",
-								"Scripts",
-								"Action"
-							]}
-							subscriptions={data.subscriptions.bundles}
-							action={"bundleEdit&product"}
-						/>
+						{#await subscriptionsPromise}
+							<TablePlaceholder
+								headers={[
+									"Title",
+									"Price (Week/Month/Year)",
+									"Subscribers",
+									"Cancelling",
+									"Free Access",
+									"Scripts",
+									"Action"
+								]}
+							/>
+						{:then subscriptions}
+							<Table
+								id="bundleEdit"
+								schema={bundleArraySchema}
+								headers={[
+									"Title",
+									"Price (Week/Month/Year)",
+									"Subscribers",
+									"Cancelling",
+									"Free Access",
+									"Scripts",
+									"Action"
+								]}
+								subscriptions={subscriptions.bundles}
+								action={"bundleEdit&product"}
+							/>
+						{/await}
 
 						<Table
 							id="bundleAdd"
 							schema={newBundleSchema}
-							data={data.newBundleForm}
 							headers={["New Bundle", "Price (Week/Month/Year)", "Scripts", "Action"]}
 							action={"bundleAdd"}
 						/>
 					{:else if tabSet === 2}
-						<Table
-							id="scriptEdit"
-							schema={scriptArraySchema}
-							data={data.scriptsForm}
-							headers={[
-								"Title",
-								"Price (Week/Month/Year)",
-								"Subscribers",
-								"Cancelling",
-								"Free Access",
-								"Action"
-							]}
-							subscriptions={data.subscriptions.scripts}
-							action={"scriptEdit&product"}
-						/>
+						{#await subscriptionsPromise}
+							<TablePlaceholder
+								headers={[
+									"Title",
+									"Price (Week/Month/Year)",
+									"Subscribers",
+									"Cancelling",
+									"Free Access",
+									"Action"
+								]}
+							/>
+						{:then subscriptions}
+							<Table
+								id="scriptEdit"
+								schema={scriptArraySchema}
+								headers={[
+									"Title",
+									"Price (Week/Month/Year)",
+									"Subscribers",
+									"Cancelling",
+									"Free Access",
+									"Action"
+								]}
+								subscriptions={subscriptions.scripts}
+								action={"scriptEdit&product"}
+							/>
+						{/await}
 
 						<Table
 							id="scriptAdd"
 							schema={newScriptArraySchema}
-							data={data.newScriptForm}
 							headers={["New Premium Script", "Price (Week/Month/Year)", "Action"]}
 							action={"scriptAdd&script"}
 						/>

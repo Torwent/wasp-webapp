@@ -1,97 +1,43 @@
 import { superValidate, setError } from "sveltekit-superforms/server"
-import { fail, redirect } from "@sveltejs/kit"
-import { scriptSchema } from "$lib/backend/schemas"
-import { filesSchema } from "$lib/backend/schemas.server"
-import { uploadScript } from "$lib/backend/data.server"
-import { encodeSEO } from "$lib/utils"
-import { scriptExists } from "$lib/backend/data"
-import type { ScriptBase } from "$lib/types/collection"
+import { redirect } from "@sveltejs/kit"
+import { addScriptServerSchema } from "$lib/server/schemas.server"
+import { uploadScript } from "$lib/server/supabase.server"
+import { encodeSEO, scriptDefaultContent } from "$lib/utils"
+import { scriptExists } from "$lib/client/supabase"
+import { zod } from "sveltekit-superforms/adapters"
 
-export const load = async (event) => {
-	return { form: await superValidate(event, scriptSchema) }
+export const load = async () => {
+	const form = await superValidate(zod(addScriptServerSchema))
+	form.data.content = scriptDefaultContent
+	return { form }
 }
 
 export const actions = {
 	default: async ({ request, locals: { supabaseServer, getProfile } }) => {
-		const promises = await Promise.all([getProfile(), request.formData()])
-
+		const promises = await Promise.all([
+			getProfile(),
+			superValidate(request, zod(addScriptServerSchema))
+		])
 		const profile = promises[0]
-		const formData = promises[1]
+		const form = promises[1]
 
-		const files = {
-			cover: formData.get("cover"),
-			banner: formData.get("banner"),
-			script: formData.get("script")
-		}
+		if (!profile) return setError(form, "", "You need to login to add a script.")
+		if (!form.valid) return setError(form, "", "Form is not valid!")
 
-		formData.delete("cover")
-		formData.delete("banner")
-		formData.delete("script")
-
-		const form = await superValidate(formData, scriptSchema)
-
-		if (!profile) {
-			const msg = "You need to login to add a script."
-			console.error(msg)
-			return setError(form, "", msg)
-		}
-
-		if (!form.valid) return fail(400, { form })
-
-		const url = encodeSEO(form.data.title + " by " + profile.username)
-
-		const tmp = await scriptExists(supabaseServer, url)
+		const tmp = await scriptExists(
+			supabaseServer,
+			encodeSEO(form.data.title + " by " + profile.username)
+		)
 		if (tmp) {
 			const msg = "A script with that name by you already exists! Choose a different name."
 			console.error(msg)
 			return setError(form, "", msg)
 		}
 
-		let validFiles
-		try {
-			validFiles = await filesSchema.safeParseAsync(files)
-		} catch (error) {
-			console.error(error)
-			return setError(form, "", "The files your sent are not valid!")
-		}
+		const { url, error: err } = await uploadScript(supabaseServer, form.data)
 
-		if (!validFiles.success) return fail(400, { form })
-
-		const script: ScriptBase = {
-			title: form.data.title,
-			description: form.data.description,
-			content: form.data.content,
-			categories: form.data.categories,
-			subcategories: form.data.subcategories,
-			published: formData.has("published"),
-			min_xp: form.data.min_xp,
-			max_xp: form.data.max_xp,
-			min_gp: form.data.min_gp,
-			max_gp: form.data.max_gp,
-			id: "",
-			fts: undefined,
-			search: "",
-			tooltip_emojis: [],
-			tooltip_names: [],
-			url: "",
-			created_at: "",
-			product: null
-		}
-
-		const { url: script_url, error: err } = await uploadScript(
-			supabaseServer,
-			script,
-			validFiles.data.script,
-			validFiles.data.cover,
-			validFiles.data.banner
-		)
-
-		if (err) {
-			console.error(err)
-			return setError(form, "", err)
-		}
-
-		if (script_url) throw redirect(303, "../" + script_url)
+		if (err) return setError(form, "", err)
+		if (url) throw redirect(303, "../" + url)
 		throw redirect(303, "./" + url)
 	}
 }

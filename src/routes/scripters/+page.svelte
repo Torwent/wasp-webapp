@@ -1,42 +1,30 @@
 <script lang="ts">
-	import { goto } from "$app/navigation"
 	import { page } from "$app/stores"
-	import { browser } from "$app/environment"
 	import ScripterCard from "./ScripterCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
+	import type { ScripterBase } from "$lib/types/collection"
+	import { replaceQuery } from "$lib/client/utils"
 
 	export let data
 
-	let { scripters, count, range } = data
+	let { scriptersPromise, range } = data
 	let { searchParams } = $page.url
 
+	$: ({ scriptersPromise, range } = data)
 	$: ({ searchParams } = $page.url)
-	$: ({ scripters, count, range } = data)
 
 	const pageStr = searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
 	let search: string
 
-	async function replaceQuery(values: Record<string, string>) {
-		if (!browser) return
-		let invalidate: boolean = false
-		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else searchParams.delete(k)
+	let scripters: ScripterBase[] | null = null
+	let count: number = 0
 
-			invalidate = invalidate || v === ""
-		}
-
-		const path = $page.url.origin + $page.url.pathname + "?" + searchParams.toString()
-
-		await goto(path, {
-			keepFocus: true,
-			noScroll: true,
-			replaceState: true,
-			invalidateAll: invalidate
-		})
-	}
+	$: scriptersPromise.then((awaited) => {
+		scripters = awaited.scripters
+		count = awaited.count
+	})
 
 	const headTitle = "Scripters - WaspScripts"
 	const headDescription =
@@ -44,8 +32,7 @@
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Scripters, Developers"
 	const headAuthor = "Torwent"
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -90,18 +77,30 @@
 						placeholder="Search username, name, info, ..."
 						class="input"
 						bind:value={search}
-						on:input={async () => await replaceQuery({ page: "1", search: search })}
+						on:input={async () =>
+							await replaceQuery($page.url, {
+								page: "1",
+								search: search
+							})}
 					/>
 				</div>
 			</div>
 		</div>
 	</div>
 
-	<div class="mx-auto max-w-2xl flex-grow">
-		{#each scripters as scripter}
-			<ScripterCard bind:scripter />
-		{/each}
-	</div>
+	{#if scripters}
+		<div class="mx-auto max-w-2xl flex-grow">
+			{#each scripters as scripter}
+				<ScripterCard bind:scripter />
+			{/each}
+		</div>
+	{:else}
+		<div class="mx-auto max-w-2xl flex-grow">
+			{#each Array(11) as _}
+				<ScripterCard />
+			{/each}
+		</div>
+	{/if}
 
-	<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count />
+	<Paginator {searchParams} pageIdx={currentPage} {range} bind:count />
 </main>

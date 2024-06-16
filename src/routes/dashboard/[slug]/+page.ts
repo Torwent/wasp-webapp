@@ -1,22 +1,24 @@
-import { getScripterDashboard } from "$lib/backend/data"
-import type { Prices, ProductEx, Profile, Script } from "$lib/types/collection"
-import { UUID_V4_REGEX } from "$lib/utils"
+import { getScripter } from "$lib/client/supabase"
+import { streamedErrorHandler } from "$lib/client/utils"
+import type { Price, ProductEx, Script, ScripterStats } from "$lib/types/collection"
+import { UUID_V4_REGEX, formatError } from "$lib/utils"
 import { error } from "@sveltejs/kit"
 
 export const load = async ({ parent, data, depends, url, params: { slug } }) => {
-	const { profile, supabaseClient } = await parent()
-
-	if (!profile) throw error(403, "You need to be logged in.")
-	if (!UUID_V4_REGEX.test(slug)) throw error(403, "Invalid dashboard UUID.")
-	if (profile.id !== slug && !profile.roles.administrator)
-		throw error(403, "You cannot access another scripter dashboard.")
+	const { user, roles, supabaseClient } = await parent()
+	if (!user) error(403, "You need to be logged in.")
+	if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
+	if (user.id !== slug && !roles?.administrator)
+		error(403, "You cannot access another scripter dashboard.")
 
 	depends("waspscripts:dashboard")
 
-	const bundlesForm = data.bundlesForm
-	const newBundleForm = data.newBundleForm
-	const scriptsForm = data.scriptsForm
-	const newScriptForm = data.newScriptForm
+	const {
+		bundles: bundlesForm,
+		newBundle: newBundleForm,
+		scripts: scriptsForm,
+		newScript: newScriptForm
+	} = data.forms
 
 	async function getSubscriptions(product: string) {
 		const {
@@ -30,14 +32,11 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			.eq("product", product)
 
 		if (err) {
-			console.error(err)
-			throw error(
+			error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT product failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT product failed!\n\n" +
+					formatError(err)
 			)
 		}
 
@@ -53,14 +52,11 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			.eq("product", product)
 
 		if (freeErr) {
-			console.error(freeErr)
-			throw error(
+			error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT product failed
-			Error code: ${freeErr.code}
-			Error hint: ${freeErr.hint}
-			Error details: ${freeErr.details}
-			Error hint: ${freeErr.message}`
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT product failed!\n\n" +
+					formatError(freeErr)
 			)
 		}
 
@@ -75,17 +71,14 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			.order("product", { ascending: true })
 			.order("amount", { ascending: true })
 			.filter("active", "eq", true)
-			.returns<Prices[]>()
+			.returns<Price[]>()
 
 		if (err) {
-			console.error(err)
-			throw error(
+			error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT scripts.prices failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT scripts.prices failed!\n\n" +
+					formatError(err)
 			)
 		}
 
@@ -104,38 +97,42 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			.returns<ProductEx[]>()
 
 		if (err) {
-			console.error(err)
-			throw error(
+			error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT product failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT product failed!\n\n" +
+					formatError(err)
 			)
 		}
 
-		return data.map((product) => {
-			return {
-				id: product.id,
-				user_id: product.user_id,
-				name: product.name,
-				username: product.bundles?.username ?? product.scripts?.protected.username ?? "",
-				bundle: product.bundle,
-				script: product.script,
-				active: product.active
-			}
-		})
+		return await Promise.all(
+			data.map(async (product) => {
+				return {
+					id: product.id,
+					user_id: product.user_id,
+					name: product.name,
+					username: product.bundles?.username ?? product.scripts?.protected.username ?? "",
+					bundle: product.bundle,
+					script: product.script,
+					active: product.active
+				}
+			})
+		)
 	}
 
 	async function getStats() {
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.rpc("get_site_stats", { user_id: slug })
-			.single()
+			.single<ScripterStats>()
 
 		if (err) {
-			throw error(400, err)
+			error(
+				500,
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT get_site_stats postgres function failed!\n\n" +
+					formatError(err)
+			)
 		}
 
 		return data
@@ -150,20 +147,18 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			.eq("user_id", id)
 
 		if (err) {
-			throw error(
+			error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT scripts.bundles failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT scripts.bundles failed!\n\n" +
+					formatError(err)
 			)
 		}
 
 		return data
 	}
 
-	async function getScripts(user_id: string) {
+	async function getScripts(author: string) {
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("scripts")
@@ -172,29 +167,33 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 			.order("title", { ascending: true })
 			.contains("categories", "{Premium}")
 			.eq("published", true)
-			.eq("protected.author_id", user_id)
+			.eq("protected.author_id", author)
 			.returns<Script[]>()
 
 		if (err) {
-			throw error(
+			error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT scripts.scripts failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT scripts.scripts failed!\n\n" +
+					formatError(err)
 			)
 		}
 
-		return data.map((script) => {
-			return {
-				id: script.id,
-				name: script.title,
-				author: script.protected.username,
-				url: url.protocol + "//" + url.host + "/" + script.url,
-				active: false
+		const result = []
+		for (let i = 0; i < data.length; i++) {
+			const script = data[i]
+			if (script.protected) {
+				result.push({
+					id: script.id,
+					name: script.title,
+					author: script.protected?.username,
+					url: url.protocol + "//" + url.host + "/" + script.url,
+					active: false
+				})
 			}
-		})
+		}
+
+		return result
 	}
 
 	async function getData() {
@@ -220,7 +219,7 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 		for (let index = 0; index < products.length; index++) {
 			const product = products[index]
 
-			const productPrices = [...prices].reduce<Prices[]>((acc, price, i) => {
+			const productPrices = [...prices].reduce<Price[]>((acc, price, i) => {
 				if (acc.length > 2) return acc
 				if (price.product === product.id) {
 					price.amount = price.amount / 100
@@ -342,16 +341,10 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 		}
 	}
 
-	const promises = await Promise.all([
-		getScripterDashboard(supabaseClient, slug),
-		getStats(),
-		getData()
-	])
-
-	const scripter = promises[0]
+	const scripterPromise = getScripter(supabaseClient, slug)
+	scripterPromise.then((s) => (newBundleForm.data.author = s.profiles.username))
 
 	newBundleForm.data.name = "Bundle name"
-	newBundleForm.data.author = scripter.profiles.username
 	newBundleForm.data.user_id = slug
 	newBundleForm.data.prices = [
 		{ amount: 4, currency: "eur", interval: "week" },
@@ -359,25 +352,25 @@ export const load = async ({ parent, data, depends, url, params: { slug } }) => 
 		{ amount: 50, currency: "eur", interval: "year" }
 	]
 
-	const stripeAccount = data.stripeAccount?.stripeAccount ?? null
-	const stripeBalance = data.stripeAccount?.stripeBalance ?? null
-	const dbaForm = data.dbaForm
+	const statsPromise = getStats()
+	const subscriptionsPromise = getData()
 
-	dbaForm.data.dba = stripeAccount?.business_profile?.name ?? ""
+	statsPromise.catch((err) => streamedErrorHandler(err))
+	subscriptionsPromise.catch((err) => streamedErrorHandler(err))
 
 	return {
-		stripeAccount,
-		stripeBalance,
-		stripeSession: data.stripeSession,
-		countryForm: data.countryForm,
-		dbaForm,
-		bundlesForm,
-		newBundleForm,
-		scriptsForm,
-		newScriptForm,
-		profile,
-		scripter,
-		stats: promises[1],
-		subscriptions: promises[2]
+		stripeData: data.stripeData,
+		forms: {
+			country: data.forms.country,
+			dba: data.forms.dba,
+			bundles: bundlesForm,
+			newBundle: newBundleForm,
+			scripts: scriptsForm,
+			newScript: newScriptForm
+		},
+
+		scripterPromise,
+		statsPromise,
+		subscriptionsPromise
 	}
 }

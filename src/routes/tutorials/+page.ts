@@ -1,7 +1,7 @@
 import { error, redirect } from "@sveltejs/kit"
 import { browser } from "$app/environment"
-import { encodeSEO } from "$lib/utils"
-import type { Tutorial } from "$lib/types/collection.js"
+import { encodeSEO, formatError } from "$lib/utils"
+import { streamedErrorHandler } from "$lib/client/utils"
 
 export const load = async ({ url, parent }) => {
 	const pageN = Number(url.searchParams.get("page") || "-1")
@@ -20,8 +20,6 @@ export const load = async ({ url, parent }) => {
 	const start = (page - 1) * range
 	const finish = start + range
 
-	const { supabaseClient, profile } = await parent()
-
 	async function getTutorials(
 		level: number,
 		search: string,
@@ -29,10 +27,18 @@ export const load = async ({ url, parent }) => {
 		finish: number,
 		ascending: boolean
 	) {
-		let query = supabaseClient.from("tutorials").select("*", { count: "estimated" })
+		const { supabaseClient, session, roles } = await parent()
+		let query = supabaseClient
+			.schema("info")
+			.from("tutorials")
+			.select("title, description, content, level, username, url, order, published, author_id", {
+				count: "estimated"
+			})
 
-		if (profile && !profile.roles.administrator && !profile.roles.moderator) {
-			query = query.or("published.eq.true,author_id.eq." + profile.id)
+		if (!session) {
+			query.or("published.eq.true")
+		} else if (!roles?.administrator && !roles?.moderator) {
+			query.or("published.eq.true,author_id.eq." + session.user.id)
 		}
 
 		if (level > -1) {
@@ -43,23 +49,24 @@ export const load = async ({ url, parent }) => {
 			query = query.ilike("search", "%" + search.replaceAll("%", "") + "%")
 		}
 
-		const { data, count, error: err } = await query.returns<Tutorial[]>()
+		const { data, count, error: err } = await query
 
-		if (err) {
-			throw error(
+		if (err)
+			error(
 				500,
-				`Server error, this is probably not an issue on your end! - SELECT tutorials failed
-			Error code: ${err.code}
-			Error hint: ${err.hint}
-			Error details: ${err.details}
-			Error hint: ${err.message}`
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT tutorials failed!\n\n" +
+					formatError(err)
 			)
-		}
 
 		if (!browser && count === 1)
-			throw redirect(303, "/tutorials/" + encodeSEO(data[0].title + " by " + data[0].username))
-		return { data, count: count ?? 0 }
+			redirect(303, "/tutorials/" + encodeSEO(data[0].title + " by " + data[0].username))
+
+		return { tutorials: data, count: count ?? 0 }
 	}
 
-	return { tutorials: await getTutorials(level, search, start, finish, ascending), range }
+	const tutorialsPromise = getTutorials(level, search, start, finish, ascending)
+	tutorialsPromise.catch((err) => streamedErrorHandler(err))
+
+	return { tutorialsPromise, range }
 }

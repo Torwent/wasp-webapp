@@ -1,11 +1,12 @@
 <script lang="ts">
-	import type { Script } from "$lib/types/collection"
+	import type { ScriptBase } from "$lib/types/collection"
 	import ScriptCardBase from "./ScriptCardBase.svelte"
-	export let script: Script
+	export let script: ScriptBase
+
 	let link = "/scripts/" + script.url
 	$: link = "/scripts/" + script.url
 </script>
 
 <a href={link}>
-	<ScriptCardBase {script} />
+	<ScriptCardBase bind:script />
 </a>

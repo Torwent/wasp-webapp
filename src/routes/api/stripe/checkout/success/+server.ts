@@ -1,5 +1,5 @@
 import { error, redirect } from "@sveltejs/kit"
-import { stripe } from "$lib/backend/supabase.server"
+import { stripe } from "$lib/server/stripe.server"
 
 export const GET = async ({ url: { searchParams } }) => {
 	const sessionID = searchParams.get("session_id")

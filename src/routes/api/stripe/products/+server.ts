@@ -1,5 +1,6 @@
 import { STRIPE_WEBHOOOK_SECRET_PRODUCTS } from "$env/static/private"
-import { insertProduct, deleteProduct, stripe, updateProduct } from "$lib/backend/supabase.server"
+import { stripe } from "$lib/server/stripe.server"
+import { WaspProduct } from "$lib/server/supabase.server"
 import { error, json } from "@sveltejs/kit"
 import type Stripe from "stripe"
 
@@ -27,7 +28,7 @@ export const POST = async ({ request }) => {
 	switch (type) {
 		case "product.deleted":
 			const productDeleted = data.object as Stripe.Product
-			await deleteProduct(productDeleted.id)
+			await WaspProduct.delete(productDeleted.id)
 			break
 
 		case "product.updated":
@@ -36,7 +37,7 @@ export const POST = async ({ request }) => {
 
 			const productUpdated = data.object as Stripe.Product
 
-			await updateProduct(productUpdated.id, productUpdated.name)
+			await WaspProduct.update(productUpdated.id, productUpdated.name)
 			break
 
 		case "product.created":
@@ -44,7 +45,7 @@ export const POST = async ({ request }) => {
 			const productCreated = data.object as Stripe.Product
 			const { name } = productCreated
 			const metadata = productCreated.metadata as unknown as ProductMetadata
-			await insertProduct({
+			await WaspProduct.insert({
 				id: productCreated.id,
 				name: name,
 				user_id: metadata.user_id,

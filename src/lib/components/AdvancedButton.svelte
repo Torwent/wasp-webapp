@@ -1,26 +1,24 @@
 <script lang="ts">
 	import { popup, type PopupSettings } from "@skeletonlabs/skeleton"
 	import { slide } from "svelte/transition"
-	import { getSignedURL } from "$lib/backend/data"
-	import { pad } from "$lib/utils"
-
+	import { getSignedURL } from "$lib/client/supabase"
+	import { pad } from "$lib/client/utils"
 	import { browser } from "$app/environment"
 	import { ChevronDown, FileDown } from "lucide-svelte"
 	import { page } from "$app/stores"
-	import type { ScriptBase } from "$lib/types/collection"
 
-	export let script: ScriptBase
-	export let rev: number
-	export let noDownload: boolean = false
+	export let id: string | null = null
+	export let title: string
+	export let rev: number = 0
 
 	const revisions = Array.from({ length: rev }, (_, i) => i + 1).reverse()
 
 	async function download() {
-		if (noDownload) return
+		if (!id) return
 		const url = await getSignedURL(
 			$page.data.supabaseClient,
 			"scripts",
-			script.id + "/" + pad(rev, 9),
+			id + "/" + pad(rev, 9),
 			"script.simba"
 		)
 		if (!url || !browser) return
@@ -32,12 +30,12 @@
 		const anchor = document.createElement("a")
 		anchor.style.display = "none"
 		anchor.href = blob
-		anchor.download = script.title.toLowerCase().replace(/\s/g, "_") + ".simba"
+		anchor.download = title.toLowerCase().replace(/\s/g, "_") + ".simba"
 		document.body.appendChild(anchor)
 		anchor.click()
 		window.URL.revokeObjectURL(blob)
 		await fetch("/api/script/download", {
-			body: JSON.stringify({ id: script.id }),
+			body: JSON.stringify({ id: id }),
 			method: "POST"
 		}).catch((error) => console.error(error))
 	}
@@ -50,13 +48,13 @@
 
 <div class="btn-group text-black fill-black">
 	<button
-		name={script.title}
-		aria-label="Download {script.title} revision {rev}"
+		name={title}
+		aria-label="Download {title} revision {rev}"
 		class="variant-filled-primary hover:variant-filled-primary uppercase"
 		on:click|preventDefault={download}
 	>
 		<FileDown />
-		<span class="border-0">{script.title}</span>
+		<span class="border-0">{title}</span>
 	</button>
 	<button
 		name="Revisions"

@@ -1,8 +1,7 @@
 <script lang="ts">
 	import { page } from "$app/stores"
-	import type { TBundleArraySchema, TScriptArraySchema } from "$lib/backend/schemas"
+	import type { TBundleArraySchema, TScriptArraySchema } from "$lib/client/schemas"
 	import TableCell from "$lib/components/tables/TableCell.svelte"
-	import { modalStore, type ModalSettings } from "@skeletonlabs/skeleton"
 
 	export let products: TScriptArraySchema["scripts"] | TBundleArraySchema["bundles"]
 	export let index: number

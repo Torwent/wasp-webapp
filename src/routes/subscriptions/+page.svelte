@@ -2,13 +2,13 @@
 	import { SlideToggle } from "@skeletonlabs/skeleton"
 	import { page } from "$app/stores"
 	import { superForm } from "sveltekit-superforms/client"
-	import { checkoutSchema } from "$lib/backend/schemas"
+	import { checkoutSchema } from "$lib/client/schemas"
 	import { onMount } from "svelte"
-	import { ExternalLink, PanelBottomOpen, PanelTopOpen } from "lucide-svelte"
+	import { ExternalLink, PanelBottomOpen, PanelTopOpen, RotateCw } from "lucide-svelte"
 	import TableHeader from "$lib/components/tables/TableHeader.svelte"
 	import TableCell from "$lib/components/tables/TableCell.svelte"
 	import ScriptLinks from "./ScriptLinks.svelte"
-	import type { Price } from "$lib/types/collection"
+	import type { FreeAccess, Price, Subscription } from "$lib/types/collection"
 	import {
 		getCurrentPrice,
 		getPrice,
@@ -16,17 +16,22 @@
 		getPriceIntervalEx,
 		setPriceInterval
 	} from "$lib/utils"
+	import { zodClient } from "sveltekit-superforms/adapters"
 
 	export let data
-	let {
-		profile,
-		data: { bundles, scripts, prices }
-	} = data
 
-	$: ({
-		profile,
-		data: { bundles, scripts, prices }
-	} = data)
+	let { profile, pageDataPromise, pricesPromise, subscriptionsPromise, freeAccessPromise } = data
+	$: ({ profile, pageDataPromise, pricesPromise, subscriptionsPromise, freeAccessPromise } = data)
+
+	let bundles: Awaited<typeof pageDataPromise>["bundles"] | null = null
+	let scripts: Awaited<typeof pageDataPromise>["scripts"] | null = null
+
+	pageDataPromise.then((awaited) => {
+		bundles = awaited.bundles
+		scripts = awaited.scripts
+	})
+
+	$: if (bundles && scripts) $checkoutForm.products = [...bundles, ...scripts]
 
 	const { errors: subscriptionsErrors, enhance: subscriptionEnhance } = superForm(
 		data.subscriptionsform,
@@ -37,13 +42,23 @@
 		}
 	)
 
-	$: if (profile?.subscription) {
-		profile.subscription.forEach((sub) => {
-			bundles.forEach((bundle) => {
+	let subscriptions: Subscription[] | null = null
+	$: if (subscriptionsPromise) {
+		subscriptionsPromise.then((subs) => (subscriptions = subs))
+	} else subscriptions = null
+
+	let free_access: FreeAccess[] | null = null
+	$: if (freeAccessPromise) {
+		freeAccessPromise.then((free) => (free_access = free))
+	} else subscriptions = null
+
+	$: if (subscriptions && bundles && scripts) {
+		subscriptions.forEach((sub) => {
+			bundles?.forEach((bundle) => {
 				if (sub.product === bundle.id) bundle.active = false
 			})
 
-			scripts.forEach((script) => {
+			scripts?.forEach((script) => {
 				if (sub.product === script.id) script.active = false
 			})
 		})
@@ -61,7 +76,7 @@
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: null,
-		validators: checkoutSchema
+		validators: zodClient(checkoutSchema)
 	})
 
 	function changePriceInterval(prices: Price[], index: number, productIndex: number) {
@@ -73,11 +88,11 @@
 	}
 
 	async function getBundle(id: string) {
-		return bundles.find((bundle) => bundle.id === id)
+		return bundles?.find((bundle) => bundle.id === id)
 	}
 
 	async function getScript(id: string) {
-		return scripts.find((script) => script.id === id)
+		return scripts?.find((script) => script.id === id)
 	}
 
 	let userLocale = "pt-PT"
@@ -90,8 +105,7 @@
 		"Get access to exclusive scripts. With access to premium scripts you have scripts for nearly all skills in OSRS."
 	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Colour, Bot, Wasp, Scripts, Simba"
 	const headAuthor = "Torwent"
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -119,7 +133,7 @@
 
 <main class="grid my-8">
 	{#if profile}
-		{#if profile.subscription.length > 0}
+		{#if subscriptions}
 			<form
 				method="POST"
 				class="my-4 items-center justify-center"
@@ -143,143 +157,163 @@
 							headers={["Product", "Type", "Price", "Interval", "Start date", "End date", "Renew"]}
 						/>
 						<tbody>
-							{#each profile.subscription as subscription}
-								{@const price = getPrice(subscription.price, prices)}
-								{#await getBundle(subscription.product)}
-									<tr>
-										<td colspan="7">
-											<span class="flex justify-center text-center py-3">...</span>
-										</td>
-									</tr>
-								{:then bundle}
-									{#if bundle}
-										<tr class="table-row">
-											<TableCell alignment="left" padding={0}>
-												<div class="mx-3">
-													<div>{bundle.name}</div>
-													<div class="text-xs text-left">by {bundle.username}</div>
-												</div>
-											</TableCell>
-
-											<TableCell padding={0}>
-												<button
-													class="btn hover:cursor-pointer hover:text-primary-500"
-													on:click|preventDefault={() => (bundle.open = !bundle.open)}
-												>
-													{#if bundle.open}
-														<PanelBottomOpen size={16} />{:else}<PanelTopOpen size={16} />
-													{/if}
-
-													<span>Bundle</span>
-												</button>
-											</TableCell>
-
-											<TableCell>{price ? getPriceAmount(price) : "..."}</TableCell>
-
-											<TableCell>{price ? getPriceIntervalEx(price) : "..."}</TableCell>
-
-											<TableCell>
-												{new Date(subscription.date_start).toLocaleString(userLocale)}
-											</TableCell>
-
-											<TableCell>
-												{subscription.cancel ? "Cancels on " : "Renews on "}
-												{new Date(subscription.date_end).toLocaleString(userLocale)}
-											</TableCell>
-
-											<TableCell>
-												<SlideToggle
-													name="{subscription.subscription}-slider"
-													checked={!subscription.cancel}
-													size="sm"
-													active="variant-filled-success"
-													background="variant-filled-surface"
-													disabled={subscription.disabled}
-													class={subscription.disabled ? "disabled" : ""}
-													on:click={() => {
-														if (subscription.disabled) return
-														subsform.setAttribute(
-															"action",
-															"?/subscriptions&product=" + subscription.subscription
-														)
-														subsform.requestSubmit()
-													}}
-												/>
-											</TableCell>
+							{#await pricesPromise}
+								Loading...
+							{:then prices}
+								{#each subscriptions as subscription}
+									{@const price = getPrice(subscription.price, prices)}
+									{#await getBundle(subscription.product)}
+										<tr>
+											<td colspan="7">
+												<span class="flex justify-center text-center py-3">...</span>
+											</td>
 										</tr>
-										{#if bundle.open}
-											<ScriptLinks scripts={bundle.scripts} colspan={7} />
-										{/if}
-									{:else}
-										{#await getScript(subscription.product)}
-											<tr><TableCell padding={0}>...</TableCell></tr>
-										{:then script}
-											{#if script}
-												<tr class="table-row">
-													<TableCell alignment="left" padding={0}>
-														<div class="mx-3">
-															<div>{script.name}</div>
-															<div class="text-xs text-left">by {script.username}</div>
-														</div>
-													</TableCell>
+									{:then bundle}
+										{#if bundle}
+											<tr class="table-row">
+												<TableCell alignment="left" padding={0}>
+													<div class="mx-3">
+														<div>{bundle.name}</div>
+														{#await bundle.username}
+															<div class="text-xs text-left">by Loading...</div>
+														{:then username}
+															<div class="text-xs text-left">by {username}</div>
+														{/await}
+													</div>
+												</TableCell>
 
-													<TableCell padding={0}>
-														<a href="/scripts/{script.url}" class="permalink">
-															<button class="btn hover:cursor-pointer hover:text-primary-500">
-																<ExternalLink size={16} />
-																<span>Script</span>
-															</button>
-														</a>
-													</TableCell>
+												<TableCell padding={0}>
+													<button
+														class="btn hover:cursor-pointer hover:text-primary-500"
+														on:click|preventDefault={() => (bundle.open = !bundle.open)}
+													>
+														{#if bundle.open}
+															<PanelBottomOpen size={16} />{:else}<PanelTopOpen size={16} />
+														{/if}
 
-													<TableCell>
-														{#if price} {getPriceAmount(price)} {:else} ... {/if}
-													</TableCell>
+														<span>Bundle</span>
+													</button>
+												</TableCell>
 
-													<TableCell>
-														{#if price} {getPriceIntervalEx(price)} {:else} ... {/if}
-													</TableCell>
+												<TableCell>{price ? getPriceAmount(price) : "..."}</TableCell>
 
-													<TableCell>
-														{new Date(subscription.date_start).toLocaleString(userLocale)}
-													</TableCell>
+												<TableCell>{price ? getPriceIntervalEx(price) : "..."}</TableCell>
 
-													<TableCell>
-														{subscription.cancel ? "Cancels on " : "Renews on "}
-														{new Date(subscription.date_end).toLocaleString(userLocale)}
-													</TableCell>
+												<TableCell>
+													{new Date(subscription.date_start).toLocaleString(userLocale)}
+												</TableCell>
 
-													<TableCell>
-														<SlideToggle
-															name="{subscription.subscription}-slider"
-															checked={!subscription.cancel}
-															size="sm"
-															active="variant-filled-success"
-															background="variant-filled-surface"
-															disabled={subscription.disabled}
-															class={subscription.disabled ? "disabled" : ""}
-															on:click={() => {
-																if (subscription.disabled) return
-																subsform.setAttribute(
-																	"action",
-																	"?/subscriptions&product=" + subscription.subscription
-																)
-																subsform.requestSubmit()
-															}}
-														/>
-													</TableCell>
-												</tr>
+												<TableCell>
+													{subscription.cancel ? "Cancels on " : "Renews on "}
+													{new Date(subscription.date_end).toLocaleString(userLocale)}
+												</TableCell>
+
+												<TableCell>
+													<SlideToggle
+														name="{subscription.subscription}-slider"
+														checked={!subscription.cancel}
+														size="sm"
+														active="variant-filled-success"
+														background="variant-filled-surface"
+														disabled={subscription.disabled}
+														class={subscription.disabled ? "disabled" : ""}
+														on:click={() => {
+															if (subscription.disabled) return
+															subsform.setAttribute(
+																"action",
+																"?/subscriptions&product=" + subscription.subscription
+															)
+															subsform.requestSubmit()
+														}}
+													/>
+												</TableCell>
+											</tr>
+											{#if bundle.open}
+												<ScriptLinks scripts={bundle.scripts} colspan={7} />
 											{/if}
-										{/await}
-									{/if}
-								{/await}
-							{/each}
+										{:else}
+											{#await getScript(subscription.product)}
+												<tr><TableCell padding={0}>...</TableCell></tr>
+											{:then script}
+												{#if script}
+													<tr class="table-row">
+														<TableCell alignment="left" padding={0}>
+															<div class="mx-3">
+																<div>{script.name}</div>
+																{#await script.username}
+																	<div class="text-xs text-left">by Loading...</div>
+																{:then username}
+																	<div class="text-xs text-left">by {username}</div>
+																{/await}
+															</div>
+														</TableCell>
+
+														<TableCell padding={0}>
+															<a href="/scripts/{script.url}" class="permalink">
+																<button class="btn hover:cursor-pointer hover:text-primary-500">
+																	<ExternalLink size={16} />
+																	<span>Script</span>
+																</button>
+															</a>
+														</TableCell>
+
+														<TableCell>
+															{#if price}
+																{getPriceAmount(price)}
+															{:else}
+																...
+															{/if}
+														</TableCell>
+
+														<TableCell>
+															{#if price}
+																{getPriceIntervalEx(price)}
+															{:else}
+																...
+															{/if}
+														</TableCell>
+
+														<TableCell>
+															{new Date(subscription.date_start).toLocaleString(userLocale)}
+														</TableCell>
+
+														<TableCell>
+															{subscription.cancel ? "Cancels on " : "Renews on "}
+															{new Date(subscription.date_end).toLocaleString(userLocale)}
+														</TableCell>
+
+														<TableCell>
+															<SlideToggle
+																name="{subscription.subscription}-slider"
+																checked={!subscription.cancel}
+																size="sm"
+																active="variant-filled-success"
+																background="variant-filled-surface"
+																disabled={subscription.disabled}
+																class={subscription.disabled ? "disabled" : ""}
+																on:click={() => {
+																	if (subscription.disabled) return
+																	subsform.setAttribute(
+																		"action",
+																		"?/subscriptions&product=" + subscription.subscription
+																	)
+																	subsform.requestSubmit()
+																}}
+															/>
+														</TableCell>
+													</tr>
+												{/if}
+											{/await}
+										{/if}
+									{/await}
+								{/each}
+							{/await}
 						</tbody>
 					</table>
 				</div>
 			</form>
 		{/if}
-		{#if profile.free_access.length > 0}
+		{#if free_access}
 			<div class="my-4 items-center justify-center">
 				<h3 class="justify-center text-center my-12">Free access</h3>
 
@@ -287,7 +321,7 @@
 					<table class="table table-hover border-separate space-y-6 text-xs">
 						<TableHeader headers={["Product", "Type", "Start date", "End date"]} />
 						<tbody>
-							{#each profile.free_access as access}
+							{#each free_access as access}
 								{#await getBundle(access.product)}
 									<tr>
 										<td colspan="7">
@@ -300,7 +334,12 @@
 											<TableCell alignment="left" padding={0}>
 												<div class="mx-3">
 													<div>{bundle.name}</div>
-													<div class="text-xs text-left">by {bundle.username}</div>
+
+													{#await bundle.username}
+														<div class="text-xs text-left">by Loading...</div>
+													{:then username}
+														<div class="text-xs text-left">by {username}</div>
+													{/await}
 												</div>
 											</TableCell>
 
@@ -337,7 +376,11 @@
 													<TableCell alignment="left" padding={0}>
 														<div class="mx-3">
 															<div>{script.name}</div>
-															<div class="text-xs text-left">by {script.username}</div>
+															{#await script.username}
+																<div class="text-xs text-left">by Loading...</div>
+															{:then username}
+																<div class="text-xs text-left">by {username}</div>
+															{/await}
 														</div>
 													</TableCell>
 
@@ -381,117 +424,159 @@
 			<table class="table table-hover border-separate space-y-6 text-sm">
 				<TableHeader headers={["Product", "Type", "Price", "Interval", "Checkout"]} />
 				<tbody>
-					{#each bundles as bundle, i}
-						{#if bundle.active}
-							<tr class="table-row">
-								<TableCell alignment="left" padding={0}>
-									<div class="mx-3">
-										<div>{bundle.name}</div>
-										<div class="text-xs text-left">by {bundle.username}</div>
-									</div>
-								</TableCell>
+					{#if bundles && scripts}
+						{#each bundles as bundle, i}
+							{#if bundle.active}
+								<tr class="table-row">
+									<TableCell alignment="left" padding={0}>
+										<div class="mx-3">
+											<div>{bundle.name}</div>
+											{#await bundle.username}
+												<div class="text-xs text-left">by Loading...</div>
+											{:then username}
+												<div class="text-xs text-left">by {username}</div>
+											{/await}
+										</div>
+									</TableCell>
 
-								<TableCell padding={0}>
-									<button
-										class="btn hover:cursor-pointer hover:text-primary-500"
-										on:click|preventDefault={() => (bundle.open = !bundle.open)}
-									>
-										{#if bundle.open}
-											<PanelBottomOpen size={16} />{:else}<PanelTopOpen size={16} />
-										{/if}
+									<TableCell padding={0}>
+										<button
+											class="btn hover:cursor-pointer hover:text-primary-500"
+											on:click|preventDefault={() => (bundle.open = !bundle.open)}
+										>
+											{#if bundle.open}
+												<PanelBottomOpen size={16} />{:else}<PanelTopOpen size={16} />
+											{/if}
 
-										<span>Bundle</span>
-									</button>
-								</TableCell>
+											<span>Bundle</span>
+										</button>
+									</TableCell>
 
-								<TableCell>
-									{#if bundle.active} {getCurrentPrice(bundle.prices)} {:else}-{/if}
-								</TableCell>
+									<TableCell>
+										{#if bundle.active}
+											{getCurrentPrice(bundle.prices)}
+										{:else}-{/if}
+									</TableCell>
 
-								<TableCell padding={bundle.active ? 0 : 3}>
-									<div class="btn-group-vertical md:btn-group variant-outline-surface rounded-md">
-										{#each bundle.prices as price, j}
-											<button
-												class="btn"
-												class:variant-ringed-primary={price.active}
-												on:click|preventDefault={() => changePriceInterval(bundle.prices, j, i)}
-											>
-												{getPriceIntervalEx(price)}
-											</button>
-										{/each}
-									</div>
-								</TableCell>
+									<TableCell padding={bundle.active ? 0 : 3}>
+										<div class="btn-group-vertical md:btn-group variant-outline-surface rounded-md">
+											{#each bundle.prices as price, j}
+												<button
+													class="btn"
+													class:variant-ringed-primary={price.active}
+													on:click|preventDefault={() => changePriceInterval(bundle.prices, j, i)}
+												>
+													{getPriceIntervalEx(price)}
+												</button>
+											{/each}
+										</div>
+									</TableCell>
 
-								<TableCell padding={0}>
-									{#if bundle.active}
+									<TableCell padding={0}>
 										<button
 											class="btn variant-filled-secondary"
 											formaction="?/checkout&product={bundle.id}"
 										>
 											Checkout
 										</button>
-									{:else}
-										<div class="btn variant-filled-surface cursor-pointer">Checkout</div>
-									{/if}
-								</TableCell>
-							</tr>
-							{#if bundle.open}
-								<ScriptLinks scripts={bundle.scripts} colspan={5} />
+									</TableCell>
+								</tr>
+								{#if bundle.open}
+									<ScriptLinks scripts={bundle.scripts} colspan={5} />
+								{/if}
 							{/if}
-						{/if}
-					{/each}
+						{/each}
 
-					{#each scripts as script, i}
-						{#if script.active}
-							<tr>
+						{#each scripts as script, i}
+							{#if script.active}
+								<tr>
+									<TableCell alignment="left" padding={0}>
+										<div class="mx-3">
+											<div class="">{script.name}</div>
+											{#await script.username}
+												<div class="text-xs">by Loading...</div>
+											{:then username}
+												<div class="text-xs">by {username}</div>
+											{/await}
+										</div>
+									</TableCell>
+
+									<TableCell padding={0}>
+										<a href="/scripts/{script.url}" class="permalink flex justify-center">
+											<button class="btn hover:cursor-pointer hover:text-primary-500">
+												<ExternalLink size={16} />
+												<span>Script</span>
+											</button>
+										</a>
+									</TableCell>
+
+									<TableCell>{getCurrentPrice(script.prices)}</TableCell>
+
+									<TableCell padding={script.active ? 0 : 3}>
+										{#if script.active}
+											<div
+												class="btn-group-vertical md:btn-group variant-outline-surface rounded-md"
+											>
+												{#each script.prices as price, j}
+													<button
+														class="btn"
+														class:variant-ringed-primary={price.active}
+														on:click|preventDefault={() =>
+															changePriceInterval(script.prices, j, i + (bundles?.length ?? 0))}
+													>
+														{getPriceIntervalEx(price)}
+													</button>
+												{/each}
+											</div>
+										{:else}
+											Unavailable
+										{/if}
+									</TableCell>
+
+									<TableCell padding={0}>
+										<button
+											class="btn variant-filled-secondary"
+											formaction="?/checkout&product={script.id}"
+										>
+											Checkout
+										</button>
+									</TableCell>
+								</tr>
+							{/if}
+						{/each}
+					{:else}
+						{#each Array(5) as _}
+							<tr class="table-row">
 								<TableCell alignment="left" padding={0}>
 									<div class="mx-3">
-										<div class="">{script.name}</div>
-										<div class="text-xs">by {script.username}</div>
+										<div>Loading...</div>
+										<div class="text-xs text-left">by Loading...</div>
 									</div>
 								</TableCell>
 
 								<TableCell padding={0}>
-									<a href="/scripts/{script.url}" class="permalink flex justify-center">
-										<button class="btn hover:cursor-pointer hover:text-primary-500">
-											<ExternalLink size={16} />
-											<span>Script</span>
-										</button>
-									</a>
+									<button class="btn hover:cursor-pointer hover:text-primary-500">
+										<RotateCw size={16} />
+										<span>Loading...</span>
+									</button>
 								</TableCell>
 
-								<TableCell>{getCurrentPrice(script.prices)}</TableCell>
+								<TableCell>Loading...</TableCell>
 
-								<TableCell padding={script.active ? 0 : 3}>
-									{#if script.active}
-										<div class="btn-group-vertical md:btn-group variant-outline-surface rounded-md">
-											{#each script.prices as price, j}
-												<button
-													class="btn"
-													class:variant-ringed-primary={price.active}
-													on:click|preventDefault={() =>
-														changePriceInterval(script.prices, j, i + bundles.length)}
-												>
-													{getPriceIntervalEx(price)}
-												</button>
-											{/each}
-										</div>
-									{:else}
-										Unavailable
-									{/if}
+								<TableCell padding={0}>
+									<div class="btn-group-vertical md:btn-group variant-outline-surface rounded-md">
+										{#each Array(3) as _}
+											<button class="btn"> Loading... </button>
+										{/each}
+									</div>
 								</TableCell>
 
 								<TableCell padding={0}>
-									<button
-										class="btn variant-filled-secondary"
-										formaction="?/checkout&product={script.id}"
-									>
-										Checkout
-									</button>
+									<div class="btn variant-filled-surface cursor-pointer disabled">Checkout</div>
 								</TableCell>
 							</tr>
-						{/if}
-					{/each}
+						{/each}
+					{/if}
 				</tbody>
 			</table>
 		</div>
@@ -528,7 +613,7 @@
 
 <h5 class="my-8 text-center">
 	By making any purchase you automatically accept the
-	<a href="/legal/user_terms_of_service">user terms or service</a>
+	<a href="/legal/user_tos">user terms or service</a>
 	.
 </h5>
 <p class="my-8 mx-auto text-center">

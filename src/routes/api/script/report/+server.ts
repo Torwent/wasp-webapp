@@ -1,15 +1,12 @@
-import { updateReporters } from "$lib/backend/supabase.server"
+import { updateReporters } from "$lib/server/supabase.server"
+import { error, json } from "@sveltejs/kit"
 
-export const POST = async ({ request, locals: { getProfile } }) => {
-	const promises = await Promise.all([request.json(), getProfile()])
+export const POST = async ({ request, locals: { session } }) => {
+	if (!session) error(403, "You need to be logged in!")
+	const data = await request.json()
 
-	const data = promises[0]
-	const profile = promises[1]
-	if (!profile) return new Response()
+	if (!Object.keys(data).includes("id")) error(403, "No script specified.")
+	await updateReporters(data.id as string, session.user.id)
 
-	if (!Object.keys(data).includes("id")) return new Response()
-	const id = data.id as string
-	await updateReporters(id, profile.id)
-
-	return new Response()
+	return json({ success: "true" })
 }

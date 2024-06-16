@@ -1,5 +1,6 @@
 import { STRIPE_WEBHOOK_SECRET_PRICES } from "$env/static/private"
-import { stripe, insertPrice, deletePrice, updatePrice } from "$lib/backend/supabase.server"
+import { stripe } from "$lib/server/stripe.server"
+import { WaspPrice } from "$lib/server/supabase.server.js"
 import { error, json } from "@sveltejs/kit"
 import type Stripe from "stripe"
 
@@ -21,12 +22,12 @@ export const POST = async ({ request }) => {
 	switch (type) {
 		case "price.deleted":
 			const priceDeleted = data.object as Stripe.Price
-			await deletePrice(priceDeleted.id)
+			await WaspPrice.delete(priceDeleted.id)
 			break
 
 		case "price.updated":
 			const priceUpdated = data.object as Stripe.Price
-			await updatePrice({
+			await WaspPrice.update({
 				id: priceUpdated.id,
 				product: priceUpdated.product.toString(),
 				amount: priceUpdated.unit_amount ?? 100,
@@ -38,7 +39,7 @@ export const POST = async ({ request }) => {
 
 		case "price.created":
 			const priceCreated = data.object as Stripe.Price
-			await insertPrice({
+			await WaspPrice.insert({
 				id: priceCreated.id,
 				product: priceCreated.product.toString(),
 				amount: priceCreated.unit_amount ?? 100,

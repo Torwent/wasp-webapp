@@ -13,8 +13,7 @@
 	const headDescription = "Need help botting osrs? See if what you are looking for is in this list."
 	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Bot, Wasp, Scripts, Simba"
 	const headAuthor = "Torwent"
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -45,9 +44,12 @@
 		<h2>Welcome to the Frequently Asked Questions and Common Errors section.</h2>
 	</header>
 
-	<DropDown title="❓ Frequently Asked Questions" entries={questions} />
-	<DropDown title="⚠️ Common Errors" entries={errors} />
-
+	{#await questions then questions}
+		<DropDown title="❓ Frequently Asked Questions" entries={questions} />
+	{/await}
+	{#await errors then errors}
+		<DropDown title="⚠️ Common Errors" entries={errors} />
+	{/await}
 	<header class="py-12 text-center">
 		<p class="py-6">
 			Hopefully you found what you were looking for here, if not feel free to join the discord

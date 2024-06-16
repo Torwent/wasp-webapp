@@ -1,22 +1,47 @@
 <script lang="ts">
 	import { page } from "$app/stores"
-	import type { StatsSimba } from "$lib/types/collection"
-	import { formatRSNumber } from "$lib/utils"
+	import { formatNumber } from "$lib/utils"
 	export let id: string
-	export let scriptStats: Promise<StatsSimba>
 
-	const authorButtons = ["none", "online list", "all time downloads", "monthly downloads"]
+	const authorButtons = ["none", "Currently Online", "All Downloads", "Downloads this month"]
 	let selectedBtn = "none"
 
-	async function getScriptsData() {
+	async function getScriptStats() {
+		const { data, error: err } = await $page.data.supabaseClient
+			.schema("scripts")
+			.from("stats_simba")
+			.select(
+				"experience, gold, runtime, levels, unique_users, unique_users_total, online_users, online_users_total"
+			)
+			.eq("id", id)
+			.single()
+
+		if (err) {
+			console.error(err)
+			return {
+				experience: 0,
+				gold: 0,
+				runtime: 0,
+				levels: 0,
+				unique_users: [],
+				unique_users_total: 0,
+				online_users: [],
+				online_users_total: 0
+			}
+		}
+
+		return data
+	}
+
+	async function getScriptData() {
 		const { data, error: err } = await $page.data.supabaseClient
 			.schema("scripts")
 			.from("stats_site")
 			.select(
-				`unique_downloads, unique_downloads_total, month_downloads, month_downloads_total, previous_months`
+				"unique_downloads, unique_downloads_total, month_downloads, month_downloads_total, previous_months"
 			)
 			.eq("id", id)
-			.limit(1)
+			.single()
 
 		if (err) {
 			console.error(err)
@@ -29,10 +54,11 @@
 			}
 		}
 
-		return data[0]
+		return data
 	}
 
-	const scriptData = getScriptsData()
+	const scriptStats = getScriptStats()
+	const scriptData = getScriptData()
 </script>
 
 <header class="text-center">
@@ -47,58 +73,73 @@
 						else selectedBtn = btn
 					}}
 				>
-					View {btn}
+					{btn}
 				</button>
 			{/if}
 		{/each}
 	</div>
 
 	{#if selectedBtn === authorButtons[1]}
-		{#await scriptStats}
-			<h4>Total downloads: ...</h4>
+		<h4>
+			Currently Online:
+			{#await scriptStats}
+				Loading...
+			{:then data}
+				{formatNumber(data.online_users_total)}
+			{/await}
+		</h4>
 
-			<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">Loading...</div>
-		{:then data}
-			<h4>Currently online (simba uuids): {formatRSNumber(data.online_users_total)}</h4>
-
-			<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
+		<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
+			{#await scriptStats}
+				Loading...
+			{:then data}
 				{#each data.online_users as user}
 					{#if user && Object.values(user).length > 0}
 						{Object.values(user)[0]}
 						<br />
 					{/if}
 				{/each}
-			</div>
-		{/await}
+			{/await}
+		</div>
 	{:else if selectedBtn === authorButtons[2]}
-		{#await scriptData}
-			<h4>Total downloads: ...</h4>
+		<h4>
+			Total downloads:
+			{#await scriptData}
+				Loading...
+			{:then data}
+				{formatNumber(data.unique_downloads_total)}
+			{/await}
+		</h4>
 
-			<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">Loading...</div>
-		{:then data}
-			<h4>Total downloads: {formatRSNumber(data.unique_downloads_total)}</h4>
-
-			<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
+		<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
+			{#await scriptData}
+				Loading...
+			{:then data}
 				{#each data.unique_downloads as user}
 					{user}
 					<br />
 				{/each}
-			</div>
-		{/await}
+			{/await}
+		</div>
 	{:else if selectedBtn === authorButtons[3]}
-		{#await scriptData}
-			<h4>Total monthly downloads: ...</h4>
+		<h4>
+			Total downloads/month:
+			{#await scriptData}
+				Loading...
+			{:then data}
+				{formatNumber(data.month_downloads_total)}
+			{/await}
+		</h4>
 
-			<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">Loading...</div>
-		{:then data}
-			<h4>Total monthly downloads: {formatRSNumber(data.month_downloads_total)}</h4>
-
-			<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
+		<div class="variant-ghost-surface max-h-[10rem] overflow-auto text-small">
+			{#await scriptData}
+				Loading...
+			{:then data}
 				{#each data.month_downloads as user}
 					{user}
 					<br />
 				{/each}
-			</div>
-		{/await}
+			{/await}
+		</div>
 	{/if}
 </header>

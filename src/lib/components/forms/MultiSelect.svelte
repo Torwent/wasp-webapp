@@ -1,13 +1,13 @@
 <!-- Based on https://svelte.dev/repl/c7094fb1004b440482d2a88f4d1d7ef5?version=3.14.0 -->
 <script lang="ts">
 	import { page } from "$app/stores"
-	import type { Category, SubCategory } from "$lib/types/collection"
+	import type { Tooltip } from "$lib/types/collection"
 	import { ChevronDown, X } from "lucide-svelte"
 	export let title: string
 	export let value: string[]
 	export let errors: string[] | undefined = undefined
 	export let placeholder = ""
-	export let entries: Category[] | SubCategory[]
+	export let tooltips: Tooltip[]
 
 	function checkErrors(err: string[] | undefined) {
 		if (!err) return false
@@ -20,11 +20,11 @@
 
 	let inputValue: string = ""
 
-	function add(category: Category) {
+	function add(category: Tooltip) {
 		if (!value.includes(category.name)) value = [...value, category.name]
 	}
 
-	function remove(category: Category) {
+	function remove(category: Tooltip) {
 		showOptions = true
 		input.focus()
 		for (let i = 0; i < value.length; i++) {
@@ -47,19 +47,18 @@
 				return
 			}
 		}
-		add(entries.filter((e) => e.name === val)[0])
+		add(tooltips.filter((e) => e.name === val)[0])
 	}
 
-	entries.forEach((e) => {
-		if (value.length < 2 && (e.name === "Community" || e.name === "Free")) add(e)
+	tooltips.forEach((tooltip) => {
+		if (value.length < 2 && (tooltip.name === "Community" || tooltip.name === "Free")) add(tooltip)
 	})
 
-	const hadPremium = value.includes("Premium")
 	$: hasError = checkErrors(errors)
 
 	$: ({ profile } = $page.data)
 
-	$: if (!profile || !profile.roles.administrator) {
+	$: if (!profile || !$page.data.roles?.administrator) {
 		if (value.includes("Official")) {
 			for (let i = 0; i < value.length; i++) {
 				if (value[i] === "Official") {
@@ -73,8 +72,8 @@
 
 <div class="mb-8">
 	<select id={title.toLowerCase()} name={title.toLowerCase()} multiple class="hidden" bind:value>
-		{#each entries as entry}
-			<option value={entry.name}>{entry.name}</option>
+		{#each tooltips as tooltip}
+			<option value={tooltip.name}>{tooltip.name}</option>
 		{/each}
 	</select>
 	<label for={title.toLowerCase()}>{title}:</label>
@@ -102,15 +101,15 @@
 			/>
 		</div>
 
-		{#each entries as entry}
-			{#if value.includes(entry.name)}
+		{#each tooltips as tooltip}
+			{#if value.includes(tooltip.name)}
 				<button
 					class="chip variant-soft hover:variant-filled-surface"
-					data-id={entry.name}
+					data-id={tooltip.name}
 					on:focus={() => input.focus()}
-					on:click={() => remove(entry)}
+					on:click={() => remove(tooltip)}
 				>
-					<span class:text-error-500={hasError}>{entry.emoji + entry.name}</span>
+					<span class:text-error-500={hasError}>{tooltip.emoji + tooltip.name}</span>
 					<X class="h-4 {hasError ? 'text-error-500' : 'text-black dark:text-white'}" />
 				</button>
 			{/if}
@@ -122,14 +121,14 @@
 		{#if showOptions}
 			<!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
 			<ul on:mousedown|preventDefault={handleOptionMousedown}>
-				{#each entries as entry}
+				{#each tooltips as tooltip}
 					<li
-						class="p-2 cursor-pointer {value.includes(entry.name)
+						class="p-2 cursor-pointer {value.includes(tooltip.name)
 							? 'variant-filled-primary hover:bg-primary-400'
 							: 'variant-filled-surface hover:bg-surface-400'}"
-						data-value={entry.name}
+						data-value={tooltip.name}
 					>
-						{entry.emoji + entry.name}
+						{tooltip.emoji + tooltip.name}
 					</li>
 				{/each}
 			</ul>

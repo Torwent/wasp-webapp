@@ -1,12 +1,13 @@
-import { ADMIN_PASS } from "$env/static/private"
-import { createStripeCustomer } from "$lib/backend/data.server"
-import { getPrivateProfile, updateCustomerID } from "$lib/backend/supabase.server"
+import { SUPABASE_WEBHOOK_PASSWORD } from "$env/static/private"
+import { createStripeCustomer } from "$lib/server/stripe.server"
+import { getPrivateProfile, updateCustomerID } from "$lib/server/supabase.server"
+import { error, json } from "@sveltejs/kit"
 
 export const POST = async ({ request }) => {
 	const hookPassword = request.headers.get("password")
 	const req = await request.json()
 
-	if (hookPassword !== ADMIN_PASS) {
+	if (hookPassword !== SUPABASE_WEBHOOK_PASSWORD) {
 		console.error("Webhook password doesn't match")
 		throw Error("Webhook password doesn't match")
 	}
@@ -29,16 +30,15 @@ export const POST = async ({ request }) => {
 
 	if (!profile) {
 		console.error("Failed to load user profile for: " + id)
-		throw Error("Failed to load user private profile for: " + id)
+		error(403, "Failed to load user private profile for: " + id)
 	}
 
 	console.log("Creating customer for " + id)
 	const customer = await createStripeCustomer(id, email, profile.discord, profile.username)
 
-	if (!customer) {
-		throw Error("Failed to create stripe user for " + id)
-	}
+	if (!customer) error(403, "Failed to create stripe user for " + id)
+
 	await updateCustomerID(id, customer)
 
-	return new Response()
+	return json({ success: "true" })
 }

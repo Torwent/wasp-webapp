@@ -6,7 +6,8 @@
 	export let index: number
 	export let total: number
 
-	const versions = Array.from({ length: total }, (_, i) => i + 1).reverse()
+	let versions = Array.from({ length: total }, (_, i) => i + 1).reverse()
+	$: versions = versions
 
 	let popupSettings: PopupSettings = {
 		event: "click",

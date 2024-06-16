@@ -1,73 +1,63 @@
 <script lang="ts">
-	import "../theme.postcss"
-	import "@skeletonlabs/skeleton/styles/all.css"
 	import "../app.postcss"
-	import { computePosition, autoUpdate, offset, shift, flip, arrow } from "@floating-ui/dom"
-
+	import hljs from "highlight.js/lib/core"
+	import "highlight.js/styles/github-dark.css"
 	import {
 		AppBar,
 		AppShell,
 		LightSwitch,
+		storeHighlightJs,
+		initializeStores,
 		Modal,
-		modalStore,
 		storePopup,
-		Toast,
-		toastStore
+		Toast
 	} from "@skeletonlabs/skeleton"
+	import shell from "highlight.js/lib/languages/shell"
+	import dos from "highlight.js/lib/languages/dos"
+	import xml from "highlight.js/lib/languages/xml"
+	import delphi from "highlight.js/lib/languages/delphi"
+	import java from "highlight.js/lib/languages/java"
+	import "highlight.js/styles/github-dark.css"
+	import { computePosition, autoUpdate, flip, shift, offset, arrow } from "@floating-ui/dom"
+	import { goto, invalidate } from "$app/navigation"
+	import MediaQuery from "$lib/components/MediaQuery.svelte"
+	import Footer from "./Footer.svelte"
+	import Navigation from "./Navigation.svelte"
+	import UserPanel from "./UserPanel.svelte"
+	import { onMount } from "svelte"
+
+	hljs.registerLanguage("shell", shell)
+	hljs.registerLanguage("cmd", dos)
+	hljs.registerLanguage("html", xml)
+	hljs.registerLanguage("pascal", delphi)
+	hljs.registerLanguage("java", java)
+
+	storeHighlightJs.set(hljs)
+
+	initializeStores()
 
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow })
 
-	import Navigation from "./Navigation.svelte"
-	import MediaQuery from "$lib/components/MediaQuery.svelte"
-	import UserPanel from "./UserPanel.svelte"
-	import Footer from "./Footer.svelte"
-	import { browser } from "$app/environment"
-	import { invalidate } from "$app/navigation"
-	import { onMount } from "svelte"
-	import type { AuthChangeEvent, RealtimeChannel, Session } from "@supabase/supabase-js"
 	export let data
-
-	let { supabaseClient, session } = data
-	$: ({ supabaseClient, session } = data)
+	$: ({ session, supabaseClient } = data)
 
 	onMount(() => {
-		const {
-			data: { subscription }
-		} = supabaseClient.auth.onAuthStateChange(
-			(_event: AuthChangeEvent, _session: Session | null) => {
-				if (_session?.expires_at !== session?.expires_at) {
-					invalidate("supabase:auth")
-				}
+		const { data } = supabaseClient.auth.onAuthStateChange((_, newSession) => {
+			if (!newSession) {
+				setTimeout(() => goto("/", { invalidateAll: true }))
 			}
-		)
 
-		let profilesSubscriptionSubscription: RealtimeChannel | null = null
-		if (session) {
-			profilesSubscriptionSubscription = supabaseClient
-				.channel("profiles-subscription-changes")
-				.on(
-					"postgres_changes",
-					{
-						event: "*",
-						schema: "profiles",
-						table: "subscription",
-						filter: "id=eq." + session.user.id
-					},
-					() => invalidate("supabase:auth")
-				)
-				.subscribe()
-		}
+			if (newSession?.expires_at !== session?.expires_at) {
+				invalidate("supabase:auth")
+			}
+		})
 
-		return () => {
-			subscription.unsubscribe()
-			if (profilesSubscriptionSubscription) profilesSubscriptionSubscription.unsubscribe()
-		}
+		return () => data.subscription.unsubscribe()
 	})
 </script>
 
-{#if browser && $modalStore.length > 0}
-	<Modal regionBody="overflow-y-scroll max-h-96" />
-{/if}
+<Toast />
+<Modal />
 
 <AppShell regionPage="relative" slotPageHeader="sticky top-0 z-10" slotPageFooter="grid">
 	<svelte:fragment slot="pageHeader">
@@ -77,22 +67,12 @@
 		>
 			<MediaQuery query="(min-width: 768px)" let:matches>
 				<AppBar class="max-w-7xl mx-auto" background="bg-transparent">
-					<svelte:fragment slot="lead">
-						{#if matches}
-							<Navigation large={true} />
-						{:else}
-							<div />
-						{/if}
-					</svelte:fragment>
-					{#if !matches}
-						<Navigation large={false} />
-					{/if}
+					<svelte:fragment slot="lead"><Navigation large={matches} /></svelte:fragment>
+
 					<svelte:fragment slot="trail">
 						{#if matches}
 							<UserPanel large={true} />
 							<LightSwitch class="hidden md:block" />
-						{:else}
-							<div />
 						{/if}
 					</svelte:fragment>
 				</AppBar>
@@ -100,14 +80,8 @@
 		</div>
 	</svelte:fragment>
 
-	<!-- Router Slot -->
 	<slot />
-	<!-- ---- / ---- -->
 	<svelte:fragment slot="pageFooter">
 		<Footer />
 	</svelte:fragment>
 </AppShell>
-
-{#if browser && $toastStore.length > 0}
-	<Toast />
-{/if}

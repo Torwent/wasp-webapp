@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Markdown from "$lib/Markdown.svelte"
-	import type { ErrorEntry, FAQEntry } from "$lib/types/collection"
+	import Markdown from "$lib/components/Markdown.svelte"
+	import type { FAQEntry } from "$lib/types/collection"
 	import { ChevronsDownUp, ChevronsUpDown } from "lucide-svelte"
 	import { slide } from "svelte/transition"
 
 	let show = false
-	export let entry: FAQEntry | ErrorEntry
+	export let entry: FAQEntry
 </script>
 
 <button

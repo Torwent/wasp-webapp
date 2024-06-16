@@ -1,66 +1,29 @@
 <script lang="ts">
-	import { goto, invalidate } from "$app/navigation"
+	import { invalidate } from "$app/navigation"
 	import { page } from "$app/stores"
-	import { browser } from "$app/environment"
 	import { onMount } from "svelte"
+	import { formatTime, formatNumber } from "$lib/utils"
+	import StatsTable from "./StatsTable.svelte"
+	import { replaceQuery } from "$lib/client/utils"
 	import type { Stats } from "$lib/types/collection"
-	import { convertTime, formatRSNumber } from "$lib/utils"
-	import Paginator from "$lib/components/Paginator.svelte"
-	import { ChevronDown, ChevronUp } from "lucide-svelte"
 
 	export let data
 
-	let {
-		supabaseClient,
-		stats: { count },
-		range
-	} = data
+	let { supabaseClient, totalPromise, statsPromise, range } = data
+	$: ({ supabaseClient, totalPromise, statsPromise, range } = data)
 
 	let { searchParams } = $page.url
 	$: ({ searchParams } = $page.url)
-	$: ({
-		supabaseClient,
-		stats: { count },
-		range
-	} = data)
-
-	const pageStr = searchParams.get("page") || "-1"
-	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 
 	let search = decodeURIComponent(searchParams.get("search") || "").trim()
-	let ascending = searchParams.get("ascending")?.toLowerCase() === "true"
-	let headers: (keyof Stats)[] = ["username", "experience", "gold", "levels", "runtime"]
-	let selectedHeader: keyof Stats = (searchParams.get("order") as keyof Stats) || "experience"
 
-	async function replaceQuery(values: Record<string, string>) {
-		if (!browser) return
-		let invalidate: boolean = false
-		for (let [k, v] of Object.entries(values)) {
-			if (!!v && v !== "") searchParams.set(encodeURIComponent(k), encodeURIComponent(v))
-			else searchParams.delete(k)
+	let stats: Stats[] | null = null
+	let count: number = 0
 
-			invalidate = invalidate || v === ""
-		}
-
-		const path = $page.url.origin + $page.url.pathname + "?" + searchParams.toString()
-
-		await goto(path, {
-			keepFocus: true,
-			noScroll: true,
-			replaceState: true,
-			invalidateAll: invalidate
-		})
-	}
-
-	async function sortBy(header: keyof Stats) {
-		search = ""
-		ascending = selectedHeader === header ? !ascending : false
-		selectedHeader = header
-		await replaceQuery({
-			ascending: ascending ? "true" : "false",
-			order: header
-		})
-	}
+	$: statsPromise.then((awaited) => {
+		stats = awaited.stats
+		count = awaited.count
+	})
 
 	onMount(() => {
 		const subscription = supabaseClient
@@ -84,8 +47,7 @@
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Stats"
 	const headAuthor = "Torwent"
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -112,25 +74,26 @@
 </svelte:head>
 
 <main class="overflow-x-auto relative sm:rounded-lg my-4 mx-12 md:mx-16 lg:mx-24">
-	<header class="">
+	<header>
 		<h5 class="py-4 px-6 font-bold text-center whitespace-nowrap">
-			Total experience:
-			<span class="py-4 pr-6">
-				{formatRSNumber(data.total.experience || 0)}
-			</span>
-			<wbr />
-			Total gold:
-			<span class="py-4 pr-6">
-				{formatRSNumber(data.total.gold || 0)}
-			</span>
-			<wbr />
-			Total levels:
-			<span class="py-4 pr-6">{formatRSNumber(data.total.levels)}</span>
-			<wbr />
-			Total runtime:
-			<span class="py-4 pr-6">
-				{convertTime(data.total.runtime || 0)}
-			</span>
+			{#await totalPromise}
+				Total experience: <span class="py-4 pr-6"> ... </span>
+				<wbr />
+				Total gold: <span class="py-4 pr-6"> ... </span>
+				<wbr />
+				Total levels: <span class="py-4 pr-6">...</span>
+				<wbr />
+				Total runtime: <span class="py-4 pr-6"> ... </span>
+			{:then total}
+				Total experience: <span class="py-4 pr-6"> {formatNumber(total.experience)} </span>
+				<wbr />
+				Total gold:
+				<span class="py-4 pr-6"> {formatNumber(total.gold)} </span>
+				<wbr />
+				Total levels: <span class="py-4 pr-6">{formatNumber(total.levels)}</span>
+				<wbr />
+				Total runtime: <span class="py-4 pr-6"> {formatTime(total.runtime)} </span>
+			{/await}
 		</h5>
 	</header>
 
@@ -140,37 +103,33 @@
 			placeholder="Search UUID or username..."
 			class="input"
 			bind:value={search}
-			on:input={async () => await replaceQuery({ page: "1", search: search })}
+			on:input={async () =>
+				await replaceQuery($page.url, {
+					page: "1",
+					search: search
+				})}
 		/>
 	</div>
 
-	<table class="w-full text-sm text-left table table-hover">
-		<thead class="text-xs uppercase text-primary-700 dark:text-primary-500">
-			<tr>
-				{#each headers as header}
-					<th scope="col" class="py-3 px-6" on:click={async () => await sortBy(header)}>
-						<div class="flex justify-between text-sm">
-							<span class="align-middle h-full my-auto">
-								{header}
-								{#if header === "levels"}
-									<a
-										href="/tutorials/waspstats-virtual-levels-by-torwent"
-										class="text-stone-700 dark:text-stone-400 hover:text-primary-400"
-									>
-										*
-									</a>
-								{/if}
-							</span>
-							{#if selectedHeader === header}
-								{#if ascending} <ChevronDown /> {:else} <ChevronUp /> {/if}
-							{/if}
-						</div>
+	{#await statsPromise}
+		<StatsTable bind:search bind:range>
+			{#each Array(search === "" ? 20 : 1) as _}
+				<tr class="animate-pulse">
+					<th
+						scope="row"
+						class="py-4 px-6 font-medium text-stone-900 whitespace-nowrap dark:text-white w-96"
+					>
+						Loading...
 					</th>
-				{/each}
-			</tr>
-		</thead>
-		<tbody>
-			{#each data.stats.stats as entry}
+					{#each Array(4) as _}
+						<td class="py-4 px-6 w-64">Loading...</td>
+					{/each}
+				</tr>
+			{/each}
+		</StatsTable>
+	{:then stats}
+		<StatsTable bind:search bind:range bind:count>
+			{#each stats.stats as entry}
 				<tr>
 					<th
 						scope="row"
@@ -178,14 +137,12 @@
 					>
 						{entry.username !== "" ? entry.username : "Anonymous"}
 					</th>
-					<td class="py-4 px-6 w-64">{formatRSNumber(entry.experience ?? 0)}</td>
-					<td class="py-4 px-6 w-64">{formatRSNumber(entry.gold ?? 0)}</td>
-					<td class="py-4 px-6 w-64">{formatRSNumber(entry.levels)}</td>
-					<td class="py-4 px-6 w-64">{convertTime(entry.runtime ?? 0)}</td>
+					<td class="py-4 px-6 w-64">{formatNumber(entry.experience)}</td>
+					<td class="py-4 px-6 w-64">{formatNumber(entry.gold)}</td>
+					<td class="py-4 px-6 w-64">{formatNumber(entry.levels)}</td>
+					<td class="py-4 px-6 w-64">{formatTime(entry.runtime)}</td>
 				</tr>
 			{/each}
-		</tbody>
-	</table>
-
-	<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count />
+		</StatsTable>
+	{/await}
 </main>

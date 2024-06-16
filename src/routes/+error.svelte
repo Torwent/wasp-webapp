@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { page } from "$app/stores"
+	import { CodeBlock } from "@skeletonlabs/skeleton"
 
 	const headTitle = "Page not found - WaspScripts"
 	const headDescription = "This page does not exist."
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Script, Developer, Tutorials, Tutorial, Guides, Guide. "
 	const headAuthor = "Torwent"
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -41,7 +41,13 @@
 
 		<div class="my-8">
 			<h4 class="my-2">Error code: {$page.status}</h4>
-			<p>{$page.error?.message}</p>
+			<CodeBlock
+				class="mx-4"
+				language="html"
+				buttonLabel="📝"
+				buttonCopied="👍"
+				code={$page.error?.message}
+			/>
 		</div>
 
 		<a href={$page.url.href}>

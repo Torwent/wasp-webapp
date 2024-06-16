@@ -1,24 +1,9 @@
-//import { STRIPE_WEBHOOOK_SECRET_LOCAL } from "$env/static/private"
-import {
-	insertProduct,
-	deleteProduct,
-	stripe,
-	updateProduct,
-	insertPrice,
-	deletePrice,
-	updatePrice,
-	insertSubscription,
-	deleteSubscription,
-	upsertSubscription
-} from "$lib/backend/supabase.server"
+import { stripe } from "$lib/server/stripe.server"
+import { WaspPrice, WaspProduct, WaspSubscription } from "$lib/server/supabase.server.js"
 import { error, json } from "@sveltejs/kit"
 import type Stripe from "stripe"
 
-export const GET = async ({ request }) => {
-	return json({ success: true })
-}
-
-export const POST = async ({ request, locals }) => {
+export const POST = async ({ request }) => {
 	const sig = request.headers.get("stripe-signature") ?? ""
 	let event: Stripe.Event
 
@@ -50,14 +35,15 @@ export const POST = async ({ request, locals }) => {
 			const subscriptionCreated = data.object as Stripe.Subscription
 			if (subscriptionCreated.status !== "active") break
 
-			await insertSubscription({
+			await WaspSubscription.insert({
 				subscription: subscriptionCreated.id,
 				id: subscriptionCreated.metadata.user_id,
 				product: subscriptionCreated.items.data[0].price.product.toString(),
 				price: subscriptionCreated.items.data[0].price.id,
 				date_end: new Date(subscriptionCreated.current_period_end * 1000).toISOString(),
 				date_start: new Date(subscriptionCreated.start_date * 1000).toISOString(),
-				cancel: subscriptionCreated.cancel_at_period_end
+				cancel: subscriptionCreated.cancel_at_period_end,
+				disabled: false
 			})
 
 			break
@@ -67,25 +53,26 @@ export const POST = async ({ request, locals }) => {
 			if (subscriptionUpdated.status !== "active" && subscriptionUpdated.status !== "canceled")
 				break
 
-			await upsertSubscription({
+			await WaspSubscription.upsert({
 				subscription: subscriptionUpdated.id,
 				id: subscriptionUpdated.metadata.user_id,
 				product: subscriptionUpdated.items.data[0].price.product.toString(),
 				price: subscriptionUpdated.items.data[0].price.id,
 				date_end: new Date(subscriptionUpdated.current_period_end * 1000).toISOString(),
 				date_start: new Date(subscriptionUpdated.start_date * 1000).toISOString(),
-				cancel: subscriptionUpdated.cancel_at_period_end
+				cancel: subscriptionUpdated.cancel_at_period_end,
+				disabled: false
 			})
 			break
 
 		case "customer.subscription.deleted":
 			const subscriptionDeleted = data.object as Stripe.Subscription
-			await deleteSubscription(subscriptionDeleted.id)
+			await WaspSubscription.delete(subscriptionDeleted.id)
 			break
 
 		case "product.deleted":
 			const productDeleted = data.object as Stripe.Product
-			await deleteProduct(productDeleted.id)
+			await WaspProduct.delete(productDeleted.id)
 			break
 
 		case "product.updated":
@@ -94,14 +81,14 @@ export const POST = async ({ request, locals }) => {
 
 			const productUpdated = data.object as Stripe.Product
 
-			await updateProduct(productUpdated.id, productUpdated.name)
+			await WaspProduct.update(productUpdated.id, productUpdated.name)
 			break
 
 		case "product.created":
 			const productCreated = data.object as Stripe.Product
 			const { name } = productCreated
 			const metadata = productCreated.metadata as unknown as ProductMetadata
-			await insertProduct({
+			await WaspProduct.insert({
 				id: productCreated.id,
 				name: name,
 				user_id: metadata.user_id,
@@ -114,12 +101,12 @@ export const POST = async ({ request, locals }) => {
 
 		case "price.deleted":
 			const priceDeleted = data.object as Stripe.Price
-			await deletePrice(priceDeleted.id)
+			await WaspPrice.delete(priceDeleted.id)
 			break
 
 		case "price.updated":
 			const priceUpdated = data.object as Stripe.Price
-			await updatePrice({
+			await WaspPrice.update({
 				id: priceUpdated.id,
 				product: priceUpdated.product.toString(),
 				amount: priceUpdated.unit_amount ?? 100,
@@ -131,7 +118,7 @@ export const POST = async ({ request, locals }) => {
 
 		case "price.created":
 			const priceCreated = data.object as Stripe.Price
-			await insertPrice({
+			await WaspPrice.insert({
 				id: priceCreated.id,
 				product: priceCreated.product.toString(),
 				amount: priceCreated.unit_amount ?? 100,
@@ -142,10 +129,8 @@ export const POST = async ({ request, locals }) => {
 			break
 
 		default:
-			throw error(404, "Product event doesn't have a valid type! Type: " + type)
+			error(404, "Product event doesn't have a valid type! Type: " + type)
 	}
 
-	return json({
-		success: "true"
-	})
+	return json({ success: "true" })
 }

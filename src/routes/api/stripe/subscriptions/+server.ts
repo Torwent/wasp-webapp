@@ -1,10 +1,6 @@
 import { STRIPE_WEBHOOK_SECRET_SUBSCRIPTIONS } from "$env/static/private"
-import {
-	stripe,
-	insertSubscription,
-	deleteSubscription,
-	upsertSubscription
-} from "$lib/backend/supabase.server"
+import { stripe } from "$lib/server/stripe.server"
+import { WaspSubscription } from "$lib/server/supabase.server"
 import { error, json } from "@sveltejs/kit"
 import type Stripe from "stripe"
 
@@ -18,7 +14,7 @@ export const POST = async ({ request }) => {
 		event = stripe.webhooks.constructEvent(body, sig, STRIPE_WEBHOOK_SECRET_SUBSCRIPTIONS)
 	} catch (err) {
 		console.log(err)
-		throw error(404, "Event is not valid! Body: " + body + " Error: " + err)
+		error(404, "Event is not valid! Body: " + body + " Error: " + err)
 	}
 
 	const { data, type } = event
@@ -30,7 +26,7 @@ export const POST = async ({ request }) => {
 			const subscriptionCreated = data.object as Stripe.Subscription
 			if (subscriptionCreated.status !== "active") break
 
-			const { error: errInsert } = await insertSubscription({
+			const { error: errInsert } = await WaspSubscription.insert({
 				subscription: subscriptionCreated.id,
 				id: subscriptionCreated.metadata.user_id,
 				product: subscriptionCreated.items.data[0].price.product.toString(),
@@ -41,7 +37,7 @@ export const POST = async ({ request }) => {
 				disabled: false
 			})
 
-			if (errInsert) throw error(404, "Error inserting subscription: " + JSON.stringify(errInsert))
+			if (errInsert) error(404, "Error inserting subscription: " + JSON.stringify(errInsert))
 
 			break
 
@@ -56,7 +52,7 @@ export const POST = async ({ request }) => {
 					message: "Upgrade.Chat user."
 				})
 
-			const { error: errUpsert } = await upsertSubscription({
+			const { error: errUpsert } = await WaspSubscription.upsert({
 				subscription: subscriptionUpdated.id,
 				id: subscriptionUpdated.metadata.user_id,
 				product: subscriptionUpdated.items.data[0].price.product.toString(),
@@ -67,30 +63,36 @@ export const POST = async ({ request }) => {
 				disabled: false
 			})
 
-			if (errUpsert) throw error(404, "Error upserting subscription: " + errUpsert)
+			if (errUpsert) error(404, "Error upserting subscription: " + errUpsert)
 
 			break
 
 		case "customer.subscription.deleted":
 			const subscriptionDeleted = data.object as Stripe.Subscription
-			const { error: errDelete } = await deleteSubscription(subscriptionDeleted.id)
-			if (errDelete) throw error(404, "Error deleting subscription: " + errDelete)
+			const { error: errDelete } = await WaspSubscription.delete(subscriptionDeleted.id)
+			if (errDelete) error(404, "Error deleting subscription: " + errDelete)
 			const last_invoice = subscriptionDeleted.latest_invoice
 			if (last_invoice) {
 				try {
 					stripe.invoices.voidInvoice(last_invoice.toString())
 				} catch (err) {
 					console.error(err)
-					throw error(404, "Failed to void invoce: " + last_invoice + " for sub: " + subscriptionDeleted.id + "  Error: " + err)
+					error(
+						404,
+						"Failed to void invoce: " +
+							last_invoice +
+							" for sub: " +
+							subscriptionDeleted.id +
+							"  Error: " +
+							err
+					)
 				}
 			}
 			break
 
 		default:
-			throw error(404, "Subscription event doesn't have a valid type! Type: " + type)
+			error(404, "Subscription event doesn't have a valid type! Type: " + type)
 	}
 
-	return json({
-		success: "true"
-	})
+	return json({ success: "true" })
 }

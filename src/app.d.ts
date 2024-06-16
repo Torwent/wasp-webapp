@@ -1,22 +1,33 @@
-import type { SupabaseClient, Session, User } from "@supabase/supabase-js"
+import type { ProfileBase, ProfileRoles, Subscription, FreeAccess } from "$lib/types/collection"
 import type { Database } from "$lib/types/supabase"
-import type { Profile } from "$lib/types/collection"
+import type { Session, SupabaseClient, User } from "@supabase/supabase-js"
 
 declare global {
 	namespace App {
+		// interface Error {}
 		interface Locals {
 			supabaseServer: SupabaseClient<Database>
-			getSession(): Promise<Session | null>
-			getUser(): Promise<User | null>
-			getProfile(): Promise<Profile | null>
-			profile: Profile | null
+			safeGetSession: () => Promise<{
+				session: Session | null
+				user: User | null
+			}>
+			session: Session | null
+			user: User | null
+			getProfile: () => Promise<ProfileBase | null> | null
+			getRoles: () => Promise<ProfileRoles | null> | null
+			getSubscriptions: () => Promise<Subscription[] | null> | null
+			getFreeAccess: () => Promise<FreeAccess[] | null> | null
 		}
 		interface PageData {
 			supabaseClient: SupabaseClient<Database>
 			session: Session | null
-			profile: Profile | null
+			user: User | null
+			profile: ProfileBase | null
+			roles: ProfileRoles | null
 		}
-		// interface Error {}
+		// interface PageState {}
 		// interface Platform {}
 	}
 }
+
+export {}

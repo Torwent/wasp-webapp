@@ -1,5 +1,4 @@
-import { removeScriptBroken, updateReporters } from "$lib/backend/supabase.server.js"
-import { UUID_V4_REGEX } from "$lib/utils.js"
+import { removeScriptBroken, updateReporters } from "$lib/server/supabase.server"
 import { error } from "@sveltejs/kit"
 
 export const load = async ({ cookies }) => {
@@ -7,29 +6,16 @@ export const load = async ({ cookies }) => {
 }
 
 export const actions = {
-	clear: async ({ url: { searchParams }, locals: { getProfile } }) => {
-		const id = searchParams.get("id")
-		if (!id) throw error(403, "No script id was passed!")
-		if (!UUID_V4_REGEX.test(id)) throw error(403, "Script id passed is not a valid UUID!")
-
-		const profile = await getProfile()
-		if (!profile) throw error(403, "You need to be logged in to clear reports.")
-
-		if (!profile.roles.tester && !profile.roles.moderator && !profile.roles.administrator) {
-			throw error(403, "Only testers, moderators and administrators can clear reports.")
+	clear: async ({ params: { slug }, locals: { getRoles } }) => {
+		const roles = await getRoles()
+		if (!roles) error(403, "You need to be logged in to clear reports.")
+		if (!roles.tester && !roles.moderator && !roles.administrator) {
+			error(403, "Only testers, moderators and administrators can clear reports.")
 		}
-
-		return await removeScriptBroken(id)
+		return { success: await removeScriptBroken(slug) }
 	},
-	report: async ({ url: { searchParams }, locals: { getSession } }) => {
-		const id = searchParams.get("id")
-		if (!id) throw error(403, "No script id was passed!")
-		if (!UUID_V4_REGEX.test(id)) throw error(403, "Script id passed is not a valid UUID!")
-		const session = await getSession()
-		if (!session) throw error(403, "You need to be logged in to report a broken script.")
-
-		updateReporters(id, session.user.id)
-
-		return
+	report: async ({ params: { slug }, locals: { session } }) => {
+		if (!session) error(403, "You need to be logged in to report a broken script.")
+		return { success: await updateReporters(slug, session.user.id) }
 	}
 }

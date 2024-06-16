@@ -1,8 +1,9 @@
 <script lang="ts">
 	import { superForm } from "sveltekit-superforms/client"
 	import { FileDropzone, SlideToggle, focusTrap } from "@skeletonlabs/skeleton"
-	import { cropString, replaceScriptContent } from "$lib/utils"
-	import { scriptSchema } from "$lib/backend/schemas"
+	import { cropString } from "$lib/utils"
+	import { replaceScriptContent } from "$lib/client/utils"
+	import { updateScriptClientSchema } from "$lib/client/schemas"
 	import FormInput from "$lib/components/forms/FormInput.svelte"
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
 	import MultiSelect from "$lib/components/forms/MultiSelect.svelte"
@@ -15,63 +16,47 @@
 	import ScriptArticle from "../../ScriptArticle.svelte"
 	import StatsHeader from "../../StatsHeader.svelte"
 	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
-	import { addToolTips, getScriptsStats } from "$lib/backend/data"
+	import { zodClient } from "sveltekit-superforms/adapters"
+	import type { Tooltip } from "$lib/types/collection"
 
 	export let data
 
-	const { categories, subcategories } = data
+	const { categoriesPromise, subcategoriesPromise, profile } = data
 
-	let { script, profile, supabaseClient } = data
-	$: ({ script, profile, supabaseClient } = data)
+	let categories: Tooltip[] = []
+	$: categoriesPromise.then((categoriesPromise) => (categories = categoriesPromise))
+
+	let subcategories: Tooltip[] = []
+	$: subcategoriesPromise.then((subcategoriesPromise) => (subcategories = subcategoriesPromise))
+
+	let { scriptPromise } = data
+	$: ({ scriptPromise } = data)
 
 	const { form, errors, enhance, validate } = superForm(data.form, {
 		dataType: "form",
 		multipleSubmits: "prevent",
 		taintedMessage: "Are you sure you want to leave?",
-		validators: scriptSchema
+		validators: zodClient(updateScriptClientSchema)
 	})
 
-	$form.id = script.id
-	$form.title = script.title
-	$form.description = script.description
-	$form.categories = script.categories
-	$form.subcategories = script.subcategories
-	$form.content = script.content
-	$form.min_xp = script.min_xp
-	$form.max_xp = script.max_xp
-	$form.min_gp = script.min_gp
-	$form.max_gp = script.max_gp
+	let defaultBanner = "/banner.jpg"
 
-	async function loadPrices() {
-		if (!script.product) return
-		const { data, error } = await supabaseClient
-			.schema("scripts")
-			.from("prices")
-			.select("amount, interval, currency")
-			.eq("product", script.product)
-			.eq("active", true)
+	let script: Awaited<typeof scriptPromise> | null = null
+	$: scriptPromise.then((awaited) => (script = awaited))
 
-		if (error) console.error(error)
-		if (data) {
-			data.forEach((price) => {
-				switch (price.interval) {
-					case "week":
-						$form.week_value = price.amount / 100
-						break
-
-					case "month":
-						$form.month_value = price.amount / 100
-						break
-
-					case "year":
-						$form.year_value = price.amount / 100
-						break
-				}
-			})
-		}
+	$: if (script) {
+		$form.title = script.title
+		$form.description = script.description
+		$form.categories = script.categories
+		$form.subcategories = script.subcategories
+		$form.content = script.content
+		$form.min_xp = script.min_xp
+		$form.max_xp = script.max_xp
+		$form.min_gp = script.min_gp
+		$form.max_gp = script.max_gp
+		defaultBanner = script.protected.assets + "/banner.jpg"
 	}
 
-	const defaultBanner = script.protected.assets + "/banner.jpg"
 	let coverElement: HTMLImageElement | undefined
 	let bannerElement: HTMLImageElement | undefined
 
@@ -89,20 +74,23 @@
 
 	let isFocused: boolean = true
 
-	$: if ($form.categories) validate()
-	$: if ($form.subcategories) validate()
-	$: if ($form.min_xp) validate("min_xp")
-	$: if ($form.max_xp) validate("max_xp")
-
-	$: script.title = $form.title
-	$: script.description = $form.description
-	$: script.content = $form.content
-
-	$: {
-		script.categories = $form.categories
-		script.subcategories = $form.subcategories
-		addToolTips(script, categories, subcategories)
+	const scriptBase = {
+		title: $form.title,
+		description: $form.description,
+		published: $form.published,
+		url: "",
+		tooltip_emojis: [],
+		tooltip_names: [],
+		protected: {
+			assets: "",
+			username: profile?.username ?? "",
+			avatar: profile?.avatar ?? ""
+		}
 	}
+
+	$: scriptBase.title = $form.title
+	$: scriptBase.description = $form.description
+	$: scriptBase.published = $form.published
 
 	function onChangeCover(e: Event): void {
 		if (coverFiles.length === 0) {
@@ -166,52 +154,47 @@
 			scriptStyle = 1
 		})
 	}
-
-	const scriptStats = getScriptsStats(supabaseClient, script.id)
-
-	const headTitle = "Edit " + script.title + " - WaspScripts"
-	const headDescription = "Edit " + script.title
-	const headKeywords =
-		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, " +
-		script.subcategories
-	const headAuthor = script.protected.username
-	const headImage = script?.protected.assets + "banner.jpg"
 </script>
 
 <svelte:head>
-	<title>{headTitle}</title>
-	<meta name="description" content={headDescription} />
-	<meta name="keywords" content={headKeywords} />
-	<meta name="author" content={headAuthor} />
-	<meta name="robots" content="noindex" />
+	{#if script}
+		<title>{"Edit " + script.title + " - WaspScripts"}</title>
+		<meta name="description" content={"Edit " + script.title} />
+		<meta
+			name="keywords"
+			content={"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, " +
+				script.subcategories}
+		/>
+		<meta name="author" content={script.protected.username} />
+		<meta name="robots" content="noindex" />
 
-	<!-- OpenGraph tags -->
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content={headTitle} />
-	<meta property="og:url" content={$page.url.href} />
-	<meta property="og:image" content={headImage} />
-	<meta property="og:image:type" content="image/jpeg" />
-	<meta property="og:image:alt" content="WaspScripts Logo" />
-	<meta property="og:description" content={headDescription} />
+		<!-- OpenGraph tags -->
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content={"Edit " + script.title + " - WaspScripts"} />
+		<meta property="og:url" content={$page.url.href} />
+		<meta property="og:image" content={script.protected.assets + "banner.jpg"} />
+		<meta property="og:image:type" content="image/jpeg" />
+		<meta property="og:image:alt" content="WaspScripts Logo" />
+		<meta property="og:description" content={"Edit " + script.title} />
 
-	<!-- Twitter tags -->
-	<meta name="twitter:card" content="summary_large_image" />
-	<meta property="twitter:domain" content={$page.url.host} />
-	<meta name="twitter:title" content={headTitle} />
-	<meta name="twitter:description" content={headDescription} />
-	<meta name="twitter:image" content={headImage} />
+		<!-- Twitter tags -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta property="twitter:domain" content={$page.url.host} />
+		<meta name="twitter:title" content={"Edit " + script.title + " - WaspScripts"} />
+		<meta name="twitter:description" content={"Edit " + script.title} />
+		<meta name="twitter:image" content={script?.protected.assets + "banner.jpg"} />
+	{/if}
 </svelte:head>
 
 <div>
 	{#if showScriptPage}
 		<div>
-			<ScriptHeader title={$form.title} username={script.protected.username ?? ""} hasLink={false}>
+			<ScriptHeader title={$form.title} hasLink={false}>
 				<img
 					bind:this={bannerElement}
 					class="z-0 absolute object-cover h-full w-full"
 					src={defaultBanner}
-					alt="{script.title} header image"
-					loading="lazy"
+					alt="{$form.title} header image"
 				/>
 			</ScriptHeader>
 
@@ -222,21 +205,13 @@
 					</h3>
 				</header>
 
-				{#await scriptStats}
-					<header class="text-center">
-						<h4>Total Experience Gained: ...</h4>
-						<h4>Total Gold Gained: ...</h4>
-						<h4>Total Runtime: ...</h4>
-					</header>
-				{:then stats}
-					<StatsHeader {stats} />
-				{/await}
+				<StatsHeader />
 
 				{#if profile}
 					<div class="text-center">
 						<div class="py-12 grid justify-center justify-items-center gap-8">
-							<AdvancedButton {script} noDownload={true} rev={script.protected.revision} />
-							<ZipDownload bind:profile noDownload={true} />
+							<AdvancedButton title={$form.title} rev={1} />
+							<ZipDownload noDownload={true} />
 						</div>
 
 						<h4 class="pt-4">
@@ -247,7 +222,7 @@
 					</div>
 				{/if}
 
-				<ScriptArticle content={replaceScriptContent(script)} />
+				<ScriptArticle content={script ? replaceScriptContent(script) : "Loading..."} />
 			</div>
 		</div>
 	{/if}
@@ -255,7 +230,7 @@
 	{#if showScriptCard}
 		<div class="max-w-2x m-8">
 			<div class="grid grid-cols-1 justify-items-center">
-				<ScriptCardBase bind:script bind:imgElement={coverElement} />
+				<ScriptCardBase script={scriptBase} bind:imgElement={coverElement} />
 			</div>
 		</div>
 	{/if}
@@ -280,16 +255,12 @@
 					</div>
 				</div>
 				<div>
-					<span class="text-lg font-semibold text-blue-400">
-						{script.title} - WaspScripts
-					</span>
-					<p>
-						{cropString("RuneScape OSRS Color Bot - " + script.description, 160)}
-					</p>
+					<span class="text-lg font-semibold text-blue-400">{$form.title} - WaspScripts</span>
+					<p>{cropString("RuneScape OSRS Color Bot - " + $form.description, 160)}</p>
 				</div>
 			</div>
 			<div class="w-[40rem] my-8 mx-auto">
-				* This is not a real search result, just an example of what you might expect to see in
+				* this is not a real search result, just an example of what you might expect to see in
 				google/bing/duckduckgo
 			</div>
 		</div>
@@ -328,22 +299,20 @@
 
 		<article class="variant-ringed-surface p-8 my-8 mx-auto xs:w-full md:w-6/7 lg:w-3/4 rounded-md">
 			<header class="text-center my-8">
-				<h3>Update Script</h3>
+				<h3>Add Script</h3>
 			</header>
 			<form method="POST" enctype="multipart/form-data" use:focusTrap={isFocused} use:enhance>
-				<input type="text" id="id" name="id" class="hidden" bind:value={$form.id} />
-
 				<div class="flex justify-evenly">
 					<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
 
 					<div class="my-8">
 						<SlideToggle
 							name="published"
-							bind:checked={script.published}
+							bind:checked={$form.published}
 							background="bg-error-500"
 							active="bg-primary-500"
 						>
-							{#if script.published}Public{:else}Hidden{/if}
+							{#if $form.published}Public{:else}Hidden{/if}
 						</SlideToggle>
 					</div>
 				</div>
@@ -367,14 +336,14 @@
 					title="Categories"
 					bind:value={$form.categories}
 					errors={$errors.categories?._errors}
-					entries={categories}
+					tooltips={categories}
 				/>
 
 				<MultiSelect
 					title="Subcategories"
 					bind:value={$form.subcategories}
 					errors={$errors.subcategories?._errors}
-					entries={subcategories}
+					tooltips={subcategories}
 				/>
 
 				<header class="text-center my-8">
@@ -409,13 +378,9 @@
 							{#if coverStyle === 0}
 								<span>Must be exactly 300x200 pixels and JPG format.</span>
 							{:else if coverStyle === 1}
-								<span class="text-success-500">{$form.cover.name}</span>
-							{:else if $errors.cover && $errors.cover.length > 0}
-								{#each $errors.cover as error}
-									{#if error}
-										<small class="flex justify-center text-error-500">{error}</small>
-									{/if}
-								{/each}
+								<span class="text-success-500">{$form.cover?.name}</span>
+							{:else if $errors.cover}
+								<small class="flex justify-center text-error-500">{$errors.cover}</small>
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>
@@ -448,13 +413,9 @@
 							{#if bannerStyle === 0}
 								<span>Must be exactly 1920x768 pixels and JPG format.</span>
 							{:else if bannerStyle === 1}
-								<span class="text-success-500">{$form.banner.name}</span>
-							{:else if $errors.banner && $errors.banner.length > 0}
-								{#each $errors.banner as error}
-									{#if error}
-										<small class="flex justify-center text-error-500">{error}</small>
-									{/if}
-								{/each}
+								<span class="text-success-500">{$form.banner?.name}</span>
+							{:else if $errors.banner}
+								<small class="flex justify-center text-error-500">{$errors.banner}</small>
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>
@@ -487,13 +448,9 @@
 							{#if scriptStyle === 0}
 								<span>Must be a Simba script file.</span>
 							{:else if scriptStyle === 1}
-								<span class="text-success-500">{$form.script.name}</span>
-							{:else if $errors.script && $errors.script.length > 0}
-								{#each $errors.script as error}
-									{#if error}
-										<small class="flex justify-center text-error-500">{error}</small>
-									{/if}
-								{/each}
+								<span class="text-success-500">{$form.script?.name}</span>
+							{:else if $errors.script}
+								<small class="flex justify-center text-error-500">{$errors.script}</small>
 							{/if}
 						</svelte:fragment>
 					</FileDropzone>

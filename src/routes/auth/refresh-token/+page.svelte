@@ -3,15 +3,14 @@
 	import { CodeBlock } from "@skeletonlabs/skeleton"
 	export let data
 
-	const { refresh_token } = data
+	const { token } = data
 
 	const headTitle = "Refresh token - WaspScripts"
 	const headDescription = "Login to waspscripts.com through Simba"
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, "
 	const headAuthor = "Torwent"
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -40,7 +39,7 @@
 <main class="container mx-auto my-52 max-w-2xl flex-grow">
 	<div class="my-24">
 		<span class="my-4 flex font-bold">Refresh token</span>
-		<CodeBlock language="html" code={refresh_token} buttonLabel="📝" buttonCopied="👍" />
+		<CodeBlock language="html" code={token} buttonLabel="📝" buttonCopied="👍" />
 	</div>
 
 	<div class="text-center">

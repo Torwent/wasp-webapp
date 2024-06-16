@@ -1,19 +1,22 @@
 <script lang="ts">
 	import Discord from "$lib/components/Discord.svelte"
 	import CanvasAnimation from "./CanvasAnimation.svelte"
-	import { convertTime, formatRSNumber } from "$lib/utils"
+	import { formatTime, formatNumber } from "$lib/utils"
 	import { page } from "$app/stores"
 	export let data
 
-	let { total } = data
+	let { totalPromise } = data
+	$: ({ totalPromise } = data)
+
+	let total: Awaited<typeof totalPromise> | null = null
+	$: totalPromise.then((awaited) => (total = awaited))
 
 	const headTitle = "WaspScripts"
 	const headDescription =
 		"OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
 	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Bot, Wasp, Scripts"
 	const headAuthor = "Torwent"
-	const headImage =
-		"https://db.waspscripts.com/storage/v1/object/public/imgs/logos/multi-color-logo.png"
+	const headImage = "/multi-color-logo.png"
 </script>
 
 <svelte:head>
@@ -53,16 +56,16 @@
 
 	<header class="text-lg sm:text-xl md:text-2xl">
 		<h2 class="mt-6 mx-6 font-bold whitespace-nowrap text-center">
-			Total Experience Earned: {formatRSNumber(total.experience)}
+			Total Experience Earned: {total ? formatNumber(total.experience) : "..."}
 		</h2>
 		<h2 class="mx-6 font-bold whitespace-nowrap text-center">
-			Total Gold Earned: {formatRSNumber(total.gold)}
+			Total Gold Earned: {total ? formatNumber(total.gold) : "..."}
 		</h2>
 		<h2 class="mx-6 font-bold whitespace-nowrap text-center">
-			Total Levels Earned: {formatRSNumber(total.levels)}
+			Total Levels Earned: {total ? formatNumber(total.levels) : "..."}
 		</h2>
 		<h2 class="mb-4 mx-6 font-bold whitespace-nowrap text-center">
-			Total Runtime: {convertTime(total.runtime)}
+			Total Runtime: {total ? formatTime(total.runtime) : "..."}
 		</h2>
 	</header>
 
