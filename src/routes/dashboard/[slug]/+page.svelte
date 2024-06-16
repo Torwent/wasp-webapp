@@ -147,7 +147,8 @@
 			{scripter ? "Scripter profile" : "Loading..."}</a
 		>
 	</div>
-	{#if !scripter?.stripe}
+
+	{#if scripter && !scripter.stripe}
 		<form
 			method="POST"
 			action="?/createStripe"

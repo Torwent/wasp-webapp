@@ -54,7 +54,7 @@
 
 		return () => data.subscription.unsubscribe()
 	})
-	let matches
+	let matches: boolean
 </script>
 
 <Toast />
@@ -66,7 +66,7 @@
 			class="backdrop-blur transition-colors duration-500 border-b dark:border-surface-50/[0.06]
 				 bg-white/60 supports-backdrop-blur:bg-white/95 dark:bg-surface-800/60"
 		>
-			<MediaQuery query="(max-width: 768px)" let:matches>
+			<MediaQuery query="(max-width: 768px)" bind:matches>
 				<AppBar class="max-w-7xl mx-auto" background="bg-transparent">
 					<svelte:fragment slot="lead"><Navigation large={!matches} /></svelte:fragment>
 
