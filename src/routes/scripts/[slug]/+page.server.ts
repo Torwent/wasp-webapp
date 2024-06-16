@@ -14,8 +14,8 @@ export const actions = {
 		}
 		return { success: await removeScriptBroken(slug) }
 	},
-	report: async ({ params: { slug }, locals: { session } }) => {
-		if (!session) error(403, "You need to be logged in to report a broken script.")
-		return { success: await updateReporters(slug, session.user.id) }
+	report: async ({ params: { slug }, locals: { user } }) => {
+		if (!user) error(403, "You need to be logged in to report a broken script.")
+		return { success: await updateReporters(slug, user.id) }
 	}
 }

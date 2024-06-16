@@ -27,7 +27,7 @@ export const load = async ({ url, parent }) => {
 		finish: number,
 		ascending: boolean
 	) {
-		const { supabaseClient, session, roles } = await parent()
+		const { supabaseClient, user, roles } = await parent()
 		let query = supabaseClient
 			.schema("info")
 			.from("tutorials")
@@ -35,10 +35,10 @@ export const load = async ({ url, parent }) => {
 				count: "estimated"
 			})
 
-		if (!session) {
+		if (!user) {
 			query.or("published.eq.true")
 		} else if (!roles?.administrator && !roles?.moderator) {
-			query.or("published.eq.true,author_id.eq." + session.user.id)
+			query.or("published.eq.true,author_id.eq." + user.id)
 		}
 
 		if (level > -1) {

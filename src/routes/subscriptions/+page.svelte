@@ -66,7 +66,7 @@
 
 	let subsform: HTMLFormElement
 
-	const {
+	let {
 		form: checkoutForm,
 		errors: checkoutErrors,
 		enhance: checkoutEnhance,
@@ -78,6 +78,19 @@
 		taintedMessage: null,
 		validators: zodClient(checkoutSchema)
 	})
+
+	$: ({
+		form: checkoutForm,
+		errors: checkoutErrors,
+		enhance: checkoutEnhance,
+		allErrors
+	} = superForm(data.checkoutForm, {
+		dataType: "json",
+		multipleSubmits: "prevent",
+		clearOnSubmit: "errors",
+		taintedMessage: null,
+		validators: zodClient(checkoutSchema)
+	}))
 
 	function changePriceInterval(prices: Price[], index: number, productIndex: number) {
 		setPriceInterval(index, prices)

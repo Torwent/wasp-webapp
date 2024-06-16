@@ -2,8 +2,8 @@ import { doLogin } from "$lib/server/supabase.server"
 import { formatError } from "$lib/utils.js"
 import { error } from "@sveltejs/kit"
 
-export const load = async ({ locals: { session, getRoles } }) => {
-	if (!session) error(403, "You need to be logged in to access this page.")
+export const load = async ({ locals: { user, getRoles } }) => {
+	if (!user) error(403, "You need to be logged in to access this page.")
 	const roles = await getRoles()
 	if (!roles?.administrator) error(403, "You need to be an admin to access this page.")
 
@@ -15,8 +15,8 @@ export const actions = {
 		return await doLogin(supabaseServer, origin, searchParams)
 	},
 
-	loginas: async ({ locals: { supabaseServer, session, getRoles } }) => {
-		if (!session) error(403, "You need to be logged in to access this page.")
+	loginas: async ({ locals: { user, getRoles } }) => {
+		if (!user) error(403, "You need to be logged in to access this page.")
 		const roles = await getRoles()
 		if (!roles?.administrator) error(403, "You need to be an admin to access this page.")
 
@@ -29,8 +29,8 @@ export const actions = {
 		return { success: true }
 	},
 
-	refresh: async ({ locals: { session } }) => {
-		if (!session) return { success: false, message: "You are not logged in!" }
+	refresh: async ({ locals: { user } }) => {
+		if (!user) return { success: false, message: "You are not logged in!" }
 		return { success: true }
 	}
 }

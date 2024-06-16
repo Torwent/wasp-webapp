@@ -10,7 +10,7 @@ export const load = async () => {
 }
 
 export const actions = {
-	default: async ({ request, locals: { supabaseServer, session, getProfile, getRoles } }) => {
+	default: async ({ request, locals: { supabaseServer, user, getProfile, getRoles } }) => {
 		const promises = await Promise.all([
 			getProfile(),
 			getRoles(),
@@ -21,7 +21,7 @@ export const actions = {
 		const form = promises[2]
 
 		if (!form.valid) return setError(form, "", "Form is not valid.")
-		if (!session || !profile) {
+		if (!user || !profile) {
 			const msg = "You need to login to edit a scripter."
 			console.error(msg)
 			return setError(form, "", msg)

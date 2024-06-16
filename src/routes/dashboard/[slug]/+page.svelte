@@ -61,7 +61,7 @@
 		resetForm: true
 	})
 
-	const {
+	let {
 		form: dbaForm,
 		errors: dbaErrors,
 		enhance: dbaEnhance,
@@ -73,6 +73,19 @@
 		validators: zodClient(dbaSchema),
 		resetForm: true
 	})
+
+	$: ({
+		form: dbaForm,
+		errors: dbaErrors,
+		enhance: dbaEnhance,
+		allErrors: dbaAllErrors
+	} = superForm(dba, {
+		dataType: "json",
+		multipleSubmits: "prevent",
+		clearOnSubmit: "errors-and-message",
+		validators: zodClient(dbaSchema),
+		resetForm: true
+	}))
 
 	let tabSet: number = 0
 	let subscription: RealtimeChannel | undefined

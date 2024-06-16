@@ -50,6 +50,9 @@ importers:
       stripe:
         specifier: ^15.11.0
         version: 15.11.0
+      svelte-media-queries:
+        specifier: ^1.6.2
+        version: 1.6.2
     devDependencies:
       '@playwright/test':
         specifier: ^1.44.1
@@ -2196,6 +2199,9 @@ packages:
     engines: {node: ^12.20 || ^14.13.1 || >= 16}
     peerDependencies:
       svelte: ^3.19.0 || ^4.0.0
+
+  svelte-media-queries@1.6.2:
+    resolution: {integrity: sha512-SMz6od/vIeZEGlc4P0HKJK4G0fZotuwFhCSpBQaPqh75h6sL6sNf+4+IjbegFKXbP7b+SOfyzVOIMXTr8jynkA==}
 
   svelte-preprocess@5.1.4:
     resolution: {integrity: sha512-IvnbQ6D6Ao3Gg6ftiM5tdbR6aAETwjhHV+UKGf5bHGYR69RQvF1ho0JKPcbUON4vy4R7zom13jPjgdOWCQ5hDA==}
@@ -4564,6 +4570,8 @@ snapshots:
   svelte-hmr@0.16.0(svelte@4.2.18):
     dependencies:
       svelte: 4.2.18
+
+  svelte-media-queries@1.6.2: {}
 
   svelte-preprocess@5.1.4(postcss-load-config@4.0.2(postcss@8.4.38))(postcss@8.4.38)(svelte@4.2.18)(typescript@5.4.5):
     dependencies:

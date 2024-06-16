@@ -20,11 +20,11 @@
 	import "highlight.js/styles/github-dark.css"
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from "@floating-ui/dom"
 	import { goto, invalidate } from "$app/navigation"
-	import MediaQuery from "$lib/components/MediaQuery.svelte"
 	import Footer from "./Footer.svelte"
 	import Navigation from "./Navigation.svelte"
 	import UserPanel from "./UserPanel.svelte"
 	import { onMount } from "svelte"
+	import MediaQuery from "svelte-media-queries"
 
 	hljs.registerLanguage("shell", shell)
 	hljs.registerLanguage("cmd", dos)
@@ -54,6 +54,7 @@
 
 		return () => data.subscription.unsubscribe()
 	})
+	let matches
 </script>
 
 <Toast />
@@ -65,12 +66,12 @@
 			class="backdrop-blur transition-colors duration-500 border-b dark:border-surface-50/[0.06]
 				 bg-white/60 supports-backdrop-blur:bg-white/95 dark:bg-surface-800/60"
 		>
-			<MediaQuery query="(min-width: 768px)" let:matches>
+			<MediaQuery query="(max-width: 768px)" let:matches>
 				<AppBar class="max-w-7xl mx-auto" background="bg-transparent">
-					<svelte:fragment slot="lead"><Navigation large={matches} /></svelte:fragment>
+					<svelte:fragment slot="lead"><Navigation large={!matches} /></svelte:fragment>
 
 					<svelte:fragment slot="trail">
-						{#if matches}
+						{#if !matches}
 							<UserPanel large={true} />
 							<LightSwitch class="hidden md:block" />
 						{/if}

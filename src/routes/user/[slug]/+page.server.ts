@@ -4,20 +4,18 @@ import { formatError } from "$lib/utils.js"
 import { zod } from "sveltekit-superforms/adapters"
 import { setError, superValidate } from "sveltekit-superforms/server"
 
-export const load = async ({ locals: { supabaseServer, session }, url: { origin } }) => {
-	if (!session)
+export const load = async ({ locals: { supabaseServer, user }, url: { origin } }) => {
+	if (!user)
 		return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 
-	return { form: await superValidate(zod(profileSchema)), email: session.user.email }
+	return { form: await superValidate(zod(profileSchema)), email: user.email }
 }
 
 export const actions = {
-	default: async ({ request, locals: { getProfile, supabaseServer } }) => {
-		const promises = await Promise.all([getProfile(), superValidate(request, zod(profileSchema))])
-		const profile = promises[0]
-		const form = promises[1]
+	default: async ({ request, locals: { user, supabaseServer } }) => {
+		const form = await superValidate(request, zod(profileSchema))
 
-		if (!profile) return setError(form, "", "You need to login to add a script.")
+		if (!user) return setError(form, "", "You need to login to add a script.")
 		if (!form.valid) return setError(form, "", "Form is not valid!")
 
 		if (form.data.email == "") form.data.email = undefined

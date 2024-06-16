@@ -23,10 +23,10 @@ export const load = async ({ locals: { getSubscriptions, getFreeAccess } }) => {
 export const actions = {
 	checkout: async ({
 		request,
-		locals: { supabaseServer, session, getProfile, getSubscriptions, getFreeAccess },
+		locals: { supabaseServer, user, getProfile, getSubscriptions, getFreeAccess },
 		url: { origin, searchParams }
 	}) => {
-		if (!session) {
+		if (!user) {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
@@ -54,7 +54,7 @@ export const actions = {
 					"",
 					`You don't seem to have a customer_id assign for some reason. This shouldn't happen and has to be fixed manually.
 					Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com and send the following:
-					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${session.user.email} username: ${profile.username}`
+					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${user.email} username: ${profile.username}`
 				)
 			}
 
@@ -68,7 +68,7 @@ export const actions = {
 					"",
 					`You don't seem to have a customer_id assign for some reason and one couldn't be created. This shouldn't happen and has to be fixed manually.
 					Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com and send the following:
-					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${session.user.email}  username: ${profile.username}`
+					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${user.email}  username: ${profile.username}`
 				)
 			}
 		}
@@ -147,8 +147,8 @@ export const actions = {
 		return setError(form, "", "Something went wrong!")
 	},
 
-	portal: async ({ locals: { supabaseServer, session, getProfile }, url: { origin } }) => {
-		if (!session) {
+	portal: async ({ locals: { supabaseServer, user, getProfile }, url: { origin } }) => {
+		if (!user) {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
@@ -167,7 +167,7 @@ export const actions = {
 					404,
 					`You don't seem to have a customer_id assign for some reason. This shouldn't happen and has to be fixed manually.
 					Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com and send the following:
-					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${session.user.email} username: ${profile.username}`
+					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${user.email} username: ${profile.username}`
 				)
 			}
 
@@ -180,7 +180,7 @@ export const actions = {
 					404,
 					`You don't seem to have a customer_id assign for some reason and one couldn't be created. This shouldn't happen and has to be fixed manually.
 					Refresh the page, if that doesn't solve the issue please contact support@waspscripts.com and send the following:
-					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${session.user.email}  username: ${profile.username}`
+					id: ${profile.id} discord_id: ${profile.discord} registered_email: ${user.email}  username: ${profile.username}`
 				)
 			}
 		}
@@ -193,10 +193,10 @@ export const actions = {
 
 	subscriptions: async ({
 		request,
-		locals: { supabaseServer, session, getProfile },
+		locals: { supabaseServer, user, getProfile },
 		url: { origin, searchParams }
 	}) => {
-		if (!session) {
+		if (!user) {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 

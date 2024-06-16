@@ -30,13 +30,13 @@ import { addFreeAccess, cancelFreeAccess } from "$lib/server/supabase.server"
 
 export const load = async ({
 	params: { slug },
-	locals: { supabaseServer, session, getRoles },
+	locals: { supabaseServer, user, getRoles },
 	depends
 }) => {
-	if (!session) error(403, "You need to be logged in.")
+	if (!user) error(403, "You need to be logged in.")
 	if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
 
-	if (session.user.id !== slug) {
+	if (user.id !== slug) {
 		const roles = await getRoles()
 		if (!roles?.administrator) error(403, "You cannot access another scripter dashboard.")
 	}
@@ -74,11 +74,11 @@ export const load = async ({
 export const actions = {
 	createStripe: async ({
 		request,
-		locals: { supabaseServer, session, getRoles },
+		locals: { supabaseServer, user, getRoles },
 		url: { origin },
 		params: { slug }
 	}) => {
-		if (!session)
+		if (!user)
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 
 		if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
@@ -87,7 +87,7 @@ export const actions = {
 		const roles = promises[0]
 		const form = promises[1]
 
-		if (session.user.id !== slug && !roles?.administrator)
+		if (user.id !== slug && !roles?.administrator)
 			return setError(form, "", "You cannot access another scripter dashboard.")
 
 		const scripter = await getScripter(supabaseServer, slug)
@@ -98,24 +98,24 @@ export const actions = {
 			supabaseServer,
 			origin,
 			scripter,
-			session.user.email,
+			user.email,
 			form.data.code
 		)
 		if (link) redirect(303, link)
 		return { form }
 	},
 	updateStripe: async ({
-		locals: { supabaseServer, session, getRoles },
+		locals: { supabaseServer, user, getRoles },
 		url: { origin },
 		params: { slug }
 	}) => {
-		if (!session)
+		if (!user)
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 
 		if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
 
 		const roles = await getRoles()
-		if (session.user.id !== slug && !roles?.administrator)
+		if (user.id !== slug && !roles?.administrator)
 			error(403, "You cannot access another scripter dashboard.")
 
 		const scripter = await getScripter(supabaseServer, slug)
@@ -128,11 +128,11 @@ export const actions = {
 
 	displayName: async ({
 		request,
-		locals: { supabaseServer, session, getRoles },
+		locals: { supabaseServer, user, getRoles },
 		url: { origin },
 		params: { slug }
 	}) => {
-		if (!session)
+		if (!user)
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 
 		if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
@@ -141,7 +141,7 @@ export const actions = {
 		const roles = promises[0]
 		const form = promises[1]
 
-		if (session.user.id !== slug && !roles?.administrator)
+		if (user.id !== slug && !roles?.administrator)
 			error(403, "You cannot access another scripter dashboard.")
 
 		const scripter = await getScripter(supabaseServer, slug)
@@ -155,11 +155,11 @@ export const actions = {
 
 	bundleEdit: async ({
 		request,
-		locals: { supabaseServer, session, getRoles },
+		locals: { supabaseServer, user, getRoles },
 		url: { origin, searchParams },
 		params: { slug }
 	}) => {
-		if (!session)
+		if (!user)
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 
 		if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
@@ -168,7 +168,7 @@ export const actions = {
 		const roles = promises[0]
 		const form = promises[1]
 
-		if (session.user.id !== slug && !roles?.administrator)
+		if (user.id !== slug && !roles?.administrator)
 			error(403, "You cannot access another scripter dashboard.")
 
 		if (!form.valid) return setError(form, "", "The form is not valid!")
@@ -261,11 +261,11 @@ export const actions = {
 	},
 	bundleAdd: async ({
 		request,
-		locals: { supabaseServer, session, getRoles },
+		locals: { supabaseServer, user, getRoles },
 		url: { origin },
 		params: { slug }
 	}) => {
-		if (!session)
+		if (!user)
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 
 		if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
@@ -274,7 +274,7 @@ export const actions = {
 		const roles = promises[0]
 		const form = promises[1]
 
-		if (session.user.id !== slug && !roles?.administrator)
+		if (user.id !== slug && !roles?.administrator)
 			error(403, "You cannot access another scripter dashboard.")
 
 		if (!form.valid) return setError(form, "", "The form is not valid!")
@@ -283,7 +283,7 @@ export const actions = {
 
 		if (!scripter.stripe) return setError(form, "", "Stripe account is not setup!")
 
-		if (!roles?.moderator || !roles?.administrator) form.data.user_id = session.user.id
+		if (!roles?.moderator || !roles?.administrator) form.data.user_id = user.id
 
 		const err = await createStripeBundleProduct(supabaseServer, form.data)
 
@@ -294,11 +294,11 @@ export const actions = {
 
 	scriptEdit: async ({
 		request,
-		locals: { supabaseServer, session, getRoles },
+		locals: { supabaseServer, user, getRoles },
 		url: { origin, searchParams },
 		params: { slug }
 	}) => {
-		if (!session) {
+		if (!user) {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
@@ -308,7 +308,7 @@ export const actions = {
 		const roles = promises[0]
 		const form = promises[1]
 
-		if (session.user.id !== slug && !roles?.administrator) {
+		if (user.id !== slug && !roles?.administrator) {
 			error(403, "You cannot access another scripter dashboard.")
 		}
 
@@ -397,11 +397,11 @@ export const actions = {
 	},
 	scriptAdd: async ({
 		request,
-		locals: { supabaseServer, session, getRoles },
+		locals: { supabaseServer, user, getRoles },
 		url: { origin, searchParams },
 		params: { slug }
 	}) => {
-		if (!session) {
+		if (!user) {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 		if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
@@ -414,7 +414,7 @@ export const actions = {
 		const roles = promises[0]
 		const form = promises[1]
 
-		if (session.user.id !== slug && !roles?.administrator) {
+		if (user.id !== slug && !roles?.administrator) {
 			error(403, "You cannot access another scripter dashboard.")
 		}
 
@@ -459,11 +459,11 @@ export const actions = {
 
 	addFreeAccess: async ({
 		request,
-		locals: { supabaseServer, session, getRoles },
+		locals: { supabaseServer, user, getRoles },
 		url: { origin, searchParams },
 		params: { slug }
 	}) => {
-		if (!session)
+		if (!user)
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 
 		if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
@@ -471,7 +471,7 @@ export const actions = {
 		const promises = await Promise.all([getRoles(), request.formData()])
 		const roles = promises[0]
 
-		if (session.user.id !== slug && !roles?.administrator)
+		if (user.id !== slug && !roles?.administrator)
 			error(403, "You cannot access another scripter dashboard.")
 
 		const product = searchParams.get("product")
@@ -500,11 +500,11 @@ export const actions = {
 	},
 	cancelFreeAccess: async ({
 		request,
-		locals: { supabaseServer, session, getRoles },
+		locals: { supabaseServer, user, getRoles },
 		url: { origin, searchParams },
 		params: { slug }
 	}) => {
-		if (!session)
+		if (!user)
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 
 		if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
@@ -512,7 +512,7 @@ export const actions = {
 		const promises = await Promise.all([getRoles(), request.formData()])
 		const roles = promises[0]
 
-		if (session.user.id !== slug && !roles?.administrator)
+		if (user.id !== slug && !roles?.administrator)
 			error(403, "You cannot access another scripter dashboard.")
 
 		const product = searchParams.get("product")
@@ -533,17 +533,17 @@ export const actions = {
 	},
 
 	cancelSub: async ({
-		locals: { supabaseServer, session, getRoles },
+		locals: { supabaseServer, user, getRoles },
 		url: { origin, searchParams },
 		params: { slug }
 	}) => {
-		if (!session)
+		if (!user)
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 
 		if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
 
 		const roles = await getRoles()
-		if (session.user.id !== slug && !roles?.administrator)
+		if (user.id !== slug && !roles?.administrator)
 			error(403, "You cannot access another scripter dashboard.")
 
 		const subscription = searchParams.get("subscription")
@@ -578,18 +578,18 @@ export const actions = {
 		return { success: true }
 	},
 	cancelAllSubs: async ({
-		locals: { supabaseServer, session, getRoles },
+		locals: { supabaseServer, user, getRoles },
 		url: { origin, searchParams },
 		params: { slug }
 	}) => {
-		if (!session)
+		if (!user)
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 
 		if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
 
 		const roles = await getRoles()
 
-		if (session.user.id !== slug && !roles?.administrator)
+		if (user.id !== slug && !roles?.administrator)
 			error(403, "You cannot access another scripter dashboard.")
 
 		const product = searchParams.get("product")
