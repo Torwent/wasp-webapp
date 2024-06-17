@@ -95,7 +95,7 @@ export type Database = {
       }
       tutorials: {
         Row: {
-          author_id: string | null
+          author_id: string
           content: string | null
           created_at: string | null
           description: string | null
@@ -110,7 +110,7 @@ export type Database = {
           username: string | null
         }
         Insert: {
-          author_id?: string | null
+          author_id: string
           content?: string | null
           created_at?: string | null
           description?: string | null
@@ -125,7 +125,7 @@ export type Database = {
           username?: string | null
         }
         Update: {
-          author_id?: string | null
+          author_id?: string
           content?: string | null
           created_at?: string | null
           description?: string | null

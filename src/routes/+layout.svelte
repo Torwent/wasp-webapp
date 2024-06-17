@@ -59,6 +59,7 @@
 
 <Toast />
 <Modal />
+<MediaQuery query="(min-width: 768px)" bind:matches />
 
 <AppShell regionPage="relative" slotPageHeader="sticky top-0 z-10" slotPageFooter="grid">
 	<svelte:fragment slot="pageHeader">
@@ -66,18 +67,20 @@
 			class="backdrop-blur transition-colors duration-500 border-b dark:border-surface-50/[0.06]
 				 bg-white/60 supports-backdrop-blur:bg-white/95 dark:bg-surface-800/60"
 		>
-			<MediaQuery query="(max-width: 768px)" bind:matches>
+			{#if matches}
 				<AppBar class="max-w-7xl mx-auto" background="bg-transparent">
-					<svelte:fragment slot="lead"><Navigation large={!matches} /></svelte:fragment>
+					<svelte:fragment slot="lead"><Navigation large={true} /></svelte:fragment>
 
 					<svelte:fragment slot="trail">
-						{#if !matches}
-							<UserPanel large={true} />
-							<LightSwitch class="hidden md:block" />
-						{/if}
+						<UserPanel large={true} />
+						<LightSwitch class="hidden md:block" />
 					</svelte:fragment>
 				</AppBar>
-			</MediaQuery>
+			{:else}
+				<AppBar class="max-w-7xl mx-auto" background="bg-transparent">
+					<svelte:fragment slot="headline"><Navigation large={false} /></svelte:fragment>
+				</AppBar>
+			{/if}
 		</div>
 	</svelte:fragment>
 

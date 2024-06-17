@@ -8,11 +8,12 @@
 	import TutorialLevel from "$lib/components/forms/TutorialLevel.svelte"
 	import { page } from "$app/stores"
 	import { zodClient } from "sveltekit-superforms/adapters"
+	import { canEdit } from "$lib/client/supabase.js"
 
 	export let data
 
-	let { tutorialPromise } = data
-	$: ({ tutorialPromise } = data)
+	let { user, roles, tutorialPromise } = data
+	$: ({ user, roles, tutorialPromise } = data)
 
 	let show: boolean = false
 	let isFocused: boolean = true
@@ -25,7 +26,9 @@
 		validators: zodClient(postSchema)
 	})
 
+	let authorID: string | null = null
 	$: tutorialPromise.then((tutorial) => {
+		authorID = tutorial.author_id
 		$form.title = tutorial.title
 		$form.description = tutorial.description
 		$form.content = tutorial.content
@@ -79,7 +82,7 @@
 		</div>
 	{/if}
 
-	{#if data.profile && data.roles?.administrator}
+	{#if canEdit(user?.id, roles, authorID)}
 		<div class="flex">
 			<button class="btn variant-filled-secondary mx-auto" on:click={() => (show = !show)}>
 				{#if show}Hide{:else}Show{/if} Post Preview

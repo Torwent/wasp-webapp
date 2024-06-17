@@ -73,12 +73,12 @@
 
 <svelte:window on:keydown={onKeyDown} />
 
-<nav class="transition-colors duration-500 font-semibold">
+<nav class="transition-colors duration-500 font-semibold h-full">
 	{#if !large}
 		<button
 			name="Menu"
 			aria-label="Open the navigation menu"
-			class="flex mx-auto text-primary-500 dark:text-primary-400"
+			class="flex mx-auto text-primary-500 dark:text-primary-400 w-full place-content-center h-full"
 			on:click={() => (showMenu = !showMenu)}
 		>
 			<Logo selected={true} />
@@ -91,10 +91,10 @@
 			: ''}"
 	>
 		{#each routeArray as route, index}
-			<li class="h-12 mx-auto">
+			<li class="h-12 mx-auto w-full">
 				<a
 					href={getLink(route)}
-					class="dark:hover:text-primary-100 hover:text-primary-400 h-full flex place-items-center"
+					class="dark:hover:text-primary-100 hover:text-primary-400 h-full flex place-items-center place-content-center"
 					class:text-primary-500={route === currentPage}
 					class:dark:text-primary-400={route === currentPage}
 					aria-label="Navigate to {route.toLowerCase()} page"

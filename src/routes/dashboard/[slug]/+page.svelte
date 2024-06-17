@@ -373,23 +373,23 @@
 						{/if}
 
 						{#if stripeData.account}
-							<div class="mb-24">
-								<span class="my-2">Missing account information:</span>
+							{#await stripeData.account then account}
+								{#if account?.requirements?.currently_due && account?.requirements?.currently_due.length > 0}
+									<div class="mb-24">
+										<span class="my-2">Missing account information:</span>
 
-								{#await stripeData.account then account}
-									{#if account?.requirements?.currently_due && account?.requirements?.currently_due.length > 0}
 										<div class="my-2 text-error-500 grid bg-surface-700">
 											{#each account?.requirements?.currently_due as requirement}
 												<small class="w-full mx-auto">{requirement}</small>
 											{/each}
 										</div>
-									{/if}
-								{/await}
-								<small>
-									This can be updated on the "Update stripe connected account" button. Ask Torwent
-									for help if needed.
-								</small>
-							</div>
+										<small>
+											This can be updated on the "Update stripe connected account" button. Ask
+											Torwent for help if needed.
+										</small>
+									</div>
+								{/if}
+							{/await}
 						{/if}
 
 						<h5 class="text-center mt-12 mb-4">Payments</h5>

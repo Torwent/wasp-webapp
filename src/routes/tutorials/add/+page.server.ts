@@ -1,6 +1,6 @@
 import { setError, superValidate } from "sveltekit-superforms/server"
 import { zod } from "sveltekit-superforms/adapters"
-import { redirect } from "@sveltejs/kit"
+import { fail, redirect } from "@sveltejs/kit"
 import { postSchema } from "$lib/client/schemas"
 import { formatError } from "$lib/utils.js"
 
@@ -9,24 +9,23 @@ export const load = async () => {
 }
 
 export const actions = {
-	default: async ({ request, locals: { user, getProfile, supabaseServer } }) => {
-		const promises = await Promise.all([getProfile(), superValidate(request, zod(postSchema))])
-		const profile = promises[0]
+	default: async ({ request, locals: { supabaseServer, user, getRoles } }) => {
+		if (!user) return fail(403, { message: "You need to login to add a script." })
+
+		const promises = await Promise.all([getRoles(), superValidate(request, zod(postSchema))])
+		const roles = promises[0]
 		const form = promises[1]
 
-		if (!form.valid) return setError(form, "", "Form is not valid.")
-		if (!user || !profile) {
-			const msg = "You need to login to add a script."
-			console.error(msg)
-			return setError(form, "", msg)
-		}
+		if (!roles?.administrator || !roles?.moderator || !roles?.scripter)
+			return setError(form, "", "Only administrators can add new versions of a the legal documents")
+		if (!form.valid) return setError(form, "", "Form is not valid!")
 
 		const { data } = await supabaseServer
 			.schema("info")
 			.from("tutorials")
 			.select("*")
 			.eq("title", form.data.title)
-			.eq("author_id", profile.id)
+			.eq("author_id", user.id)
 			.single()
 
 		if (data) {
@@ -45,7 +44,7 @@ export const actions = {
 				level: form.data.level,
 				order: form.data.order,
 				published: form.data.published,
-				author_id: profile.id
+				author_id: user.id
 			})
 			.select()
 			.single()

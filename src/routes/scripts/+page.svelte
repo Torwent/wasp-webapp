@@ -8,6 +8,7 @@
 	import { onMount } from "svelte"
 	import { replaceQuery } from "$lib/client/utils"
 	import type { CheckboxType, ScriptBase } from "$lib/types/collection"
+	import CarouselEntry from "./CarouselEntry.svelte"
 
 	export let data
 	const { checkboxesPromise, range, featuredPromise } = data
@@ -178,84 +179,33 @@
 		<button type="button" class="btn-icon variant-filled-surface" on:click={carouselLeft}>
 			<ArrowLeft />
 		</button>
-		{#await featuredPromise}
-			<!-- Full Images -->
-			<div class="snap-x snap-mandatory scroll-smooth flex overflow-x-auto hide-scrollbar">
+
+		<div
+			bind:this={carousel}
+			class="text-white snap-x snap-mandatory scroll-smooth flex overflow-x-auto hide-scrollbar"
+		>
+			{#await featuredPromise}
 				<div class="relative snap-center shrink-0 w-full text-center">
-					<img
-						class="md:44 lg:h-64 object-fill w-full rounded-container-token brightness-90"
-						src="/banner.jpg"
-						alt="Loading featured..."
-						loading="lazy"
-					/>
-					<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid">
-						<span
-							class="font-bold text-md lg:text-lg xl:text-4xl text-shadow-strong drop-shadow-2xl"
-						>
-							Loading...
-						</span>
-						<span class="text-xs lg:text-md xl:text-lg">
-							<span class="font-semibold text-shadow-strong drop-shadow-2xl"> by Loading... </span>
-						</span>
-					</div>
+					<CarouselEntry />
 				</div>
-			</div>
-		{:then featured}
-			<!-- Full Images -->
-			<div
-				bind:this={carousel}
-				class="snap-x snap-mandatory scroll-smooth flex overflow-x-auto hide-scrollbar"
-			>
+			{:then featured}
 				{#each featured as feat}
 					{#await feat}
 						<div class="relative snap-center shrink-0 w-full text-center">
-							<img
-								class="md:44 lg:h-64 object-fill w-full rounded-container-token brightness-90"
-								src="/banner.jpg"
-								alt="Loading featured..."
-								loading="lazy"
-							/>
-							<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid">
-								<span
-									class="font-bold text-md lg:text-lg xl:text-4xl text-shadow-strong drop-shadow-2xl"
-								>
-									Loading...
-								</span>
-								<span class="text-xs lg:text-md xl:text-lg">
-									<span class="font-semibold text-shadow-strong drop-shadow-2xl">
-										by Loading...
-									</span>
-								</span>
-							</div>
+							<CarouselEntry />
 						</div>
 					{:then feat}
 						<a href="/scripts/{feat?.url}" class="relative snap-center shrink-0 w-full text-center">
-							<img
-								class="md:44 lg:h-64 object-fill w-full rounded-container-token brightness-90"
-								src="{feat?.protected?.assets}/banner.jpg"
-								alt={feat?.title}
-								loading="lazy"
+							<CarouselEntry
+								assets={feat?.protected?.assets}
+								title={feat?.title}
+								username={feat?.protected?.username}
 							/>
-							<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 grid">
-								<span
-									class="font-bold text-md lg:text-lg xl:text-4xl text-shadow-strong drop-shadow-2xl"
-								>
-									{feat?.title}
-								</span>
-								<span class="text-xs lg:text-md xl:text-lg">
-									<a
-										href="/scripters/{feat?.protected?.username}"
-										class="font-semibold text-shadow-strong drop-shadow-2xl"
-									>
-										by {feat?.protected?.username}
-									</a>
-								</span>
-							</div>
 						</a>
 					{/await}
 				{/each}
-			</div>
-		{/await}
+			{/await}
+		</div>
 
 		<!-- Button: Right -->
 		<button type="button" class="btn-icon variant-filled-surface" on:click={carouselRight}>

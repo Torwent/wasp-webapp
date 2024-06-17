@@ -7,10 +7,10 @@
 	import type { Tutorial } from "$lib/types/collection"
 	export let data
 
-	let { profile, roles, range, tutorialsPromise } = data
+	let { user, roles, range, tutorialsPromise } = data
 	let { searchParams } = $page.url
 
-	$: ({ profile, roles, tutorialsPromise, range } = data)
+	$: ({ user, roles, tutorialsPromise, range } = data)
 	$: ({ searchParams } = $page.url)
 
 	const pageStr = searchParams.get("page") || "-1"
@@ -129,7 +129,7 @@
 				</div>
 			</div>
 		</div>
-		{#if profile && roles?.administrator}
+		{#if user && (roles?.administrator || roles?.moderator || roles?.scripter)}
 			<a href="/tutorials/add" class="flex mx-auto">
 				<button class="btn variant-filled-secondary flex mx-auto">Add Post</button>
 			</a>

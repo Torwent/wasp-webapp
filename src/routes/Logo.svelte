@@ -5,7 +5,12 @@
 <!-- Website Logo -->
 <div class="flex group transition duration-300 dark:hover:text-primary-200 hover:text-primary-300">
 	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 701.99 552.97" class="h-8 mr-3 fill-current">
-		<g id="WaspLayer" data-name="WaspLayer">
+		<g
+			id="WaspLayer"
+			class="transition duration-300 group-hover:text-yellow-300"
+			class:text-yellow-200={selected}
+			data-name="WaspLayer"
+		>
 			<g id="wasp-body">
 				<path
 					id="top"
@@ -24,8 +29,8 @@
 				/>
 				<path
 					id="tail"
-					class="transition duration-300 group-hover:text-orange-400"
-					class:text-[#f5650b]={selected}
+					class="transition duration-300 group-hover:text-yellow-300"
+					class:text-orange-400={selected}
 					d="M547,662s-29.45,1.17-30.48,2.82l-16.68,26.55-16.68-26.55c-1-1.65-30.49-2.82-30.49-2.82-6.22,0-10.81,2.23-9.36,4.54L495.76,750,500,775.33l4.37-26.13,52-82.71C557.8,664.18,553.21,662,547,662Z"
 					transform="translate(-149 -222.36)"
 				/>
@@ -34,15 +39,14 @@
 			<g id="wasp-left">
 				<path
 					id="antenna"
-					class="transition duration-300 group-hover:text-yellow-300"
-					class:text-[#f5e90b]={selected}
+					class:text-yellow-300={selected}
 					d="M484.89,377.57c-23-34.85-51.23-57.63-93-67.33,23.45-16.91,42.87-17.18,62.49-6.7C475,314.55,489.46,347,484.89,377.57Z"
 					transform="translate(-149 -222.36)"
 				/>
 				<path
 					id="wing-top"
 					class="transition duration-300 group-hover:text-yellow-300"
-					class:text-[#f5e90b]={selected}
+					class:text-yellow-300={selected}
 					d="M411.71,507.05C396,465.36,374.83,437.89,350,419.76s-53.37-26.93-83.79-31.29a179.23,179.23,0,0,1-37.64-9.36,141.74,141.74,0,0,1-35-19c-16.93-12.59-29.38-30.57-36.74-51.84s-9.65-45.81-6.24-71.53c.89-6.76,2-12,4-14.25s42,35.71,60.26,46,37.56,17.57,57.3,23.51c16.81,5.05,33.11,11.33,48.6,19.95a177.9,177.9,0,0,1,43.69,34c16.9,18,30.23,42.6,38.58,70.52A239.31,239.31,0,0,1,411.71,507.05Z"
 					transform="translate(-149 -222.36)"
 				/>
@@ -56,6 +60,7 @@
 			<g id="wasp-right">
 				<path
 					id="antenna"
+					class:text-yellow-300={selected}
 					d="M607.75,310.23c-41.76,9.72-70.07,32.38-92.92,66.7-4.9-29.33,9.55-62.39,30.1-73.39C564.53,293.05,584.06,293.23,607.75,310.23Z"
 					transform="translate(-149 -222.36)"
 				/>
@@ -66,8 +71,8 @@
 				/>
 				<path
 					id="wing-bottom"
-					class="transition duration-300 group-hover:text-orange-400"
-					class:text-[#f5650b]={selected}
+					class="transition duration-300 group-hover:text-yellow-300"
+					class:text-orange-400={selected}
 					d="M573.72,529.47c6.77,6.69,13.07,12.61,19,18.35s11.48,11.28,16.78,17.23c9.78,11,17.41,24.27,24.1,38.55s12.43,29.55,18.45,44.54c12.36,30.75,29.79,49.17,50.75,54.89s45.45-1.24,71.91-21.24c4-3,7.87-5.89,9.92-9.64s-38.44-78.64-62-102S671.5,530,638.47,522.88a103.33,103.33,0,0,0-30.53-2.24A108.63,108.63,0,0,0,573.72,529.47Z"
 					transform="translate(-149 -222.36)"
 				/>

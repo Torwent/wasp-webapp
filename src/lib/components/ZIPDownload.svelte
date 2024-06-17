@@ -204,22 +204,24 @@
 	</button>
 </div>
 
-<div
-	class="z-10 bg-surface-800"
-	data-popup="zipDropDown"
-	in:slide={{ duration: 300 }}
-	out:slide={{ duration: 300 }}
->
-	<div class="arrow bg-surface-800" />
-	<ul class="overflow-y-auto max-h-48 py-1 text-sm mt-2">
-		{#each zipsAvailable as zip}
-			<li
-				class="block py-2 px-4 hover:bg-primary-100 dark:hover:bg-primary-300 dark:hover:text-surface-900"
-			>
-				<button on:click={() => (zipName = zip)}>
-					{zip}
-				</button>
-			</li>
-		{/each}
-	</ul>
-</div>
+{#if zipsAvailable.length > 0}
+	<div
+		class="z-10 bg-surface-800"
+		data-popup="zipDropDown"
+		in:slide={{ duration: 300 }}
+		out:slide={{ duration: 300 }}
+	>
+		<div class="arrow bg-surface-800" />
+		<ul class="overflow-y-auto max-h-48 py-1 text-sm mt-2">
+			{#each zipsAvailable as zip}
+				<li
+					class="block py-2 px-4 hover:bg-primary-100 dark:hover:bg-primary-300 dark:hover:text-surface-900"
+				>
+					<button on:click={() => (zipName = zip)}>
+						{zip}
+					</button>
+				</li>
+			{/each}
+		</ul>
+	</div>
+{/if}

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { zodClient } from "sveltekit-superforms/adapters"
 	import Markdown from "$lib/components/Markdown.svelte"
 	import { postSchema } from "$lib/client/schemas"
 	import { focusTrap } from "@skeletonlabs/skeleton"
@@ -8,28 +7,38 @@
 	import FormTextarea from "$lib/components/forms/FormTextarea.svelte"
 	import TutorialLevel from "$lib/components/forms/TutorialLevel.svelte"
 	import { page } from "$app/stores"
+	import { zodClient } from "sveltekit-superforms/adapters"
 
 	export let data
 
-	let { user, roles } = data
-	$: ({ user, roles } = data)
+	let { tutorialPromise } = data
+	$: ({ tutorialPromise } = data)
 
 	let show: boolean = false
 	let isFocused: boolean = true
-	let published: boolean = false
 
 	const { form, errors, enhance } = superForm(data.form, {
+		dataType: "json",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
 		validators: zodClient(postSchema)
 	})
 
-	const headTitle = "Add Tutorial - WaspScripts"
-	const headDescription = "Add Tutorial."
+	$: tutorialPromise.then((tutorial) => {
+		$form.title = tutorial.title
+		$form.description = tutorial.description
+		$form.content = tutorial.content
+		$form.level = tutorial.level
+		$form.order = tutorial.order
+		$form.published = tutorial.published
+	})
+
+	const headTitle = "Edit tutorial - WaspScripts"
+	const headDescription = "Edit tutorial in WaspScripts."
 	const headKeywords =
 		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide"
-	const headAuthor = "Torwent"
+	const headAuthor = ""
 	const headImage = "/multi-color-logo.png"
 </script>
 
@@ -70,7 +79,7 @@
 		</div>
 	{/if}
 
-	{#if user && (roles?.administrator || roles?.moderator || roles?.scripter)}
+	{#if data.profile && data.roles?.administrator}
 		<div class="flex">
 			<button class="btn variant-filled-secondary mx-auto" on:click={() => (show = !show)}>
 				{#if show}Hide{:else}Show{/if} Post Preview
@@ -124,7 +133,7 @@
 						id="published"
 						name="published"
 						class="form-check-input h-4 w-4 rounded-sm transition duration-200 mt-1 align-top float-left mr-2 cursor-pointer accent-primary-500"
-						bind:checked={published}
+						bind:checked={$form.published}
 					/>
 				</label>
 			</div>
@@ -147,6 +156,6 @@
 			{/if}
 		</form>
 	{:else}
-		You don't have permission to add posts.
+		You don't have permission to edit this post.
 	{/if}
 </div>

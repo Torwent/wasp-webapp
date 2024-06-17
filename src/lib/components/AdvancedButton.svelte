@@ -11,17 +11,20 @@
 	export let title: string
 	export let rev: number = 0
 
-	const revisions = Array.from({ length: rev }, (_, i) => i + 1).reverse()
+	let revisions = Array.from({ length: rev }, (_, i) => i + 1).reverse()
 
 	async function download() {
+		if (!browser) return
 		if (!id) return
+
 		const url = await getSignedURL(
 			$page.data.supabaseClient,
 			"scripts",
 			id + "/" + pad(rev, 9),
 			"script.simba"
 		)
-		if (!url || !browser) return
+
+		if (!url) return
 
 		const response = await fetch(url)
 		const blobObject = await response.blob()
@@ -37,7 +40,7 @@
 		await fetch("/api/script/download", {
 			body: JSON.stringify({ id: id }),
 			method: "POST"
-		}).catch((error) => console.error(error))
+		}).catch((err) => console.error(err))
 	}
 
 	let popupSettings: PopupSettings = {
@@ -66,22 +69,24 @@
 	</button>
 </div>
 
-<div
-	class="z-10 bg-surface-800"
-	data-popup="revisionsDropDown"
-	in:slide={{ duration: 300 }}
-	out:slide={{ duration: 300 }}
->
-	<div class="arrow bg-surface-800" />
-	<ul class="overflow-y-auto max-h-48 py-1 text-sm mt-2">
-		{#each revisions as r}
-			<li
-				class="block py-2 px-4 hover:bg-primary-100 dark:hover:bg-primary-300 dark:hover:text-surface-900"
-			>
-				<button on:click={() => (rev = r)}>
-					Revision {r}
-				</button>
-			</li>
-		{/each}
-	</ul>
-</div>
+{#if revisions.length > 0}
+	<div
+		class="z-10 bg-surface-800"
+		data-popup="revisionsDropDown"
+		in:slide={{ duration: 300 }}
+		out:slide={{ duration: 300 }}
+	>
+		<div class="arrow bg-surface-800" />
+		<ul class="overflow-y-auto max-h-48 py-1 text-sm mt-2">
+			{#each revisions as r}
+				<li
+					class="block py-2 px-4 hover:bg-primary-100 dark:hover:bg-primary-300 dark:hover:text-surface-900"
+				>
+					<button on:click={() => (rev = r)}>
+						Revision {r}
+					</button>
+				</li>
+			{/each}
+		</ul>
+	</div>
+{/if}

@@ -143,6 +143,10 @@ export const postSchema = z.object({
 	published: z.boolean()
 })
 
+export const legalSchema = z.object({
+	content: content
+})
+
 export const profileSchema = z.object({
 	email: z.string().email("Must be a valid email!").optional(),
 	password: z
