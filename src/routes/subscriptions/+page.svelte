@@ -19,9 +19,11 @@
 	import { zodClient } from "sveltekit-superforms/adapters"
 
 	export let data
+	export let form
 
-	let { profile, pageDataPromise, pricesPromise, subscriptionsPromise, freeAccessPromise } = data
-	$: ({ profile, pageDataPromise, pricesPromise, subscriptionsPromise, freeAccessPromise } = data)
+	const { profile, freeAccessPromise } = data
+	let { pageDataPromise, pricesPromise, subscriptionsPromise } = data
+	$: ({ pageDataPromise, pricesPromise, subscriptionsPromise } = data)
 
 	let bundles: Awaited<typeof pageDataPromise>["bundles"] | null = null
 	let scripts: Awaited<typeof pageDataPromise>["scripts"] | null = null
@@ -36,6 +38,7 @@
 	const { errors: subscriptionsErrors, enhance: subscriptionEnhance } = superForm(
 		data.subscriptionsform,
 		{
+			id: "subscriptions",
 			dataType: "json",
 			multipleSubmits: "prevent",
 			clearOnSubmit: "errors"
@@ -43,26 +46,44 @@
 	)
 
 	let subscriptions: Subscription[] | null = null
-	$: if (subscriptionsPromise) {
-		subscriptionsPromise.then((subs) => (subscriptions = subs))
-	} else subscriptions = null
-
 	let free_access: FreeAccess[] | null = null
-	$: if (freeAccessPromise) {
-		freeAccessPromise.then((free) => (free_access = free))
-	} else subscriptions = null
+
+	if (subscriptionsPromise) subscriptionsPromise.then((subs) => (subscriptions = subs))
+	if (freeAccessPromise) freeAccessPromise.then((free) => (free_access = free))
 
 	$: if (subscriptions && bundles && scripts) {
-		subscriptions.forEach((sub) => {
-			bundles?.forEach((bundle) => {
-				if (sub.product === bundle.id) bundle.active = false
-			})
+		for (let i = 0; i < subscriptions.length; i++) {
+			const product = subscriptions[i].product
 
-			scripts?.forEach((script) => {
-				if (sub.product === script.id) script.active = false
+			bundles.forEach((bundle) => {
+				if (product === bundle.id) bundle.active = false
 			})
-		})
+			scripts.forEach((script) => {
+				if (product === script.id) script.active = false
+			})
+		}
 	}
+
+	$: if (free_access && bundles && scripts) {
+		for (let i = 0; i < free_access.length; i++) {
+			const product = free_access[i].product
+
+			bundles.forEach((bundle) => {
+				if (product === bundle.id) bundle.active = false
+			})
+			scripts.forEach((script) => {
+				if (product === script.id) script.active = false
+			})
+		}
+	}
+
+	function toggleSub(subscription: string) {
+		if (!subscriptions) return
+		const i = subscriptions.findIndex((sub) => sub.subscription === subscription)
+		if (i > -1) subscriptions[i].cancel = !subscriptions[i].cancel
+	}
+
+	$: if (form?.subscription) toggleSub(form.subscription)
 
 	let subsform: HTMLFormElement
 
@@ -72,6 +93,7 @@
 		enhance: checkoutEnhance,
 		allErrors
 	} = superForm(data.checkoutForm, {
+		id: "checkout",
 		dataType: "json",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
@@ -85,11 +107,13 @@
 		enhance: checkoutEnhance,
 		allErrors
 	} = superForm(data.checkoutForm, {
+		id: "checkout",
 		dataType: "json",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: null,
-		validators: zodClient(checkoutSchema)
+		validators: zodClient(checkoutSchema),
+		warnings: { duplicateId: false }
 	}))
 
 	function changePriceInterval(prices: Price[], index: number, productIndex: number) {
@@ -101,11 +125,13 @@
 	}
 
 	async function getBundle(id: string) {
-		return bundles?.find((bundle) => bundle.id === id)
+		const { bundles } = await pageDataPromise
+		return bundles.find((bundle) => bundle.id === id)
 	}
 
 	async function getScript(id: string) {
-		return scripts?.find((script) => script.id === id)
+		const { scripts } = await pageDataPromise
+		return scripts.find((script) => script.id === id)
 	}
 
 	let userLocale = "pt-PT"
@@ -176,10 +202,34 @@
 								{#each subscriptions as subscription}
 									{@const price = getPrice(subscription.price, prices)}
 									{#await getBundle(subscription.product)}
-										<tr>
-											<td colspan="7">
-												<span class="flex justify-center text-center py-3">...</span>
-											</td>
+										<tr> </tr><tr class="table-row">
+											<TableCell alignment="left" padding={0}>
+												<div class="mx-3">
+													<div>Loading...</div>
+													<div class="text-xs text-left">by Loading...</div>
+												</div>
+											</TableCell>
+											<TableCell padding={0}>
+												<button class="btn hover:cursor-pointer hover:text-primary-500">
+													<RotateCw size={16} />
+													<span>Loading...</span>
+												</button>
+											</TableCell>
+											<TableCell>...</TableCell>
+											<TableCell>...</TableCell>
+											<TableCell>Loading...</TableCell>
+											<TableCell>Loading...</TableCell>
+											<TableCell>
+												<SlideToggle
+													name="placeholder"
+													checked={false}
+													size="sm"
+													active="variant-filled-success"
+													background="variant-filled-surface"
+													disabled={true}
+													class="disabled"
+												/>
+											</TableCell>
 										</tr>
 									{:then bundle}
 										{#if bundle}

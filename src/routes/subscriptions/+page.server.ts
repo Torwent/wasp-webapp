@@ -12,11 +12,14 @@ export const load = async ({ locals: { getSubscriptions, getFreeAccess } }) => {
 		superValidate(zod(checkoutSchema))
 	])
 
+	const subscriptions = getSubscriptions()
+	const freeAccess = getFreeAccess()
+
 	return {
 		subscriptionsform: promises[0],
 		checkoutForm: promises[1],
-		subscriptions: getSubscriptions(),
-		freeAccess: getFreeAccess()
+		subscriptions,
+		freeAccess
 	}
 }
 
@@ -213,8 +216,9 @@ export const actions = {
 		}
 
 		if (!profile.customer_id) {
-			throw error(
-				403,
+			return setError(
+				form,
+				"",
 				"You don't have a customer id. This should not be possible! Please contact support@waspscripts.com"
 			)
 		}
@@ -268,6 +272,6 @@ export const actions = {
 			cancel_at_period_end: !subscription.cancel_at_period_end
 		})
 
-		return
+		return { form, subscription: subscriptionID }
 	}
 }

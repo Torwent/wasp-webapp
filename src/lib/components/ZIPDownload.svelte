@@ -119,8 +119,8 @@
 		const zipBlob = await zip.generateAsync({ type: "blob" })
 		progress = 1
 		setTimeout(async () => (progress = -1), 2000)
-		const FileSaver = await require("file-saver")
-		return FileSaver.saveAs(zipBlob, zipName)
+		const { saveAs } = await import("file-saver")
+		return saveAs(zipBlob, zipName)
 	}
 
 	async function downloadAndZip() {

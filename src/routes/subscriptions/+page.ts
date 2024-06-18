@@ -31,6 +31,7 @@ export const load = async ({ parent, data }) => {
 		id: string
 		username: string
 	}
+
 	const cachedUsers: User[] = []
 
 	async function getProfile(id: string) {

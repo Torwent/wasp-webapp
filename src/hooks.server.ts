@@ -115,7 +115,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
 			.select("id, product, date_start, date_end")
 			.eq("id", user.id)
 
-		console.log(`💰 Subscriptions took ${(performance.now() - start).toFixed(2)} ms to check!`)
+		console.log(`💰 Free access took ${(performance.now() - start).toFixed(2)} ms to check!`)
 		if (err) return null
 		return data
 	}

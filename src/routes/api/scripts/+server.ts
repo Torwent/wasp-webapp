@@ -5,7 +5,7 @@ export const POST = async ({ request, locals: { user } }) => {
 	if (!user) error(403, "You need to be logged in!")
 	const data = await request.json()
 
-	if (!Object.keys(data).includes("id")) error(403, "No script specified.")
+	if (!Object.keys(data).includes("ids")) error(403, "No script specified.")
 	const ids = data.ids as string[]
 
 	let promises: ReturnType<typeof updateDownloaders>[] = []
