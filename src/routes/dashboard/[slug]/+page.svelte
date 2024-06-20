@@ -84,7 +84,8 @@
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors-and-message",
 		validators: zodClient(dbaSchema),
-		resetForm: true
+		resetForm: true,
+		warnings: { duplicateId: false }
 	}))
 
 	let tabSet: number = 0

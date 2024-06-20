@@ -37,15 +37,7 @@ export const actions = {
 		const { data: tutorial, error: err } = await supabaseServer
 			.schema("info")
 			.from("tutorials")
-			.insert({
-				title: form.data.title,
-				description: form.data.description,
-				content: form.data.content,
-				level: form.data.level,
-				order: form.data.order,
-				published: form.data.published,
-				author_id: user.id
-			})
+			.insert(form.data)
 			.select()
 			.single()
 

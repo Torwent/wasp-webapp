@@ -134,6 +134,9 @@ export async function getScripter(supabase: SupabaseClient, slug: string) {
 			500,
 			"Server error, this is probably not an issue on your end!\n" +
 				"SELECT profiles.scripters failed!\n\n" +
+				"Slug: " +
+				slug +
+				"\n" +
 				formatError(err)
 		)
 	}

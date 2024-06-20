@@ -42,7 +42,7 @@ export const baseScriptSchema = z.object({
 			"Scripts can't have both 🎈Free and 👑Premium categories."
 		),
 	subcategories: z.array(z.string()).min(1, "You should have at least 1 subcategory."),
-	published: z.boolean(),
+	published: z.boolean().default(true),
 	min_xp: z
 		.number()
 		.int("Only whole numbers are allowed.")

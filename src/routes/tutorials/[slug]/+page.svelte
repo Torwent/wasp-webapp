@@ -7,7 +7,7 @@
 	$: ({ tutorialPromise } = data)
 
 	let tutorial: Awaited<typeof tutorialPromise> | null = null
-	$: tutorialPromise.then((awaited) => (tutorial = awaited))
+	$: tutorialPromise?.then((awaited) => (tutorial = awaited))
 
 	const headImage = "/multi-color-logo.png"
 </script>

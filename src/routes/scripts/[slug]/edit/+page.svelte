@@ -54,6 +54,7 @@
 		$form.max_xp = script.max_xp
 		$form.min_gp = script.min_gp
 		$form.max_gp = script.max_gp
+		$form.published = script.published
 		defaultBanner = script.protected.assets + "/banner.jpg"
 	}
 

@@ -96,50 +96,58 @@ export type Database = {
       tutorials: {
         Row: {
           author_id: string
-          content: string | null
-          created_at: string | null
-          description: string | null
+          content: string
+          created_at: string
+          description: string
           fts: unknown | null
-          id: string | null
-          level: number | null
-          order: number | null
-          published: boolean | null
+          id: string
+          level: number
+          order: number
+          published: boolean
           search: string | null
-          title: string | null
-          url: string | null
-          username: string | null
+          title: string
+          url: string
+          username: string
         }
         Insert: {
-          author_id: string
-          content?: string | null
-          created_at?: string | null
-          description?: string | null
+          author_id?: string
+          content: string
+          created_at?: string
+          description: string
           fts?: unknown | null
-          id?: string | null
-          level?: number | null
-          order?: number | null
-          published?: boolean | null
+          id?: string
+          level?: number
+          order: number
+          published?: boolean
           search?: string | null
-          title?: string | null
-          url?: string | null
-          username?: string | null
+          title: string
+          url?: string
+          username?: string
         }
         Update: {
           author_id?: string
-          content?: string | null
-          created_at?: string | null
-          description?: string | null
+          content?: string
+          created_at?: string
+          description?: string
           fts?: unknown | null
-          id?: string | null
-          level?: number | null
-          order?: number | null
-          published?: boolean | null
+          id?: string
+          level?: number
+          order?: number
+          published?: boolean
           search?: string | null
-          title?: string | null
-          url?: string | null
-          username?: string | null
+          title?: string
+          url?: string
+          username?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tutorials_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_tos: {
         Row: {
@@ -838,38 +846,38 @@ export type Database = {
       }
       stats: {
         Row: {
-          experience: number | null
-          gold: number | null
+          experience: number
+          gold: number
           id: string
           levels: number
           password: string
-          runtime: number | null
+          runtime: number
           updated_at: string | null
           username: string
         }
         Insert: {
-          experience?: number | null
-          gold?: number | null
+          experience?: number
+          gold?: number
           id: string
           levels?: number
           password?: string
-          runtime?: number | null
+          runtime?: number
           updated_at?: string | null
           username?: string
         }
         Update: {
-          experience?: number | null
-          gold?: number | null
+          experience?: number
+          gold?: number
           id?: string
           levels?: number
           password?: string
-          runtime?: number | null
+          runtime?: number
           updated_at?: string | null
           username?: string
         }
         Relationships: []
       }
-      stats_backup: {
+      stats_bak: {
         Row: {
           experience: number | null
           gold: number | null
@@ -2047,6 +2055,10 @@ export type Database = {
           metadata: Json
           updated_at: string
         }[]
+      }
+      operation: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       search: {
         Args: {

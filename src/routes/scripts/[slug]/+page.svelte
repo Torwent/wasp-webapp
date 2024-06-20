@@ -24,7 +24,7 @@
 	const modalStore = getModalStore()
 
 	let script: Awaited<typeof scriptPromise> | null = null
-	$: scriptPromise.then((awaited) => (script = awaited))
+	$: scriptPromise?.then((awaited) => (script = awaited))
 
 	function warningDismissed(r: boolean) {
 		if (r) {
