@@ -19,6 +19,7 @@
 	let published: boolean = false
 
 	const { form, errors, enhance } = superForm(data.form, {
+		dataType: "json",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: "Are you sure you want to leave?",
@@ -138,7 +139,7 @@
 			</div>
 
 			{#if $errors._errors}
-				<div class="mt-8 grid">
+				<div class="my-8 grid">
 					Errors:
 					{#each $errors._errors as err}
 						<small class="text-error-500">- {err}</small>
