@@ -10,7 +10,7 @@ const redirects: Handle = async ({ event, resolve }) => {
 		return redirect(303, "/auth/refresh-token")
 	}
 	const response = resolve(event)
-	console.log(`🔗 Redirects took ${(performance.now() - start).toFixed(2)} ms to handle!`)
+	console.log(`└🔗 Redirects took ${(performance.now() - start).toFixed(2)} ms to handle!`)
 
 	return response
 }
@@ -30,7 +30,7 @@ const supabase: Handle = async ({ event, resolve }) => {
 			data: { session }
 		} = await event.locals.supabaseServer.auth.getSession()
 		if (!session) return { session: null, user: null, getProfile: null }
-		console.log(`📜 session took ${(performance.now() - start).toFixed(2)} ms to check!`)
+		console.log(`└📜 session took ${(performance.now() - start).toFixed(2)} ms to check!`)
 
 		start = performance.now()
 		const {
@@ -38,7 +38,7 @@ const supabase: Handle = async ({ event, resolve }) => {
 			error
 		} = await event.locals.supabaseServer.auth.getUser()
 		if (error) return { session: null, user: null, getProfile: null }
-		console.log(`🔥 user took ${(performance.now() - start).toFixed(2)} ms to check!`)
+		console.log(`└🔥 user took ${(performance.now() - start).toFixed(2)} ms to check!`)
 
 		// @ts-expect-error
 		delete session.user
@@ -101,7 +101,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
 			.select("subscription, product, price, date_start, date_end, cancel, disabled")
 			.eq("id", user.id)
 
-		console.log(`💰 Subscriptions took ${(performance.now() - start).toFixed(2)} ms to check!`)
+		console.log(`└──💰 Subscriptions took ${(performance.now() - start).toFixed(2)} ms to check!`)
 		if (err) return null
 		return data
 	}
@@ -115,7 +115,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
 			.select("id, product, date_start, date_end")
 			.eq("id", user.id)
 
-		console.log(`💰 Free access took ${(performance.now() - start).toFixed(2)} ms to check!`)
+		console.log(`└──💰 Free access took ${(performance.now() - start).toFixed(2)} ms to check!`)
 		if (err) return null
 		return data
 	}
@@ -125,7 +125,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	}
 
 	const response = resolve(event)
-	console.log(`🤖 Auth took ${(performance.now() - start).toFixed(2)} ms to check!`)
+	console.log(`└🤖 Auth took ${(performance.now() - start).toFixed(2)} ms to check!`)
 
 	return response
 }
@@ -135,7 +135,7 @@ const performanceCheck: Handle = async ({ event, resolve }) => {
 	const { url } = event
 	const response = await resolve(event)
 	const loadTime = performance.now() - start
-	console.log(`🚀 ${url} took ${loadTime.toFixed(2)} ms to load!`)
+	console.log(`└🚀 ${url} took ${loadTime.toFixed(2)} ms to load!`)
 	return response
 }
 

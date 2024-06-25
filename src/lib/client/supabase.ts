@@ -1,4 +1,5 @@
 import type {
+	SimpleScripter,
 	Category,
 	FAQEntry,
 	ProfileRoles,
@@ -17,6 +18,11 @@ const SCRIPT_CACHE_MAX_AGE = 2 * 60 * 1000
 
 interface CachedStatsTotal {
 	data: StatsTotal
+	timestamp: number
+}
+
+interface CachedScripters {
+	data: SimpleScripter[]
 	timestamp: number
 }
 
@@ -144,6 +150,43 @@ export async function getScripter(supabase: SupabaseClient, slug: string) {
 	return data
 }
 
+export class WaspScripters {
+	static #CACHE_MAX_AGE = 10 * 60 * 1000
+	static #randomScripters: CachedScripters | null = null
+
+	static async #fetchRandomScripters(supabase: SupabaseClient) {
+		const start = performance.now()
+		const { data, error: err } = await supabase
+			.schema("profiles")
+			.from("random_scripters")
+			.select(`url, profiles!inner (username)`)
+			.limit(5)
+			.limit(1, { foreignTable: "profiles" })
+			.order("id", { ascending: true })
+			.returns<SimpleScripter[]>()
+
+		console.log(`└──💻 5 Random scripters loaded in ${(performance.now() - start).toFixed(2)} ms!`)
+		if (err) {
+			console.error(err)
+			return []
+		}
+
+		return data
+	}
+
+	static async getRandomScripters(supabase: SupabaseClient) {
+		const now = Date.now()
+
+		if (this.#randomScripters && now - this.#randomScripters.timestamp < this.#CACHE_MAX_AGE) {
+			return this.#randomScripters.data
+		}
+
+		const data = await this.#fetchRandomScripters(supabase)
+		if (data.length > 0) this.#randomScripters = { data, timestamp: now }
+		return data
+	}
+}
+
 export class WaspCategories {
 	static #CACHE_MAX_AGE = 60 * 60 * 1000
 	static #categories: CachedCategories | null = null
@@ -151,12 +194,13 @@ export class WaspCategories {
 	static #tooltips: CachedTooltips | null = null
 
 	static async #fetchCategories(supabase: SupabaseClient) {
-		console.log("🔨 Fetching categories")
+		const start = performance.now()
 		const { data, error: err } = await supabase
 			.schema("scripts")
 			.from("categories")
 			.select("name, emoji")
 
+		console.log(`└──🔨 Categories loaded in ${(performance.now() - start).toFixed(2)} ms!`)
 		if (err) {
 			error(
 				500,
@@ -182,12 +226,13 @@ export class WaspCategories {
 	}
 
 	static async #fetchSubCategories(supabase: SupabaseClient) {
-		console.log("🔧 Fetching subcategories")
+		const start = performance.now()
 		const { data, error: err } = await supabase
 			.schema("scripts")
 			.from("subcategories")
 			.select("category, name, emoji")
 
+		console.log(`└──🔧 Categories loaded in ${(performance.now() - start).toFixed(2)} ms!`)
 		if (err) {
 			error(
 				500,
@@ -216,11 +261,12 @@ export class WaspCategories {
 		categoriesPromise: ReturnType<typeof this.getCategories>,
 		subcategoriesPromise: ReturnType<typeof this.getSubCategories>
 	) {
-		console.log("💥 Processing tooltips")
+		const start = performance.now()
 		const promises = await Promise.all([categoriesPromise, subcategoriesPromise])
 		const converted = promises[1].map((subcategory) => {
 			return { name: subcategory.name, emoji: subcategory.emoji }
 		})
+		console.log(`└────💥 Tooltips processed in ${(performance.now() - start).toFixed(2)} ms!`)
 		return [...promises[0], ...converted]
 	}
 
@@ -269,7 +315,7 @@ export async function getScript(
 		return cached.data
 	}
 
-	console.log("💥 Fetching script " + slug)
+	const start = performance.now()
 	const { data, error: err } = await supabase
 		.schema("scripts")
 		.from("scripts")
@@ -281,6 +327,7 @@ export async function getScript(
 		.eq((isUUID == null && UUID_V4_REGEX.test(slug)) || isUUID ? "id" : "url", slug)
 		.single<Script>()
 
+	console.log(`└────📑 Script: ${slug} loaded in ${(performance.now() - start).toFixed(2)} ms!`)
 	if (err) {
 		error(
 			500,
@@ -404,12 +451,14 @@ export async function getFAQ(supabase: SupabaseClient, table: string) {
 		return cached.data
 	}
 
-	console.log("💥 Fetching FAQs: " + table)
+	const start = performance.now()
 	const { data, error: err } = await supabase
 		.schema("info")
 		.from(table)
 		.select("title, content")
 		.order("id")
+
+	console.log(`└──❓ FAQs ${table} loaded in ${(performance.now() - start).toFixed(2)} ms!`)
 
 	if (err) {
 		error(

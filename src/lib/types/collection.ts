@@ -30,6 +30,11 @@ export interface ScripterBase {
 	}
 }
 
+export interface SimpleScripter {
+	url: string
+	profiles: { username: string }
+}
+
 export interface Scripter extends ScripterBase {
 	id: string
 	stripe: string | undefined

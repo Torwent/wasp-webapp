@@ -2,25 +2,7 @@
 	import { Github, Globe } from "lucide-svelte"
 	import Logo from "./Logo.svelte"
 	import { page } from "$app/stores"
-
-	async function getRandomScripters() {
-		const start = performance.now()
-		const { data, error: err } = await $page.data.supabaseClient
-			.schema("profiles")
-			.from("random_scripters")
-			.select(`id, realname, url, profiles!inner (username)`)
-			.limit(5)
-			.limit(1, { foreignTable: "profiles" })
-			.order("id", { ascending: true })
-
-		console.log(`💻 Scripters loaded in ${(performance.now() - start).toFixed(2)} ms!`)
-		if (err) {
-			console.error(err)
-			return []
-		}
-
-		return data
-	}
+	import { WaspScripters } from "$lib/client/supabase"
 </script>
 
 <footer class="variant-soft-surface">
@@ -52,7 +34,7 @@
 				<nav>
 					<span class="mb-6 text-sm font-semibold uppercase">Special thanks:</span>
 					<ul>
-						{#await getRandomScripters()}~
+						{#await WaspScripters.getRandomScripters($page.data.supabaseClient)}
 							{#each Array(5) as _}
 								<li>Loading...</li>
 							{/each}
