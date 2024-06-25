@@ -492,11 +492,7 @@ export const actions = {
 
 		if (err) error(403, formatError(err))
 
-		const formBundle = await superValidate(request, zod(bundleArraySchema))
-		const formScripts = await superValidate(request, zod(scriptArraySchema))
-
-		const form = formBundle.valid ? formBundle : formScripts
-		return { form }
+		return
 	},
 	cancelFreeAccess: async ({
 		request,
@@ -525,11 +521,7 @@ export const actions = {
 		const err = await cancelFreeAccess(supabaseServer, id, product)
 		if (err) error(403, formatError(err))
 
-		const formBundle = await superValidate(request, zod(bundleArraySchema))
-		const formScripts = await superValidate(request, zod(scriptArraySchema))
-
-		const form = formBundle.valid ? formBundle : formScripts
-		return { form }
+		return
 	},
 
 	cancelSub: async ({
