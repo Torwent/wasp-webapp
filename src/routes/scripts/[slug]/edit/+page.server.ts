@@ -2,11 +2,14 @@ import { superValidate, setError } from "sveltekit-superforms/server"
 import { redirect } from "@sveltejs/kit"
 import { updateScriptServerSchema } from "$lib/server/schemas.server"
 import { canEdit, getScript } from "$lib/client/supabase"
-import { updateScript } from "$lib/server/supabase.server"
+import { doLogin, updateScript } from "$lib/server/supabase.server"
 import { UUID_V4_REGEX } from "$lib/utils"
 import { zod } from "sveltekit-superforms/adapters"
 
-export const load = async () => {
+export const load = async ({ locals: { supabaseServer, user, session } }) => {
+	if (!user || !session) {
+		return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+	}
 	return { form: await superValidate(zod(updateScriptServerSchema)) }
 }
 
@@ -14,8 +17,12 @@ export const actions = {
 	default: async ({
 		request,
 		params: { slug },
-		locals: { supabaseServer, getProfile, getRoles }
+		locals: { supabaseServer, user, session, getProfile, getRoles }
 	}) => {
+		if (!user || !session) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
+
 		const promises = await Promise.all([
 			getProfile(),
 			getRoles(),

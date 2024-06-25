@@ -1,19 +1,27 @@
 import { superValidate, setError } from "sveltekit-superforms/server"
 import { redirect } from "@sveltejs/kit"
 import { addScriptServerSchema } from "$lib/server/schemas.server"
-import { uploadScript } from "$lib/server/supabase.server"
+import { doLogin, uploadScript } from "$lib/server/supabase.server"
 import { encodeSEO, scriptDefaultContent } from "$lib/utils"
 import { scriptExists } from "$lib/client/supabase"
 import { zod } from "sveltekit-superforms/adapters"
 
-export const load = async () => {
+export const load = async ({ locals: { supabaseServer, user, session } }) => {
+	if (!user || !session) {
+		return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+	}
+
 	const form = await superValidate(zod(addScriptServerSchema))
 	form.data.content = scriptDefaultContent
 	return { form }
 }
 
 export const actions = {
-	default: async ({ request, locals: { supabaseServer, getProfile } }) => {
+	default: async ({ request, locals: { user, session, supabaseServer, getProfile } }) => {
+		if (!user || !session) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
+
 		const promises = await Promise.all([
 			getProfile(),
 			superValidate(request, zod(addScriptServerSchema))
@@ -21,7 +29,8 @@ export const actions = {
 		const profile = promises[0]
 		const form = promises[1]
 
-		if (!profile) return setError(form, "", "You need to login to add a script.")
+		if (profile?.id !== user.id)
+			return setError(form, "", "You can't add a script for another user.")
 		if (!form.valid) return setError(form, "", "Form is not valid!")
 
 		const tmp = await scriptExists(

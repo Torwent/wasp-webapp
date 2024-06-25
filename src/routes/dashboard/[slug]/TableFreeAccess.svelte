@@ -31,18 +31,6 @@
 
 	let freePromise = getFreeAccess(products[index].id)
 
-	async function toggleFree(idx: number) {
-		products[idx].freeOpen = !products[idx].freeOpen
-		if (products[idx].freeOpen) {
-			freePromise = getFreeAccess(products[idx].id)
-
-			for (let i = 0; i < products.length; i++) {
-				products[index].subsOpen = false
-				if (i !== idx) products[index].freeOpen = false
-			}
-		}
-	}
-
 	const btnText = action.includes("dd") ? "Add" : "Save"
 	let userLocale = "pt-PT"
 </script>
@@ -88,6 +76,7 @@
 					type="submit"
 					class="btn variant-outline-primary"
 					formaction="?/addFreeAccess&product={products[index].id}"
+					on:submit={async () => (freePromise = getFreeAccess(products[index].id))}
 				>
 					{btnText}
 				</button>
@@ -108,6 +97,7 @@
 							type="submit"
 							class="btn variant-outline-error"
 							formaction="?/cancelFreeAccess&product={products[index].id}&id={row.id}"
+							on:submit={async () => (freePromise = getFreeAccess(products[index].id))}
 						>
 							Cancel
 						</button>

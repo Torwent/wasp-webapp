@@ -3,14 +3,20 @@ import { fail, redirect } from "@sveltejs/kit"
 import { postSchema } from "$lib/client/schemas"
 import { zod } from "sveltekit-superforms/adapters"
 import { formatError } from "$lib/utils.js"
+import { doLogin } from "$lib/server/supabase.server"
 
-export const load = async () => {
+export const load = async ({ locals: { supabaseServer, user, session } }) => {
+	if (!user || !session) {
+		return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+	}
 	return { form: await superValidate(zod(postSchema)) }
 }
 
 export const actions = {
-	default: async ({ request, locals: { supabaseServer, user, getRoles }, params }) => {
-		if (!user) return fail(403, { message: "You need to login to add a script." })
+	default: async ({ request, locals: { supabaseServer, user, session, getRoles }, params }) => {
+		if (!user || !session) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
 
 		const promises = await Promise.all([getRoles(), superValidate(request, zod(postSchema))])
 		const roles = promises[0]
