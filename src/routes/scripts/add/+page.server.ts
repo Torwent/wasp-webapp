@@ -46,7 +46,7 @@ export const actions = {
 		const { url, error: err } = await uploadScript(supabaseServer, form.data)
 
 		if (err) return setError(form, "", err)
-		if (url) throw redirect(303, "../" + url)
-		throw redirect(303, "./" + url)
+		if (url) throw redirect(303, "/scripts/" + url)
+		throw redirect(303, "/scripts")
 	}
 }
