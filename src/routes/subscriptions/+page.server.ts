@@ -122,12 +122,16 @@ export const actions = {
 			)
 		}
 
+		const start = performance.now()
 		const { data, error: err } = await supabaseServer
 			.schema("scripts")
 			.from("products")
 			.select("user_id, stripe_user")
 			.eq("id", productID)
 			.single()
+		console.log(
+			`└────🦾 Product owner data took ${(performance.now() - start).toFixed(2)} ms to check!`
+		)
 
 		if (err) {
 			return setError(
@@ -138,6 +142,7 @@ export const actions = {
 		}
 
 		const stripeUser = data.user_id !== PUBLIC_SUPER_USER_ID ? data.stripe_user : null
+
 		const url = await createCheckoutSession(
 			profile.id,
 			profile.customer_id,

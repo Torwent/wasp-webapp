@@ -31,7 +31,23 @@ export async function createCheckoutSession(
 ) {
 	let session: Stripe.Checkout.Session
 
+	let currency: string = "eur"
+	if (stripeUser) {
+		try {
+			const start = performance.now()
+			const stripeAccount = await stripe.accounts.retrieve(stripeUser)
+			currency = stripeAccount.default_currency ?? currency
+			console.log(
+				`└────🪙 Account currency took ${(performance.now() - start).toFixed(2)} ms to check!`
+			)
+		} catch (err: any) {
+			console.error(err)
+			return null
+		}
+	}
+
 	try {
+		const start = performance.now()
 		session = await stripe.checkout.sessions.create({
 			line_items: [{ price: price, quantity: 1 }],
 			customer: customer,
@@ -43,13 +59,16 @@ export async function createCheckoutSession(
 			allow_promotion_codes: true,
 			subscription_data: {
 				on_behalf_of: stripeUser ?? undefined,
-				application_fee_percent: stripeUser ? 20 : undefined,
+				application_fee_percent: stripeUser ? (currency === "eur" ? 20 : 22) : undefined,
 				transfer_data: stripeUser ? { destination: stripeUser } : undefined,
 				metadata: { user_id: id }
 			},
 			success_url: origin + "/api/stripe/checkout/success?session_id={CHECKOUT_SESSION_ID}",
 			cancel_url: origin + "/api/stripe/checkout/cancel?session_id={CHECKOUT_SESSION_ID}"
 		})
+		console.log(
+			`└────🛒 Checkout session took ${(performance.now() - start).toFixed(2)} ms to create!`
+		)
 	} catch (err: any) {
 		console.error(err)
 		return null
@@ -190,7 +209,10 @@ export async function createStripeConnectAccount(
 			},
 			metadata: { id: scripter.id, username: scripter.profiles.username },
 			settings: {
-				payouts: { schedule: { interval: "weekly", delay_days: 7, weekly_anchor: "monday" } }
+				payouts: {
+					schedule: { interval: "monthly", delay_days: 15, monthly_anchor: 31 },
+					statement_descriptor: "waspscripts.com"
+				}
 			}
 		})
 	} catch (err) {
