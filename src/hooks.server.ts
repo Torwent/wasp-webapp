@@ -39,6 +39,9 @@ const supabase: Handle = async ({ event, resolve }) => {
 		} = await event.locals.supabaseServer.auth.getUser()
 		if (error) return { session: null, user: null, getProfile: null }
 		console.log(`└🔥 user took ${(performance.now() - start).toFixed(2)} ms to check!`)
+		if (user) {
+			console.log(`└😄 user ${user.id} accessing from ${event.getClientAddress()}`)
+		}
 
 		// @ts-expect-error
 		delete session.user

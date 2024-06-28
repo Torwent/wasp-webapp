@@ -56,15 +56,34 @@
 
 	$: hasError = checkErrors(errors)
 
-	$: ({ profile } = $page.data)
+	let { roles } = $page.data
+	$: ({ roles } = $page.data)
 
-	$: if (!profile || !$page.data.roles?.administrator) {
+	$: if (!roles?.administrator) {
 		if (value.includes("Official")) {
 			for (let i = 0; i < value.length; i++) {
 				if (value[i] === "Official") {
 					value.splice(i, 1)
 					i--
 				}
+			}
+		}
+	}
+
+	$: if (value.includes("Official") && value.includes("Community")) {
+		for (let i = 0; i < value.length; i++) {
+			if (value[i] === (roles?.administrator ? "Official" : "Community")) {
+				value.splice(i, 1)
+				i--
+			}
+		}
+	}
+
+	$: if (value.includes("Premium") && value.includes("Free")) {
+		for (let i = 0; i < value.length; i++) {
+			if (value[i] === "Premium") {
+				value.splice(i, 1)
+				i--
 			}
 		}
 	}
