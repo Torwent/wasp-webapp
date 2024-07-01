@@ -21,8 +21,8 @@ export const actions = {
 		const roles = promises[0]
 		const form = promises[1]
 
-		if (!roles?.administrator || !roles?.moderator || !roles?.scripter)
-			return setError(form, "", "Only administrators can add new versions of a the legal documents")
+		if (!roles?.administrator && !roles?.moderator && !roles?.scripter)
+			return setError(form, "", "Only administrators can add tutorials.")
 		if (!form.valid) return setError(form, "", "Form is not valid!")
 
 		const { data } = await supabaseServer
