@@ -31,7 +31,12 @@ export const actions = {
 
 		if (profile?.id !== user.id)
 			return setError(form, "", "You can't add a script for another user.")
-		if (!form.valid) return setError(form, "", "Form is not valid!")
+		if (!form.valid)
+			return setError(
+				form,
+				"",
+				"Form is not valid" + (form.errors?._errors ? ": " + form.errors?._errors.toString() : "!")
+			)
 
 		const tmp = await scriptExists(
 			supabaseServer,

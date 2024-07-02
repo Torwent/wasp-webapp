@@ -17,32 +17,35 @@ export const actions = {
 	default: async ({
 		request,
 		params: { slug },
-		locals: { supabaseServer, user, session, getProfile, getRoles }
+		locals: { supabaseServer, user, session, getRoles }
 	}) => {
 		if (!user || !session) {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
 
 		const promises = await Promise.all([
-			getProfile(),
 			getRoles(),
 			superValidate(request, zod(updateScriptServerSchema))
 		])
-		const profile = promises[0]
-		const roles = promises[1]
-		const form = promises[2]
+		const roles = promises[0]
+		const form = promises[1]
 
-		if (!profile || !roles) return setError(form, "", "You need to login to edit a script.")
-		if (!form.valid) return setError(form, "", "Form is not valid!")
+		if (!form.valid) {
+			return setError(
+				form,
+				"",
+				"Form is not valid" + (form.errors?._errors ? ": " + form.errors?._errors.toString() : "!")
+			)
+		}
 
 		const isUUID = UUID_V4_REGEX.test(slug)
 		const script = await getScript(supabaseServer, slug, isUUID)
 
-		if (script.categories.includes("Official") && !roles.administrator) {
+		if (script.categories.includes("Official") && !roles?.administrator) {
 			return setError(form, "", "You cannot edit an official script!")
 		}
 
-		if (!canEdit(profile.id, roles, script.protected.author_id)) {
+		if (!canEdit(user.id, roles, script.protected.author_id)) {
 			return setError(form, "", "You can't edit a script that doesn't belong to you!")
 		}
 
