@@ -4,7 +4,7 @@
 	import type { Tooltip } from "$lib/types/collection"
 	import { ChevronDown, X } from "lucide-svelte"
 	export let title: string
-	export let value: string[]
+	export let values: string[]
 	export let errors: string[] | undefined = undefined
 	export let placeholder = ""
 	export let tooltips: Tooltip[]
@@ -21,16 +21,16 @@
 	let inputValue: string = ""
 
 	function add(category: Tooltip) {
-		if (!value.includes(category.name)) value = [...value, category.name]
+		if (!values.includes(category.name)) values = [...values, category.name]
 	}
 
 	function remove(category: Tooltip) {
 		showOptions = true
 		input.focus()
-		for (let i = 0; i < value.length; i++) {
-			if (value[i] === category.name) {
-				value.splice(i, 1)
-				value = value
+		for (let i = 0; i < values.length; i++) {
+			if (values[i] === category.name) {
+				values.splice(i, 1)
+				values = values
 				return
 			}
 		}
@@ -40,10 +40,10 @@
 		const val = e.target.dataset.value
 		input.focus()
 
-		for (let i = 0; i < value.length; i++) {
-			if (value[i] === val) {
-				value.splice(i, 1)
-				value = value
+		for (let i = 0; i < values.length; i++) {
+			if (values[i] === val) {
+				values.splice(i, 1)
+				values = values
 				return
 			}
 		}
@@ -51,7 +51,7 @@
 	}
 
 	tooltips.forEach((tooltip) => {
-		if (value.length < 2 && (tooltip.name === "Community" || tooltip.name === "Free")) add(tooltip)
+		if (values.length < 2 && (tooltip.name === "Community" || tooltip.name === "Free")) add(tooltip)
 	})
 
 	$: hasError = checkErrors(errors)
@@ -60,29 +60,29 @@
 	$: ({ roles } = $page.data)
 
 	$: if (!roles?.administrator) {
-		if (value.includes("Official")) {
-			for (let i = 0; i < value.length; i++) {
-				if (value[i] === "Official") {
-					value.splice(i, 1)
+		if (values.includes("Official")) {
+			for (let i = 0; i < values.length; i++) {
+				if (values[i] === "Official") {
+					values.splice(i, 1)
 					i--
 				}
 			}
 		}
 	}
 
-	$: if (value.includes("Official") && value.includes("Community")) {
-		for (let i = 0; i < value.length; i++) {
-			if (value[i] === (roles?.administrator ? "Official" : "Community")) {
-				value.splice(i, 1)
+	$: if (values.includes("Official") && values.includes("Community")) {
+		for (let i = 0; i < values.length; i++) {
+			if (values[i] === (roles?.administrator ? "Official" : "Community")) {
+				values.splice(i, 1)
 				i--
 			}
 		}
 	}
 
-	$: if (value.includes("Premium") && value.includes("Free")) {
-		for (let i = 0; i < value.length; i++) {
-			if (value[i] === "Premium") {
-				value.splice(i, 1)
+	$: if (values.includes("Premium") && values.includes("Free")) {
+		for (let i = 0; i < values.length; i++) {
+			if (values[i] === "Premium") {
+				values.splice(i, 1)
 				i--
 			}
 		}
@@ -90,7 +90,13 @@
 </script>
 
 <div class="mb-8">
-	<select id={title.toLowerCase()} name={title.toLowerCase()} multiple class="hidden" bind:value>
+	<select
+		id={title.toLowerCase()}
+		name={title.toLowerCase()}
+		multiple
+		class="hidden"
+		bind:value={values}
+	>
 		{#each tooltips as tooltip}
 			<option value={tooltip.name}>{tooltip.name}</option>
 		{/each}
@@ -121,7 +127,7 @@
 		</div>
 
 		{#each tooltips as tooltip}
-			{#if value.includes(tooltip.name)}
+			{#if values.includes(tooltip.name)}
 				<button
 					class="chip variant-soft hover:variant-filled-surface"
 					data-id={tooltip.name}
@@ -133,7 +139,7 @@
 				</button>
 			{/if}
 		{/each}
-		{#if !value.length}
+		{#if !values.length}
 			<div class="h-7" />
 		{/if}
 
@@ -142,7 +148,7 @@
 			<ul on:mousedown|preventDefault={handleOptionMousedown}>
 				{#each tooltips as tooltip}
 					<li
-						class="p-2 cursor-pointer {value.includes(tooltip.name)
+						class="p-2 cursor-pointer {values.includes(tooltip.name)
 							? 'variant-filled-primary hover:bg-primary-400'
 							: 'variant-filled-surface hover:bg-surface-400'}"
 						data-value={tooltip.name}

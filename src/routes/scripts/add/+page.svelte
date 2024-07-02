@@ -335,19 +335,53 @@
 					h={"h-64"}
 				/>
 
-				<MultiSelect
-					title="Categories"
-					bind:value={$form.categories}
-					errors={$errors.categories?._errors}
-					tooltips={categories}
-				/>
+				{#if categories.length > 0}
+					<MultiSelect
+						title="Categories"
+						bind:values={$form.categories}
+						errors={$errors.categories?._errors}
+						bind:tooltips={categories}
+					/>
+				{:else}
+					<div class="mb-8">
+						<span>Categories:</span>
+						<div class="input rounded-md">
+							<div class="w-full items-center flex">
+								<input
+									class="input outline-none border-none h-10 disabled"
+									disabled
+									autocomplete="off"
+									placeholder="Loading..."
+								/>
+							</div>
+							<div class="h-7" />
+						</div>
+					</div>
+				{/if}
 
-				<MultiSelect
-					title="Subcategories"
-					bind:value={$form.subcategories}
-					errors={$errors.subcategories?._errors}
-					tooltips={subcategories}
-				/>
+				{#if subcategories.length > 0}
+					<MultiSelect
+						title="Subcategories"
+						bind:values={$form.subcategories}
+						errors={$errors.subcategories?._errors}
+						bind:tooltips={subcategories}
+					/>
+				{:else}
+					<div class="mb-8">
+						<span>Subcategories:</span>
+						<div class="input rounded-md">
+							<div class="w-full items-center flex">
+								<input
+									class="input outline-none border-none h-10 disabled"
+									disabled
+									autocomplete="off"
+									placeholder="Loading..."
+								/>
+							</div>
+							<div class="h-7" />
+						</div>
+					</div>
+				{/if}
 
 				<header class="text-center my-8">
 					<h5>Files</h5>

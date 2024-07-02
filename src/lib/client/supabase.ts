@@ -470,5 +470,6 @@ export async function getFAQ(supabase: SupabaseClient, table: string) {
 	}
 
 	faqs.set(table, { data, timestamp: now })
+
 	return data
 }

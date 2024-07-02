@@ -335,16 +335,16 @@
 
 				<MultiSelect
 					title="Categories"
-					bind:value={$form.categories}
+					bind:values={$form.categories}
 					errors={$errors.categories?._errors}
-					tooltips={categories}
+					bind:tooltips={categories}
 				/>
 
 				<MultiSelect
 					title="Subcategories"
-					bind:value={$form.subcategories}
+					bind:values={$form.subcategories}
 					errors={$errors.subcategories?._errors}
-					tooltips={subcategories}
+					bind:tooltips={subcategories}
 				/>
 
 				<header class="text-center my-8">

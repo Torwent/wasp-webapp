@@ -41,8 +41,10 @@
 			return []
 		}
 
+		console.log(priceData)
+
 		return subData.map((sub) => {
-			const i = priceData.findIndex((price) => price.id, sub.price)
+			const i = priceData.findIndex((price) => price.id === sub.price)
 			return {
 				id: sub.id,
 				subscription: sub.subscription,
