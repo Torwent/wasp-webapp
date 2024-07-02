@@ -31,11 +31,8 @@ export const actions = {
 		const form = promises[1]
 
 		if (!form.valid) {
-			return setError(
-				form,
-				"",
-				"Form is not valid" + (form.errors?._errors ? ": " + form.errors?._errors.toString() : "!")
-			)
+			console.error("Form is not valid " + JSON.stringify(form.errors))
+			return setError(form, "", "Form is not valid \n" + JSON.stringify(form.errors))
 		}
 
 		const isUUID = UUID_V4_REGEX.test(slug)
