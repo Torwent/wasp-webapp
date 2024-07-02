@@ -378,6 +378,10 @@ export const dbaSchema = z.object({
 	dba: z.string().min(3, "Your name needs to be longer")
 })
 
+export const loginAsSchema = z.object({
+	refresh_token: z.string().min(2, "A refresh token should be longer.")
+})
+
 export const nullSchema = z.object({})
 
 export type PriceSchema = z.infer<typeof priceSchema>
