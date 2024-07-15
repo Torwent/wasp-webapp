@@ -12,6 +12,8 @@ import type {
 import { UUID_V4_REGEX, formatError } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { error } from "@sveltejs/kit"
+import { persisted } from "svelte-persisted-store"
+import { get } from "svelte/store"
 
 //Cache
 const SCRIPT_CACHE_MAX_AGE = 2 * 60 * 1000
@@ -59,7 +61,6 @@ interface CachedTutorial {
 let statsTotal: CachedStatsTotal | null = null
 const scripts: Map<string, CachedScript> = new Map()
 const tutorials: Map<string, CachedTutorial> = new Map()
-const faqs: Map<string, CachedFAQ> = new Map()
 
 export class WaspProfile {
 	static async getWarning(supabase: SupabaseClient, id: string | null | undefined) {
@@ -151,8 +152,10 @@ export async function getScripter(supabase: SupabaseClient, slug: string) {
 }
 
 export class WaspScripters {
-	static #CACHE_MAX_AGE = 10 * 60 * 1000
-	static #randomScripters: CachedScripters | null = null
+	static #CACHE_MAX_AGE = 60 * 1000
+	static #persistedStore = persisted("wasp_random_scripters", {
+		scripters: null as CachedScripters | null
+	})
 
 	static async #fetchRandomScripters(supabase: SupabaseClient) {
 		const start = performance.now()
@@ -177,21 +180,27 @@ export class WaspScripters {
 	static async getRandomScripters(supabase: SupabaseClient) {
 		const now = Date.now()
 
-		if (this.#randomScripters && now - this.#randomScripters.timestamp < this.#CACHE_MAX_AGE) {
-			return this.#randomScripters.data
+		const store = get(this.#persistedStore)
+		if (store.scripters && now - store.scripters.timestamp < this.#CACHE_MAX_AGE) {
+			return store.scripters.data
 		}
 
 		const data = await this.#fetchRandomScripters(supabase)
-		if (data.length > 0) this.#randomScripters = { data, timestamp: now }
+		if (data.length > 0) {
+			store.scripters = { data, timestamp: now }
+			this.#persistedStore.set(store)
+		}
 		return data
 	}
 }
 
 export class WaspCategories {
 	static #CACHE_MAX_AGE = 60 * 60 * 1000
-	static #categories: CachedCategories | null = null
-	static #subcategories: CachedSubcategories | null = null
-	static #tooltips: CachedTooltips | null = null
+	static #persistedStore = persisted("wasp_categories", {
+		categories: null as CachedCategories | null,
+		subcategories: null as CachedSubcategories | null,
+		tooltips: null as CachedTooltips | null
+	})
 
 	static async #fetchCategories(supabase: SupabaseClient) {
 		const start = performance.now()
@@ -216,12 +225,14 @@ export class WaspCategories {
 	static async getCategories(supabase: SupabaseClient) {
 		const now = Date.now()
 
-		if (this.#categories && now - this.#categories.timestamp < this.#CACHE_MAX_AGE) {
-			return this.#categories.data
+		const store = get(this.#persistedStore)
+		if (store.categories && now - store.categories.timestamp < this.#CACHE_MAX_AGE) {
+			return store.categories.data
 		}
 
 		const data = await this.#fetchCategories(supabase)
-		this.#categories = { data, timestamp: now }
+		store.categories = { data, timestamp: now }
+		this.#persistedStore.set(store)
 		return data
 	}
 
@@ -248,12 +259,14 @@ export class WaspCategories {
 	static async getSubCategories(supabase: SupabaseClient) {
 		const now = Date.now()
 
-		if (this.#subcategories && now - this.#subcategories.timestamp < this.#CACHE_MAX_AGE) {
-			return this.#subcategories.data
+		const store = get(this.#persistedStore)
+		if (store.subcategories && now - store.subcategories.timestamp < this.#CACHE_MAX_AGE) {
+			return store.subcategories.data
 		}
 
 		const data = await this.#fetchSubCategories(supabase)
-		this.#subcategories = { data, timestamp: now }
+		store.subcategories = { data, timestamp: now }
+		this.#persistedStore.set(store)
 		return data
 	}
 
@@ -273,15 +286,17 @@ export class WaspCategories {
 	static async getTooltips(supabase: SupabaseClient) {
 		const now = Date.now()
 
-		if (this.#tooltips && now - this.#tooltips.timestamp < this.#CACHE_MAX_AGE) {
-			return this.#tooltips.data
+		const store = get(this.#persistedStore)
+		if (store.tooltips && now - store.tooltips.timestamp < this.#CACHE_MAX_AGE) {
+			return store.tooltips.data
 		}
 
 		const data = await this.#fetchTooltips(
 			this.getCategories(supabase),
 			this.getSubCategories(supabase)
 		)
-		this.#tooltips = { data, timestamp: now }
+		store.tooltips = { data, timestamp: now }
+		this.#persistedStore.set(store)
 		return data
 	}
 
@@ -443,33 +458,55 @@ export async function getTutorial(
 	return data
 }
 
-export async function getFAQ(supabase: SupabaseClient, table: string) {
-	const now = Date.now()
-	const cached = faqs.get(table)
+export class WaspFAQ {
+	static #CACHE_MAX_AGE = 5 * 60 * 1000
+	static #persistedStore = persisted("wasp_faqs", {
+		faqs: null as CachedFAQ | null,
+		errors: null as CachedFAQ | null
+	})
 
-	if (cached && now - cached.timestamp < SCRIPT_CACHE_MAX_AGE) {
-		return cached.data
+	static async #fetchFAQ(supabase: SupabaseClient, table: string) {
+		const start = performance.now()
+		const { data, error: err } = await supabase
+			.schema("info")
+			.from(table)
+			.select("title, content")
+			.order("id")
+
+		console.log(`└──❓ FAQs ${table} loaded in ${(performance.now() - start).toFixed(2)} ms!`)
+
+		if (err) {
+			error(
+				500,
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT info.faqs failed!\n\n" +
+					formatError(err)
+			)
+		}
+
+		return data
 	}
 
-	const start = performance.now()
-	const { data, error: err } = await supabase
-		.schema("info")
-		.from(table)
-		.select("title, content")
-		.order("id")
+	static async getFAQ(supabase: SupabaseClient, table: string) {
+		const now = Date.now()
 
-	console.log(`└──❓ FAQs ${table} loaded in ${(performance.now() - start).toFixed(2)} ms!`)
+		const store = get(this.#persistedStore)
 
-	if (err) {
-		error(
-			500,
-			"Server error, this is probably not an issue on your end!\n" +
-				"SELECT info.faqs failed!\n\n" +
-				formatError(err)
-		)
+		let cached = table === "questions" ? store.faqs : table === "errors" ? store.errors : null
+
+		if (cached && now - cached.timestamp < this.#CACHE_MAX_AGE) {
+			return cached.data
+		}
+
+		const data = await this.#fetchFAQ(supabase, table)
+
+		if (table === "questions") {
+			store.faqs = { data, timestamp: now }
+		} else if (table === "errors") {
+			store.errors = { data, timestamp: now }
+		}
+
+		this.#persistedStore.set(store)
+		return data
 	}
-
-	faqs.set(table, { data, timestamp: now })
-
-	return data
 }

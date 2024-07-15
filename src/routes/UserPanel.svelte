@@ -75,7 +75,7 @@
 					name="Refresh"
 					aria-label="Refresh roles"
 					class="mx-4 text-secondary-500 hover:text-secondary-400"
-					formaction="/?/refresh"
+					formaction="/auth?/refresh"
 				>
 					<RotateCcw />
 				</button>
