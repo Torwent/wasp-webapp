@@ -85,7 +85,9 @@
 		{/if}
 
 		{#if form?.email}
-			<small class="text-success-500">You've received a link on your email to confirm it.</small>
+			<small class="text-success-500"
+				>You've received a link on both emails. Open them both to confirm the change.</small
+			>
 		{/if}
 		{#if form?.password}
 			<small class="text-success-500">Your password has been updated.</small>
