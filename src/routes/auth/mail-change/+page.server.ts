@@ -1,4 +1,4 @@
-import { error } from "@sveltejs/kit"
+import { error, redirect } from "@sveltejs/kit"
 
 export const load = async ({ url: { searchParams } }) => {
 	const err = searchParams.get("error")
@@ -16,6 +16,11 @@ export const load = async ({ url: { searchParams } }) => {
 		}
 
 		error(401, message)
+	}
+
+	const code = searchParams.get("code")
+	if (code) {
+		return { message: "Email successfully updated!" }
 	}
 
 	const message = searchParams.get("message")
