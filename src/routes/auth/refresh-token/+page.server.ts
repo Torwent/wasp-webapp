@@ -1,4 +1,4 @@
-import { formatError } from "$lib/utils.js"
+import { formatError } from "$lib/utils"
 import { error, redirect } from "@sveltejs/kit"
 
 export const load = async ({ url: { origin }, locals: { supabaseServer } }) => {
