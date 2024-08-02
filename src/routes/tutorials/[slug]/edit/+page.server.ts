@@ -2,7 +2,7 @@ import { setError, superValidate } from "sveltekit-superforms/server"
 import { fail, redirect } from "@sveltejs/kit"
 import { postSchema } from "$lib/client/schemas"
 import { zod } from "sveltekit-superforms/adapters"
-import { formatError } from "$lib/utils.js"
+import { formatError } from "$lib/utils"
 import { doLogin } from "$lib/server/supabase.server"
 
 export const load = async ({ locals: { supabaseServer, user, session } }) => {

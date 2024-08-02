@@ -21,7 +21,7 @@
 			<div class="my-4 flex justify-around">
 				<label>
 					Refresh Token:
-					<input name="refresh_token" type="text" bind:value={$form.refresh_token} />
+					<input name="refresh_token" type="text" class="input" bind:value={$form.refresh_token} />
 					<small class="text-error-500">{$errors.refresh_token}</small>
 				</label>
 			</div>
