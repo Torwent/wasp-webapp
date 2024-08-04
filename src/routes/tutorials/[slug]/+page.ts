@@ -4,9 +4,8 @@ import { error } from "@sveltejs/kit"
 export const load = async ({ params: { slug }, fetch }) => {
 	const response = await fetch("/api/tutorials/" + slug)
 	const meta: Tutorial = await response.json()
-
 	try {
-		const tutorial = await import(`/src/wasp-info/tutorials/${meta.order}.md`)
+		const tutorial = await import(`../../../wasp-info/tutorials/${meta.order}.md`)
 		return {
 			content: tutorial.default,
 			meta
