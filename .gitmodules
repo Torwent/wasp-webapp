@@ -1,0 +1,4 @@
+[submodule "src/wasp-info"]
+	path = src/wasp-info
+	url = https://github.com/Torwent/wasp-info/
+	branch = main
