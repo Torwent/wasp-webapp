@@ -1,12 +1,34 @@
 import adapter from "@sveltejs/adapter-node"
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte"
+import { mdsvex, escapeSvelte } from "mdsvex"
+import { getSingletonHighlighter } from "shiki"
+
+const highlighter = await getSingletonHighlighter({
+	themes: ["github-dark"],
+	langs: ["javascript", "typescript", "bash", "cmd", "yml", "yaml", "pascal"]
+})
+
+/** @type {import('mdsvex').MdsvexOptions} */
+const mdsvexOptions = {
+	extensions: [".md"],
+	highlight: {
+		highlighter: async (code, lang = "text") => {
+			try {
+				const html = escapeSvelte(highlighter.codeToHtml(code, { lang, theme: "github-dark" }))
+				return `{@html \`${html}\` }`
+			} catch (error) {
+				lang = "cmd"
+				const html = escapeSvelte(highlighter.codeToHtml(code, { lang, theme: "github-dark" }))
+				return `{@html \`${html}\` }`
+			}
+		}
+	}
+}
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	extensions: [".svelte"],
-	// Consult https://kit.svelte.dev/docs/integrations#preprocessors
-	// for more information about preprocessors
-	preprocess: [vitePreprocess()],
+	extensions: [".svelte", ".md"],
+	preprocess: [vitePreprocess(), mdsvex(mdsvexOptions)],
 
 	vitePlugin: { inspector: true },
 	kit: {

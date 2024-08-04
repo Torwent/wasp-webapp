@@ -7,10 +7,10 @@
 	import type { Tutorial } from "$lib/types/collection"
 	export let data
 
-	let { user, roles, range, tutorialsPromise } = data
+	let { user, roles, tutorialsPromise } = data
 	let { searchParams } = $page.url
 
-	$: ({ user, roles, tutorialsPromise, range } = data)
+	$: ({ user, roles, tutorialsPromise } = data)
 	$: ({ searchParams } = $page.url)
 
 	const pageStr = searchParams.get("page") || "-1"
@@ -41,8 +41,7 @@
 	let resolvedCount: number = 0
 
 	$: tutorialsPromise.then((tutorials) => {
-		resolvedPromise = tutorials.tutorials
-		resolvedCount = tutorials.count
+		resolvedPromise = tutorials
 	})
 
 	const headTitle = "Tutorials - WaspScripts"
@@ -129,11 +128,14 @@
 				</div>
 			</div>
 		</div>
-		{#if user && (roles?.administrator || roles?.moderator || roles?.scripter)}
-			<a href="/tutorials/add" class="flex mx-auto">
-				<button class="btn variant-filled-secondary flex mx-auto">Add Post</button>
+		<div class="my-8 grid place-items-center">
+			<a
+				href="https://github.com/Torwent/wasp-info/new/main/tutorials"
+				class="btn variant-filled-tertiary"
+			>
+				Add a tutorial through GitHub!
 			</a>
-		{/if}
+		</div>
 	</div>
 
 	{#if resolvedPromise}
@@ -150,5 +152,5 @@
 		</div>
 	{/if}
 
-	<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count={resolvedCount} />
+	<!-- <Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count={resolvedCount} /> -->
 </main>

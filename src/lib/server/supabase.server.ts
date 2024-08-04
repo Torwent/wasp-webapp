@@ -3,9 +3,14 @@ import { PUBLIC_SUPABASE_URL } from "$env/static/public"
 import type { AddScriptSchema, UpdateScriptSchema } from "$lib/client/schemas"
 import { pad } from "$lib/client/utils"
 import type { Price, Product, Profile, ProfileSubscription } from "$lib/types/collection"
+import type { Database } from "$lib/types/supabase"
 import { UUID_V4_REGEX, formatError } from "$lib/utils"
 import { type SupabaseClient, createClient, type Provider } from "@supabase/supabase-js"
 import { error, redirect } from "@sveltejs/kit"
+
+export const supabaseAdmin = createClient<Database>(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+	auth: { autoRefreshToken: true, persistSession: false }
+})
 
 export async function doLogin(
 	supabase: SupabaseClient,
@@ -70,7 +75,7 @@ export async function updateScripterAccount(id: string, account_id: string) {
 
 	const { error: err } = await supabaseAdmin
 		.schema("profiles")
-		.from("scripter")
+		.from("scripters")
 		.update({ stripe: account_id })
 		.eq("id", id)
 
@@ -250,9 +255,18 @@ export async function updateScript(
 	return { url: data.url, error: err }
 }
 
-export const supabaseAdmin = createClient(PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_KEY, {
-	auth: { autoRefreshToken: true, persistSession: false }
-})
+export async function getUsername(id: string) {
+	const { data, error: err } = await supabaseAdmin
+		.schema("profiles")
+		.from("profiles")
+		.select("username")
+		.eq("id", id)
+		.single()
+
+	if (err) throw error(500, formatError(err))
+
+	return data.username
+}
 
 export async function updateCustomerID(id: string, customer_id: string) {
 	console.log("Updating profiles.profiles for user: ", id)

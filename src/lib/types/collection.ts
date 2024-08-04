@@ -66,16 +66,19 @@ export type FAQEntry = {
 	title: string
 }
 
-export type Tutorial = {
+export interface Tutorial {
+	order: number
 	title: string
 	description: string
 	content: string
+	created_at: string
+	updated_at: string
 	level: number
+	author: string
 	username: string
-	url: string
-	order: number
+	coauthors: string[] | null
 	published: boolean
-	author_id: string
+	url: string
 }
 
 //scripts
