@@ -18,29 +18,41 @@ const redirects: Handle = async ({ event, resolve }) => {
 const supabase: Handle = async ({ event, resolve }) => {
 	event.locals.supabaseServer = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
 		cookies: {
-			get: (key) => event.cookies.get(key),
-			set: (key, value, options) => event.cookies.set(key, value, { ...options, path: "/" }),
-			remove: (key, options) => event.cookies.delete(key, { ...options, path: "/" })
+			getAll: () => event.cookies.getAll(),
+			setAll: (cookiesToSet) => {
+				cookiesToSet.forEach(({ name, value, options }) => {
+					event.cookies.set(name, value, { ...options, path: "/" })
+				})
+			}
 		}
 	})
 
 	event.locals.safeGetSession = async () => {
 		let start = performance.now()
+
 		const {
 			data: { session }
 		} = await event.locals.supabaseServer.auth.getSession()
+
 		if (!session) return { session: null, user: null, getProfile: null }
 		console.log(`└📜 session took ${(performance.now() - start).toFixed(2)} ms to check!`)
 
 		start = performance.now()
+
 		const {
 			data: { user },
 			error
 		} = await event.locals.supabaseServer.auth.getUser()
+
 		if (error) return { session: null, user: null, getProfile: null }
+
 		console.log(`└🔥 user took ${(performance.now() - start).toFixed(2)} ms to check!`)
 		if (user) {
-			console.log(`└😄 user ${user.id} accessing from ${event.getClientAddress()}`)
+			try {
+				console.log(`└😄 user ${user.id} accessing from ${event.getClientAddress()}`)
+			} catch (error) {
+				console.log(`└😄 user ${user.id} accessing from NO IP`)
+			}
 		}
 
 		// @ts-expect-error

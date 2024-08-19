@@ -112,13 +112,12 @@ export const load = async ({ url, parent }) => {
 		return checkboxes
 	}
 
-	const scriptsPromise = getScripts(search, ascending, start, finish)
+	const scripts = await getScripts(search, ascending, start, finish)
 	const featuredPromise = getFeatured()
 	const checkboxesPromise = getCheckBoxes()
 
-	scriptsPromise.catch((err) => streamedErrorHandler(err))
 	featuredPromise.catch((err) => streamedErrorHandler(err))
 	checkboxesPromise.catch((err) => streamedErrorHandler(err))
 
-	return { scriptsPromise, featuredPromise, checkboxesPromise, range }
+	return { scripts, featuredPromise, checkboxesPromise, range }
 }

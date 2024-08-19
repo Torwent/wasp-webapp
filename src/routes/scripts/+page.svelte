@@ -4,25 +4,16 @@
 	import { page } from "$app/stores"
 	import Paginator from "$lib/components/Paginator.svelte"
 	import ScriptCard from "$lib/components/ScriptCard.svelte"
-	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
 	import { onMount } from "svelte"
 	import { replaceQuery } from "$lib/client/utils"
-	import type { CheckboxType, ScriptBase } from "$lib/types/collection"
+	import type { CheckboxType } from "$lib/types/collection"
 	import CarouselEntry from "./CarouselEntry.svelte"
 
 	export let data
 	const { checkboxesPromise, range, featuredPromise } = data
-	let { roles, scriptsPromise } = data
+	let { roles, scripts } = data
 
-	let scripts: ScriptBase[] | null = null
-	let count: number = 0
-
-	$: scriptsPromise.then((awaited) => {
-		scripts = awaited.scripts
-		count = awaited.count
-	})
-
-	$: ({ profile, scriptsPromise } = data)
+	$: ({ profile, scripts } = data)
 	let { searchParams } = $page.url
 	$: ({ searchParams } = $page.url)
 
@@ -232,17 +223,11 @@
 			<div
 				class="grid gap-8 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 justify-center justify-items-center"
 			>
-				{#if scripts}
-					{#each scripts as script}
-						<ScriptCard bind:script />
-					{/each}
-				{:else}
-					{#each Array(8) as _}
-						<ScriptCardBase />
-					{/each}
-				{/if}
+				{#each scripts.scripts as script}
+					<ScriptCard bind:script />
+				{/each}
 			</div>
 		</div>
-		<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count />
+		<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count={scripts.count} />
 	</main>
 </AppShell>

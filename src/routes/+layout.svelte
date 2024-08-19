@@ -39,14 +39,11 @@
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow })
 
 	export let data
+	let { session, supabaseClient } = data
 	$: ({ session, supabaseClient } = data)
 
 	onMount(() => {
 		const { data } = supabaseClient.auth.onAuthStateChange((_, newSession) => {
-			if (!newSession) {
-				setTimeout(() => goto("/", { invalidateAll: true }))
-			}
-
 			if (newSession?.expires_at !== session?.expires_at) {
 				invalidate("supabase:auth")
 			}
