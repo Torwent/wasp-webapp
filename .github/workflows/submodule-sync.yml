@@ -1,7 +1,7 @@
 name: Submodule Sync
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "0,15,30,45 * * * *"
   workflow_dispatch: ~
 
 jobs:
