@@ -12,7 +12,9 @@ export const load = async ({ locals: { supabaseServer, user, session }, url: { o
 	}
 
 	return {
-		form: await superValidate({ content: scriptDefaultContent }, zod(addScriptServerSchema))
+		form: await superValidate({ content: scriptDefaultContent }, zod(addScriptServerSchema), {
+			allowFiles: true
+		})
 	}
 }
 
@@ -24,7 +26,7 @@ export const actions = {
 
 		const promises = await Promise.all([
 			getProfile(),
-			superValidate(request, zod(addScriptServerSchema))
+			superValidate(request, zod(addScriptServerSchema), { allowFiles: true })
 		])
 		const profile = promises[0]
 		const form = promises[1]

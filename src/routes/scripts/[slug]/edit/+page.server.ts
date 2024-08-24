@@ -10,7 +10,9 @@ export const load = async ({ locals: { supabaseServer, user, session } }) => {
 	if (!user || !session) {
 		return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 	}
-	return { form: await superValidate(zod(updateScriptServerSchema)) }
+	return {
+		form: await superValidate(zod(updateScriptServerSchema), { allowFiles: true })
+	}
 }
 
 export const actions = {
@@ -25,7 +27,7 @@ export const actions = {
 
 		const promises = await Promise.all([
 			getRoles(),
-			superValidate(request, zod(updateScriptServerSchema))
+			superValidate(request, zod(updateScriptServerSchema), { allowFiles: true })
 		])
 		const roles = promises[0]
 		const form = promises[1]
