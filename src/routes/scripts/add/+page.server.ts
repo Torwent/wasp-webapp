@@ -1,5 +1,5 @@
-import { superValidate, setError } from "sveltekit-superforms/server"
-import { redirect } from "@sveltejs/kit"
+import { superValidate, setError, withFiles } from "sveltekit-superforms/server"
+import { fail, redirect } from "@sveltejs/kit"
 import { addScriptServerSchema } from "$lib/server/schemas.server"
 import { doLogin, uploadScript } from "$lib/server/supabase.server"
 import { encodeSEO, scriptDefaultContent } from "$lib/utils"
@@ -34,16 +34,7 @@ export const actions = {
 
 		if (!form.valid) {
 			console.error("Form is not valid " + JSON.stringify(form.errors))
-			return setError(
-				form,
-				"",
-				"Form is not valid \n" +
-					JSON.stringify(form.errors) +
-					"\n" +
-					JSON.stringify(form.data) +
-					"\n" +
-					JSON.stringify(form)
-			)
+			return fail(400, withFiles({ form }))
 		}
 
 		const tmp = await scriptExists(

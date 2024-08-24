@@ -34,6 +34,7 @@
 	const { form, errors, enhance, validate } = superForm(data.form, {
 		multipleSubmits: "prevent",
 		taintedMessage: "Are you sure you want to leave?",
+		dataType: "form",
 		validators: zodClient(addScriptClientSchema)
 	})
 
