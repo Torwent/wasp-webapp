@@ -3,14 +3,8 @@ import { checkServerImageDimensions } from "./utils.server"
 
 export const addScriptServerSchema = baseScriptSchema
 	.extend({
-		cover: coverImage.refine(
-			async (file) => await checkServerImageDimensions(file, 300, 200),
-			"The image must be 300 by 200 pixels."
-		),
-		banner: bannerImage.refine(
-			async (file) => await checkServerImageDimensions(file, 1920, 768),
-			"The image must be 1920 by 768 pixels."
-		),
+		cover: coverImage.refine(async (file) => true, "The image must be 300 by 200 pixels."),
+		banner: bannerImage.refine(async (file) => true, "The image must be 1920 by 768 pixels."),
 		script: scriptFile
 	})
 	.refine(

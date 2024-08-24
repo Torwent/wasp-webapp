@@ -11,9 +11,9 @@ export const load = async ({ locals: { supabaseServer, user, session }, url: { o
 		return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 	}
 
-	const form = await superValidate(zod(addScriptServerSchema))
-	form.data.content = scriptDefaultContent
-	return { form }
+	return {
+		form: await superValidate({ content: scriptDefaultContent }, zod(addScriptServerSchema))
+	}
 }
 
 export const actions = {
@@ -42,7 +42,7 @@ export const actions = {
 					"\n" +
 					JSON.stringify(form.data) +
 					"\n" +
-					JSON.stringify(await request.formData())
+					JSON.stringify(form)
 			)
 		}
 
