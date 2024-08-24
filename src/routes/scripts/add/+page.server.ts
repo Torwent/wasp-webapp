@@ -6,7 +6,7 @@ import { encodeSEO, scriptDefaultContent } from "$lib/utils"
 import { scriptExists } from "$lib/client/supabase"
 import { zod } from "sveltekit-superforms/adapters"
 
-export const load = async ({ locals: { supabaseServer, user, session } }) => {
+export const load = async ({ locals: { supabaseServer, user, session }, url: { origin } }) => {
 	if (!user || !session) {
 		return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 	}
@@ -37,7 +37,12 @@ export const actions = {
 			return setError(
 				form,
 				"",
-				"Form is not valid \n" + JSON.stringify(form.errors) + "\n" + JSON.stringify(form.data)
+				"Form is not valid \n" +
+					JSON.stringify(form.errors) +
+					"\n" +
+					JSON.stringify(form.data) +
+					"\n" +
+					JSON.stringify(await request.formData())
 			)
 		}
 
