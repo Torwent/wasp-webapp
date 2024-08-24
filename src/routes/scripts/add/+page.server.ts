@@ -31,9 +31,14 @@ export const actions = {
 
 		if (profile?.id !== user.id)
 			return setError(form, "", "You can't add a script for another user.")
+
 		if (!form.valid) {
 			console.error("Form is not valid " + JSON.stringify(form.errors))
-			return setError(form, "", "Form is not valid \n" + JSON.stringify(form.errors))
+			return setError(
+				form,
+				"",
+				"Form is not valid \n" + JSON.stringify(form.errors) + "\n" + JSON.stringify(form.data)
+			)
 		}
 
 		const tmp = await scriptExists(

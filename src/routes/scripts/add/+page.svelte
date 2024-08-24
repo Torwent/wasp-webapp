@@ -17,6 +17,7 @@
 	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
 	import { zodClient } from "sveltekit-superforms/adapters"
 	import { replaceScriptContent } from "$lib/client/utils"
+	import SuperDebug from "sveltekit-superforms"
 
 	import type { ScriptReplace, Tooltip } from "$lib/types/collection"
 
@@ -95,6 +96,9 @@
 	$: scriptBase.title = $form.title
 	$: scriptBase.description = $form.description
 	$: scriptBase.published = $form.published
+	$: if (!$form.cover) coverStyle = 0
+	$: if (!$form.banner) bannerStyle = 0
+	$: if (!$form.script) scriptStyle = 0
 
 	function onChangeCover(e: Event): void {
 		if (coverFiles.length === 0) {
@@ -304,6 +308,8 @@
 			<header class="text-center my-8">
 				<h3>Add Script</h3>
 			</header>
+
+			<SuperDebug data={$form} />
 			<form method="POST" enctype="multipart/form-data" use:focusTrap={isFocused} use:enhance>
 				<div class="flex justify-evenly">
 					<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
