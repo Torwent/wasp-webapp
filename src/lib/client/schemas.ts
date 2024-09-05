@@ -58,7 +58,7 @@ export const baseScriptSchema = z.object({
 	max_gp: z
 		.number()
 		.int("Only whole numbers are allowed.")
-		.max(250000, "That exceeds the reasonable profit limit.")
+		.max(600000, "That exceeds the reasonable profit limit.")
 })
 
 export const coverImage = z
