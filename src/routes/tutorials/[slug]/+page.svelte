@@ -1,8 +1,6 @@
 <script lang="ts">
-	import EditButton from "$lib/components/EditButton.svelte"
 	import { page } from "$app/stores"
 	export let data
-
 	const { content, meta } = data
 	const headImage = "/multi-color-logo.png"
 </script>
