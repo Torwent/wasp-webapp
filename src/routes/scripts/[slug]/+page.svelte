@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser } from "$app/environment"
 	import { goto } from "$app/navigation"
-	import { WaspProfile, canDownload, canEdit } from "$lib/client/supabase"
+	import { WaspProfile, canDownload, canEdit, getBundles, getProducts } from "$lib/client/supabase"
 	import AdvancedButton from "$lib/components/AdvancedButton.svelte"
 	import ZipDownload from "$lib/components/ZIPDownload.svelte"
 	import EditButton from "$lib/components/EditButton.svelte"
@@ -13,7 +13,20 @@
 	import { onMount } from "svelte"
 	import { replaceScriptContent } from "$lib/client/utils"
 	import ScriptData from "./ScriptData.svelte"
-	import { BadgeAlert, BadgeCheck } from "lucide-svelte"
+	import {
+		BadgeAlert,
+		BadgeCheck,
+		ExternalLink,
+		PanelBottomOpen,
+		PanelTopOpen,
+		RotateCw
+	} from "lucide-svelte"
+
+	import TableHeader from "$lib/components/tables/TableHeader.svelte"
+	import TableCell from "$lib/components/tables/TableCell.svelte"
+	import { getCurrentPrice, getPriceIntervalEx, setPriceInterval } from "$lib/utils"
+	import type { Price } from "$lib/types/collection"
+	import ScriptLinks from "../../subscriptions/ScriptLinks.svelte"
 
 	export let data
 
@@ -77,11 +90,16 @@
 		}
 	})
 
+	let products: Awaited<ReturnType<typeof getProducts>> | null = null
+
 	async function canDownloadScript() {
 		const script = await scriptPromise
 		if (!script) return false
 		if (script.categories.includes("Free")) return true
-		return await canDownload(supabaseClient, roles, script.id)
+		const result = await canDownload(supabaseClient, roles, script.id)
+
+		if (!result) products = await getProducts(supabaseClient, script.id)
+		return result
 	}
 
 	if (!profile) {
@@ -135,7 +153,7 @@
 		/>
 	</ScriptHeader>
 
-	<div class="container mt-80 mx-auto mb-6 max-w-lg md:max-w-2xl flex-grow">
+	<div class="container mt-80 mx-auto mb-6 max-w-lg md:max-w-5xl flex-grow">
 		<header class="my-8">
 			<h3 class="my-4 text-center text-secondary-500 text-shadow drop-shadow-2xl">
 				{script ? script.description : "Loading..."}
@@ -203,17 +221,129 @@
 							<EditButton author={script?.protected.author_id} />
 						</div>
 					{:else}
-						<h4 class="py-2">
-							This is a <span class="text-secondary-500">premium</span>
-							script that you don't have access to.
-						</h4>
-						<h5>
-							To be able to download this script buy a
-							<a href="/subscriptions" class="font-semibold text-secondary-500 hover:underline">
-								subscription
-							</a>
-							that gives you access to it!
-						</h5>
+						<div class="variant-outline-surface rounded-md p-4 my-8">
+							<h4 class="py-2">
+								This is a <span class="text-secondary-500">premium</span>
+								script that you don't have access to.
+							</h4>
+							<h5>
+								To be able to download this script buy a
+								<a href="/subscriptions" class="font-semibold text-secondary-500 hover:underline">
+									subscription
+								</a>
+								that gives you access to it! You can buy it with the following products
+							</h5>
+
+							{#if script?.categories.includes("Premium") && products}
+								<form method="POST" class="my-12 flex justify-evenly overflow-auto">
+									<table class="table table-hover border-separate space-y-6 text-xs">
+										<TableHeader headers={["Product", "Type", "Price", "Interval", "Checkout"]} />
+										<tbody>
+											{#each products.bundles as bundle}
+												<tr class="table-row">
+													<TableCell alignment="left" padding={0}>
+														<div class="mx-3">
+															<div>{bundle.name}</div>
+														</div>
+													</TableCell>
+
+													<TableCell padding={0}>
+														<a
+															href="/subscriptions"
+															class="btn hover:cursor-pointer hover:text-primary-500"
+														>
+															<ExternalLink size={16} />
+															<span>Bundle</span>
+														</a>
+													</TableCell>
+
+													<TableCell>{getCurrentPrice(bundle.prices)}</TableCell>
+
+													<TableCell padding={0}>
+														<div
+															class="btn-group-vertical md:btn-group variant-outline-surface rounded-md"
+														>
+															{#each bundle.prices as price, j}
+																<button
+																	class="btn"
+																	class:variant-ringed-primary={price.active}
+																	on:click|preventDefault={() => setPriceInterval(j, bundle.prices)}
+																>
+																	{getPriceIntervalEx(price)}
+																</button>
+															{/each}
+														</div>
+													</TableCell>
+
+													<TableCell padding={0}>
+														<button
+															class="btn variant-filled-secondary"
+															formaction="?/checkout&product={bundle.id}&price={bundle.prices.find(
+																(p) => p.active
+															)?.id}"
+														>
+															Checkout
+														</button>
+													</TableCell>
+												</tr>
+											{/each}
+
+											{#each products.scripts as script}
+												<tr>
+													<TableCell alignment="left" padding={0}>
+														<div class="mx-3">
+															<div class="">{script.name}</div>
+														</div>
+													</TableCell>
+
+													<TableCell padding={0}>
+														<a
+															href="/subscriptions"
+															class="btn hover:cursor-pointer hover:text-primary-500"
+														>
+															<ExternalLink size={16} />
+															<span>Script</span>
+														</a>
+													</TableCell>
+
+													<TableCell>{getCurrentPrice(script.prices)}</TableCell>
+
+													<TableCell padding={0}>
+														<div
+															class="btn-group-vertical md:btn-group variant-outline-surface rounded-md"
+														>
+															{#each script.prices as price, j}
+																<button
+																	class="btn"
+																	class:variant-ringed-primary={price.active}
+																	on:click|preventDefault={() => {
+																		setPriceInterval(j, script.prices)
+																		products = products
+																	}}
+																>
+																	{getPriceIntervalEx(price)}
+																</button>
+															{/each}
+														</div>
+													</TableCell>
+
+													<TableCell padding={0}>
+														<button
+															class="btn variant-filled-secondary"
+															formaction="?/checkout&product={script.id}&price={script.prices.find(
+																(p) => p.active
+															)?.id}"
+														>
+															Checkout
+														</button>
+													</TableCell>
+												</tr>
+											{/each}
+										</tbody>
+									</table>
+								</form>
+							{/if}
+						</div>
 					{/if}
 				{/await}
 			</div>

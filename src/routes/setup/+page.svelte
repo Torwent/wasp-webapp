@@ -17,8 +17,8 @@
 	function getOS(userAgent: string) {
 		userAgent = userAgent.toLowerCase()
 		if (userAgent.includes("win")) {
-			currentOS = { OS: "Windows", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
-			secondaryOS = { OS: "Linux", Extension: "sh", tutorialID: "linux-setup-debian-by-torwent" }
+			currentOS = { OS: "Windows", Extension: "exe", tutorialID: "0" }
+			secondaryOS = { OS: "Linux", Extension: "sh", tutorialID: "1" }
 			return
 		}
 
@@ -27,27 +27,27 @@
 				currentOS = {
 					OS: "Debian Linux",
 					Extension: "sh",
-					tutorialID: "linux-setup-debian-by-torwent"
+					tutorialID: "1"
 				}
-				secondaryOS = { OS: "Windows", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
+				secondaryOS = { OS: "Windows", Extension: "exe", tutorialID: "0" }
 				return
 			}
 
 			if (userAgent.includes("ubuntu")) {
-				currentOS = { OS: "Ubuntu", Extension: "sh", tutorialID: "linux-setup-debian-by-torwent" }
-				secondaryOS = { OS: "Windows", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
+				currentOS = { OS: "Ubuntu", Extension: "sh", tutorialID: "1" }
+				secondaryOS = { OS: "Windows", Extension: "exe", tutorialID: "0" }
 				return
 			}
 
-			currentOS = { OS: "Linux", Extension: "sh", tutorialID: "linux-setup-debian-by-torwent" }
-			secondaryOS = { OS: "Windows", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
+			currentOS = { OS: "Linux", Extension: "sh", tutorialID: "1" }
+			secondaryOS = { OS: "Windows", Extension: "exe", tutorialID: "0" }
 			return
 		}
 
 		if (userAgent.includes("mac")) {
 			hasMac = true
-			currentOS = { OS: "MacOS", Extension: "exe", tutorialID: "setup-windows-by-torwent" }
-			secondaryOS = { OS: "Linux", Extension: "sh", tutorialID: "linux-setup-debian-by-torwent" }
+			currentOS = { OS: "MacOS", Extension: "exe", tutorialID: "0" }
+			secondaryOS = { OS: "Linux", Extension: "sh", tutorialID: "1" }
 			return
 		}
 	}

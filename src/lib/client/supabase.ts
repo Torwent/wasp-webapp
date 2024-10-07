@@ -9,6 +9,7 @@ import type {
 	SubCategory,
 	Tutorial
 } from "$lib/types/collection"
+import type { Database } from "$lib/types/supabase"
 import { UUID_V4_REGEX, formatError } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { error } from "@sveltejs/kit"
@@ -509,4 +510,109 @@ export class WaspFAQ {
 		this.#persistedStore.set(store)
 		return data
 	}
+}
+
+export async function getPrices(supabase: SupabaseClient<Database>, product: string) {
+	console.log("💸 Fetching prices for ", product)
+	const { data, error: err } = await supabase
+		.schema("scripts")
+		.from("prices")
+		.select(`id, product, amount, currency, interval, active`)
+		.eq("product", product)
+		.eq("active", true)
+		.order("amount", { ascending: true })
+
+	if (err) {
+		error(
+			500,
+			"Server error, this is probably not an issue on your end!\n" +
+				"SELECT scripts.prices failed!\n\n" +
+				formatError(err)
+		)
+	}
+
+	for (let i = 1; i < data.length; i++) data[i].active = false
+	return data
+}
+
+export async function getBundles(supabase: SupabaseClient<Database>, script: string) {
+	const { data, error: err } = await supabase
+		.schema("scripts")
+		.from("bundles")
+		.select(`id`)
+		.contains("scripts", [script])
+
+	if (err) {
+		throw error(
+			500,
+			"Server error, this is probably not an issue on your end!\n" +
+				"SELECT scripts.bundles failed!\n\n" +
+				formatError(err)
+		)
+	}
+
+	return data.map((bundle) => bundle.id)
+}
+
+export async function getProducts(supabase: SupabaseClient<Database>, script: string) {
+	const bundles = await getBundles(supabase, script)
+
+	const scriptQuery = supabase
+		.schema("scripts")
+		.from("products")
+		.select(`id, name`)
+		.eq("active", true)
+		.eq("script", script)
+		.order("name", { ascending: true })
+
+	const bundleQuery = supabase
+		.schema("scripts")
+		.from("products")
+		.select(`id, name`)
+		.eq("active", true)
+		.in("bundle", bundles)
+		.order("name", { ascending: true })
+
+	const promises = await Promise.all([scriptQuery, bundleQuery])
+	const { data: scriptData, error: scriptErr } = promises[0]
+	const { data: bundleData, error: bundleErr } = promises[1]
+
+	if (scriptErr) {
+		throw error(
+			500,
+			"Server error, this is probably not an issue on your end!\n" +
+				"SELECT scripts.products failed!\n\n" +
+				formatError(scriptErr)
+		)
+	}
+
+	if (bundleErr) {
+		throw error(
+			500,
+			"Server error, this is probably not an issue on your end!\n" +
+				"SELECT scripts.products failed!\n\n" +
+				formatError(bundleErr)
+		)
+	}
+
+	const formatedScriptData = await Promise.all(
+		scriptData.map(async (product) => {
+			return {
+				id: product.id,
+				name: product.name,
+				prices: await getPrices(supabase, product.id)
+			}
+		})
+	)
+
+	const formatedBundleData = await Promise.all(
+		bundleData.map(async (product) => {
+			return {
+				id: product.id,
+				name: product.name,
+				prices: await getPrices(supabase, product.id)
+			}
+		})
+	)
+	return { bundles: formatedBundleData, scripts: formatedScriptData }
 }

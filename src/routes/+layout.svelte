@@ -19,7 +19,7 @@
 	import java from "highlight.js/lib/languages/java"
 	import "highlight.js/styles/github-dark.css"
 	import { computePosition, autoUpdate, flip, shift, offset, arrow } from "@floating-ui/dom"
-	import { goto, invalidate } from "$app/navigation"
+	import { invalidate } from "$app/navigation"
 	import Footer from "./Footer.svelte"
 	import Navigation from "./Navigation.svelte"
 	import UserPanel from "./UserPanel.svelte"

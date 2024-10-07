@@ -1,8 +1,51 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export type Database = {
+	graphql_public: {
+		Tables: {
+			[_ in never]: never
+		}
+		Views: {
+			[_ in never]: never
+		}
+		Functions: {
+			graphql: {
+				Args: {
+					operationName?: string
+					query?: string
+					variables?: Json
+					extensions?: Json
+				}
+				Returns: Json
+			}
+		}
+		Enums: {
+			[_ in never]: never
+		}
+		CompositeTypes: {
+			[_ in never]: never
+		}
+	}
 	info: {
 		Tables: {
+			discord: {
+				Row: {
+					created_at: string
+					id: string
+					response: string
+				}
+				Insert: {
+					created_at?: string
+					id?: string
+					response: string
+				}
+				Update: {
+					created_at?: string
+					id?: string
+					response?: string
+				}
+				Relationships: []
+			}
 			errors: {
 				Row: {
 					content: string | null
@@ -164,7 +207,45 @@ export type Database = {
 			[_ in never]: never
 		}
 		Functions: {
+			is_author:
+				| {
+						Args: {
+							tutorial_id: string
+						}
+						Returns: boolean
+				  }
+				| {
+						Args: {
+							tutorial_id: string
+							user_id: string
+						}
+						Returns: boolean
+				  }
+		}
+		Enums: {
 			[_ in never]: never
+		}
+		CompositeTypes: {
+			[_ in never]: never
+		}
+	}
+	pgbouncer: {
+		Tables: {
+			[_ in never]: never
+		}
+		Views: {
+			[_ in never]: never
+		}
+		Functions: {
+			get_auth: {
+				Args: {
+					p_usename: string
+				}
+				Returns: {
+					username: string
+					password: string
+				}[]
+			}
 		}
 		Enums: {
 			[_ in never]: never
@@ -181,31 +262,32 @@ export type Database = {
 					date_start: string
 					id: string
 					product: string
+					row_id: string
 				}
 				Insert: {
 					date_end?: string
 					date_start?: string
 					id: string
 					product: string
+					row_id?: string
 				}
 				Update: {
 					date_end?: string
 					date_start?: string
 					id?: string
 					product?: string
+					row_id?: string
 				}
 				Relationships: [
 					{
 						foreignKeyName: "free_access_product_fkey"
 						columns: ["product"]
-						isOneToOne: false
 						referencedRelation: "products"
 						referencedColumns: ["id"]
 					},
 					{
 						foreignKeyName: "free_access_user_id_fkey"
 						columns: ["id"]
-						isOneToOne: false
 						referencedRelation: "profiles"
 						referencedColumns: ["id"]
 					}
@@ -217,31 +299,32 @@ export type Database = {
 					date_start: string
 					id: string
 					product: string
+					row_id: string
 				}
 				Insert: {
 					date_end?: string
 					date_start?: string
 					id: string
 					product: string
+					row_id?: string
 				}
 				Update: {
 					date_end?: string
 					date_start?: string
 					id?: string
 					product?: string
+					row_id?: string
 				}
 				Relationships: [
 					{
 						foreignKeyName: "profiles_free_access_old_id_fkey"
 						columns: ["id"]
-						isOneToOne: false
 						referencedRelation: "profiles"
 						referencedColumns: ["id"]
 					},
 					{
 						foreignKeyName: "profiles_free_access_old_product_fkey"
 						columns: ["product"]
-						isOneToOne: false
 						referencedRelation: "products"
 						referencedColumns: ["id"]
 					}
@@ -267,7 +350,6 @@ export type Database = {
 					{
 						foreignKeyName: "private_id_fkey"
 						columns: ["id"]
-						isOneToOne: true
 						referencedRelation: "profiles"
 						referencedColumns: ["id"]
 					}
@@ -299,7 +381,6 @@ export type Database = {
 					{
 						foreignKeyName: "profiles_id_fkey"
 						columns: ["id"]
-						isOneToOne: true
 						referencedRelation: "users"
 						referencedColumns: ["id"]
 					}
@@ -349,7 +430,6 @@ export type Database = {
 					{
 						foreignKeyName: "roles_id_fkey"
 						columns: ["id"]
-						isOneToOne: true
 						referencedRelation: "profiles"
 						referencedColumns: ["id"]
 					}
@@ -396,7 +476,6 @@ export type Database = {
 					{
 						foreignKeyName: "scripters_id_fkey"
 						columns: ["id"]
-						isOneToOne: true
 						referencedRelation: "profiles"
 						referencedColumns: ["id"]
 					}
@@ -437,21 +516,18 @@ export type Database = {
 					{
 						foreignKeyName: "subscription_id_fkey"
 						columns: ["id"]
-						isOneToOne: false
 						referencedRelation: "profiles"
 						referencedColumns: ["id"]
 					},
 					{
 						foreignKeyName: "subscription_price_fkey"
 						columns: ["price"]
-						isOneToOne: false
 						referencedRelation: "prices"
 						referencedColumns: ["id"]
 					},
 					{
 						foreignKeyName: "subscription_product_fkey"
 						columns: ["product"]
-						isOneToOne: false
 						referencedRelation: "products"
 						referencedColumns: ["id"]
 					}
@@ -492,21 +568,18 @@ export type Database = {
 					{
 						foreignKeyName: "subscriptions_old_id_fkey"
 						columns: ["id"]
-						isOneToOne: false
 						referencedRelation: "profiles"
 						referencedColumns: ["id"]
 					},
 					{
 						foreignKeyName: "subscriptions_old_price_fkey"
 						columns: ["price"]
-						isOneToOne: false
 						referencedRelation: "prices"
 						referencedColumns: ["id"]
 					},
 					{
 						foreignKeyName: "subscriptions_old_product_fkey"
 						columns: ["product"]
-						isOneToOne: false
 						referencedRelation: "products"
 						referencedColumns: ["id"]
 					}
@@ -540,15 +613,7 @@ export type Database = {
 					price_id?: string
 					subscription_id?: string | null
 				}
-				Relationships: [
-					{
-						foreignKeyName: "subscriptions_uc_price_id_fkey"
-						columns: ["price_id"]
-						isOneToOne: false
-						referencedRelation: "prices"
-						referencedColumns: ["stripe_id"]
-					}
-				]
+				Relationships: []
 			}
 		}
 		Views: {
@@ -569,7 +634,6 @@ export type Database = {
 					{
 						foreignKeyName: "scripters_id_fkey"
 						columns: ["id"]
-						isOneToOne: true
 						referencedRelation: "profiles"
 						referencedColumns: ["id"]
 					}
@@ -615,6 +679,15 @@ export type Database = {
 					product: string
 				}
 				Returns: boolean
+			}
+			create_stripe_customer: {
+				Args: {
+					id: string
+					email: string
+					discord_id: string
+					username: string
+				}
+				Returns: number
 			}
 			cron_check_subscriptions: {
 				Args: Record<PropertyKey, never>
@@ -720,39 +793,6 @@ export type Database = {
 	}
 	public: {
 		Tables: {
-			prices: {
-				Row: {
-					amount: number
-					created_at: string | null
-					currency: string
-					id: string
-					interval: string | null
-					recurring: boolean
-					stripe_id: string
-					stripe_product: string
-				}
-				Insert: {
-					amount: number
-					created_at?: string | null
-					currency?: string
-					id?: string
-					interval?: string | null
-					recurring?: boolean
-					stripe_id?: string
-					stripe_product?: string
-				}
-				Update: {
-					amount?: number
-					created_at?: string | null
-					currency?: string
-					id?: string
-					interval?: string | null
-					recurring?: boolean
-					stripe_id?: string
-					stripe_product?: string
-				}
-				Relationships: []
-			}
 			stats: {
 				Row: {
 					experience: number
@@ -996,14 +1036,12 @@ export type Database = {
 					{
 						foreignKeyName: "bundles_product_fkey"
 						columns: ["product"]
-						isOneToOne: true
 						referencedRelation: "products"
 						referencedColumns: ["id"]
 					},
 					{
 						foreignKeyName: "bundles_user_id_fkey"
 						columns: ["user_id"]
-						isOneToOne: false
 						referencedRelation: "profiles"
 						referencedColumns: ["id"]
 					}
@@ -1041,7 +1079,6 @@ export type Database = {
 					{
 						foreignKeyName: "featured_id_fkey"
 						columns: ["id"]
-						isOneToOne: true
 						referencedRelation: "scripts"
 						referencedColumns: ["id"]
 					}
@@ -1076,7 +1113,6 @@ export type Database = {
 					{
 						foreignKeyName: "prices_product_fkey"
 						columns: ["product"]
-						isOneToOne: false
 						referencedRelation: "products"
 						referencedColumns: ["id"]
 					}
@@ -1114,28 +1150,24 @@ export type Database = {
 					{
 						foreignKeyName: "products_bundle_fkey"
 						columns: ["bundle"]
-						isOneToOne: true
 						referencedRelation: "bundles"
 						referencedColumns: ["id"]
 					},
 					{
 						foreignKeyName: "products_script_fkey"
 						columns: ["script"]
-						isOneToOne: true
 						referencedRelation: "scripts"
 						referencedColumns: ["id"]
 					},
 					{
 						foreignKeyName: "products_user_id_fkey"
 						columns: ["user_id"]
-						isOneToOne: false
 						referencedRelation: "random_scripters"
 						referencedColumns: ["id"]
 					},
 					{
 						foreignKeyName: "products_user_id_fkey"
 						columns: ["user_id"]
-						isOneToOne: false
 						referencedRelation: "scripters"
 						referencedColumns: ["id"]
 					}
@@ -1176,14 +1208,12 @@ export type Database = {
 					{
 						foreignKeyName: "protected_author_id_fkey"
 						columns: ["author_id"]
-						isOneToOne: false
 						referencedRelation: "profiles"
 						referencedColumns: ["id"]
 					},
 					{
 						foreignKeyName: "protected_id_fkey"
 						columns: ["id"]
-						isOneToOne: true
 						referencedRelation: "scripts"
 						referencedColumns: ["id"]
 					}
@@ -1254,7 +1284,6 @@ export type Database = {
 					{
 						foreignKeyName: "scripts_product_fkey"
 						columns: ["product"]
-						isOneToOne: true
 						referencedRelation: "products"
 						referencedColumns: ["id"]
 					}
@@ -1298,7 +1327,6 @@ export type Database = {
 					{
 						foreignKeyName: "stats_simba_id_fkey"
 						columns: ["id"]
-						isOneToOne: true
 						referencedRelation: "scripts"
 						referencedColumns: ["id"]
 					}
@@ -1345,7 +1373,6 @@ export type Database = {
 					{
 						foreignKeyName: "stats_site_id_fkey"
 						columns: ["id"]
-						isOneToOne: true
 						referencedRelation: "scripts"
 						referencedColumns: ["id"]
 					}
@@ -1371,7 +1398,6 @@ export type Database = {
 					{
 						foreignKeyName: "subcategories_category_fkey"
 						columns: ["category"]
-						isOneToOne: false
 						referencedRelation: "categories"
 						referencedColumns: ["name"]
 					}
@@ -1666,7 +1692,6 @@ export type Database = {
 					{
 						foreignKeyName: "objects_bucketId_fkey"
 						columns: ["bucket_id"]
-						isOneToOne: false
 						referencedRelation: "buckets"
 						referencedColumns: ["id"]
 					}
@@ -1707,7 +1732,6 @@ export type Database = {
 					{
 						foreignKeyName: "s3_multipart_uploads_bucket_id_fkey"
 						columns: ["bucket_id"]
-						isOneToOne: false
 						referencedRelation: "buckets"
 						referencedColumns: ["id"]
 					}
@@ -1754,14 +1778,12 @@ export type Database = {
 					{
 						foreignKeyName: "s3_multipart_uploads_parts_bucket_id_fkey"
 						columns: ["bucket_id"]
-						isOneToOne: false
 						referencedRelation: "buckets"
 						referencedColumns: ["id"]
 					},
 					{
 						foreignKeyName: "s3_multipart_uploads_parts_upload_id_fkey"
 						columns: ["upload_id"]
-						isOneToOne: false
 						referencedRelation: "s3_multipart_uploads"
 						referencedColumns: ["id"]
 					}
@@ -1861,6 +1883,145 @@ export type Database = {
 					metadata: Json
 				}[]
 			}
+		}
+		Enums: {
+			[_ in never]: never
+		}
+		CompositeTypes: {
+			[_ in never]: never
+		}
+	}
+	stripe: {
+		Tables: {
+			customers: {
+				Row: {
+					attrs: Json | null
+					created: string | null
+					description: string | null
+					email: string | null
+					id: string | null
+					name: string | null
+				}
+				Insert: {
+					attrs?: Json | null
+					created?: string | null
+					description?: string | null
+					email?: string | null
+					id?: string | null
+					name?: string | null
+				}
+				Update: {
+					attrs?: Json | null
+					created?: string | null
+					description?: string | null
+					email?: string | null
+					id?: string | null
+					name?: string | null
+				}
+				Relationships: []
+			}
+			invoices: {
+				Row: {
+					attrs: Json | null
+					currency: string | null
+					customer: string | null
+					id: string | null
+					period_end: string | null
+					period_start: string | null
+					status: string | null
+					subscription: string | null
+					total: number | null
+				}
+				Insert: {
+					attrs?: Json | null
+					currency?: string | null
+					customer?: string | null
+					id?: string | null
+					period_end?: string | null
+					period_start?: string | null
+					status?: string | null
+					subscription?: string | null
+					total?: number | null
+				}
+				Update: {
+					attrs?: Json | null
+					currency?: string | null
+					customer?: string | null
+					id?: string | null
+					period_end?: string | null
+					period_start?: string | null
+					status?: string | null
+					subscription?: string | null
+					total?: number | null
+				}
+				Relationships: []
+			}
+			products: {
+				Row: {
+					active: boolean | null
+					attrs: Json | null
+					created: string | null
+					default_price: string | null
+					description: string | null
+					id: string | null
+					name: string | null
+					updated: string | null
+				}
+				Insert: {
+					active?: boolean | null
+					attrs?: Json | null
+					created?: string | null
+					default_price?: string | null
+					description?: string | null
+					id?: string | null
+					name?: string | null
+					updated?: string | null
+				}
+				Update: {
+					active?: boolean | null
+					attrs?: Json | null
+					created?: string | null
+					default_price?: string | null
+					description?: string | null
+					id?: string | null
+					name?: string | null
+					updated?: string | null
+				}
+				Relationships: []
+			}
+			subscriptions: {
+				Row: {
+					attrs: Json | null
+					currency: string | null
+					current_period_end: string | null
+					current_period_start: string | null
+					customer: string | null
+					id: string | null
+				}
+				Insert: {
+					attrs?: Json | null
+					currency?: string | null
+					current_period_end?: string | null
+					current_period_start?: string | null
+					customer?: string | null
+					id?: string | null
+				}
+				Update: {
+					attrs?: Json | null
+					currency?: string | null
+					current_period_end?: string | null
+					current_period_start?: string | null
+					customer?: string | null
+					id?: string | null
+				}
+				Relationships: []
+			}
+		}
+		Views: {
+			[_ in never]: never
+		}
+		Functions: {
+			[_ in never]: never
 		}
 		Enums: {
 			[_ in never]: never

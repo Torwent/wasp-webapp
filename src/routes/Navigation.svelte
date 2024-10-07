@@ -4,6 +4,7 @@
 	import Logo from "./Logo.svelte"
 	import UserPanel from "./UserPanel.svelte"
 	import { goto } from "$app/navigation"
+	import { Menu } from "lucide-svelte"
 	export let large: boolean
 
 	let { roles } = $page.data
@@ -51,7 +52,7 @@
 		const inputFields = ["input", "textarea"]
 		if (inputFields.includes(window.document.activeElement?.localName ?? "")) return
 		switch (e.key) {
-			case "ArrowLeft" || "a" || "A":
+			case "ArrowLeft":
 				for (let i = 0; i < routeArray.length; i++) {
 					if (currentPage === routeArray[i]) {
 						if (i <= 0) goto(getLink(routeArray[routeArray.length - 1]))
@@ -59,7 +60,7 @@
 					}
 				}
 				break
-			case "ArrowRight" || "d" || "D":
+			case "ArrowRight":
 				for (let i = 0; i < routeArray.length; i++) {
 					if (currentPage === routeArray[i]) {
 						if (i >= routeArray.length - 1) goto(getLink(routeArray[0]))
@@ -78,10 +79,12 @@
 		<button
 			name="Menu"
 			aria-label="Open the navigation menu"
-			class="flex mx-auto text-primary-500 dark:text-primary-400 w-full place-content-center h-full"
+			class="flex mx-auto text-primary-500 dark:text-primary-400 w-full place-content-center h-full justify-between"
 			on:click={() => (showMenu = !showMenu)}
 		>
+			<Menu class="text-white" />
 			<Logo selected={true} />
+			<div />
 		</button>
 	{/if}
 
