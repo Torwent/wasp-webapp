@@ -154,5 +154,10 @@
 		</div>
 	</div>
 
-	<Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count={resolvedCount} />
+	<Paginator
+		bind:searchParams
+		bind:pageIdx={currentPage}
+		amount={range}
+		bind:count={resolvedCount}
+	/>
 </main>

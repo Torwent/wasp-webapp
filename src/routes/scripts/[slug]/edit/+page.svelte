@@ -187,27 +187,24 @@
 	{/if}
 </svelte:head>
 
-<div>
+<main>
 	{#if showScriptPage}
-		<div>
-			<ScriptHeader title={$form.title} hasLink={false}>
+		<main class="w-[90%] flex-col mx-auto">
+			<ScriptHeader
+				id={script?.id}
+				title={script?.title}
+				username={script?.protected.username}
+				description={script?.description}
+			>
 				<img
-					bind:this={bannerElement}
-					class="z-0 absolute object-cover h-full w-full"
-					src={defaultBanner}
-					alt="{$form.title} header image"
+					class="rounded-md {!script ? 'animate-pulse' : ''}"
+					src={script ? script.protected.assets + "banner.jpg" : "/banner.jpg"}
+					alt="Script banner"
+					loading="lazy"
 				/>
 			</ScriptHeader>
 
-			<div class="container mt-80 mx-auto mb-6 max-w-2xl flex-grow">
-				<header class="my-8">
-					<h3 class="text-center text-secondary-500 text-shadow drop-shadow-2xl">
-						{$form.description}
-					</h3>
-				</header>
-
-				<StatsHeader />
-
+			<div class="container mx-auto mb-6 max-w-lg md:max-w-5xl flex-grow">
 				{#if profile}
 					<div class="text-center">
 						<div class="py-12 grid justify-center justify-items-center gap-8">
@@ -225,7 +222,7 @@
 
 				<ScriptArticle content={script ? replaceScriptContent(script) : "Loading..."} />
 			</div>
-		</div>
+		</main>
 	{/if}
 
 	{#if showScriptCard}
@@ -554,4 +551,4 @@
 			</form>
 		</article>
 	</div>
-</div>
+</main>

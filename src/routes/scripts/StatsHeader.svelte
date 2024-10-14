@@ -1,19 +1,12 @@
 <script lang="ts">
 	import { page } from "$app/stores"
 	import { formatTime, formatNumber } from "$lib/utils"
-	export let id: string | null = null
+	export let id: string | undefined
 
-	const { supabaseClient } = $page.data
+	let { supabaseClient } = $page.data
+	$: ({ supabaseClient } = $page.data)
 
-	interface Stats {
-		experience: number
-		gold: number
-		runtime: number
-	}
-
-	let stats: Stats | null = null
-
-	async function getStats(id: string | null) {
+	async function getStats() {
 		if (!id) {
 			return {
 				experience: Math.random() * 1000000,
@@ -36,20 +29,16 @@
 
 		return data
 	}
-
-	$: getStats(id).then((result) => (stats = result))
 </script>
 
-{#if stats}
-	<header class="text-center">
-		<h4>Total Experience Gained: {formatNumber(stats.experience)}</h4>
-		<h4>Total Gold Gained: {formatNumber(stats.gold)}</h4>
-		<h4>Total Runtime: {formatTime(stats.runtime)}</h4>
-	</header>
-{:else if id}
-	<header class="text-center">
+<header class="text-center">
+	{#await getStats()}
 		<h4>Total Experience Gained: Loading...</h4>
 		<h4>Total Gold Gained: Loading...</h4>
 		<h4>Total Runtime: Loading...</h4>
-	</header>
-{/if}
+	{:then stats}
+		<h4>Total Experience Gained: {stats ? formatNumber(stats.experience) : "Loading..."}</h4>
+		<h4>Total Gold Gained: {stats ? formatNumber(stats.gold) : "Loading..."}</h4>
+		<h4>Total Runtime: {stats ? formatTime(stats.runtime) : "Loading..."}</h4>
+	{/await}
+</header>

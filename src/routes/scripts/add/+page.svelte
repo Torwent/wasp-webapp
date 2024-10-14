@@ -17,7 +17,6 @@
 	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
 	import { zodClient } from "sveltekit-superforms/adapters"
 	import { replaceScriptContent } from "$lib/client/utils"
-	import SuperDebug from "sveltekit-superforms"
 
 	import type { ScriptReplace, Tooltip } from "$lib/types/collection"
 
@@ -194,27 +193,24 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<div>
+<main>
 	{#if showScriptPage}
-		<div>
-			<ScriptHeader title={$form.title} hasLink={false}>
+		<main class="w-[90%] flex-col mx-auto">
+			<ScriptHeader
+				id={undefined}
+				title={$form.title}
+				username={profile?.username}
+				description={$form.description}
+			>
 				<img
 					bind:this={bannerElement}
-					class="z-0 absolute object-cover h-full w-full"
+					class="rounded-md"
 					src={defaultBanner}
 					alt="{$form.title} header image"
 				/>
 			</ScriptHeader>
 
-			<div class="container mt-80 mx-auto mb-6 max-w-2xl flex-grow">
-				<header class="my-8">
-					<h3 class="text-center text-secondary-500 text-shadow drop-shadow-2xl">
-						{$form.description}
-					</h3>
-				</header>
-
-				<StatsHeader />
-
+			<div class="container mx-auto mb-6 max-w-lg md:max-w-5xl flex-grow">
 				{#if profile}
 					<div class="text-center">
 						<div class="py-12 grid justify-center justify-items-center gap-8">
@@ -232,7 +228,7 @@
 
 				<ScriptArticle content={replaceScriptContent(scriptReplace)} />
 			</div>
-		</div>
+		</main>
 	{/if}
 
 	{#if showScriptCard}
@@ -310,7 +306,6 @@
 				<h3>Add Script</h3>
 			</header>
 
-			<SuperDebug data={$form} />
 			<form method="POST" enctype="multipart/form-data" use:focusTrap={isFocused} use:enhance>
 				<div class="flex justify-evenly">
 					<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
@@ -597,4 +592,4 @@
 			</form>
 		</article>
 	</div>
-</div>
+</main>

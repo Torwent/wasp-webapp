@@ -5,7 +5,7 @@
 	import { WaspScripters } from "$lib/client/supabase"
 </script>
 
-<footer class="variant-soft-surface">
+<footer class="bg-surface-100-800-token z-40 h-fit my-auto">
 	<div class="mx-8 md:mx-0">
 		<header class="grid md:flex md:justify-between md:m-8 md:pt-8">
 			<div class="mx-auto lg:mx-0 my-6">
@@ -56,8 +56,8 @@
 				</nav>
 			</div>
 		</header>
-		<footer class="sm:flex sm:items-center sm:justify-between p-8 sm:p-12">
-			<span class="text-sm sm:text-center">
+		<footer class="flex flex-col sm:flex-row my-8">
+			<span class="text-sm sm:text-center mx-auto my-auto">
 				This webapp is open source! Checkout
 				<a
 					class="permalink text-secondary-500"
@@ -68,7 +68,7 @@
 				</a>
 				!
 			</span>
-			<div class="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
+			<div class="flex mx-auto my-auto space-x-6 sm:justify-center sm:mt-0">
 				<a
 					href="https://github.com/torwent"
 					target="_blank"

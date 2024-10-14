@@ -4,9 +4,13 @@ import type { ScriptBase, ScriptFeatured } from "$lib/types/collection"
 import { formatError } from "$lib/utils"
 import { error, redirect } from "@sveltejs/kit"
 
-export const load = async ({ url, parent }) => {
+export const load = async ({ url, parent, depends }) => {
+	depends("supabase:scripts")
 	const pageN = Number(url.searchParams.get("page") || "-1")
 	const page = pageN < 0 || Number.isNaN(pageN) ? 1 : pageN
+
+	const amountN = Number(url.searchParams.get("amount") || "8")
+	const amount = amountN < 0 || Number.isNaN(amountN) ? 1 : amountN
 
 	const search = decodeURIComponent(url.searchParams.get("search") || "").trim()
 	const ascending = url.searchParams.get("ascending")?.toLowerCase() !== "true"
@@ -16,9 +20,8 @@ export const load = async ({ url, parent }) => {
 	const subcategoriesStr = decodeURIComponent(url.searchParams.get("subcategories") || "")
 	const subcategoriesFilter = subcategoriesStr.split("-")
 
-	const range = 11
-	const start = (page - 1) * range
-	const finish = start + range
+	const start = (page - 1) * amount
+	const finish = start + amount - 1
 
 	async function getScripts(search: string, ascending: boolean, start: number, finish: number) {
 		const { supabaseClient } = await parent()
@@ -75,7 +78,7 @@ export const load = async ({ url, parent }) => {
 			)
 		}
 
-		return data.map(async (scripts) => scripts.scripts)
+		return await Promise.all(data.map(async (scripts) => scripts.scripts))
 	}
 
 	async function getCheckBoxes() {
@@ -112,12 +115,10 @@ export const load = async ({ url, parent }) => {
 		return checkboxes
 	}
 
-	const scripts = await getScripts(search, ascending, start, finish)
-	const featuredPromise = getFeatured()
-	const checkboxesPromise = getCheckBoxes()
-
-	featuredPromise.catch((err) => streamedErrorHandler(err))
-	checkboxesPromise.catch((err) => streamedErrorHandler(err))
-
-	return { scripts, featuredPromise, checkboxesPromise, range }
+	const promises = await Promise.all([
+		getScripts(search, ascending, start, finish),
+		getFeatured(),
+		getCheckBoxes()
+	])
+	return { scripts: promises[0], featured: promises[1], checkboxes: promises[2], amount }
 }

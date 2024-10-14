@@ -5,7 +5,7 @@
 	import type { Stats } from "$lib/types/collection"
 	import { ChevronDown, ChevronUp } from "lucide-svelte"
 
-	export let range: number
+	export let amount: number
 	export let count: number = 0
 	export let search: string
 
@@ -13,7 +13,7 @@
 	$: ({ searchParams } = $page.url)
 
 	const pageStr = searchParams.get("page") || "-1"
-	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
+	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr) - 1
 
 	let ascending = searchParams.get("ascending")?.toLowerCase() === "true"
 	let headers: (keyof Stats)[] = ["username", "experience", "gold", "levels", "runtime"]
@@ -30,8 +30,8 @@
 	}
 </script>
 
-<table class="w-full text-sm text-left table table-hover">
-	<thead class="text-xs uppercase text-primary-700 dark:text-primary-500">
+<table class="text-xs md:text-sm text-left table table-hover my-8 mx-auto w-">
+	<thead class="text-primary-500-400-token">
 		<tr>
 			{#each headers as header}
 				<th scope="col" class="py-3 px-6" on:click={async () => await sortBy(header)}>
@@ -64,4 +64,4 @@
 	</tbody>
 </table>
 
-<Paginator bind:searchParams pageIdx={currentPage} {range} bind:count />
+<Paginator bind:searchParams bind:pageIdx={currentPage} bind:amount bind:count />

@@ -1,5 +1,4 @@
 import { getStatsTotal } from "$lib/client/supabase"
-import { streamedErrorHandler } from "$lib/client/utils"
 import { UUID_V4_REGEX, formatError } from "$lib/utils"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { error } from "@sveltejs/kit"
@@ -7,16 +6,18 @@ import { error } from "@sveltejs/kit"
 export const load = async ({ url, depends, parent }) => {
 	depends("supabase:stats")
 
+	const pageN = Number(url.searchParams.get("page") || "-1")
+	const page = pageN < 0 || Number.isNaN(pageN) ? 1 : pageN
+
+	const amountN = Number(url.searchParams.get("amount") || "20")
+	const amount = amountN < 0 || Number.isNaN(amountN) ? 1 : amountN
+
 	const order = url.searchParams.get("order") || "experience"
 	const ascending = url.searchParams.get("ascending")?.toLowerCase() === "true"
 	const search = decodeURIComponent(url.searchParams.get("search") || "").trim()
 
-	const pageN = Number(url.searchParams.get("page") || "-1")
-	const page = pageN < 0 || Number.isNaN(pageN) ? 1 : pageN
-
-	const range = 20
-	const start = (page - 1) * range
-	const finish = start + range
+	const start = (page - 1) * amount
+	const finish = start + amount - 1
 
 	const totalEntries = 10
 
@@ -35,7 +36,10 @@ export const load = async ({ url, depends, parent }) => {
 		} else if (UUID_V4_REGEX.test(search)) {
 			query.eq("id", search)
 		} else {
-			query.ilike("username", "%" + search.replaceAll("%", "") + "%")
+			query
+				.ilike("username", "%" + search.replaceAll("%", "") + "%")
+				.range(start, finish)
+				.order(order, { ascending: ascending, nullsFirst: false })
 		}
 
 		const { data, count, error: err } = await query
@@ -52,11 +56,7 @@ export const load = async ({ url, depends, parent }) => {
 		return { stats: data, count: count || totalEntries }
 	}
 
-	const totalPromise = getStatsTotal(supabaseClient)
-	totalPromise.catch((err) => streamedErrorHandler(err))
+	const promises = await Promise.all([getStatsTotal(supabaseClient), getStats(supabaseClient)])
 
-	const statsPromise = getStats(supabaseClient)
-	statsPromise.catch((err) => streamedErrorHandler(err))
-
-	return { totalPromise, statsPromise, range: range }
+	return { totals: promises[0], stats: promises[1], amount }
 }

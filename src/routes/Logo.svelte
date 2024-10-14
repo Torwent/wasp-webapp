@@ -3,7 +3,9 @@
 </script>
 
 <!-- Website Logo -->
-<div class="flex group transition duration-300 dark:hover:text-primary-200 hover:text-primary-300">
+<div
+	class="my-auto flex group transition duration-300 dark:hover:text-primary-200 hover:text-primary-300"
+>
 	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 701.99 552.97" class="h-8 mr-3 fill-current">
 		<g
 			id="WaspLayer"

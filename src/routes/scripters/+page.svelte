@@ -102,5 +102,5 @@
 		</div>
 	{/if}
 
-	<Paginator {searchParams} pageIdx={currentPage} {range} bind:count />
+	<Paginator {searchParams} pageIdx={currentPage} amount={range} bind:count />
 </main>

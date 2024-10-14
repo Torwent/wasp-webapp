@@ -6,9 +6,9 @@
 	export let data
 
 	let { totalPromise } = data
-	$: ({ totalPromise } = data)
-
 	let total: Awaited<typeof totalPromise> | null = null
+
+	$: ({ totalPromise } = data)
 	$: totalPromise.then((awaited) => (total = awaited))
 
 	const headTitle = "WaspScripts"
@@ -42,7 +42,7 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main class="container my-6 mx-auto flex-grow max-w-2xl">
+<main class="container my-8 mx-auto flex-grow max-w-2xl">
 	<header>
 		<h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-center py-12">
 			<div class="py-4">WaspScripts</div>

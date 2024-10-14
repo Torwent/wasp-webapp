@@ -143,22 +143,23 @@
 	{/if}
 </svelte:head>
 
-<main>
-	<ScriptHeader title={script?.title} username={script?.protected.username ?? ""}>
+<main class="flex flex-col w-[90%] mx-auto">
+	<ScriptHeader
+		id={script?.id}
+		title={script?.title}
+		username={script?.protected.username}
+		description={script?.description}
+	>
 		<img
-			class="z-0 absolute object-cover h-full w-full {!script ? 'animate-pulse' : ''}"
+			class="rounded-md {!script ? 'animate-pulse' : ''}"
 			src={script ? script.protected.assets + "banner.jpg" : "/banner.jpg"}
 			alt="Script banner"
 			loading="lazy"
 		/>
 	</ScriptHeader>
 
-	<div class="container mt-80 mx-auto mb-6 max-w-lg md:max-w-5xl flex-grow">
+	<div class="container mx-auto mb-6 max-w-lg md:max-w-5xl flex-grow">
 		<header class="my-8">
-			<h3 class="my-4 text-center text-secondary-500 text-shadow drop-shadow-2xl">
-				{script ? script.description : "Loading..."}
-			</h3>
-
 			<form method="POST" class="grid">
 				{#if script?.protected.broken}
 					<h4 class="text-error-500 my-2">
@@ -191,8 +192,6 @@
 				<h4 class="my-4 text-center text-error-500 text-shadow drop-shadow-2xl">Unpublished</h4>
 			{/if}
 		</header>
-
-		<StatsHeader id={script?.id} />
 
 		{#if script && canEdit(profile?.id, roles, script.protected.author_id)}
 			<ScriptData id={script.id} />
