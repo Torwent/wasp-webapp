@@ -6,7 +6,7 @@
 	let { supabaseClient } = $page.data
 	$: ({ supabaseClient } = $page.data)
 
-	async function getStats() {
+	async function getStats(id: string | undefined) {
 		if (!id) {
 			return {
 				experience: Math.random() * 1000000,
@@ -32,7 +32,7 @@
 </script>
 
 <header class="text-center">
-	{#await getStats()}
+	{#await getStats(id)}
 		<h4>Total Experience Gained: Loading...</h4>
 		<h4>Total Gold Gained: Loading...</h4>
 		<h4>Total Runtime: Loading...</h4>

@@ -26,8 +26,8 @@
 			{description ?? "Loading..."}
 		</h2>
 		<h3 class="my-4">
-			ID: {id ?? "Loading..."}
+			{id ?? "Loading..."}
 		</h3>
-		<StatsHeader {id} />
+		<StatsHeader bind:id />
 	</div>
 </header>
