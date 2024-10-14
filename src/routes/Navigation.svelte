@@ -234,7 +234,7 @@
 					<RoleBadges />
 				</div>
 			</section>
-			<footer class="card-footer flex">
+			<footer class="flex flex-col card-footer">
 				<button
 					name="Logout"
 					aria-label="Logout"
@@ -246,14 +246,14 @@
 				</button>
 			</footer>
 		{:else}
-			<header class="card-header">
+			<header class="card-header my-8">
 				<h3 class="text-2x1 font-bold text-center md:text-3x1">Log In</h3>
 			</header>
 
-			<div class="p-4">
+			<footer class="card-footer flex justify-evenly my-4">
 				<button
 					name="Login"
-					aria-label="Login to your account"
+					aria-label="Login to your account mx-auto"
 					class="btn variant-filled-secondary"
 					formaction="/auth?/login&provider=discord"
 				>
@@ -266,7 +266,7 @@
 
 					<span class="px-2">Login with Discord</span>
 				</button>
-			</div>
+			</footer>
 		{/if}
 	</form>
 </nav>
