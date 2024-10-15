@@ -39,7 +39,7 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main class="pb-16 container mx-auto my-6 max-w-2xl flex-grow">
+<main class="my-16 container mx-auto max-w-2xl flex-grow">
 	<header class="py-12 text-center">
 		<h2>Welcome to the Frequently Asked Questions and Common Errors section.</h2>
 	</header>

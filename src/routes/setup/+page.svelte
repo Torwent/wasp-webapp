@@ -89,7 +89,7 @@
 
 <div class="container mx-auto my-6 max-w-2xl flex-grow">
 	{#if checkedOS}
-		<div>
+		<div class="h-screen my-8">
 			<header>
 				<h1 class="text-xl py-16 text-center text-primary-500 dark:text-primary-100 md:text-3xl">
 					{currentOS.OS} OS detected!

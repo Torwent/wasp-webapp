@@ -30,7 +30,7 @@
 	}
 </script>
 
-<table class="text-xs md:text-sm text-left table table-hover my-8 mx-auto w-">
+<table class="text-xs md:text-sm text-left table table-hover my-8 mx-auto w-full overflow-auto">
 	<thead class="text-primary-500-400-token">
 		<tr>
 			{#each headers as header}

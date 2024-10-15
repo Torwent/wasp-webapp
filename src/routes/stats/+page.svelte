@@ -67,7 +67,7 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main class="overflow-x-auto relative mx-4 md:mx-16 lg:mx-24">
+<main class="mx-4 md:mx-16 lg:mx-24 h-fit my-8 flex-grow">
 	<header class="text-sm lg:text-lg flex-col text-center my-4">
 		<h5 class="md:whitespace-nowrap">
 			Total experience: <wbr />
