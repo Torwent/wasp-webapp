@@ -161,7 +161,7 @@
 			if (previous > scroll) {
 				const parent = event.currentTarget.parentElement?.parentElement
 				if (!parent || parent.scrollTop === 0) return
-				parent.scrollBy({ top: -5, behavior: "smooth" })
+				parent.scrollBy({ top: -Math.round(parent.clientHeight / 10), behavior: "smooth" })
 			}
 		}}
 	>
