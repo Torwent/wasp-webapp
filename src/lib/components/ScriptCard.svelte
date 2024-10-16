@@ -7,6 +7,6 @@
 	$: link = "/scripts/" + script.url
 </script>
 
-<a href={link}>
+<a href={link} class="mx-auto">
 	<ScriptCardBase bind:script />
 </a>

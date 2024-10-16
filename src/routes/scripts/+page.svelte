@@ -103,7 +103,7 @@
 
 <main class="flex h-full">
 	<aside
-		class="relative h-full bg-surface-100-800-token flex text-sm overflow-x-visible overflow-y-auto
+		class="relative h-full variant-outline-surface flex text-sm overflow-x-visible overflow-y-auto
 		{show ? 'w-fit' : ''} xl:text-base"
 	>
 		<div
@@ -194,7 +194,7 @@
 					<button class="btn variant-filled-secondary inline-block">Add Script</button>
 				</a>
 			{/if}
-			<div class="py-6 flex flex-col text-sm mb-2 max-w-2xl mx-auto">
+			<div class="mx-auto w-[80%] lg:w-[70%] xl:w-[60%] flex flex-col my-12">
 				<input
 					placeholder="Search script id, name, categories, author,..."
 					class="input"

@@ -37,7 +37,7 @@
 </script>
 
 {#if script}
-	<div class="card w-[260px] xl:w-[290px] shadow-sm card-hover">
+	<div class="card w-[260px] xxl:w-[290px] shadow-sm card-hover">
 		<header class="group h-[200px] p-0">
 			<img
 				bind:this={imgElement}
@@ -83,7 +83,7 @@
 		</footer>
 	</div>
 {:else}
-	<div class="card w-[260px] xl:w-[290px] shadow-sm card-hover animate-pulse">
+	<div class="card w-[260px] xxl:w-[290px] shadow-sm card-hover animate-pulse">
 		<header class="group h-[200px] p-0">
 			<img
 				bind:this={imgElement}
