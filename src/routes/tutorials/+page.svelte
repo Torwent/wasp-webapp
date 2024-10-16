@@ -7,10 +7,10 @@
 	import type { Tutorial } from "$lib/types/collection"
 	export let data
 
-	let { user, roles, tutorialsPromise } = data
+	let { user, roles, tutorials, amount, count } = data
 	let { searchParams } = $page.url
 
-	$: ({ user, roles, tutorialsPromise } = data)
+	$: ({ user, roles, tutorials, amount, count } = data)
 	$: ({ searchParams } = $page.url)
 
 	const pageStr = searchParams.get("page") || "-1"
@@ -36,13 +36,6 @@
 			ascending: ascending ? "true" : "false"
 		})
 	}
-
-	let resolvedPromise: Tutorial[] | null = null
-	let resolvedCount: number = 0
-
-	$: tutorialsPromise.then((tutorials) => {
-		resolvedPromise = tutorials
-	})
 
 	const headTitle = "Tutorials - WaspScripts"
 	const headDescription =
@@ -76,7 +69,7 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main class="flex flex-col">
+<main class="flex flex-col mx-auto">
 	<header class="text-center py-8">
 		<h3>Welcome to the Tutorials section.</h3>
 		<p>Here you can find guides and tutorials to learn how to bot!</p>
@@ -131,7 +124,7 @@
 				<div class="w-full flex flex-col text-sm mb-2">
 					<input
 						type="text"
-						placeholder="Search script id, name, categories, author,..."
+						placeholder="Search script id, name, categories, author,... (CURRENTLY NOT WORKING!)"
 						class="input"
 						bind:value={search}
 						on:input={async () =>
@@ -153,19 +146,17 @@
 		</div>
 	</div>
 
-	{#if resolvedPromise}
-		<div class="mx-auto max-w-2xl flex-grow">
-			{#each resolvedPromise as tutorial}
-				<TutorialCard bind:tutorial />
-			{/each}
-		</div>
-	{:else}
-		<div class="mx-auto max-w-2xl flex-grow">
-			{#each Array(10) as _}
-				<TutorialCard />
-			{/each}
-		</div>
-	{/if}
+	<div class="mx-auto max-w-2xl flex-grow">
+		{#each tutorials as tutorial}
+			<TutorialCard bind:tutorial />
+		{/each}
+	</div>
 
-	<!-- <Paginator bind:searchParams bind:pageIdx={currentPage} {range} bind:count={resolvedCount} /> -->
+	<Paginator
+		bind:searchParams
+		bind:pageIdx={currentPage}
+		bind:amount
+		bind:count
+		amounts={[5, 10, 15, 20]}
+	/>
 </main>

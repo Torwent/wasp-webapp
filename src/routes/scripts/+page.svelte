@@ -70,6 +70,8 @@
 		return () => clearInterval(autoplay)
 	})
 
+	let oldScroll: number = 0
+
 	const headTitle = "Scripts - WaspScripts"
 	const headDescription =
 		"Large script collection to bot OldSchool RuneScape with Simba, SRL and WaspLib. Get that 99 on osrs today!"
@@ -149,7 +151,20 @@
 		</button>
 	</aside>
 
-	<main class="ml-2 overflow-y-scroll h-full w-full">
+	<main
+		class="ml-2 overflow-y-scroll h-full w-full"
+		on:scroll={(event) => {
+			const scroll = event.currentTarget.scrollTop
+			const previous = oldScroll
+			oldScroll = scroll
+
+			if (previous > scroll) {
+				const parent = event.currentTarget.parentElement?.parentElement
+				if (!parent || parent.scrollTop === 0) return
+				parent.scrollBy({ top: -5, behavior: "smooth" })
+			}
+		}}
+	>
 		<header class="flex h-22 md:h-44 lg:h-64 grid-cols-12 my-4 justify-evenly">
 			<!-- Button: Left -->
 			<button
