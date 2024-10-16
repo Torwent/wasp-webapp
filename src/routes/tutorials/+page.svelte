@@ -76,20 +76,42 @@
 	<meta name="twitter:image" content={headImage} />
 </svelte:head>
 
-<main>
+<main class="flex flex-col">
 	<header class="text-center py-8">
 		<h3>Welcome to the Tutorials section.</h3>
 		<p>Here you can find guides and tutorials to learn how to bot!</p>
 	</header>
 
-	<div class="py-6">
-		<div class="text-center form my-6">
-			<header class="py-4"><h3>Filter by level or search the a blog post:</h3></header>
-			<div class="justify-center md:flex md:space-x-5 mb-2">
+	<div class="flex flex-col my-16 mx-auto">
+		<h3 class="text-center">Useful resources</h3>
+
+		<div class="flex flex-col lg:flex-row my-4 gap-2">
+			<a href="https://torwent.github.io/SRL-T/" class="mx-auto">
+				<button class="btn variant-outline-secondary">SRL-T Documentation</button>
+			</a>
+			<a href="https://torwent.github.io/WaspLib/" class="mx-auto">
+				<button class="btn variant-outline-secondary">WaspLib Documentation</button>
+			</a>
+
+			<a href="https://api.waspscripts.com/docs" class="mx-auto">
+				<button class="btn variant-outline-secondary">Stats API Documentation</button>
+			</a>
+
+			<a href="https://map.waspscripts.com" class="mx-auto">
+				<button class="btn variant-outline-secondary">Interactive Map</button>
+			</a>
+		</div>
+	</div>
+
+	<div class="my-4">
+		<div class="text-center form">
+			<h3 class="my-8"><h3>Filter by level or search the a blog post:</h3></h3>
+			<div class="flex flex-col md:flex-row mx-auto my-4 gap-2 justify-center">
 				{#each levelNames as name, i}
 					<button
-						class="w-full my-2 md:w-auto text-xs py-1 px-8 font-bold rounded-md text-white
-							   bg-{levelColors[i]}-500 border-{levelColors[i]}-500"
+						class="mx-auto md:mx-0 text-xs p-2 font-bold rounded-md text-white bg-{levelColors[
+							i
+						]}-500 border-{levelColors[i]}-500"
 						class:border-r-8={level === i}
 						class:pr-6={level === i}
 						on:click={async () => {
@@ -103,15 +125,8 @@
 						{name} tutorial
 					</button>
 				{/each}
-
-				<button on:click={async () => await sort()} aria-label="Sort posts by level">
-					{#if ascending}
-						<ArrowDownAZ />
-					{:else}
-						<ArrowUpZA />
-					{/if}
-				</button>
 			</div>
+
 			<div class="max-w-2xl mx-auto justify-center md:flex md:space-x-5 mb-2">
 				<div class="w-full flex flex-col text-sm mb-2">
 					<input
