@@ -206,7 +206,7 @@
 			</div>
 
 			<div
-				class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 md:gap-4 lg:gap-3 overflow-y-visible"
+				class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 lg:gap-3 overflow-y-visible"
 			>
 				{#each scripts.scripts as script}
 					<ScriptCard bind:script />

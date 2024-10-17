@@ -48,8 +48,9 @@
 		...
 		bind:settings={paginationSettings}
 		showNumerals
-		maxNumerals={3}
+		regionControl="btn-group"
 		controlVariant="variant-ringed-surface"
+		justify="justify-between mx-4 lg:mx-3"
 		showFirstLastButtons={true}
 		on:page={async (e) => await replaceQuery({ page: (e.detail + 1).toString() })}
 		on:amount={async (e) => await replaceQuery({ amount: e.detail.toString() })}
