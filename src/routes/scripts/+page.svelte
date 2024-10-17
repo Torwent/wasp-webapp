@@ -151,20 +151,7 @@
 		</button>
 	</aside>
 
-	<main
-		class="ml-2 overflow-y-scroll h-full w-full"
-		on:scroll={(event) => {
-			const scroll = event.currentTarget.scrollTop
-			const previous = oldScroll
-			oldScroll = scroll
-
-			if (previous > scroll) {
-				const parent = event.currentTarget.parentElement?.parentElement
-				if (!parent || parent.scrollTop === 0) return
-				parent.scrollBy({ top: -Math.round(parent.clientHeight / 10), behavior: "smooth" })
-			}
-		}}
-	>
+	<main class="ml-2 overflow-y-scroll h-full w-full overscroll-contain">
 		<header class="flex h-22 md:h-44 lg:h-64 grid-cols-12 my-4 justify-evenly">
 			<!-- Button: Left -->
 			<button
