@@ -19,7 +19,7 @@
 	$: count = scripts.count
 
 	const pageStr = searchParams.get("page") || "-1"
-	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
+	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 0 : Number(pageStr)
 
 	let search = decodeURIComponent(searchParams.get("search") || "").trim()
 	let categories: string[] = []

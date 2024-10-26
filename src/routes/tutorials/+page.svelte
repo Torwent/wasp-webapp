@@ -7,14 +7,14 @@
 	import type { Tutorial } from "$lib/types/collection"
 	export let data
 
-	let { user, roles, tutorials, amount, count } = data
+	let { tutorials, amount, count } = data
 	let { searchParams } = $page.url
 
 	$: ({ user, roles, tutorials, amount, count } = data)
 	$: ({ searchParams } = $page.url)
 
 	const pageStr = searchParams.get("page") || "-1"
-	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
+	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 0 : Number(pageStr)
 
 	let search = decodeURIComponent(searchParams.get("search") || "").trim()
 	const ascendingStr = searchParams.get("ascending")

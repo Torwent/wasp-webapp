@@ -9,7 +9,7 @@ export const load = async ({ url, parent, depends }) => {
 	const pageN = Number(url.searchParams.get("page") || "-1")
 	const page = pageN < 0 || Number.isNaN(pageN) ? 1 : pageN
 
-	const amountN = Number(url.searchParams.get("amount") || "8")
+	const amountN = Number(url.searchParams.get("amount") || "12")
 	const amount = amountN < 0 || Number.isNaN(amountN) ? 1 : amountN
 
 	const search = decodeURIComponent(url.searchParams.get("search") || "").trim()

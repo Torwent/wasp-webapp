@@ -2,29 +2,20 @@
 	import { page } from "$app/stores"
 	import ScripterCard from "./ScripterCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
-	import type { ScripterBase } from "$lib/types/collection"
 	import { replaceQuery } from "$lib/client/utils"
 
 	export let data
 
-	let { scriptersPromise, range } = data
+	let { scripters, count, amount } = data
 	let { searchParams } = $page.url
 
-	$: ({ scriptersPromise, range } = data)
+	$: ({ scripters, count, amount } = data)
 	$: ({ searchParams } = $page.url)
 
 	const pageStr = searchParams.get("page") || "-1"
-	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
+	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 0 : Number(pageStr)
 
 	let search: string
-
-	let scripters: ScripterBase[] | null = null
-	let count: number = 0
-
-	$: scriptersPromise.then((awaited) => {
-		scripters = awaited.scripters
-		count = awaited.count
-	})
 
 	const headTitle = "Scripters - WaspScripts"
 	const headDescription =
@@ -88,19 +79,17 @@
 		</div>
 	</div>
 
-	{#if scripters}
-		<div class="mx-auto max-w-2xl flex-grow">
-			{#each scripters as scripter}
-				<ScripterCard bind:scripter />
-			{/each}
-		</div>
-	{:else}
-		<div class="mx-auto max-w-2xl flex-grow">
-			{#each Array(11) as _}
-				<ScripterCard />
-			{/each}
-		</div>
-	{/if}
+	<div class="mx-auto max-w-2xl flex-grow">
+		{#each scripters as scripter}
+			<ScripterCard bind:scripter />
+		{/each}
+	</div>
 
-	<Paginator {searchParams} pageIdx={currentPage} amount={range} bind:count />
+	<Paginator
+		bind:searchParams
+		bind:pageIdx={currentPage}
+		bind:amount
+		bind:count
+		amounts={[5, 10, 15, 20]}
+	/>
 </main>

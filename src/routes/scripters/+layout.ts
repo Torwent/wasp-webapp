@@ -1,18 +1,19 @@
 import { browser } from "$app/environment"
-import { streamedErrorHandler } from "$lib/client/utils"
 import type { ScripterBase } from "$lib/types/collection"
 import { encodeSEO, formatError } from "$lib/utils.js"
 import { error, redirect } from "@sveltejs/kit"
 
-export const load = async ({ url: { searchParams }, params: { slug }, parent }) => {
+export const load = async ({ url: { searchParams }, parent }) => {
 	const pageN = Number(searchParams.get("page") || "-1")
 	const page = pageN < 0 || Number.isNaN(pageN) ? 1 : pageN
 
-	const search = decodeURIComponent(searchParams.get("search") || "").trim()
-	const range = 10
+	const amountN = Number(searchParams.get("amount") || "10")
+	const amount = amountN < 0 || Number.isNaN(amountN) ? 1 : amountN
 
-	const start = ((slug ? 1 : page) - 1) * range
-	const finish = start + range
+	const search = decodeURIComponent(searchParams.get("search") || "").trim()
+
+	const start = (page - 1) * amount
+	const finish = start + amount - 1
 
 	async function getScripters() {
 		const { supabaseClient } = await parent()
@@ -39,8 +40,7 @@ export const load = async ({ url: { searchParams }, params: { slug }, parent }) 
 		return { scripters: data, count: count ?? 0 }
 	}
 
-	const scriptersPromise = getScripters()
-	scriptersPromise.catch((err) => streamedErrorHandler(err))
+	const scripters = await getScripters()
 
-	return { scriptersPromise, range }
+	return { scripters: scripters.scripters, amount, count: scripters.count }
 }
