@@ -37,36 +37,42 @@
 </script>
 
 {#if script}
-	<div class="card w-[260px] xxl:w-[290px] shadow-sm card-hover">
-		<header class="group h-[200px] p-0">
-			<img
-				bind:this={imgElement}
-				src={imgLink}
-				alt="Script cover"
-				class="rounded-t"
-				loading="lazy"
-			/>
-		</header>
-		<section class="p-4">
-			<header class="h-12">
-				<div class="font-semibold text-primary-600 dark:text-primary-500 whitespace-nowrap">
-					{script.title}
-				</div>
-				<div class="text-xs whitespace-nowrap text-primary-600 dark:text-secondary-500 drop-shadow">
-					by
-					<a
-						href="/scripters/{encodeSEO(script.protected.username.normalize('NFKC'))}"
-						class="permalink"
-					>
-						{script.protected.username}
-					</a>
-					{#if !script.published}<small class="text-error-500">Unpublished</small>{/if}
-				</div>
+	<div class="card w-64 h-96 shadow-sm card-hover flex flex-col justify-between">
+		<div>
+			<header class="h-48 p-0">
+				<img
+					bind:this={imgElement}
+					src={imgLink}
+					alt="Script cover"
+					class="rounded-t"
+					loading="lazy"
+				/>
 			</header>
-			<article class="h-20 mt-4 dark:text-surface-300 text-surface-600 text-sm break-words">
-				{cropString(script.description, 80)}
-			</article>
-		</section>
+			<section class="flex flex-col mx-3">
+				<header class="flex flex-col h-fit">
+					<span
+						class="font-semibold text-primary-600 dark:text-primary-500 whitespace-break-spaces"
+					>
+						{script.title}
+					</span>
+					<span class="text-xs text-primary-600 dark:text-secondary-500 drop-shadow">
+						by
+						<a
+							href="/scripters/{encodeSEO(script.protected.username.normalize('NFKC'))}"
+							class="permalink"
+						>
+							{script.protected.username}
+						</a>
+						{#if !script.published}<small class="text-error-500">Unpublished</small>{/if}
+					</span>
+				</header>
+				<article
+					class="h-full my-4 dark:text-surface-300 text-surface-600 text-sm break-words overflow-y-auto"
+				>
+					{cropString(script.description, 80)}
+				</article>
+			</section>
+		</div>
 		<footer class="card-footer flex h-8 w-full justify-end">
 			{#each script.tooltip_emojis as emoji, i}
 				<button use:popup={getPopup(script.url + "-hover-" + i.toString())}>
@@ -83,29 +89,35 @@
 		</footer>
 	</div>
 {:else}
-	<div class="card w-[260px] xxl:w-[290px] shadow-sm card-hover animate-pulse">
-		<header class="group h-[200px] p-0">
-			<img
-				bind:this={imgElement}
-				src={imgLink}
-				alt="Script cover"
-				class="rounded-t"
-				loading="lazy"
-			/>
-		</header>
-		<section class="p-4">
-			<header class="h-12">
-				<div class="font-semibold text-primary-600 dark:text-primary-500 whitespace-nowrap">
-					Loading...
-				</div>
-				<div class="text-xs whitespace-nowrap text-primary-600 dark:text-secondary-500 drop-shadow">
-					by Loading...
-				</div>
+	<div class="card w-64 h-96 shadow-sm card-hover flex flex-col justify-between">
+		<div>
+			<header class="h-48 p-0">
+				<img
+					bind:this={imgElement}
+					src={imgLink}
+					alt="Script cover"
+					class="rounded-t"
+					loading="lazy"
+				/>
 			</header>
-			<article class="h-20 mt-4 dark:text-surface-300 text-surface-600 text-sm break-words">
-				Loading...
-			</article>
-		</section>
-		<footer class="card-footer flex h-8 w-full justify-end"></footer>
+			<section class="flex flex-col mx-3">
+				<header class="flex flex-col h-fit">
+					<span
+						class="font-semibold text-primary-600 dark:text-primary-500 whitespace-break-spaces"
+					>
+						Loading...
+					</span>
+					<span class="text-xs text-primary-600 dark:text-secondary-500 drop-shadow">
+						by Loading...
+					</span>
+				</header>
+				<article
+					class="h-full my-4 dark:text-surface-300 text-surface-600 text-sm break-words overflow-y-auto"
+				>
+					Loading...
+				</article>
+			</section>
+		</div>
+		<footer class="card-footer flex h-8 w-full justify-end" />
 	</div>
 {/if}
