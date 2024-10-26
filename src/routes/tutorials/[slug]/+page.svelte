@@ -47,7 +47,7 @@
 	<article
 		class="mx-auto prose dark:prose-invert py-6 border-t-2 border-surface-300 dark:border-surface-800"
 	>
-		<div class="">
+		<div>
 			<svelte:component this={content} />
 		</div>
 	</article>
