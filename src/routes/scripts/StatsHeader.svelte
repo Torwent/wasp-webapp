@@ -32,13 +32,17 @@
 </script>
 
 <header class="text-center">
-	{#await getStats(id)}
-		<h4>Total Experience Gained: Loading...</h4>
-		<h4>Total Gold Gained: Loading...</h4>
-		<h4>Total Runtime: Loading...</h4>
-	{:then stats}
-		<h4>Total Experience Gained: {stats ? formatNumber(stats.experience) : "Loading..."}</h4>
-		<h4>Total Gold Gained: {stats ? formatNumber(stats.gold) : "Loading..."}</h4>
-		<h4>Total Runtime: {stats ? formatTime(stats.runtime) : "Loading..."}</h4>
+	{#await getStats(id) then stats}
+		{#if stats}
+			{#if stats.experience > 0 || stats.gold > 0 || stats.runtime > 0}
+				<h4>Total Experience Gained: {formatNumber(stats.experience)}</h4>
+				<h4>Total Gold Gained: {formatNumber(stats.gold)}</h4>
+				<h4>Total Runtime: {formatTime(stats.runtime)}</h4>
+			{/if}
+		{:else}
+			<h4>Total Experience Gained: Loading...</h4>
+			<h4>Total Gold Gained: Loading...</h4>
+			<h4>Total Runtime: Loading...</h4>
+		{/if}
 	{/await}
 </header>

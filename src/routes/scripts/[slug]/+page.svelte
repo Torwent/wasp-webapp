@@ -30,14 +30,11 @@
 
 	export let data
 
-	let { scriptPromise, dismissed, profile, supabaseClient, roles } = data
-	$: ({ scriptPromise, dismissed, profile, supabaseClient, roles } = data)
+	let { script, dismissed, profile, supabaseClient, roles } = data
+	$: ({ script, dismissed, profile, supabaseClient, roles } = data)
 
 	const toastStore = getToastStore()
 	const modalStore = getModalStore()
-
-	let script: Awaited<typeof scriptPromise> | null = null
-	$: scriptPromise?.then((awaited) => (script = awaited))
 
 	function warningDismissed(r: boolean) {
 		if (r) {
@@ -83,9 +80,8 @@
 	if (!dismissed) warningPromise = WaspProfile.getWarning(supabaseClient, profile?.id)
 
 	onMount(async () => {
-		const s = await scriptPromise
-		if (!$page.url.pathname.includes("-by-")) history.replaceState({}, "", "/scripts/" + s.url)
-		if (!dismissed && s.categories.includes("Community")) {
+		if (!$page.url.pathname.includes("-by-")) history.replaceState({}, "", "/scripts/" + script.url)
+		if (!dismissed && script.categories.includes("Community")) {
 			if (!(await warningPromise)) modalStore.trigger(warn)
 		}
 	})
@@ -93,7 +89,6 @@
 	let products: Awaited<ReturnType<typeof getProducts>> | null = null
 
 	async function canDownloadScript() {
-		const script = await scriptPromise
 		if (!script) return false
 		if (script.categories.includes("Free")) return true
 		const result = await canDownload(supabaseClient, roles, script.id)
@@ -145,13 +140,13 @@
 
 <main class="flex flex-col w-[90%] mx-auto">
 	<ScriptHeader
-		id={script?.id}
-		title={script?.title}
-		username={script?.protected.username}
-		description={script?.description}
+		id={script.id}
+		title={script.title}
+		username={script.protected.username}
+		description={script.description}
 	>
 		<img
-			class="rounded-md {!script ? 'animate-pulse' : ''}"
+			class="rounded-md"
 			src={script ? script.protected.assets + "banner.jpg" : "/banner.jpg"}
 			alt="Script banner"
 			loading="lazy"
@@ -161,7 +156,7 @@
 	<div class="container mx-auto mb-6 max-w-lg md:max-w-5xl flex-grow">
 		<header class="my-8">
 			<form method="POST" class="grid">
-				{#if script?.protected.broken}
+				{#if script.protected.broken}
 					<h4 class="text-error-500 my-2">
 						This script has been reported broken and it might not work.
 					</h4>
@@ -171,7 +166,7 @@
 						<button
 							type="submit"
 							class="mx-auto btn variant-glass-success"
-							formaction="?/clear&id={script?.id}"
+							formaction="?/clear&id={script.id}"
 						>
 							<BadgeCheck class="mr-2" />
 							{script ? "Clear reports" : "Loading..."}
@@ -180,7 +175,7 @@
 					<button
 						type="submit"
 						class="mx-auto btn variant-glass-error"
-						formaction="?/report&id={script?.id}"
+						formaction="?/report&id={script.id}"
 					>
 						{script ? "Report broken" : "Loading..."}
 						<BadgeAlert class="ml-2" />
@@ -202,22 +197,22 @@
 				{#await canDownloadScript()}
 					<div class="py-12 grid justify-center justify-items-center gap-8 animate-pulse">
 						<AdvancedButton
-							id={script?.id}
-							title={script?.title ?? ""}
-							rev={script?.protected.revision}
+							id={script.id}
+							title={script.title ?? ""}
+							rev={script.protected.revision}
 						/>
-						<ZipDownload id={script?.id} />
+						<ZipDownload id={script.id} />
 					</div>
 				{:then has_access}
 					{#if has_access}
 						<div class="py-12 grid justify-center justify-items-center gap-8">
 							<AdvancedButton
-								id={script?.id}
-								title={script?.title ?? ""}
-								rev={script?.protected.revision}
+								id={script.id}
+								title={script.title ?? ""}
+								rev={script.protected.revision}
 							/>
-							<ZipDownload id={script?.id} />
-							<EditButton author={script?.protected.author_id} />
+							<ZipDownload id={script.id} />
+							<EditButton author={script.protected.author_id} />
 						</div>
 					{:else}
 						<div class="variant-outline-surface rounded-md p-4 my-8">
@@ -233,7 +228,7 @@
 								that gives you access to it! You can buy it with the following products
 							</h5>
 
-							{#if script?.categories.includes("Premium") && products}
+							{#if script.categories.includes("Premium") && products}
 								<form method="POST" class="my-12 flex justify-evenly overflow-auto">
 									<table class="table table-hover border-separate space-y-6 text-xs">
 										<TableHeader headers={["Product", "Type", "Price", "Interval", "Checkout"]} />

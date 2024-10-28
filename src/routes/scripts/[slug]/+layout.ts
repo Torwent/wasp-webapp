@@ -16,8 +16,5 @@ export const load = async ({ params: { slug }, parent }) => {
 	}
 
 	const { supabaseClient } = await parent()
-	const scriptPromise = getScript(supabaseClient, slug, isUUID)
-	scriptPromise.catch((err) => streamedErrorHandler(err))
-
-	return { scriptPromise }
+	return { script: await getScript(supabaseClient, slug, isUUID) }
 }
