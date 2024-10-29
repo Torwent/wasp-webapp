@@ -14,23 +14,13 @@
 	import ZipDownload from "$lib/components/ZIPDownload.svelte"
 	import ScriptHeader from "../../ScriptHeader.svelte"
 	import ScriptArticle from "../../ScriptArticle.svelte"
-	import StatsHeader from "../../StatsHeader.svelte"
 	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
 	import { zodClient } from "sveltekit-superforms/adapters"
-	import type { Tooltip } from "$lib/types/collection"
 
 	export let data
 
-	const { categoriesPromise, subcategoriesPromise, profile } = data
-
-	let categories: Tooltip[] = []
-	$: categoriesPromise.then((categoriesPromise) => (categories = categoriesPromise))
-
-	let subcategories: Tooltip[] = []
-	$: subcategoriesPromise.then((subcategoriesPromise) => (subcategories = subcategoriesPromise))
-
-	let { scriptPromise } = data
-	$: ({ scriptPromise } = data)
+	let { script, categories, subcategories, profile } = data
+	$: ({ script, categories, subcategories, profile } = data)
 
 	const { form, errors, enhance, validate } = superForm(data.form, {
 		dataType: "form",
@@ -41,22 +31,17 @@
 
 	let defaultBanner = "/banner.jpg"
 
-	let script: Awaited<typeof scriptPromise> | null = null
-	$: scriptPromise.then((awaited) => (script = awaited))
-
-	$: if (script) {
-		$form.title = script.title
-		$form.description = script.description
-		$form.categories = script.categories
-		$form.subcategories = script.subcategories
-		$form.content = script.content
-		$form.min_xp = script.min_xp
-		$form.max_xp = script.max_xp
-		$form.min_gp = script.min_gp
-		$form.max_gp = script.max_gp
-		$form.published = script.published
-		defaultBanner = script.protected.assets + "/banner.jpg"
-	}
+	$form.title = script.title
+	$form.description = script.description
+	$form.categories = script.categories
+	$form.subcategories = script.subcategories
+	$form.content = script.content
+	$form.min_xp = script.min_xp
+	$form.max_xp = script.max_xp
+	$form.min_gp = script.min_gp
+	$form.max_gp = script.max_gp
+	$form.published = script.published
+	defaultBanner = script.protected.assets + "/banner.jpg"
 
 	let coverElement: HTMLImageElement | undefined
 	let bannerElement: HTMLImageElement | undefined

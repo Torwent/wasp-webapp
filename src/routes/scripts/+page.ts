@@ -84,9 +84,7 @@ export const load = async ({ url, parent, depends }) => {
 	async function getCheckBoxes() {
 		const checkboxes = []
 		let id = 0
-		const { categoriesPromise, subcategoriesPromise } = await parent()
-
-		const categories = await categoriesPromise
+		const { categories, subcategories } = await parent()
 
 		for (const category of categories) {
 			checkboxes.push({
@@ -96,8 +94,6 @@ export const load = async ({ url, parent, depends }) => {
 				main: true,
 				checked: false
 			})
-
-			const subcategories = await subcategoriesPromise
 
 			for (const subcategory of subcategories) {
 				if (category.name === subcategory.category) {

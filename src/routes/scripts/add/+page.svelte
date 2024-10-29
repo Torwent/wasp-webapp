@@ -22,13 +22,8 @@
 
 	export let data
 
-	const { categoriesPromise, subcategoriesPromise, profile } = data
-
-	let categories: Tooltip[] = []
-	$: categoriesPromise.then((categoriesPromise) => (categories = categoriesPromise))
-
-	let subcategories: Tooltip[] = []
-	$: subcategoriesPromise.then((subcategoriesPromise) => (subcategories = subcategoriesPromise))
+	let { categories, subcategories, profile } = data
+	$: ({ categories, subcategories, profile } = data)
 
 	const { form, errors, enhance, validate } = superForm(data.form, {
 		dataType: "form",
