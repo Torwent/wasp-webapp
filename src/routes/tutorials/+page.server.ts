@@ -1,51 +1,23 @@
-import { getUsername } from "$lib/server/supabase.server"
+import { tutorialsPromise } from "$lib/server/utils.server"
+import { createTutorialsIndex, searchTutorialsIndex } from "$lib/tutorials.server"
 import type { Tutorial } from "$lib/types/collection"
-import { encodeSEO } from "$lib/utils"
-
-async function getTutorials() {
-	console.log("LOADING TUTORIALS!")
-	let tutorials: Tutorial[] = []
-
-	const paths = import.meta.glob("/src/wasp-info/tutorials/*.md", { eager: true })
-
-	for (const path in paths) {
-		const file = paths[path]
-		const order = path.split("/").at(-1)?.replace(".md", "")
-
-		if (file && typeof file === "object" && "metadata" in file && order) {
-			const metadata = file.metadata as Omit<Tutorial, "slug">
-			const username = await getUsername(metadata.author)
-			if (!username) continue
-
-			const url = encodeSEO(metadata.title + " by " + username)
-
-			const tutorial = { ...metadata, username, order: parseInt(order), url } satisfies Tutorial
-			tutorials.push(tutorial)
-		}
-	}
-
-	return tutorials.sort((first, second) => first.order - second.order)
-}
-
-const tutorialsPromise = getTutorials()
 
 async function getPublishedTutorials() {
 	const tutorials = await tutorialsPromise
-	return tutorials.filter((tutorial) => tutorial.published)
+	const filtered = tutorials.filter((tutorial) => tutorial.published)
+	createTutorialsIndex(filtered)
+	return filtered
 }
 
-const publishedTutorialPromise = getTutorials()
+const publishedTutorialPromise = getPublishedTutorials()
 
 async function getTutorialLevels(level: number) {
 	const tutorials = await publishedTutorialPromise
-	return tutorials.filter((tutorial) => tutorial.level === level)
+	const filtered = tutorials.filter((tutorial) => tutorial.level === level)
+	return filtered
 }
 
-const tutorialLevels: Promise<Tutorial[]>[] = [
-	getTutorialLevels(0),
-	getTutorialLevels(1),
-	getTutorialLevels(2)
-]
+const tutorialLevelsPromises = [getTutorialLevels(0), getTutorialLevels(1), getTutorialLevels(2)]
 
 export async function load({ depends, url }) {
 	depends("wasp:tutorials")
@@ -64,10 +36,18 @@ export async function load({ depends, url }) {
 	const finish = start + amount - 1
 
 	let tutorials: Tutorial[]
-	if (level != -1) {
-		tutorials = await tutorialLevels[level]
+
+	if (search !== "") {
+		tutorials = searchTutorialsIndex(search)
+		if (level != -1) {
+			tutorials = tutorials.filter((t) => t.level === level)
+		}
 	} else {
-		tutorials = await publishedTutorialPromise
+		if (level != -1) {
+			tutorials = await tutorialLevelsPromises[level]
+		} else {
+			tutorials = await publishedTutorialPromise
+		}
 	}
 
 	const filteredTutorials = tutorials.slice(

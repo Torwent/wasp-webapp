@@ -60,6 +60,7 @@
 		"@supabase/ssr": "^0.4.1",
 		"@supabase/supabase-js": "^2.45.4",
 		"file-saver": "^2.0.5",
+		"flexsearch": "^0.7.43",
 		"highlight.js": "11.10.0",
 		"jszip": "^3.10.1",
 		"lucide-svelte": "^0.428.0",

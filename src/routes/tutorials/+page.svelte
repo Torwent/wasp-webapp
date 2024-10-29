@@ -2,23 +2,19 @@
 	import { page } from "$app/stores"
 	import TutorialCard from "./TutorialCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
-	import { ArrowDownAZ, ArrowUpZA } from "lucide-svelte"
 	import { replaceQuery } from "$lib/client/utils"
-	import type { Tutorial } from "$lib/types/collection"
 	export let data
 
 	let { tutorials, amount, count } = data
 	let { searchParams } = $page.url
 
-	$: ({ user, roles, tutorials, amount, count } = data)
+	$: ({ tutorials, amount, count } = data)
 	$: ({ searchParams } = $page.url)
 
 	const pageStr = searchParams.get("page") || "-1"
 	let currentPage = Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 0 : Number(pageStr)
 
 	let search = decodeURIComponent(searchParams.get("search") || "").trim()
-	const ascendingStr = searchParams.get("ascending")
-	let ascending = ascendingStr ? ascendingStr.toLowerCase() === "true" : true
 
 	const parsedLevel = Number(searchParams.get("level") ?? "-1")
 
@@ -26,16 +22,6 @@
 
 	const levelColors = ["sky", "orange", "red"]
 	const levelNames = ["Basic", "Intermidiate", "Advanced"]
-
-	async function sort() {
-		search = ""
-		ascending = !ascending
-		await replaceQuery($page.url, {
-			page: "1",
-			search: search,
-			ascending: ascending ? "true" : "false"
-		})
-	}
 
 	const headTitle = "Tutorials - WaspScripts"
 	const headDescription =

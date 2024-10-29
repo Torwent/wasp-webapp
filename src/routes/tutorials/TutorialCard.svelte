@@ -8,7 +8,8 @@
 
 {#if tutorial}
 	<div
-		class="rounded-md variant-ghost-surface m-4 shadow-none hover:shadow-sm {tutorial.level === 0
+		class="w-[40rem] rounded-md variant-ghost-surface m-4 shadow-none hover:shadow-sm {tutorial.level ===
+		0
 			? 'ring-sky-400 dark:ring-sky-500 shadow-sky-500'
 			: tutorial.level === 1
 				? 'ring-orange-400 dark:ring-orange-500 shadow-orange-500'
@@ -46,7 +47,7 @@
 	</div>
 {:else}
 	<div
-		class="rounded-md variant-ghost-surface m-4 shadow-none hover:shadow-sm ring-surface-400 dark:ring-surface-500 shadow-surface-500 animate-pulse"
+		class="w-[40rem] rounded-md variant-ghost-surface m-4 shadow-none hover:shadow-sm ring-surface-400 dark:ring-surface-500 shadow-surface-500 animate-pulse"
 	>
 		<a href={link}>
 			<div class="flex flex-col p-3">

@@ -47,7 +47,6 @@ export async function getTutorials() {
 export const tutorialsPromise = getTutorials()
 
 export async function getFullTutorials() {
-	console.log("LOADING FULL")
 	let tutorials: Tutorial[] = []
 
 	const paths = import.meta.glob("/src/wasp-info/tutorials/*.md", { eager: true })
