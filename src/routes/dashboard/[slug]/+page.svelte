@@ -17,10 +17,11 @@
 	import { browser } from "$app/environment"
 	import type { RealtimeChannel } from "@supabase/supabase-js"
 	import { Tab, TabGroup } from "@skeletonlabs/skeleton"
-	import { FileCode, Landmark, Package } from "lucide-svelte"
+	import { FileCode, Landmark, Package, Tag } from "lucide-svelte"
 	import type { StripeConnectInstance } from "@stripe/connect-js"
 	import { zodClient } from "sveltekit-superforms/adapters"
 	import TablePlaceholder from "./TablePlaceholder.svelte"
+	import Coupons from "./Coupons.svelte"
 
 	export let data
 
@@ -302,6 +303,10 @@
 				<Tab bind:group={tabSet} name="tab3" value={2}>
 					<div class="flex justify-end"><FileCode /> Scripts</div>
 				</Tab>
+				<Tab bind:group={tabSet} name="tab4" value={3}>
+					<div class="flex justify-end"><Tag /> Coupons</div>
+				</Tab>
+
 				<!-- Tab Panels --->
 				<svelte:fragment slot="panel">
 					{#if tabSet === 0}
