@@ -250,31 +250,34 @@
 					"Free access"
 				]}
 			/>
-			<tr class="table-row">
-				{#await statsPromise}
-					{#each Array(4) as _}
-						<TableCell>Loading...</TableCell>
-					{/each}
-				{:then stats}
-					<TableCell>{stats.total_user_scripts} / {stats.total_scripts}</TableCell>
-					<TableCell>{stats.total_user_premium_scripts} / {stats.total_premium_scripts}</TableCell>
-					<TableCell>{stats.month_user_downloads} / {stats.month_downloads}</TableCell>
-					<TableCell>
-						{stats.month_premium_user_downloads} / {stats.month_premium_downloads}
-					</TableCell>
-				{/await}
 
-				{#await subscriptionsPromise}
-					{#each Array(3) as _}
-						<TableCell>Loading...</TableCell>
-					{/each}
-				{:then subscriptions}
-					<TableCell>{subscriptions.total.subscribers}</TableCell>
-					<TableCell>{subscriptions.total.cancelling}</TableCell>
-					<TableCell>{subscriptions.total.free_access}</TableCell>
-				{/await}
-			</tr>
-			<tbody />
+			<tbody>
+				<tr class="table-row">
+					{#await statsPromise}
+						{#each Array(4) as _}
+							<TableCell>Loading...</TableCell>
+						{/each}
+					{:then stats}
+						<TableCell>{stats.total_user_scripts} / {stats.total_scripts}</TableCell>
+						<TableCell>{stats.total_user_premium_scripts} / {stats.total_premium_scripts}</TableCell
+						>
+						<TableCell>{stats.month_user_downloads} / {stats.month_downloads}</TableCell>
+						<TableCell>
+							{stats.month_premium_user_downloads} / {stats.month_premium_downloads}
+						</TableCell>
+					{/await}
+
+					{#await subscriptionsPromise}
+						{#each Array(3) as _}
+							<TableCell>Loading...</TableCell>
+						{/each}
+					{:then subscriptions}
+						<TableCell>{subscriptions.total.subscribers}</TableCell>
+						<TableCell>{subscriptions.total.cancelling}</TableCell>
+						<TableCell>{subscriptions.total.free_access}</TableCell>
+					{/await}
+				</tr>
+			</tbody>
 		</table>
 	</div>
 

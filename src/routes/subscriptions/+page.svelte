@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from "$app/navigation"
 	import { SlideToggle } from "@skeletonlabs/skeleton"
 	import { page } from "$app/stores"
 	import { superForm } from "sveltekit-superforms/client"
@@ -197,12 +198,12 @@
 						/>
 						<tbody>
 							{#await pricesPromise}
-								Loading...
+								<tr> Loading... </tr>
 							{:then prices}
 								{#each subscriptions as subscription}
 									{@const price = getPrice(subscription.price, prices)}
 									{#await getBundle(subscription.product)}
-										<tr> </tr><tr class="table-row">
+										<tr class="table-row">
 											<TableCell alignment="left" padding={0}>
 												<div class="mx-3">
 													<div>Loading...</div>
@@ -565,12 +566,13 @@
 									</TableCell>
 
 									<TableCell padding={0}>
-										<a href="/scripts/{script.url}" class="permalink flex justify-center">
-											<button class="btn hover:cursor-pointer hover:text-primary-500">
-												<ExternalLink size={16} />
-												<span>Script</span>
-											</button>
-										</a>
+										<button
+											class="btn hover:cursor-pointer hover:text-primary-500"
+											on:click={() => goto("/scripts/" + script.url)}
+										>
+											<ExternalLink size={16} />
+											<span>Script</span>
+										</button>
 									</TableCell>
 
 									<TableCell>{getCurrentPrice(script.prices)}</TableCell>

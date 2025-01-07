@@ -86,24 +86,24 @@
 				{action}
 			/>
 		{/if}
-		<div class="max-h-64">
-			{#if $allErrors}
-				<div
-					class="max-h-24 bg-surface-700 rounded-md overflow-y-scroll overflow-x-hidden text-error-500"
-				>
-					{#each $allErrors as error, i}
-						{#if i === 0}
-							Errors:
-						{/if}
-						<small class="mx-8 text-error-500 flex rounded-md">
-							Error path: {error.path}
-							{#each error.messages as messages}
-								{messages}
-							{/each}
-						</small>
-					{/each}
-				</div>
-			{/if}
-		</div>
 	</table>
+	<div class="max-h-64">
+		{#if $allErrors}
+			<div
+				class="max-h-24 bg-surface-700 rounded-md overflow-y-scroll overflow-x-hidden text-error-500"
+			>
+				{#each $allErrors as error, i}
+					{#if i === 0}
+						Errors:
+					{/if}
+					<small class="mx-8 text-error-500 flex rounded-md">
+						Error path: {error.path}
+						{#each error.messages as messages}
+							{messages}
+						{/each}
+					</small>
+				{/each}
+			</div>
+		{/if}
+	</div>
 </form>

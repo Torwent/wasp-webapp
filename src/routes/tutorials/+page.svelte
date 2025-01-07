@@ -84,7 +84,7 @@
 
 	<div class="my-4">
 		<div class="text-center form">
-			<h3 class="my-8"><h3>Filter by level or search the a blog post:</h3></h3>
+			<h3 class="my-8">Filter by level or search the a blog post:</h3>
 			<div class="flex flex-col md:flex-row mx-auto my-4 gap-2 justify-center">
 				{#each levelNames as name, i}
 					<button
