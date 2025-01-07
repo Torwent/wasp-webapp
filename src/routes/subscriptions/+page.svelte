@@ -198,7 +198,7 @@
 						/>
 						<tbody>
 							{#await pricesPromise}
-								<tr> Loading... </tr>
+								<tr><td>Loading...</td></tr>
 							{:then prices}
 								{#each subscriptions as subscription}
 									{@const price = getPrice(subscription.price, prices)}

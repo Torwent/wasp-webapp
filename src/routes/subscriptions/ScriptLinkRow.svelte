@@ -6,13 +6,11 @@
 	export let title: string
 </script>
 
-<tr>
-	<button class="flex permalink h-full w-full" on:click={() => goto("/scripts/" + url)}>
-		<td class="text-xs">
-			<div class="flex align-items-center ml-3">
-				<ExternalLink size={16} class="mr-4" />
-				{title}
-			</div>
-		</td>
-	</button>
+<tr class="flex h-full w-full cursor-pointer" on:click={() => goto("/scripts/" + url)}>
+	<td class="text-xs">
+		<div class="flex align-items-center ml-3">
+			<ExternalLink size={16} class="mr-4" />
+			{title}
+		</div>
+	</td>
 </tr>
