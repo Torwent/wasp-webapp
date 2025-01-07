@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from "$app/navigation"
 	import type { Tutorial } from "$lib/types/collection"
 	import { encodeSEO } from "$lib/utils"
 	export let tutorial: Tutorial | null = null
@@ -7,15 +8,16 @@
 </script>
 
 {#if tutorial}
-	<div
-		class="w-[40rem] rounded-md variant-ghost-surface m-4 shadow-none hover:shadow-sm {tutorial.level ===
+	<button
+		class="block w-[40rem] rounded-md variant-ghost-surface m-4 shadow-none hover:shadow-sm {tutorial.level ===
 		0
 			? 'ring-sky-400 dark:ring-sky-500 shadow-sky-500'
 			: tutorial.level === 1
 				? 'ring-orange-400 dark:ring-orange-500 shadow-orange-500'
 				: 'ring-red-400 dark:ring-red-500 shadow-red-500'}"
+		on:click={async () => await goto(link)}
 	>
-		<a href={link}>
+		<div>
 			<div class="flex flex-col p-3">
 				<div class="text-md font-semibold text-primary-500 text-shadow truncate">
 					{tutorial.title}
@@ -36,20 +38,23 @@
 				</div>
 			</div>
 
-			<span
-				class="text-xs inline-block py-1 px-2.5 text-center font-bold text-white rounded-tr-md rounded-bl-md
+			<div class="flex">
+				<span
+					class="text-xs inline-block py-1 px-2.5 text-center font-bold text-white rounded-tr-md rounded-bl-md
 				{tutorial.level === 0 ? 'bg-sky-500' : tutorial.level === 1 ? 'bg-orange-500 ' : 'bg-red-500 '}"
-			>
-				{#if tutorial.level === 0}Basic{:else if tutorial.level === 1}Intermediate{:else}Advanced{/if}
-				tutorial
-			</span>
-		</a>
-	</div>
+				>
+					{#if tutorial.level === 0}Basic{:else if tutorial.level === 1}Intermediate{:else}Advanced{/if}
+					tutorial
+				</span>
+			</div>
+		</div>
+	</button>
 {:else}
-	<div
+	<button
 		class="w-[40rem] rounded-md variant-ghost-surface m-4 shadow-none hover:shadow-sm ring-surface-400 dark:ring-surface-500 shadow-surface-500 animate-pulse"
+		on:click={async () => await goto(link)}
 	>
-		<a href={link}>
+		<div>
 			<div class="flex flex-col p-3">
 				<div class="text-md font-semibold text-primary-500 text-shadow truncate"></div>
 				<small class="text-xs text-surface-400 truncate mt-1">by Loading...</small>
@@ -61,6 +66,6 @@
 			>
 				Loading...
 			</span>
-		</a>
-	</div>
+		</div>
+	</button>
 {/if}
