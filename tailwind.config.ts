@@ -1,25 +1,19 @@
-import { join } from 'path'
-import type { Config } from 'tailwindcss'
-import forms from '@tailwindcss/forms';
-import typography from '@tailwindcss/typography';
-import { skeleton } from '@skeletonlabs/tw-plugin';
-import { wasp } from './src/wasp'
+import containerQueries from "@tailwindcss/container-queries";
+import forms from "@tailwindcss/forms";
+import typography from "@tailwindcss/typography";
+import type { Config } from "tailwindcss";
+
+import { skeleton, contentPath } from "@skeletonlabs/skeleton/plugin";
+import * as themes from "@skeletonlabs/skeleton/themes";
 
 export default {
-	darkMode: 'class',
-	content: ['./src/**/*.{html,js,svelte,ts}', join(require.resolve('@skeletonlabs/skeleton'), '../**/*.{html,js,svelte,ts}')],
-	theme: {
-		extend: {},
-	},
+	darkMode: "selector",
+	content: ["./src/**/*.{html,js,svelte,ts}", contentPath(import.meta.url, "svelte")],
+	theme: { extend: {} },
 	plugins: [
-		forms,
 		typography,
-		skeleton({
-			themes: {
-				custom: [
-					wasp,
-				],
-			},
-		}),
-	],
+		forms,
+		containerQueries,
+		skeleton({ themes: [themes.fennec, themes.cerberus, themes.modern, themes.concord] })
+	]
 } satisfies Config;
