@@ -16,13 +16,13 @@
 	id="theme-form"
 	method="POST"
 	action="/?/setTheme"
-	class="my-auto hover:preset-tonal"
+	class="mx-1 my-auto hidden hover:preset-tonal xl:block"
 	use:enhance={() => document.body.setAttribute("data-theme", theme)}
 	onchange={(e) => e.currentTarget.requestSubmit()}
 >
-	<select name="theme" id="theme-select" class="select" bind:value={theme}>
+	<select name="theme" id="theme-select" class="select h-9" bind:value={theme}>
 		{#each themesData as entry}
-			<option value={entry.value} selected={entry.value === theme}>{entry.label}</option>
+			<option value={entry.value} selected={entry.value === theme}> {entry.label}</option>
 		{/each}
 	</select>
 </form>

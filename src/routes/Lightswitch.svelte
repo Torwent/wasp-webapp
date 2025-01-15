@@ -10,7 +10,7 @@
 	id="dark-form"
 	method="POST"
 	action="/?/toggleDark"
-	class="my-auto"
+	class="mx-1 my-auto hidden lg:block"
 	use:enhance={() => {
 		dark = !dark
 		document.documentElement.classList.toggle("dark", dark)
@@ -18,7 +18,7 @@
 >
 	<button
 		id="lightswitch"
-		class="btn my-auto hidden hover:preset-tonal lg:block"
+		class="btn my-auto hover:preset-tonal"
 		title="Toggle dark mode."
 		type="submit"
 	>

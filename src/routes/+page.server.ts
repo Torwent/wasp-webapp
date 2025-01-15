@@ -4,7 +4,6 @@ export const actions = {
 	toggleDark: async (event) => {
 		let dark = event.cookies.get("darkMode")
 		if (!dark) dark = "true"
-		//set darkMode cookie
 		event.cookies.set("darkMode", dark === "true" ? "false" : "true", {
 			path: "/",
 			maxAge: 60 * 60 * 24 * 7 * 360

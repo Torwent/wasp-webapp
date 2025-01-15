@@ -48,25 +48,22 @@ export type Database = {
 			}
 			errors: {
 				Row: {
-					content: string | null
+					content: string
 					created_at: string | null
 					id: number
-					id2: number | null
-					title: string | null
+					title: string
 				}
 				Insert: {
-					content?: string | null
+					content: string
 					created_at?: string | null
 					id?: number
-					id2?: number | null
-					title?: string | null
+					title: string
 				}
 				Update: {
-					content?: string | null
+					content?: string
 					created_at?: string | null
 					id?: number
-					id2?: number | null
-					title?: string | null
+					title?: string
 				}
 				Relationships: []
 			}
@@ -93,22 +90,22 @@ export type Database = {
 			}
 			questions: {
 				Row: {
-					content: string | null
+					content: string
 					created_at: string | null
 					id: number
-					title: string | null
+					title: string
 				}
 				Insert: {
-					content?: string | null
+					content: string
 					created_at?: string | null
 					id?: number
-					title?: string | null
+					title: string
 				}
 				Update: {
-					content?: string | null
+					content?: string
 					created_at?: string | null
 					id?: number
-					title?: string | null
+					title?: string
 				}
 				Relationships: []
 			}

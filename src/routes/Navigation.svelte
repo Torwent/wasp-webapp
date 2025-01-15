@@ -10,12 +10,13 @@
 	import Lightswitch from "./Lightswitch.svelte"
 	import ThemeSwitcher from "./ThemeSwitcher.svelte"
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
+	import Discord from "./Discord.svelte"
+	import GitHub from "./GitHub.svelte"
 
 	let showMenu = $state(false)
 	let showProfile = $state(false)
 
-	const profile = $state(page.data.profile)
-	const roles = $state(page.data.roles)
+	const { profile, roles } = $derived(page.data)
 
 	const routes = [
 		"Home",
@@ -28,7 +29,16 @@
 		"Dashboard"
 	] as const
 
-	let currentPage: (typeof routes)[number] = $state("Home")
+	function setCurrentPage(currentPath: string) {
+		const path = currentPath.split("/")[1]
+		if (path.length === 0) return "Home"
+		for (const route of routes) {
+			if (route.toLowerCase().replace("home", "") === path) return route
+		}
+		return "Home"
+	}
+
+	let currentPage: (typeof routes)[number] = $derived(setCurrentPage(page.url.pathname))
 
 	function getLink(route: string): string {
 		return "/" + route.toLowerCase().replace("home", "")
@@ -46,20 +56,22 @@
 </script>
 
 <nav class="col-span-12 row-span-1 w-full flex-col">
-	<div class="preset-filled-surface-500/20 flex h-full justify-between font-semibold backdrop-blur">
+	<div
+		class="flex h-full justify-between font-semibold backdrop-blur preset-filled-surface-100-900"
+	>
 		<button
 			name="Menu"
 			aria-label="Open the navigation menu"
-			class="text-primary-500-400-token justify-left my-auto flex h-full p-2 align-middle lg:hidden"
+			class="justify-left my-auto flex h-full p-2 align-middle text-primary-500 lg:hidden"
 			onclick={() => {
 				showMenu = !showMenu
 				if (showMenu) showProfile = false
 			}}
 		>
 			{#if showMenu}
-				<X class="text-surface-900-50-token mx-2 my-auto" />
+				<X class="mx-2 my-auto text-surface-900-100" />
 			{:else}
-				<Menu class="text-surface-900-50-token mx-2 my-auto" />
+				<Menu class="mx-2 my-auto text-surface-900-100" />
 			{/if}
 			<Logo selected={true} />
 		</button>
@@ -68,9 +80,8 @@
 			<li class="h-12">
 				<a
 					href="/"
-					class="flex h-full place-content-center place-items-center hover:text-primary-400 dark:hover:text-primary-100"
-					class:text-primary-500={"Home" === currentPage}
-					class:dark:text-primary-400={"Home" === currentPage}
+					class="flex h-full place-content-center place-items-center hover:text-primary-600-400"
+					class:text-primary-600-400={"Home" === currentPage}
 					aria-label="Navigate to home page"
 				>
 					<Logo selected={false} />
@@ -81,9 +92,8 @@
 					<li class="h-12">
 						<a
 							href={getLink(route)}
-							class="flex h-full place-content-center place-items-center hover:text-primary-400 dark:hover:text-primary-100"
-							class:text-primary-500={route === currentPage}
-							class:dark:text-primary-400={route === currentPage}
+							class="flex h-full place-content-center place-items-center hover:text-primary-600-400"
+							class:text-primary-600-400={route === currentPage}
 							aria-label="Navigate to {route.toLowerCase()} page"
 						>
 							{#if index === 0}
@@ -129,6 +139,8 @@
 
 			<Lightswitch />
 			<ThemeSwitcher />
+			<Discord />
+			<GitHub />
 		</div>
 	</div>
 
@@ -164,13 +176,15 @@
 			<div class="mx-auto my-auto">
 				<ThemeSwitcher />
 				<Lightswitch />
+				<Discord />
+				<GitHub />
 			</div>
 		</li>
 	</ul>
 
 	<form
 		method="POST"
-		class="preset-filled-surface-300/20 absolute z-50 w-full backdrop-blur-sm {showProfile
+		class="absolute z-50 w-full bg-surface-200/30 backdrop-blur dark:bg-surface-800/30 {showProfile
 			? 'flex flex-col'
 			: 'hidden'}"
 		use:enhance
@@ -219,7 +233,7 @@
 				<button
 					name="Login"
 					aria-label="Login to your account mx-auto"
-					class="btn preset-filled-secondary-500"
+					class="btn preset-filled-primary-500"
 					formaction="/auth?/login&provider=discord&path={page.url.pathname}"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="h-4 w-4">

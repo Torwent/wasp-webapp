@@ -3,6 +3,7 @@ import { type Handle, redirect } from "@sveltejs/kit"
 import { sequence } from "@sveltejs/kit/hooks"
 
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from "$env/static/public"
+import type { Database } from "$lib/types/supabase"
 
 const redirects: Handle = async ({ event, resolve }) => {
 	if (event.url.pathname.startsWith("/refresh_token")) {
@@ -20,31 +21,57 @@ const redirects: Handle = async ({ event, resolve }) => {
 }
 
 const supabase: Handle = async ({ event, resolve }) => {
-	event.locals.supabaseServer = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
-		cookies: {
-			getAll: () => event.cookies.getAll(),
-			setAll: (cookiesToSet) => {
-				cookiesToSet.forEach(({ name, value, options }) => {
-					event.cookies.set(name, value, { ...options, path: "/" })
-				})
+	event.locals.supabaseServer = createServerClient<Database>(
+		PUBLIC_SUPABASE_URL,
+		PUBLIC_SUPABASE_ANON_KEY,
+		{
+			cookies: {
+				getAll: () => event.cookies.getAll(),
+				setAll: (cookiesToSet) => {
+					cookiesToSet.forEach(({ name, value, options }) => {
+						event.cookies.set(name, value, { ...options, path: "/" })
+					})
+				}
 			}
 		}
-	})
+	)
 
 	event.locals.safeGetSession = async () => {
+		let start = performance.now()
+
 		const {
 			data: { session }
 		} = await event.locals.supabaseServer.auth.getSession()
 
-		if (!session) return { session: null, user: null }
+		if (!session) return { session: null, user: null, getProfile: null }
+		console.log(`└📜 session took ${(performance.now() - start).toFixed(2)} ms to check!`)
+
+		start = performance.now()
 
 		const {
 			data: { user },
-			error: err
+			error
 		} = await event.locals.supabaseServer.auth.getUser()
-		if (err) return { session: null, user: null } // JWT validation has failed
 
-		return { session, user }
+		if (error) return { session: null, user: null, getProfile: null }
+
+		console.log(`└🔥 user took ${(performance.now() - start).toFixed(2)} ms to check!`)
+
+		if (!user) return { session: null, user: null, getProfile: null }
+
+		try {
+			console.log(`└😄 user ${user.id} accessing from ${event.getClientAddress()}`)
+		} catch (error) {
+			console.log(`└😄 user ${user.id} accessing from NO IP`)
+		}
+
+		// @ts-expect-error
+		delete session.user
+
+		return {
+			session: Object.assign({}, session, { user }),
+			user
+		}
 	}
 
 	return resolve(event, {

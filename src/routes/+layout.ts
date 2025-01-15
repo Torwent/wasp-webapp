@@ -1,12 +1,15 @@
 import { createBrowserClient, createServerClient, isBrowser } from "@supabase/ssr"
 import { PUBLIC_SUPABASE_ANON_KEY, PUBLIC_SUPABASE_URL } from "$env/static/public"
+import type { Database } from "$lib/types/supabase"
 
 export const load = async ({ data, depends, fetch }) => {
 	depends("supabase:auth")
 
-	const supabase = isBrowser()
-		? createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, { global: { fetch } })
-		: createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+	const supabaseClient = isBrowser()
+		? createBrowserClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
+				global: { fetch }
+			})
+		: createServerClient<Database>(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
 				global: { fetch },
 				cookies: {
 					getAll() {
@@ -15,18 +18,51 @@ export const load = async ({ data, depends, fetch }) => {
 				}
 			})
 
-	/**
-	 * It's fine to use `getSession` here, because on the client, `getSession` is
-	 * safe, and on the server, it reads `session` from the `LayoutData`, which
-	 * safely checked the session using `safeGetSession`.
-	 */
 	const {
 		data: { session }
-	} = await supabase.auth.getSession()
+	} = await supabaseClient.auth.getSession()
 
 	const {
 		data: { user }
-	} = await supabase.auth.getUser()
+	} = await supabaseClient.auth.getUser()
 
-	return { darkMode: data.darkMode, theme: data.theme, session, supabase, user }
+	const getProfile = async () => {
+		if (!user) return null
+		const { data, error: err } = await supabaseClient
+			.schema("profiles")
+			.from("profiles")
+			.select(`id, discord, username, avatar, customer_id`)
+			.eq("id", user.id)
+			.single()
+
+		if (err) return null
+
+		return data
+	}
+
+	const getRoles = async () => {
+		if (!user) return null
+		const { data, error: err } = await supabaseClient
+			.schema("profiles")
+			.from("roles")
+			.select("banned, premium, vip, tester, scripter, moderator, administrator")
+			.eq("id", user.id)
+			.single()
+
+		if (err) return null
+
+		return data
+	}
+
+	const promises = await Promise.all([getProfile(), getRoles()])
+
+	return {
+		darkMode: data.darkMode,
+		theme: data.theme,
+		supabaseClient,
+		session,
+		user,
+		profile: promises[0],
+		roles: promises[1]
+	}
 }

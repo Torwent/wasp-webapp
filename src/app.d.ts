@@ -8,9 +8,8 @@ import type { ProfileBase, ProfileRoles, Subscription, FreeAccess } from "$lib/t
 declare global {
 	namespace App {
 		interface Locals {
-			supabaseServer: SupabaseClient
+			supabaseServer: SupabaseClient<Database>
 			safeGetSession: () => Promise<{ session: Session | null; user: User | null }>
-
 			session: Session | null
 			user: User | null
 			getProfile: () => Promise<ProfileBase | null> | null
