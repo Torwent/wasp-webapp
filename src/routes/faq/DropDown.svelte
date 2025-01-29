@@ -4,9 +4,7 @@
 	import ChevronsDownUp from "svelte-lucide/ChevronsDownUp.svelte"
 	import ChevronsUpDown from "svelte-lucide/ChevronsUpDown.svelte"
 	import type { FAQEntry } from "$lib/types/collection"
-	const data = $props()
-	const title: string = $state(data.title)
-	const entries: FAQEntry[] = $state(data.entries)
+	const { title, entries } = $props()
 
 	let show = $state(false)
 	let searchQuery = $state("")
@@ -45,7 +43,7 @@
 <div>
 	<button
 		type="button"
-		class="inline-flex w-full justify-between rounded-t px-4 py-2 text-sm font-medium preset-outlined-surface-500 hover:preset-outlined-primary-500"
+		class="inline-flex w-full justify-between px-4 py-2 text-sm font-medium preset-outlined-surface-500 hover:preset-outlined-primary-500"
 		aria-expanded={show}
 		aria-haspopup="true"
 		onclick={() => (show = !show)}

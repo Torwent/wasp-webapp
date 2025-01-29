@@ -1,12 +1,7 @@
 import { WaspFAQ } from "$lib/client/supabase"
+import { shikiHighlighter } from "$lib/server/utils.server"
 import type { FAQEntry } from "$lib/types/collection"
 import { compile, escapeSvelte } from "mdsvex"
-import { createHighlighter } from "shiki"
-
-const highlighter = await createHighlighter({
-	themes: ["github-dark", "github-light"],
-	langs: ["javascript", "typescript", "cmd", "pascal"]
-})
 
 export const load = async ({ locals: { supabaseServer }, cookies }) => {
 	const darkMode = cookies.get("darkMode") === "true"
@@ -26,7 +21,7 @@ export const load = async ({ locals: { supabaseServer }, cookies }) => {
 								if (!lang) lang = "text"
 								else if (lang === "freepascal") lang = "pascal"
 								return escapeSvelte(
-									highlighter.codeToHtml(code, {
+									shikiHighlighter.codeToHtml(code, {
 										lang,
 										theme: darkMode ? "github-dark" : "github-light"
 									})

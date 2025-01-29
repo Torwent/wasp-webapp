@@ -5,12 +5,7 @@
 	import CanvasAnimation from "./CanvasAnimation.svelte"
 
 	const { data } = $props()
-	let totalPromise = $state(data.totalPromise)
-	let total: Awaited<typeof totalPromise> | null = $state(null)
-
-	$effect(() => {
-		totalPromise.then((awaited) => (total = awaited))
-	})
+	const { totals } = $derived(data)
 
 	const headTitle = "WaspScripts"
 	const headDescription =
@@ -57,16 +52,16 @@
 
 	<header class="text-lg sm:text-xl md:text-2xl">
 		<h2 class="mx-6 mt-6 whitespace-nowrap text-center font-bold">
-			Total Experience Earned: {total ? formatNumber(total.experience) : "..."}
+			Total Experience Earned: {formatNumber(totals.experience)}
 		</h2>
 		<h2 class="mx-6 whitespace-nowrap text-center font-bold">
-			Total Gold Earned: {total ? formatNumber(total.gold) : "..."}
+			Total Gold Earned: {formatNumber(totals.gold)}
 		</h2>
 		<h2 class="mx-6 whitespace-nowrap text-center font-bold">
-			Total Levels Earned: {total ? formatNumber(total.levels) : "..."}
+			Total Levels Earned: {formatNumber(totals.levels)}
 		</h2>
 		<h2 class="mx-6 mb-4 whitespace-nowrap text-center font-bold">
-			Total Runtime: {total ? formatTime(total.runtime) : "..."}
+			Total Runtime: {formatTime(totals.runtime)}
 		</h2>
 	</header>
 
@@ -84,8 +79,6 @@
 		</a>
 		or join the discord community!
 	</p>
-
-	<Discord />
 
 	<div class="my-6">
 		<header>

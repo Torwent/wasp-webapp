@@ -426,39 +426,6 @@ export async function getSignedURL(
 	return data.signedUrl
 }
 
-export async function getTutorial(
-	supabase: SupabaseClient,
-	slug: string,
-	isUUID: boolean | null = null
-) {
-	const now = Date.now()
-	const cached = tutorials.get(slug)
-
-	if (cached && now - cached.timestamp < SCRIPT_CACHE_MAX_AGE) {
-		return cached.data
-	}
-
-	console.log("💥 Fetching script " + slug)
-	const { data, error: err } = await supabase
-		.schema("info")
-		.from("tutorials")
-		.select("title, description, content, level, order, username, url, published, author_id")
-		.eq((isUUID == null && UUID_V4_REGEX.test(slug)) || isUUID ? "id" : "url", slug)
-		.single<Tutorial>()
-
-	if (err) {
-		error(
-			500,
-			"Server error, this is probably not an issue on your end!\n" +
-				"SELECT info.tutorials failed!\n\n" +
-				formatError(err)
-		)
-	}
-
-	tutorials.set(slug, { data, timestamp: now })
-	return data
-}
-
 export class WaspFAQ {
 	static #CACHE_MAX_AGE = 5 * 60 * 1000
 	static #persistedStore = persisted("wasp_faqs", {

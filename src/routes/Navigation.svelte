@@ -139,8 +139,8 @@
 
 			<Lightswitch />
 			<ThemeSwitcher />
-			<Discord />
 			<GitHub />
+			<Discord />
 		</div>
 	</div>
 
@@ -176,8 +176,8 @@
 			<div class="mx-auto my-auto">
 				<ThemeSwitcher />
 				<Lightswitch />
-				<Discord />
 				<GitHub />
+				<Discord />
 			</div>
 		</li>
 	</ul>

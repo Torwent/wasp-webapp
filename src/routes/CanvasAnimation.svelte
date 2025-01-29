@@ -82,6 +82,7 @@
 	}
 
 	async function drawHeatMap() {
+		if (!canvas) return
 		if (!frameReady) {
 			context.clearRect(106, 2, 29, 32)
 			canvasData = context.getImageData(0, 0, canvas.width, canvas.height)
@@ -101,20 +102,22 @@
 		drawInterface(canvas, context)
 	}
 
-	onMount(async () => {
+	onMount(() => {
 		canvas = document.getElementById("canvas") as HTMLCanvasElement
 		context = canvas.getContext("2d", {
 			willReadFrequently: true
 		}) as CanvasRenderingContext2D
 		context.strokeStyle = "rgba(255, 0, 0, 1)"
 
-		window.addEventListener("resize", resizeCanvas, false)
-		window.onmousemove = async (e: MouseEvent) => {
-			const { x, y } = canvas.getBoundingClientRect()
+		window.onresize = resizeCanvas
+		window.onmousemove = async (event: MouseEvent) => {
+			const rect = canvas.getBoundingClientRect()
+			const scaleX = canvas.width / rect.width
+			const scaleY = canvas.height / rect.height
 
 			mouse = {
-				x: e.pageX - x,
-				y: e.pageY - y
+				x: (event.clientX - rect.left) * scaleX,
+				y: (event.clientY - rect.top) * scaleY
 			}
 		}
 
