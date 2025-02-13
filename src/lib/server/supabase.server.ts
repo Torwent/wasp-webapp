@@ -27,14 +27,13 @@ export async function doLogin(
 	const { data, error: err } = await supabase.auth.signInWithOAuth({
 		provider: provider,
 		options: {
-			redirectTo: href + (path?.slice(1) ?? ""),
+			redirectTo: href + (path?.slice(3) ?? ""),
 			scopes: "identify email guilds guilds.members.read"
 		}
 	})
 
 	if (err) error(400, formatError(err))
 
-	console.log(data)
 	redirect(303, data.url)
 }
 

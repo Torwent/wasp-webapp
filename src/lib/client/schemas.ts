@@ -43,19 +43,19 @@ export const baseScriptSchema = z.object({
 		),
 	subcategories: z.array(z.string()).min(1, "You should have at least 1 subcategory."),
 	published: z.boolean().default(true),
-	min_xp: z
+	xp_min: z
 		.number()
 		.int("Only whole numbers are allowed.")
 		.gte(0, "There's no way to lose experience in OSRS."),
-	max_xp: z
+	xp_max: z
 		.number()
 		.int("Only whole numbers are allowed.")
 		.max(60000, "That exceeds the reasonable limit."),
-	min_gp: z
+	gp_min: z
 		.number()
 		.int("Only whole numbers are allowed.")
 		.gte(-200000, "That exceeds the reasonable loss limit."),
-	max_gp: z
+	gp_max: z
 		.number()
 		.int("Only whole numbers are allowed.")
 		.max(600000, "That exceeds the reasonable profit limit.")
@@ -89,11 +89,11 @@ export const addScriptClientSchema = baseScriptSchema
 		script: scriptFile
 	})
 	.refine(
-		(schema) => schema.min_xp <= schema.max_xp,
+		(schema) => schema.xp_min <= schema.xp_max,
 		"Minimum experience cannot exceed the maximum experience."
 	)
 	.refine(
-		(schema) => schema.min_gp <= schema.max_gp,
+		(schema) => schema.gp_min <= schema.gp_max,
 		"Minimum gold cannot exceed the maximum gold."
 	)
 
@@ -116,11 +116,11 @@ export const updateScriptClientSchema = baseScriptSchema
 		script: scriptFile.optional()
 	})
 	.refine(
-		(schema) => schema.min_xp <= schema.max_xp,
+		(schema) => schema.xp_min <= schema.xp_max,
 		"Minimum experience cannot exceed the maximum experience."
 	)
 	.refine(
-		(schema) => schema.min_gp <= schema.max_gp,
+		(schema) => schema.gp_min <= schema.gp_max,
 		"Minimum gold cannot exceed the maximum gold."
 	)
 

@@ -3,7 +3,7 @@
 	const roles = $derived(page.data.roles)
 </script>
 
-<div class="flex w-full justify-evenly">
+<div class="flex w-full flex-col justify-evenly gap-2 sm:flex-row">
 	<span
 		class="inline-block whitespace-nowrap rounded-full bg-stone-500 px-2.5 py-1 text-center align-baseline text-xs font-bold leading-none text-white xl:px-7 xl:py-5"
 	>

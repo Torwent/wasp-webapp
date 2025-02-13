@@ -11,10 +11,12 @@ const redirects: Handle = async ({ event, resolve }) => {
 	}
 
 	if (event.url.pathname.startsWith("/auth/callback")) {
-		const slug = event.url.pathname.slice(14)
-		if (slug === "") return resolve(event)
-		const searchParams = event.url.searchParams.toString() + "&path=" + encodeURI(slug)
-		console.log(searchParams)
+		const path = event.url.pathname.slice(14)
+		if (path === "") return resolve(event)
+
+		const searchParams =
+			event.url.searchParams.toString() + "&path=" + encodeURI(path.replaceAll("_-_", "/"))
+
 		return redirect(303, "/auth/callback?" + searchParams)
 	}
 	return resolve(event)

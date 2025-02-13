@@ -14,7 +14,7 @@ export const load = async ({ params: { slug } }) => {
 		}
 	}
 
-	return {
-		script: await (isUUID ? getScriptByID(slug) : getScriptByURL(slug))
-	}
+	const script = await (isUUID ? getScriptByID(slug) : getScriptByURL(slug))
+	if (!script) error(404, "Script not found!")
+	return { script }
 }

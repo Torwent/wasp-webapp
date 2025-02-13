@@ -5,10 +5,7 @@
 	import { legalSchema } from "$lib/client/schemas"
 
 	let { data } = $props()
-	let { policies } = $derived(data)
-
 	let show: boolean = $state(false)
-	let isFocused: boolean = $state(true)
 
 	const { form, errors, enhance } = superForm(data.form, {
 		dataType: "json",

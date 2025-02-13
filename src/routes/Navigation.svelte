@@ -184,7 +184,7 @@
 
 	<form
 		method="POST"
-		class="absolute z-50 w-full bg-surface-200/30 backdrop-blur dark:bg-surface-800/30 {showProfile
+		class="absolute z-50 w-full bg-surface-200/30 py-14 backdrop-blur dark:bg-surface-800/30 {showProfile
 			? 'flex flex-col'
 			: 'hidden'}"
 		use:enhance
@@ -234,7 +234,7 @@
 					name="Login"
 					aria-label="Login to your account mx-auto"
 					class="btn preset-filled-primary-500"
-					formaction="/auth?/login&provider=discord&path={page.url.pathname}"
+					formaction="/auth?/login&provider=discord&path={page.url.pathname.replaceAll('/', '_-_')}"
 				>
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512" class="h-4 w-4">
 						<path
