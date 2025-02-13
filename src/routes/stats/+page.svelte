@@ -79,7 +79,7 @@
 	<div class="mx-auto mb-2 flex flex-col lg:w-[80%]">
 		<input
 			type="text"
-			placeholder="Search UUID or username..."
+			placeholder="🔍Search UUID or username..."
 			class="input"
 			bind:value={search}
 			oninput={async () =>

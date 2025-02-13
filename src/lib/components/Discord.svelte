@@ -1,6 +1,6 @@
 <script lang="ts">
 	let props = $props()
-	let label: boolean = props.label ?? "Join Discord"
+	const label: boolean = $derived(props.label ?? "Join Discord")
 </script>
 
 <div class="flex justify-center">

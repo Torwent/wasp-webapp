@@ -33,6 +33,8 @@ export async function doLogin(
 	})
 
 	if (err) error(400, formatError(err))
+
+	console.log(data)
 	redirect(303, data.url)
 }
 

@@ -3,8 +3,8 @@ import adapter from "@sveltejs/adapter-auto"
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte"
 import { getSingletonHighlighter } from "shiki"
 
-const highlighter = await getSingletonHighlighter({
-	themes: ["github-dark"],
+const shikiHighlighter = await getSingletonHighlighter({
+	themes: ["github-dark", "github-light"],
 	langs: ["javascript", "typescript", "bash", "cmd", "yml", "yaml", "pascal"]
 })
 
@@ -13,14 +13,14 @@ const mdsvexOptions = {
 	extensions: [".md"],
 	highlight: {
 		highlighter: async (code, lang = "text") => {
-			try {
-				const html = escapeSvelte(highlighter.codeToHtml(code, { lang, theme: "github-dark" }))
-				return `{@html \`${html}\` }`
-			} catch (error) {
-				lang = "cmd"
-				const html = escapeSvelte(highlighter.codeToHtml(code, { lang, theme: "github-dark" }))
-				return `{@html \`${html}\` }`
-			}
+			if (lang === "freepascal") lang = "pascal"
+			const html = escapeSvelte(
+				shikiHighlighter.codeToHtml(code, {
+					lang,
+					themes: { light: "github-light", dark: "github-dark" }
+				})
+			)
+			return `{@html \`${html}\` }`
 		}
 	}
 }

@@ -969,7 +969,32 @@ export type Database = {
 			}
 		}
 		Enums: {
-			[_ in never]: never
+			script_category:
+				| "combat"
+				| "boss"
+				| "minigame"
+				| "moneymaker"
+				| "tool"
+				| "magic"
+				| "prayer"
+				| "mining"
+				| "fishing"
+				| "woodcutting"
+				| "hunter"
+				| "farming"
+				| "cooking"
+				| "smithing"
+				| "fletching"
+				| "firemaking"
+				| "herblore"
+				| "crafting"
+				| "construction"
+				| "agility"
+				| "slayer"
+				| "thieving"
+				| "runecrafting"
+			script_status: "official" | "community"
+			script_type: "premium" | "free"
 		}
 		CompositeTypes: {
 			profile_data_type: {
@@ -1075,6 +1100,40 @@ export type Database = {
 				Relationships: [
 					{
 						foreignKeyName: "featured_id_fkey"
+						columns: ["id"]
+						referencedRelation: "scripts"
+						referencedColumns: ["id"]
+					}
+				]
+			}
+			metadata: {
+				Row: {
+					categories: Database["public"]["Enums"]["script_category"][]
+					created_at: string
+					id: string
+					status: Database["public"]["Enums"]["script_status"]
+					type: Database["public"]["Enums"]["script_type"]
+					updated_at: string
+				}
+				Insert: {
+					categories: Database["public"]["Enums"]["script_category"][]
+					created_at?: string
+					id?: string
+					status?: Database["public"]["Enums"]["script_status"]
+					type?: Database["public"]["Enums"]["script_type"]
+					updated_at?: string
+				}
+				Update: {
+					categories?: Database["public"]["Enums"]["script_category"][]
+					created_at?: string
+					id?: string
+					status?: Database["public"]["Enums"]["script_status"]
+					type?: Database["public"]["Enums"]["script_type"]
+					updated_at?: string
+				}
+				Relationships: [
+					{
+						foreignKeyName: "metadata_id_fkey"
 						columns: ["id"]
 						referencedRelation: "scripts"
 						referencedColumns: ["id"]
@@ -1282,6 +1341,37 @@ export type Database = {
 						foreignKeyName: "scripts_product_fkey"
 						columns: ["product"]
 						referencedRelation: "products"
+						referencedColumns: ["id"]
+					}
+				]
+			}
+			stats_limits: {
+				Row: {
+					gp_max: number
+					gp_min: number
+					id: string
+					xp_max: number
+					xp_min: number
+				}
+				Insert: {
+					gp_max?: number
+					gp_min: number
+					id: string
+					xp_max?: number
+					xp_min?: number
+				}
+				Update: {
+					gp_max?: number
+					gp_min?: number
+					id?: string
+					xp_max?: number
+					xp_min?: number
+				}
+				Relationships: [
+					{
+						foreignKeyName: "stats_limits_id_fkey"
+						columns: ["id"]
+						referencedRelation: "scripts"
 						referencedColumns: ["id"]
 					}
 				]
@@ -1577,7 +1667,7 @@ export type Database = {
 			}
 		}
 		Enums: {
-			[_ in never]: never
+			status: "Official" | "Community"
 		}
 		CompositeTypes: {
 			[_ in never]: never

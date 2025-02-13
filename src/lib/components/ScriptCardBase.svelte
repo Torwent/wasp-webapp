@@ -1,81 +1,105 @@
 <script lang="ts">
+	import type { Script } from "$lib/types/collection"
+	import { cropString, encodeSEO, scriptCategories, scriptStatus, scriptTypes } from "$lib/utils"
 	import { Tooltip } from "@skeletonlabs/skeleton-svelte"
-	import { cropString, encodeSEO } from "$lib/utils"
 	import { onMount } from "svelte"
 
-	let { script, imgElement = undefined } = $props()
+	let data = $props()
+	let script: Script | null = $derived(data.script)
+	let imgElement: HTMLImageElement | undefined = $state(data.imgElement ?? undefined)
 
-	const tooltipStates = $state(new Array(script.tooltip_emojis.length).fill(false))
-	const defaultCover = "/cover.jpg"
+	let imgLink = $state(data.script?.protected.assets + "cover.jpg")
 
-	function getCover(path: string | undefined) {
-		if (!path) return ""
-		if (path.endsWith(".jpg")) return path
-		return path + "cover.jpg"
-	}
-
-	let imgLink = $state(getCover(script?.protected.assets))
+	$effect(() => {
+		imgLink = data.script?.protected.assets + "cover.jpg"
+	})
 
 	onMount(async () => {
 		if (imgLink !== "") {
 			const response = await fetch(imgLink)
-			if (response.status != 200) imgLink = defaultCover
-		} else imgLink = defaultCover
+			if (response.status != 200) imgLink = "/cover.jpg"
+		} else imgLink = "/cover.jpg"
+
+		imgElement?.src
 	})
+
+	const categoriesTooltip: boolean[] = $state(
+		new Array(data.script?.metadata.categories.length).fill(false)
+	)
+	let status = $state(false)
+	let type = $state(false)
 </script>
 
 {#if script}
 	<div
-		class="card card-hover flex h-96 w-64 flex-col justify-between shadow-sm preset-filled-surface-200-800"
+		class="card card-hover flex h-96 w-64 flex-col shadow-sm preset-filled-surface-200-800 hover:preset-outlined"
 	>
-		<div>
-			<header class="h-48 p-0">
-				<img
-					bind:this={imgElement}
-					src={imgLink}
-					alt="Script cover"
-					class="rounded-t"
-					loading="lazy"
-				/>
-			</header>
-			<section class="mx-3 flex flex-col">
-				<header class="flex h-fit flex-col">
-					<span
-						class="whitespace-break-spaces font-semibold text-primary-600 dark:text-primary-500"
+		<header class="m-1">
+			<img
+				bind:this={imgElement}
+				src={imgLink}
+				alt="Script cover"
+				class="rounded-md contain-content"
+				loading="lazy"
+			/>
+		</header>
+		<section class="m-2 flex h-full flex-col">
+			<header class="flex h-fit flex-col">
+				<span class="whitespace-break-spaces font-semibold text-primary-600 dark:text-primary-500">
+					{script.title}
+				</span>
+				<span class="text-xs text-primary-600 drop-shadow dark:text-secondary-500">
+					by
+					<a
+						href="/scripters/{encodeSEO(script.protected.username.normalize('NFKC'))}"
+						class="permalink"
 					>
-						{script.title}
-					</span>
-					<span class="text-xs text-primary-600 drop-shadow dark:text-secondary-500">
-						by
-						<a
-							href="/scripters/{encodeSEO(script.protected.username.normalize('NFKC'))}"
-							class="permalink"
-						>
-							{script.protected.username}
-						</a>
-						{#if !script.published}<small class="text-error-500">Unpublished</small>{/if}
-					</span>
-				</header>
-				<article
-					class="my-4 h-full overflow-y-auto break-words text-sm text-surface-600 dark:text-surface-300"
-				>
-					{cropString(script.description, 80)}
-				</article>
-			</section>
-		</div>
-		<footer class="card-footer flex h-8 w-full justify-end">
-			{#each script.tooltip_emojis as emoji, i}
+						{script.protected.username}
+					</a>
+					{#if !script.published}<small class="text-error-500">Unpublished</small>{/if}
+				</span>
+			</header>
+			<article
+				class="my-4 h-full overflow-y-auto break-words text-sm text-surface-600 dark:text-surface-300"
+			>
+				{cropString(script.description, 80)}
+			</article>
+		</section>
+
+		<footer class="m-2 flex justify-between">
+			<div class="flex">
 				<Tooltip
-					bind:open={tooltipStates[i]}
+					open={status}
 					positioning={{ placement: "top" }}
-					triggerBase="underline"
 					contentBase="card preset-filled p-4"
 					openDelay={200}
 				>
-					{#snippet trigger()}{emoji}{/snippet}
-					{#snippet content()}{script.tooltip_names[i]}{/snippet}
+					{#snippet trigger()}{scriptStatus[script.metadata.status].icon}{/snippet}
+					{#snippet content()}{scriptStatus[script.metadata.status].name}{/snippet}
 				</Tooltip>
-			{/each}
+				<Tooltip
+					open={type}
+					positioning={{ placement: "top" }}
+					contentBase="card preset-filled p-4"
+					openDelay={200}
+				>
+					{#snippet trigger()}{scriptTypes[script.metadata.type].icon}{/snippet}
+					{#snippet content()}{scriptTypes[script.metadata.type].name}{/snippet}
+				</Tooltip>
+			</div>
+			<div class="flex">
+				{#each script.metadata.categories as category, i}
+					<Tooltip
+						open={categoriesTooltip[i]}
+						positioning={{ placement: "top" }}
+						contentBase="card preset-filled p-4"
+						openDelay={200}
+					>
+						{#snippet trigger()}{scriptCategories[category].icon}{/snippet}
+						{#snippet content()}{scriptCategories[category].name}{/snippet}
+					</Tooltip>
+				{/each}
+			</div>
 		</footer>
 	</div>
 {:else}

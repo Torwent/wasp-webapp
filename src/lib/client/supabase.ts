@@ -54,15 +54,8 @@ interface CachedFAQ {
 	timestamp: number
 }
 
-interface CachedTutorial {
-	data: Tutorial
-	timestamp: number
-}
-
 let statsTotal: CachedStatsTotal | null = null
 const scripts: Map<string, CachedScript> = new Map()
-const tutorials: Map<string, CachedTutorial> = new Map()
-
 export class WaspProfile {
 	static async getWarning(supabase: SupabaseClient, id: string | null | undefined) {
 		if (!id) return false
@@ -354,6 +347,51 @@ export async function getScript(
 	}
 
 	scripts.set(slug, { data, timestamp: now })
+	return data
+}
+
+export async function fetchScriptByID(supabase: SupabaseClient<Database>, id: string) {
+	const { data, error } = await supabase
+		.schema("scripts")
+		.from("scripts")
+		.select(
+			`id, title, description, content, url, published,
+				protected!inner (assets, username, avatar, author_id, revision, revision_date, broken),
+				metadata!inner (status, type, categories),
+				stats_limits!inner (xp_min, xp_max, gp_min, gp_max)`
+		)
+		.eq("id", id)
+		.returns<Script>()
+
+	if (error) {
+		console.error(error)
+		return null
+	}
+
+	return data
+}
+
+export async function getScriptByURL(
+	supabase: SupabaseClient<Database>,
+	url: string
+): Promise<Script | null> {
+	const { data, error } = await supabase
+		.schema("scripts")
+		.from("scripts")
+		.select(
+			`id, title, description, content, url, published,
+				protected!inner (assets, username, avatar, author_id, revision, revision_date, broken),
+				metadata!inner (status, type, categories),
+				stats_limits!inner (xp_min, xp_max, gp_min, gp_max)`
+		)
+		.eq("url", url)
+		.returns<Script>()
+
+	if (error) {
+		console.error(error)
+		return null
+	}
+
 	return data
 }
 

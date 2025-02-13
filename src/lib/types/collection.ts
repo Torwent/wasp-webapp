@@ -87,8 +87,6 @@ export interface ScriptBase {
 	description: string
 	published: boolean
 	url: string
-	tooltip_emojis: string[]
-	tooltip_names: string[]
 	protected: {
 		assets: string
 		username: string
@@ -96,43 +94,41 @@ export interface ScriptBase {
 	}
 }
 
-export interface ScriptReplace {
-	id: string
-	title: string
-	description: string
-	content: string
-	min_xp: number
-	max_xp: number
-	min_gp: number
-	max_gp: number
-	protected: {
-		username: string
-		revision: number
-		revision_date: number
-	}
+export interface ScriptPublic {
+	id: Database["scripts"]["Tables"]["scripts"]["Row"]["id"]
+	url: Database["scripts"]["Tables"]["scripts"]["Row"]["url"]
+	title: Database["scripts"]["Tables"]["scripts"]["Row"]["title"]
+	description: Database["scripts"]["Tables"]["scripts"]["Row"]["description"]
+	content: Database["scripts"]["Tables"]["scripts"]["Row"]["content"]
+	published: Database["scripts"]["Tables"]["scripts"]["Row"]["published"]
 }
 
-export interface Script {
-	id: string
-	title: string
-	description: string
-	content: string
-	url: string
-	categories: string[]
-	subcategories: string[]
-	published: boolean
-	min_xp: number
-	max_xp: number
-	min_gp: number
-	max_gp: number
-	protected: {
-		assets: string
-		username: string
-		author_id: string
-		revision: number
-		revision_date: number
-		broken: boolean
-	}
+export interface ScriptProtected {
+	assets: Database["scripts"]["Tables"]["protected"]["Row"]["assets"]
+	username: Database["scripts"]["Tables"]["protected"]["Row"]["username"]
+	author_id: Database["scripts"]["Tables"]["protected"]["Row"]["author_id"]
+	revision: Database["scripts"]["Tables"]["protected"]["Row"]["revision"]
+	revision_date: Database["scripts"]["Tables"]["protected"]["Row"]["revision_date"]
+	broken: Database["scripts"]["Tables"]["protected"]["Row"]["broken"]
+}
+
+export interface ScriptMetaData {
+	status: Database["scripts"]["Tables"]["metadata"]["Row"]["status"]
+	type: Database["scripts"]["Tables"]["metadata"]["Row"]["type"]
+	categories: Database["scripts"]["Tables"]["metadata"]["Row"]["categories"]
+}
+
+export interface ScriptLimits {
+	xp_min: Database["scripts"]["Tables"]["stats_limits"]["Row"]["xp_min"]
+	xp_max: Database["scripts"]["Tables"]["stats_limits"]["Row"]["xp_max"]
+	gp_min: Database["scripts"]["Tables"]["stats_limits"]["Row"]["gp_min"]
+	gp_max: Database["scripts"]["Tables"]["stats_limits"]["Row"]["gp_max"]
+}
+
+export type Script = ScriptPublic & {
+	protected: ScriptProtected
+	metadata: ScriptMetaData
+	stats_limits: ScriptLimits
 }
 
 export interface ScriptSimple {

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from "$app/state"
-	const roles = $state(page.data.roles)
+	const roles = $derived(page.data.roles)
 </script>
 
 <div class="flex w-full justify-evenly">

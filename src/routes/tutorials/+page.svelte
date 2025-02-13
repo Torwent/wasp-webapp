@@ -116,7 +116,7 @@
 				<div class="mb-2 flex w-full flex-col text-sm">
 					<input
 						type="text"
-						placeholder="Search script id, name, categories, author,... (CURRENTLY NOT WORKING!)"
+						placeholder="🔍Search tutorial by name, level, author, co-authors, content, ..."
 						class="input"
 						bind:value={search}
 						oninput={async () =>

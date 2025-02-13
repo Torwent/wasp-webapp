@@ -1,6 +1,6 @@
 import { browser } from "$app/environment"
 import { goto } from "$app/navigation"
-import type { Script, ScriptReplace } from "$lib/types/collection"
+import type { Script } from "$lib/types/collection"
 import { ACCEPTED_IMAGE_TYPES, formatNumber } from "$lib/utils"
 import { error } from "@sveltejs/kit"
 
@@ -40,10 +40,10 @@ export const pad = (n: number, size: number) => {
 	return s
 }
 
-export function replaceScriptContent(script: ScriptReplace): string
 export function replaceScriptContent(script: Script): string
 export function replaceScriptContent(script: Script): string
-export function replaceScriptContent(script: ScriptReplace | Script, locale: string = "pt-PT") {
+export function replaceScriptContent(script: Script): string
+export function replaceScriptContent(script: Script, locale: string = "pt-PT") {
 	const date: Intl.DateTimeFormatOptions = {
 		day: "2-digit",
 		month: "2-digit",
@@ -69,10 +69,10 @@ export function replaceScriptContent(script: ScriptReplace | Script, locale: str
 		last_revision_date: new Date(script.protected.revision_date).toLocaleString(locale, date),
 		last_revision_time: new Date(script.protected.revision_date).toLocaleString(locale, time),
 		revision_time: new Date(script.protected.revision_date).toLocaleString(locale, time),
-		min_xp: formatNumber(Number(script.min_xp * 12)),
-		max_xp: formatNumber(Number(script.max_xp * 12)),
-		min_gp: formatNumber(Number(script.min_gp * 12)),
-		max_gp: formatNumber(Number(script.max_gp * 12))
+		min_xp: formatNumber(Number(script.stats_limits.xp_min * 12)),
+		max_xp: formatNumber(Number(script.stats_limits.xp_max * 12)),
+		min_gp: formatNumber(Number(script.stats_limits.gp_min * 12)),
+		max_gp: formatNumber(Number(script.stats_limits.gp_max * 12))
 	}
 
 	const result = script.content.replace(/\{\$([^{}\s$]+)\}/g, (match, placeholder) => {

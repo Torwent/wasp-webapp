@@ -1,5 +1,8 @@
-import { tutorialsPromise } from "$lib/server/utils.server"
-import { createTutorialsIndex, searchTutorialsIndex } from "$lib/server/tutorials.server"
+import {
+	tutorialsPromise,
+	createTutorialsIndex,
+	searchTutorialsIndex
+} from "$lib/server/tutorials.server"
 import type { Tutorial } from "$lib/types/collection"
 
 async function getPublishedTutorials() {

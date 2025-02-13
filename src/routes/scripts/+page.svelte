@@ -1,19 +1,19 @@
 <script lang="ts">
-	import { ArrowLeft, ArrowRight, ChevronsRight } from "svelte-lucide"
 	import { page } from "$app/state"
-	import Paginator from "$lib/components/Paginator.svelte"
-	import ScriptCard from "$lib/components/ScriptCard.svelte"
-	import { onMount } from "svelte"
 	import { replaceQuery } from "$lib/client/utils"
-	import type { CheckboxType } from "$lib/types/collection"
+	import { scriptCategories, scriptStatus, scriptTypes } from "$lib/utils"
+	import { onMount } from "svelte"
+	import { ArrowRight } from "svelte-lucide"
 	import CarouselEntry from "./CarouselEntry.svelte"
+	import { goto, invalidate } from "$app/navigation"
+	import ScriptCard from "$lib/components/ScriptCard.svelte"
+	import Paginator from "$lib/components/Paginator.svelte"
 
 	const { data } = $props()
-	const { checkboxes, featured, roles, scripts } = $derived(data)
+	const { scripts, featured, roles } = $derived(data)
 
 	let { amount } = $state(data)
-
-	const count = $derived(scripts.count)
+	const { count } = $derived(data)
 
 	const pageStr = page.url.searchParams.get("page") || "-1"
 	let currentPage = $state(
@@ -21,29 +21,11 @@
 	)
 
 	let search = $state(decodeURIComponent(page.url.searchParams.get("search") || "").trim())
+	let statusFilter = $state(page.url.searchParams.get("status") ?? "")
+	let typeFilter = $state(page.url.searchParams.get("type") ?? "")
 
-	let categories: string[] = []
-	let subcategories: string[] = []
-	let show = $state(false)
-
-	async function handleFilters() {
-		categories = checkboxes
-			.filter((checkbox: CheckboxType) => checkbox.checked && checkbox.main)
-			.map((checkbox: CheckboxType) => checkbox.name)
-
-		subcategories = checkboxes
-			.filter((checkbox: CheckboxType) => checkbox.checked && !checkbox.main)
-			.map((checkbox: CheckboxType) => checkbox.name)
-
-		await replaceQuery(page.url, {
-			page: "1",
-			categories: categories.toString().replaceAll(",", "-")
-		})
-		await replaceQuery(page.url, {
-			page: "1",
-			subcategories: subcategories.toString().replaceAll(",", "-")
-		})
-	}
+	let categoriesStr = page.url.searchParams.get("categories")
+	let categoriesFilter = $state(categoriesStr ? decodeURIComponent(categoriesStr).split("-") : [])
 
 	let carousel: HTMLDivElement
 
@@ -70,148 +52,147 @@
 		return () => clearInterval(autoplay)
 	})
 
-	let oldScroll: number = 0
+	const categories = Object.values(scriptCategories)
+	const categoriesCheckboxes: boolean[] = $state(new Array(categories.length).fill(false))
 
-	const headTitle = "Scripts - WaspScripts"
-	const headDescription =
-		"Large script collection to bot OldSchool RuneScape with Simba, SRL and WaspLib. Get that 99 on osrs today!"
-	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba"
-	const headAuthor = "Torwent"
-	const headImage = "/multi-color-logo.png"
+	async function handleFilter(key: string, value: string) {
+		if (value == "") page.url.searchParams.delete(key)
+		else page.url.searchParams.set(key, value)
+		await goto(page.url, { noScroll: true, keepFocus: true })
+		invalidate("wasp:scripts")
+	}
 </script>
 
-<svelte:head>
-	<title>{headTitle}</title>
-	<meta name="description" content={headDescription} />
-	<meta name="keywords" content={headKeywords} />
-	<meta name="author" content={headAuthor} />
-	<meta name="robots" content="all" />
+<header class="my-4 flex h-full grid-cols-12 justify-evenly">
+	<!-- Button: Left -->
+	<button type="button" class="btn-icon ml-4 h-auto hover:preset-tonal" onclick={carouselLeft}>
+		<ArrowRight class="rotate-180" />
+	</button>
 
-	<!-- OpenGraph tags -->
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content={headTitle} />
-	<meta property="og:url" content={page.url.href} />
-	<meta property="og:image" content={headImage} />
-	<meta property="og:image:type" content="image/png" />
-	<meta property="og:image:alt" content="WaspScripts Logo" />
-	<meta property="og:description" content={headDescription} />
-
-	<!-- Twitter tags -->
-	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content={headTitle} />
-	<meta name="twitter:description" content={headDescription} />
-	<meta name="twitter:image" content={headImage} />
-</svelte:head>
-
-<main class="flex">
-	<aside
-		class="preset-outlined-surface-500 flex text-sm outline
-		{show ? 'w-fit' : ''} xl:text-base"
+	<div
+		bind:this={carousel}
+		class="hide-scrollbar col-span-10 flex snap-x snap-mandatory overflow-x-auto scroll-smooth text-white"
 	>
-		<div
-			class="{show
-				? 'block'
-				: 'hidden xl:block'} xs:w-70 my-4 ml-2 w-screen justify-center sm:mx-2 md:mx-4 md:w-52 lg:my-auto"
-		>
-			{#each checkboxes as checkbox}
-				<div class="flex">
-					{#if !checkbox.main}
-						<div class="h-2 w-4"></div>
-					{/if}
-					<div
-						id={"checkboxdiv" + checkbox.id}
-						class:font-thin={!checkbox.main}
-						onchange={async () => await handleFilters()}
-					>
+		{#each featured as feature}
+			<a
+				href="/scripts/{feature.url}"
+				class="relative w-full shrink-0 snap-center rounded-lg text-center"
+			>
+				<CarouselEntry
+					assets={feature.protected.assets}
+					title={feature.title}
+					username={feature.protected.username}
+				/>
+			</a>
+		{/each}
+	</div>
+
+	<!-- Button: Right -->
+	<button type="button" class="btn-icon mr-4 h-auto hover:preset-tonal" onclick={carouselRight}>
+		<ArrowRight />
+	</button>
+</header>
+
+<div class="flex h-full w-full">
+	<aside class="mx-4 my-4 h-full">
+		<label class="label my-4">
+			<span class="label-text">Status:</span>
+			<select
+				name="status"
+				id="script-status"
+				class="select w-full"
+				bind:value={statusFilter}
+				onchange={() => handleFilter("status", statusFilter)}
+			>
+				<option value="" selected={statusFilter == null || statusFilter == ""}>🎮All</option>
+				{#each Object.values(scriptStatus) as status}
+					<option value={status.value} selected={status.value == statusFilter}>
+						{status.icon}{status.name}
+					</option>
+				{/each}
+			</select>
+		</label>
+
+		<label class="label my-4">
+			<span class="label-text">Type:</span>
+			<select
+				name="type"
+				id="script-type"
+				class="select w-full"
+				bind:value={typeFilter}
+				onchange={() => handleFilter("type", typeFilter)}
+			>
+				<option
+					value=""
+					selected={typeFilter == null || typeFilter == ""}
+					class="selection:bg-primary-500">🕹️All</option
+				>
+				{#each Object.values(scriptTypes) as type}
+					<option value={type.value} selected={type.value == typeFilter}>
+						{type.icon}{type.name}
+					</option>
+				{/each}
+			</select>
+		</label>
+
+		<div class="label my-4 h-auto">
+			<span class="label-text">Categories</span>
+			<div class="select flex h-auto w-auto flex-col gap-1 overflow-y-scroll p-3">
+				{#each categories as category, idx}
+					<label class="flex gap-2">
 						<input
-							class="form-check-input accent-primary-500 cursor-pointer rounded-sm transition duration-200"
 							type="checkbox"
-							id={"checkbox" + checkbox.id}
-							bind:checked={checkbox.checked}
+							id={category.value}
+							name={category.name}
+							bind:checked={categoriesCheckboxes[idx]}
+							class="checkbox my-auto"
+							onchange={() => {
+								const i = categoriesFilter.indexOf(category.value)
+								if (i === -1) categoriesFilter.push(category.value)
+								else categoriesFilter.splice(i, 1)
+								handleFilter("categories", categoriesFilter.join("-"))
+							}}
 						/>
-						<label
-							class="form-check-label hover:text-primary-200 inline-block cursor-pointer"
-							for={"checkbox" + checkbox.id}
-							class:text-amber-500={checkbox.checked}
-						>
-							{checkbox.name + checkbox.emoji}
-						</label>
-					</div>
-				</div>
-				{#if checkbox.id === 3}
-					<br />
-				{/if}
-			{/each}
-		</div>
-		<button
-			class="border-surface-200-700-token h-full content-center justify-center justify-items-center border-r fill-white px-1 lg:px-2 xl:hidden"
-			onclick={() => (show = !show)}
-		>
-			<ChevronsRight class="flex duration-100 {show ? 'rotate-180' : ''}" />
-		</button>
-	</aside>
-
-	<main>
-		<header class="my-4 flex h-22 grid-cols-12 justify-evenly md:h-44 lg:h-64">
-			<!-- Button: Left -->
-			<button
-				type="button"
-				class="btn-icon preset-outlined-surface-500 mx-1 my-auto p-2 sm:mx-4"
-				onclick={carouselLeft}
-			>
-				<ArrowLeft />
-			</button>
-
-			<div
-				bind:this={carousel}
-				class="hide-scrollbar col-span-10 flex snap-x snap-mandatory overflow-x-auto scroll-smooth text-white"
-			>
-				{#each featured as feature}
-					<a
-						href="/scripts/{feature.url}"
-						class="relative w-full shrink-0 snap-center rounded-lg text-center"
-					>
-						<CarouselEntry
-							assets={feature?.protected?.assets}
-							title={feature?.title}
-							username={feature?.protected?.username}
-						/>
-					</a>
+						<span class="my-auto select-none whitespace-nowrap text-lg">
+							{category.icon}
+							{category.name}
+						</span>
+					</label>
 				{/each}
 			</div>
+		</div>
+	</aside>
 
-			<!-- Button: Right -->
-			<button
-				type="button"
-				class="btn-icon preset-outlined-surface-500 mx-1 my-auto shrink-0 p-2 sm:mx-4"
-				onclick={carouselRight}
+	<main class="h-full w-full">
+		{#if roles?.scripter}
+			<a href="/scripts/add" class="mx-auto my-4 block w-fit">
+				<button class="btn preset-filled-secondary-500">Add Script</button>
+			</a>
+		{/if}
+
+		<input
+			type="text"
+			placeholder="🔍Search script by id, name, categories, author, content, ..."
+			class="input mx-auto my-8 max-w-3xl"
+			bind:value={search}
+			oninput={() =>
+				replaceQuery(page.url, {
+					page: "1",
+					search: search
+				})}
+		/>
+
+		<main class="my-4 flex h-fit flex-col">
+			<div
+				class="3xl:grid-cols-5 mx-8 my-8 grid gap-10 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
 			>
-				<ArrowRight />
-			</button>
-		</header>
-
-		<main class="mx-4 flex h-fit flex-col lg:mx-auto">
-			{#if roles?.scripter}
-				<a href="/scripts/add" class="mx-auto block w-fit">
-					<button class="btn preset-filled-secondary-500 inline-block">Add Script</button>
-				</a>
-			{/if}
-			<div class="mx-auto my-12 flex w-[80%] flex-col lg:w-[70%] xl:w-[60%]">
-				<input
-					placeholder="Search script id, name, categories, author,..."
-					class="input"
-					bind:value={search}
-					oninput={async () => await replaceQuery(page.url, { page: "1", search: search })}
-				/>
-			</div>
-
-			<div class="mx-8 grid">
-				{#each scripts.scripts as script}
+				{#each scripts as script}
 					<ScriptCard {script} />
 				{/each}
 			</div>
-
-			<Paginator data={scripts.scripts} {currentPage} bind:pageSize={amount} {count} />
+			<div class="mx-8">
+				<Paginator data={scripts} {currentPage} bind:pageSize={amount} {count} />
+			</div>
 		</main>
 	</main>
-</main>
+</div>

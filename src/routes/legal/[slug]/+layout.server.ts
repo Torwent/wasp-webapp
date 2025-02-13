@@ -1,15 +1,13 @@
-import { shikiHighlighter } from "$lib/server/utils.server"
+import { mdvsvexCompile } from "$lib/server/markdown.server"
 import { formatError } from "$lib/utils"
 import { error } from "@sveltejs/kit"
-import { compile, escapeSvelte } from "mdsvex"
 
 type validSlug = "privacy_policy" | "scripter_tos" | "user_tos"
 
-export const load = async ({ params: { slug }, locals: { supabaseServer }, cookies }) => {
+export const load = async ({ params: { slug }, locals: { supabaseServer } }) => {
 	const validSlugs = ["privacy_policy", "scripter_tos", "user_tos"]
 	slug = slug.toLowerCase()
 	if (!validSlugs.includes(slug)) error(404, "Unknown legal page.")
-	const darkMode = cookies.get("darkMode") === "true"
 
 	async function getInfo() {
 		const schema = "info"
@@ -35,20 +33,7 @@ export const load = async ({ params: { slug }, locals: { supabaseServer }, cooki
 				return {
 					version: legal.version,
 					created_at: legal.created_at,
-					content: await compile(legal.content, {
-						highlight: {
-							highlighter: async (code: string, lang = "text") => {
-								if (!lang) lang = "text"
-								else if (lang === "freepascal") lang = "pascal"
-								return escapeSvelte(
-									shikiHighlighter.codeToHtml(code, {
-										lang,
-										theme: darkMode ? "github-dark" : "github-light"
-									})
-								)
-							}
-						}
-					}),
+					content: await mdvsvexCompile(legal.content),
 					originalContent: legal.content
 				}
 			})

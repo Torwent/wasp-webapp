@@ -1,10 +1,8 @@
 import { WaspFAQ } from "$lib/client/supabase"
-import { shikiHighlighter } from "$lib/server/utils.server"
+import { mdvsvexCompile } from "$lib/server/markdown.server"
 import type { FAQEntry } from "$lib/types/collection"
-import { compile, escapeSvelte } from "mdsvex"
 
-export const load = async ({ locals: { supabaseServer }, cookies }) => {
-	const darkMode = cookies.get("darkMode") === "true"
+export const load = async ({ locals: { supabaseServer } }) => {
 	const questions = WaspFAQ.getFAQ(supabaseServer, "questions")
 	const errors = WaspFAQ.getFAQ(supabaseServer, "errors")
 
@@ -15,20 +13,7 @@ export const load = async ({ locals: { supabaseServer }, cookies }) => {
 			faq.map(async (entry) => {
 				return {
 					title: entry.title,
-					content: await compile(entry.content, {
-						highlight: {
-							highlighter: async (code, lang = "text") => {
-								if (!lang) lang = "text"
-								else if (lang === "freepascal") lang = "pascal"
-								return escapeSvelte(
-									shikiHighlighter.codeToHtml(code, {
-										lang,
-										theme: darkMode ? "github-dark" : "github-light"
-									})
-								)
-							}
-						}
-					})
+					content: await mdvsvexCompile(entry.content)
 				}
 			})
 		)
