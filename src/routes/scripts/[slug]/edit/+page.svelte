@@ -1,135 +1,53 @@
 <script lang="ts">
 	import { superForm } from "sveltekit-superforms"
 	import { zodClient } from "sveltekit-superforms/adapters"
-	import { cropString } from "$lib/utils"
+	import { cropString, scriptCategories, scriptStatus, scriptTypes } from "$lib/utils"
 	import { replaceScriptContent } from "$lib/client/utils"
 	import { FileCode, ImagePlus } from "svelte-lucide"
-	import { browser } from "$app/environment"
 	import ScriptHeader from "../../ScriptHeader.svelte"
 	import ScriptArticle from "../../ScriptArticle.svelte"
 	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
 	import { updateScriptClientSchema } from "$lib/client/schemas"
-
+	import { FileUpload, Switch } from "@skeletonlabs/skeleton-svelte"
+	import AdvancedButton from "../../AdvancedButton.svelte"
+	import ZipDownload from "../../ZipDownload.svelte"
+	// svelte-ignore state_snapshot_uncloneable
 	const { data } = $props()
-	let { script } = $derived(data)
+	let script = $derived(data.script)
 	let profile = $derived(data.profile!)
+	let roles = $derived(data.roles!)
 
-	const { form, errors, enhance, validate } = superForm(data.form, {
+	const { form, errors, enhance, validate } = superForm(data.form!, {
 		dataType: "form",
 		multipleSubmits: "prevent",
 		taintedMessage: "Are you sure you want to leave?",
 		validators: zodClient(updateScriptClientSchema)
 	})
 
-	let defaultBanner = script.protected.assets + "/banner.jpg"
+	const categories = Object.values(scriptCategories)
 
-	let coverElement: HTMLImageElement | undefined
-	let bannerElement: HTMLImageElement | undefined
+	let coverURL: string | undefined = $state()
+	let bannerURL: string | undefined = $state()
 
-	let coverFiles: FileList
-	let bannerFiles: FileList
-	let scriptFiles: FileList
+	let coverStyle: 0 | 1 | 2 = $state(0)
+	let bannerStyle: 0 | 1 | 2 = $state(0)
+	let scriptStyle: 0 | 1 | 2 = $state(0)
 
-	let coverStyle: 0 | 1 | 2 = 0
-	let bannerStyle: 0 | 1 | 2 = 0
-	let scriptStyle: 0 | 1 | 2 = 0
-
-	let showScriptPage: boolean = false
-	let showScriptCard: boolean = false
-	let showSearchResult: boolean = false
-
-	let isFocused: boolean = true
-
-	const scriptBase = {
-		title: $form.title,
-		description: $form.description,
-		published: $form.published,
-		url: "",
-		tooltip_emojis: [],
-		tooltip_names: [],
-		protected: {
-			assets: "",
-			username: profile?.username ?? "",
-			avatar: profile?.avatar ?? ""
-		}
-	}
-
-	function onChangeCover(e: Event): void {
-		if (coverFiles.length === 0) {
-			coverStyle = 0
-			return
-		}
-
-		$form.cover = coverFiles[0]
-		validate("cover").then((result) => {
-			if (!browser) return
-			if (result) {
-				coverStyle = 2
-				return
-			}
-			coverStyle = 1
-			let reader = new FileReader()
-			reader.onload = function () {
-				if (!coverElement) coverElement = new Image()
-				coverElement.src = reader.result as string
-			}
-			reader.readAsDataURL(coverFiles[0])
-		})
-	}
-
-	function onChangeBanner(e: Event): void {
-		if (bannerFiles.length === 0) {
-			bannerStyle = 0
-			return
-		}
-		$form.banner = bannerFiles[0]
-		validate("banner").then((result) => {
-			if (!browser) return
-			if (!bannerElement) bannerElement = new Image()
-			if (result) {
-				bannerElement.src = defaultBanner
-				bannerStyle = 2
-				return
-			}
-			bannerStyle = 1
-
-			let reader = new FileReader()
-			reader.onload = function () {
-				if (!bannerElement) bannerElement = new Image()
-				bannerElement.src = reader.result as string
-			}
-			reader.readAsDataURL(bannerFiles[0])
-		})
-	}
-
-	function onChangeScript(e: Event): void {
-		if (scriptFiles.length === 0) {
-			scriptStyle = 0
-			return
-		}
-		$form.script = scriptFiles[0]
-		validate("script").then((result) => {
-			if (result) {
-				scriptStyle = 2
-				return
-			}
-			scriptStyle = 1
-		})
-	}
+	let show: boolean[] = $state([false, false, false])
 </script>
 
 <main>
-	{#if showScriptPage}
+	{#if show[0]}
 		<main class="mx-auto w-[90%] flex-col">
 			<ScriptHeader
-				id={script?.id}
-				title={script?.title}
-				username={script?.protected.username}
-				description={script?.description}
+				id={script.id}
+				title={$form.title}
+				username={script.protected.username}
+				description={$form.description}
 			>
 				<img
 					class="rounded-md {!script ? 'animate-pulse' : ''}"
-					src={script ? script.protected.assets + "banner.jpg" : "/banner.jpg"}
+					src={bannerURL ?? script.protected.assets + "banner.jpg"}
 					alt="Script banner"
 					loading="lazy"
 				/>
@@ -156,15 +74,15 @@
 		</main>
 	{/if}
 
-	{#if showScriptCard}
+	{#if show[1]}
 		<div class="max-w-2x m-8">
 			<div class="grid grid-cols-1 justify-items-center">
-				<ScriptCardBase script={scriptBase} bind:imgElement={coverElement} />
+				<ScriptCardBase {script} customCover={coverURL} />
 			</div>
 		</div>
 	{/if}
 
-	{#if showSearchResult}
+	{#if show[2]}
 		<div class="max-w-2x m-8">
 			<div class="mx-auto w-[36rem] rounded-md bg-zinc-200 p-8 text-left dark:bg-zinc-900">
 				<div class="flex">
@@ -196,271 +114,394 @@
 	{/if}
 
 	<div class="max-w-2x container mx-auto my-8 mb-6 flex flex-col">
-		<div class="btn-group-vertical variant-filled-secondary mx-auto md:btn-group">
-			<button
-				on:click={() => {
-					showScriptPage = !showScriptPage
-					showScriptCard = false
-					showSearchResult = false
-				}}
-			>
-				{#if showScriptPage}Hide{:else}Show{/if} script page
-			</button>
-			<button
-				on:click={() => {
-					showScriptCard = !showScriptCard
-					showScriptPage = false
-					showSearchResult = false
-				}}
-			>
-				{#if showScriptCard}Hide{:else}Show{/if} script card
-			</button>
-			<button
-				on:click={() => {
-					showSearchResult = !showSearchResult
-					showScriptPage = false
-					showScriptCard = false
-				}}
-			>
-				{#if showSearchResult}Hide{:else}Show{/if} search result example
-			</button>
+		<div class="btn-group mx-auto flex flex-col preset-outlined-surface-500 md:flex-row">
+			{#each [" script page", " script card", " search result example"] as str, idx}
+				<button
+					class="btn {show[idx] ? 'preset-filled' : 'hover:preset-tonal'}"
+					onclick={() => {
+						const tmp = show[idx]
+						for (let i = 0; i < show.length; i++) show[i] = false
+						show[idx] = !tmp
+					}}
+				>
+					{#if show[idx]}Hide{:else}Show{/if}{str}
+				</button>
+			{/each}
 		</div>
 
-		<article class="variant-ringed-surface xs:w-full md:w-6/7 mx-auto my-8 rounded-md p-8 lg:w-3/4">
+		<article
+			class="xs:w-full md:w-6/7 mx-auto my-8 rounded-md p-8 preset-outlined-surface-500 lg:w-3/4"
+		>
 			<header class="my-8 text-center">
-				<h3>Add Script</h3>
+				<h3>Edit Script</h3>
 			</header>
-			<form method="POST" enctype="multipart/form-data" use:focusTrap={isFocused} use:enhance>
-				<div class="flex justify-evenly">
-					<FormInput title="Title" bind:value={$form.title} bind:errors={$errors.title} />
-
-					<div class="my-8">
-						<SlideToggle
-							name="published"
-							bind:checked={$form.published}
-							background="bg-error-500"
-							active="bg-primary-500"
-						>
+			<form method="POST" enctype="multipart/form-data" use:enhance>
+				<div class="mx-auto my-8 flex flex-col justify-evenly md:flex-row">
+					<label class="label mx-auto my-4 flex w-fit place-items-center">
+						<Switch name="published" bind:checked={$form.published} />
+						<span class="label-text mx-2 text-center">
 							{#if $form.published}Public{:else}Hidden{/if}
-						</SlideToggle>
-					</div>
+						</span>
+					</label>
+
+					<label class="label mx-auto my-4 flex w-fit place-items-center">
+						<Switch
+							name="status"
+							bind:checked={$form.status}
+							disabled={!roles.administrator}
+							classes={roles.administrator ? "" : "disabled"}
+						/>
+						<span class="label-text mx-2 text-center">
+							{#if $form.status}
+								{scriptStatus.official.icon}{scriptStatus.official.name}
+							{:else}
+								{scriptStatus.community.icon}{scriptStatus.community.name}
+							{/if}
+						</span>
+					</label>
+
+					<label class="label mx-auto my-4 flex w-fit place-items-center">
+						<Switch name="type" bind:checked={$form.type} />
+						<span class="label-text mx-2 text-center">
+							{#if $form.type}
+								{scriptTypes.premium.icon}{scriptTypes.premium.name}
+							{:else}
+								{scriptTypes.free.icon}{scriptTypes.free.name}
+							{/if}
+						</span>
+					</label>
+				</div>
+				<div class="my-8 flex justify-evenly">
+					<label class="label">
+						<span class="label-text">Title:</span>
+						<input
+							type="text"
+							id="title"
+							name="title"
+							class="input"
+							class:input-error={$errors.title != null}
+							bind:value={$form.title}
+						/>
+					</label>
+
+					{#if $errors.title}
+						<small class="text-error-500">{$errors.title}</small>
+					{/if}
 				</div>
 
-				<FormTextarea
-					title="Description"
-					extraTitle=" (recommended 60-80 characters)"
-					bind:value={$form.description}
-					bind:errors={$errors.description}
-					h={"h-18"}
-				/>
+				<div class="my-8">
+					<label class="label">
+						<span class="label-text">Description (recommended 60-80 characters):</span>
+						<textarea
+							id="description"
+							name="description"
+							class="textarea"
+							class:input-error={$errors.description != null}
+							bind:value={$form.description}
+						>
+						</textarea>
+					</label>
+					{#if $errors.description}
+						<small class="text-error-500">{$errors.description}</small>
+					{/if}
+				</div>
 
-				<FormTextarea
-					title="Content"
-					bind:value={$form.content}
-					bind:errors={$errors.content}
-					h={"h-64"}
-				/>
+				<div class="my-8">
+					<label class="label">
+						<span class="label-text">Content:</span>
+						<textarea
+							id="content"
+							name="content"
+							class="textarea h-64"
+							class:input-error={$errors.content != null}
+							bind:value={$form.content}
+						>
+						</textarea>
+					</label>
+					{#if $errors.content}
+						<small class="text-error-500">{$errors.content}</small>
+					{/if}
+				</div>
 
-				<MultiSelect
-					title="Categories"
-					bind:values={$form.categories}
-					errors={$errors.categories?._errors}
-					bind:tooltips={categories}
-				/>
+				<div class="my-8 flex flex-col">
+					<label class="label">
+						<span class="label-text">Categories:</span>
+						<select
+							id="categories"
+							name="categories"
+							class="select overflow-y-scroll"
+							class:input-error={$errors.categories != null}
+							bind:value={$form.categories}
+							multiple
+						>
+							{#each categories as category}
+								<option value={category.value} class="selection:bg-primary-500">
+									{category.icon}{category.name}
+								</option>
+							{/each}
+						</select>
+					</label>
+					<small class="my-2">
+						{#each $form.categories as category}
+							<span class="mx-2">
+								{scriptCategories[category].icon}{scriptCategories[category].name}
+							</span>
+						{/each}
+					</small>
+					<span class="mx-auto">
+						<kbd class="kbd">CTRL + Click</kbd>
+						or
+						<kbd class="kbd">SHIFT + Click</kbd>
+						to select multiple categories
+					</span>
 
-				<MultiSelect
-					title="Subcategories"
-					bind:values={$form.subcategories}
-					errors={$errors.subcategories?._errors}
-					bind:tooltips={subcategories}
-				/>
+					{#if $errors.categories}
+						<small class="text-error-500">{$errors.categories}</small>
+					{/if}
+				</div>
 
 				<header class="my-8 text-center">
 					<h5>Files</h5>
 				</header>
-				<div class="flex justify-between gap-4">
-					<FileDropzone
+				<div class="flex flex-col justify-between gap-4 2xl:flex-row">
+					<FileUpload
 						name="cover"
-						bind:files={coverFiles}
+						label="Cover image"
 						accept="image/jpeg"
-						on:change={onChangeCover}
-					>
-						<svelte:fragment slot="lead">
-							{#if coverStyle === 0}
-								<ImagePlus class="mx-auto" />
-							{:else if coverStyle === 1}
-								<ImagePlus class="mx-auto stroke-success-500" />
-							{:else}
-								<ImagePlus class="mx-auto stroke-error-500" />
-							{/if}
-						</svelte:fragment>
-						<svelte:fragment slot="message">
-							{#if coverStyle === 0}
-								<span class="mx-auto">Cover image</span>
-							{:else if coverStyle === 1}
-								<span class="mx-auto text-success-500">Cover image</span>
-							{:else}
-								<span class="mx-auto text-error-500">Cover image</span>
-							{/if}
-						</svelte:fragment>
-						<svelte:fragment slot="meta">
-							{#if coverStyle === 0}
-								<span>Must be exactly 300x200 pixels and JPG format.</span>
-							{:else if coverStyle === 1}
-								<span class="text-success-500">{$form.cover?.name}</span>
-							{:else if $errors.cover}
-								<small class="flex justify-center text-error-500">{$errors.cover}</small>
-							{/if}
-						</svelte:fragment>
-					</FileDropzone>
+						maxFiles={1}
+						maxFileSize={1024 * 1024 * 50}
+						subtext={$errors.cover == null
+							? "Must be exactly 300x200 pixels and JPG format."
+							: $errors.cover.toString()}
+						onFileReject={console.error}
+						interfaceIcon={coverStyle === 0
+							? ""
+							: coverStyle === 1
+								? "text-success-500"
+								: "text-error-500"}
+						interfaceText={coverStyle === 0
+							? ""
+							: coverStyle === 1
+								? "text-success-500"
+								: "text-error-500"}
+						interfaceSubtext="type-scale-1 opacity-60 {coverStyle === 0
+							? ''
+							: coverStyle === 1
+								? 'text-success-500'
+								: 'text-error-500'}"
+						classes="w-full"
+						interfaceBase="preset-filled-surface-100-900 text-center hover:preset-filled-surface-200-800"
+						allowDrop
+						onFileChange={async (details) => {
+							coverStyle = 0
+							coverURL = undefined
+							if (details.acceptedFiles.length === 0) {
+								if (details.rejectedFiles.length > 0) coverStyle = 2
+								return
+							}
 
-					<FileDropzone
+							$form.cover = details.acceptedFiles[0]
+							coverStyle = 2
+							const invalid = await validate("cover")
+
+							if (invalid) {
+								console.error(invalid)
+								return
+							}
+
+							coverStyle = 1
+							let reader = new FileReader()
+							reader.onload = function () {
+								coverURL = reader.result as string
+							}
+							reader.readAsDataURL(details.acceptedFiles[0])
+						}}
+					>
+						{#snippet iconInterface()}<ImagePlus class="mx-auto" />{/snippet}
+					</FileUpload>
+
+					<FileUpload
 						name="banner"
-						bind:files={bannerFiles}
+						label="Banner image"
 						accept="image/jpeg"
-						on:change={onChangeBanner}
-					>
-						<svelte:fragment slot="lead">
-							{#if bannerStyle === 0}
-								<ImagePlus class="mx-auto" />
-							{:else if bannerStyle === 1}
-								<ImagePlus class="mx-auto stroke-success-500" />
-							{:else}
-								<ImagePlus class="mx-auto stroke-error-500" />
-							{/if}
-						</svelte:fragment>
-						<svelte:fragment slot="message">
-							{#if bannerStyle === 0}
-								<span class="mx-auto">Banner image</span>
-							{:else if bannerStyle === 1}
-								<span class="mx-auto text-success-500">Banner image</span>
-							{:else}
-								<span class="mx-auto text-error-500">Banner image</span>
-							{/if}
-						</svelte:fragment>
-						<svelte:fragment slot="meta">
-							{#if bannerStyle === 0}
-								<span>Must be exactly 1920x768 pixels and JPG format.</span>
-							{:else if bannerStyle === 1}
-								<span class="text-success-500">{$form.banner?.name}</span>
-							{:else if $errors.banner}
-								<small class="flex justify-center text-error-500">{$errors.banner}</small>
-							{/if}
-						</svelte:fragment>
-					</FileDropzone>
+						maxFiles={1}
+						maxFileSize={1024 * 1024 * 50}
+						subtext={$errors.banner == null
+							? "Must be exactly 1920x768 pixels and JPG format."
+							: $errors.banner.toString()}
+						interfaceIcon={bannerStyle === 0
+							? ""
+							: bannerStyle === 1
+								? "text-success-500"
+								: "text-error-500"}
+						interfaceText={bannerStyle === 0
+							? ""
+							: bannerStyle === 1
+								? "text-success-500"
+								: "text-error-500"}
+						interfaceSubtext="type-scale-1 opacity-60 {bannerStyle === 0
+							? ''
+							: bannerStyle === 1
+								? 'text-success-500'
+								: 'text-error-500'}"
+						onFileReject={console.error}
+						classes="w-full"
+						interfaceBase="preset-filled-surface-100-900 text-center hover:preset-filled-surface-200-800"
+						allowDrop
+						onFileChange={async (details) => {
+							bannerStyle = 0
+							bannerURL = undefined
+							if (details.acceptedFiles.length === 0) {
+								if (details.rejectedFiles.length > 0) bannerStyle = 2
+								return
+							}
 
-					<FileDropzone
-						name="script"
-						bind:files={scriptFiles}
-						accept=".simba"
-						on:change={onChangeScript}
+							$form.banner = details.acceptedFiles[0]
+							bannerStyle = 2
+							const invalid = await validate("banner")
+
+							if (invalid) {
+								console.error(invalid)
+								return
+							}
+
+							bannerStyle = 1
+							let reader = new FileReader()
+							reader.onload = function () {
+								bannerURL = reader.result as string
+							}
+							reader.readAsDataURL(details.acceptedFiles[0])
+						}}
 					>
-						<svelte:fragment slot="lead">
-							{#if scriptStyle === 0}
-								<FileCode class="mx-auto" />
-							{:else if scriptStyle === 1}
-								<FileCode class="mx-auto stroke-success-500" />
-							{:else}
-								<FileCode class="mx-auto stroke-error-500" />
-							{/if}
-						</svelte:fragment>
-						<svelte:fragment slot="message">
-							{#if scriptStyle === 0}
-								<span class="mx-auto">Simba script</span>
-							{:else if scriptStyle === 1}
-								<span class="mx-auto text-success-500">Simba script</span>
-							{:else}
-								<span class="mx-auto text-error-500">Simba script</span>
-							{/if}
-						</svelte:fragment>
-						<svelte:fragment slot="meta">
-							{#if scriptStyle === 0}
-								<span>Must be a Simba script file.</span>
-							{:else if scriptStyle === 1}
-								<span class="text-success-500">{$form.script?.name}</span>
-							{:else if $errors.script}
-								<small class="flex justify-center text-error-500">{$errors.script}</small>
-							{/if}
-						</svelte:fragment>
-					</FileDropzone>
+						{#snippet iconInterface()}<ImagePlus class="mx-auto" />{/snippet}
+					</FileUpload>
+
+					<FileUpload
+						name="script"
+						label="Simba script"
+						accept=".simba"
+						maxFiles={1}
+						maxFileSize={1024 * 1024 * 50}
+						subtext={$errors.script == null
+							? "Must be a simba script file."
+							: $errors.script.toString()}
+						interfaceIcon={scriptStyle === 0
+							? ""
+							: scriptStyle === 1
+								? "text-success-500"
+								: "text-error-500"}
+						interfaceText={scriptStyle === 0
+							? ""
+							: scriptStyle === 1
+								? "text-success-500"
+								: "text-error-500"}
+						interfaceSubtext="type-scale-1 opacity-60 {scriptStyle === 0
+							? ''
+							: scriptStyle === 1
+								? 'text-success-500'
+								: 'text-error-500'}"
+						onFileReject={console.error}
+						classes="w-full"
+						interfaceBase="preset-filled-surface-100-900 text-center hover:preset-filled-surface-200-800"
+						allowDrop
+						onFileChange={async (details) => {
+							scriptStyle = 0
+							if (details.acceptedFiles.length === 0) {
+								if (details.rejectedFiles.length > 0) scriptStyle = 2
+								return
+							}
+
+							$form.script = details.acceptedFiles[0]
+							scriptStyle = 2
+							const invalid = await validate("script")
+
+							if (invalid) {
+								console.error(invalid)
+								return
+							}
+							scriptStyle = 1
+						}}
+					>
+						{#snippet iconInterface()}<FileCode class="mx-auto" />{/snippet}
+					</FileUpload>
 				</div>
 
-				<div class="variant-soft-surface mx-auto my-8 rounded-md p-8">
+				<div class="my-8 rounded-md p-8 preset-filled-surface-100-900">
 					<header class="my-8 text-center">
 						<h5>Stats limits (every 5 minutes)</h5>
 					</header>
-					<div class="flex justify-between gap-4">
-						<label for="min_xp" class="label my-2">
-							<span>Minimum Experience:</span>
-							<input
-								type="number"
-								id="min_xp"
-								name="min_xp"
-								class="input h-10"
-								class:input-error={$errors.min_xp}
-								bind:value={$form.min_xp}
-							/>
+					<div class="flex flex-col justify-between gap-4 md:flex-row">
+						<div class="flex w-full flex-col gap-4 lg:flex-row">
+							<div class="w-full">
+								<label class="label">
+									<span class="label-text">Minimum Experience:</span>
+									<input
+										type="number"
+										id="xp_min"
+										name="xp_min"
+										class="input"
+										class:input-error={$errors.xp_min != null}
+										bind:value={$form.xp_min}
+									/>
+								</label>
+								{#if $errors.xp_min}
+									<small class="text-error-500">{$errors.xp_min}</small>
+								{/if}
+							</div>
 
-							{#if $errors.min_xp}
-								<small class="text-error-500">{$errors.min_xp}</small>
-							{:else}
-								<div class="m-0 h-5" />
-							{/if}
-						</label>
+							<div class="w-full">
+								<label class="label">
+									<span class="label-text">Maximum Experience:</span>
+									<input
+										type="number"
+										id="xp_max"
+										name="xp_max"
+										class="input"
+										class:input-error={$errors.xp_max}
+										bind:value={$form.xp_max}
+									/>
+								</label>
+								{#if $errors.xp_max}
+									<small class="text-error-500">{$errors.xp_max}</small>
+								{/if}
+							</div>
+						</div>
 
-						<label for="max_xp" class="label my-2">
-							<span>Maximum Experience:</span>
-							<input
-								type="number"
-								id="max_xp"
-								name="max_xp"
-								class="input h-10"
-								class:input-error={$errors.max_xp}
-								bind:value={$form.max_xp}
-							/>
+						<div class="flex w-full flex-col gap-4 lg:flex-row">
+							<div class="w-full">
+								<label class="label">
+									<span class="label-text">Minimum Gold:</span>
+									<input
+										type="number"
+										id="gp_min"
+										name="gp_min"
+										class="input"
+										class:input-error={$errors.gp_min != null}
+										bind:value={$form.gp_min}
+									/>
+								</label>
+								{#if $errors.gp_min}
+									<small class="text-error-500">{$errors.gp_min}</small>
+								{/if}
+							</div>
 
-							{#if $errors.min_xp}
-								<small class="text-error-500">{$errors.min_xp}</small>
-							{:else}
-								<div class="m-0 h-5" />
-							{/if}
-						</label>
-
-						<label for="min_gp" class="label my-2">
-							<span>Minimum Gold:</span>
-							<input
-								type="number"
-								id="min_gp"
-								name="min_gp"
-								class="input h-10"
-								class:input-error={$errors.min_gp}
-								bind:value={$form.min_gp}
-							/>
-
-							{#if $errors.min_gp}
-								<small class="text-error-500">{$errors.min_gp}</small>
-							{:else}
-								<div class="m-0 h-5" />
-							{/if}
-						</label>
-
-						<label for="max_gp" class="label my-2">
-							<span>Maximum Gold:</span>
-							<input
-								type="number"
-								id="max_gp"
-								name="max_gp"
-								class="input h-10"
-								class:input-error={$errors.max_gp}
-								bind:value={$form.max_gp}
-							/>
-
-							{#if $errors.max_gp}
-								<small class="text-error-500">{$errors.max_gp}</small>
-							{:else}
-								<div class="m-0 h-5" />
-							{/if}
-						</label>
+							<div class="w-full">
+								<label class="label">
+									<span class="label-text">Maximum Gold:</span>
+									<input
+										type="number"
+										id="gp_max"
+										name="gp_max"
+										class="input"
+										class:input-error={$errors.gp_max}
+										bind:value={$form.gp_max}
+									/>
+								</label>
+								{#if $errors.gp_max}
+									<small class="text-error-500">{$errors.gp_max}</small>
+								{/if}
+							</div>
+						</div>
 					</div>
 				</div>
 
@@ -474,10 +515,10 @@
 
 				<div class="flex justify-between">
 					<a href="./">
-						<button class="variant-filled-secondary btn">Back</button>
+						<button class="btn preset-filled-secondary-500">Back</button>
 					</a>
 
-					<button type="submit" class="variant-filled-secondary btn">Submit</button>
+					<button type="submit" class="btn preset-filled-secondary-500">Submit</button>
 				</div>
 			</form>
 		</article>

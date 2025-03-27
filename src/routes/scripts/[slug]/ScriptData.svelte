@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { page } from "$app/stores"
+	import { page } from "$app/state"
 	import { formatNumber } from "$lib/utils"
 	const { id } = $props()
 
@@ -7,7 +7,7 @@
 	let selectedBtn = $state("none")
 
 	async function getScriptStats() {
-		const { data, error: err } = await $page.data.supabaseClient
+		const { data, error: err } = await page.data.supabaseClient
 			.schema("scripts")
 			.from("stats_simba")
 			.select(
@@ -34,7 +34,7 @@
 	}
 
 	async function getScriptData() {
-		const { data, error: err } = await $page.data.supabaseClient
+		const { data, error: err } = await page.data.supabaseClient
 			.schema("scripts")
 			.from("stats_site")
 			.select(

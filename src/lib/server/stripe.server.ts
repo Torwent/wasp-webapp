@@ -4,7 +4,7 @@ import type { Bundle, Price, Scripter } from "$lib/types/collection"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import Stripe from "stripe"
 
-export const stripe = new Stripe(STRIPE_KEY, { apiVersion: "2024-06-20", typescript: true })
+export const stripe = new Stripe(STRIPE_KEY, { apiVersion: "2025-01-27.acacia", typescript: true })
 
 export async function createCustomerPortal(customer: string, origin: string) {
 	let portal: Stripe.BillingPortal.Session
@@ -63,8 +63,8 @@ export async function createCheckoutSession(
 				transfer_data: stripeUser ? { destination: stripeUser } : undefined,
 				metadata: { user_id: id }
 			},
-			success_url: origin + "/api/stripe/checkout/success?session_id={CHECKOUT_SESSION_ID}",
-			cancel_url: origin + "/api/stripe/checkout/cancel?session_id={CHECKOUT_SESSION_ID}"
+			success_url: origin + "/subscriptions/success?session_id={CHECKOUT_SESSION_ID}",
+			cancel_url: origin + "/subscriptions/cancel?session_id={CHECKOUT_SESSION_ID}"
 		})
 		console.log(
 			`└────🛒 Checkout session took ${(performance.now() - start).toFixed(2)} ms to create!`
@@ -77,7 +77,8 @@ export async function createCheckoutSession(
 	return session.url
 }
 
-export async function getStripeConnectAccount(id: string) {
+export async function getStripeConnectAccount(id: string | null | undefined) {
+	if (!id) return null
 	let stripeAccount: Stripe.Account | null = null
 
 	try {
@@ -92,7 +93,8 @@ export async function getStripeConnectAccount(id: string) {
 	return stripeAccount
 }
 
-export async function getStripeConnectAccountBalance(id: string) {
+export async function getStripeConnectAccountBalance(id: string | null | undefined) {
+	if (!id) return null
 	let stripeBalance: Stripe.Balance | null = null
 	try {
 		stripeBalance = await stripe.balance.retrieve({
@@ -108,7 +110,8 @@ export async function getStripeConnectAccountBalance(id: string) {
 	return stripeBalance
 }
 
-export async function getStripeSession(account: string) {
+export async function getStripeSession(account: string | null | undefined) {
+	if (!account) return null
 	let accountSession: Stripe.Response<Stripe.AccountSession> | null = null
 
 	try {

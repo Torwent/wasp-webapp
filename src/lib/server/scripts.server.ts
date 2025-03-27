@@ -34,6 +34,7 @@ export async function getScripts(): Promise<Script[]> {
 			metadata!inner (status, type, categories),
 			stats_limits!inner (xp_min, xp_max, gp_min, gp_max)`
 		)
+		.order("title", { ascending: true })
 		.returns<Script[]>()
 
 	if (error) {
@@ -69,12 +70,10 @@ export async function getScriptByURL(url: string) {
 	return null
 }
 
-async function scritpListener(data: any) {
+export async function updateScript(id: string) {
 	if (scripts.length === 0) return
 
-	const id = data.id
 	const script = await fetchScriptByID(supabaseAdmin, id)
-
 	if (script == null) return
 
 	const index = scripts.findIndex((s) => s.id === id)
@@ -85,14 +84,10 @@ async function scritpListener(data: any) {
 	}
 
 	scripts[index] = script
-	scriptsIndex.update(index, getScriptString(script))
-}
 
-console.log("Listening to scripts changes!")
-supabaseAdmin
-	.channel("waspscripts-scripts-listener")
-	.on("postgres_changes", { event: "*", schema: "scripts", table: "scripts" }, scritpListener)
-	.on("postgres_changes", { event: "*", schema: "scripts", table: "protected" }, scritpListener)
-	.on("postgres_changes", { event: "*", schema: "scripts", table: "metadata" }, scritpListener)
-	.on("postgres_changes", { event: "*", schema: "scripts", table: "stats_limits" }, scritpListener)
-	.subscribe()
+	if (!scriptsIndex) await getPublishedScripts()
+	else {
+		const scriptStr = getScriptString(script)
+		scriptsIndex.update(index, scriptStr)
+	}
+}

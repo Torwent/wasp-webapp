@@ -11,7 +11,7 @@ export const actions = {
 	},
 	setTheme: async ({ cookies, request }) => {
 		const formData = await request.formData()
-		const theme = formData.get("theme")?.toString().toLowerCase() ?? "fennec"
+		const theme = formData.get("theme")?.toString().toLowerCase() ?? "wasp"
 		cookies.set("theme", theme, { path: "/", maxAge: 60 * 60 * 24 * 7 * 360 })
 	}
 } satisfies Actions

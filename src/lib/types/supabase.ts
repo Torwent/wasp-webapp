@@ -1277,60 +1277,60 @@ export type Database = {
 			}
 			scripts: {
 				Row: {
-					categories: string[]
+					categories: string[] | null
 					content: string
 					created_at: string
 					description: string
-					fts: unknown
+					fts: unknown | null
 					id: string
-					max_gp: number
-					max_xp: number
-					min_gp: number
-					min_xp: number
+					max_gp: number | null
+					max_xp: number | null
+					min_gp: number | null
+					min_xp: number | null
 					product: string | null
 					published: boolean
-					search: string
-					subcategories: string[]
+					search: string | null
+					subcategories: string[] | null
 					title: string
 					tooltip_emojis: string[]
 					tooltip_names: string[]
 					url: string | null
 				}
 				Insert: {
-					categories?: string[]
+					categories?: string[] | null
 					content: string
 					created_at?: string
 					description: string
-					fts: unknown
+					fts?: unknown | null
 					id?: string
-					max_gp?: number
-					max_xp?: number
-					min_gp?: number
-					min_xp?: number
+					max_gp?: number | null
+					max_xp?: number | null
+					min_gp?: number | null
+					min_xp?: number | null
 					product?: string | null
 					published?: boolean
-					search?: string
-					subcategories?: string[]
+					search?: string | null
+					subcategories?: string[] | null
 					title: string
 					tooltip_emojis?: string[]
 					tooltip_names?: string[]
 					url?: string | null
 				}
 				Update: {
-					categories?: string[]
+					categories?: string[] | null
 					content?: string
 					created_at?: string
 					description?: string
-					fts?: unknown
+					fts?: unknown | null
 					id?: string
-					max_gp?: number
-					max_xp?: number
-					min_gp?: number
-					min_xp?: number
+					max_gp?: number | null
+					max_xp?: number | null
+					min_gp?: number | null
+					min_xp?: number | null
 					product?: string | null
 					published?: boolean
-					search?: string
-					subcategories?: string[]
+					search?: string | null
+					subcategories?: string[] | null
 					title?: string
 					tooltip_emojis?: string[]
 					tooltip_names?: string[]

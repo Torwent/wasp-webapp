@@ -1,6 +1,7 @@
 import { z } from "zod"
-import { ACCEPTED_IMAGE_TYPES, MB_SIZE } from "$lib/utils"
-import { checkClientImageDimensions } from "./utils"
+import { ACCEPTED_IMAGE_TYPES, MB_SIZE, scriptCategories } from "$lib/utils"
+import { checkClientImageDimensions } from "$lib/client/utils"
+import type { TScriptCategories } from "$lib/types/collection"
 
 const title = z
 	.string()
@@ -18,30 +19,16 @@ const content = z.string().min(10).includes(" ", {
 		"You have no spaces, this is supposed to be at least a couple of words, ideally a few sentences."
 })
 
+const categoryKeys = Object.keys(scriptCategories) as TScriptCategories
+const ScriptCategoryEnum = z.enum(categoryKeys as [TScriptCategories[number], ...TScriptCategories])
+
 export const baseScriptSchema = z.object({
 	title: title,
 	description: description,
 	content: content,
-	categories: z
-		.array(z.string())
-		.min(3, "You should have at least 3 categories.")
-		.refine(
-			(categories) => categories.includes("Official") || categories.includes("Community"),
-			"Scripts need to have either 🎫Official or 🚀Community category."
-		)
-		.refine(
-			(categories) => !categories.includes("Official") || !categories.includes("Community"),
-			"Scripts can't have both 🎫Official and 🚀Community categories."
-		)
-		.refine(
-			(categories) => categories.includes("Free") || categories.includes("Premium"),
-			"Scripts need to have either 🎈Free or 👑Premium category."
-		)
-		.refine(
-			(categories) => !categories.includes("Free") || !categories.includes("Premium"),
-			"Scripts can't have both 🎈Free and 👑Premium categories."
-		),
-	subcategories: z.array(z.string()).min(1, "You should have at least 1 subcategory."),
+	status: z.boolean().default(false),
+	type: z.boolean().default(false),
+	categories: z.array(ScriptCategoryEnum).min(1, "You should have at least 1 category."),
 	published: z.boolean().default(true),
 	xp_min: z
 		.number()
@@ -271,8 +258,8 @@ const bundleSchema = z.object({
 		}, "Bundle prices are not in order"),
 	bundledScripts: z.array(bundledScriptSchema).min(2, "A bundle must have at least 2 scripts!"),
 	open: z.boolean(),
-	subsOpen: z.boolean().default(false).optional(),
-	freeOpen: z.boolean().default(false).optional()
+	subsOpen: z.boolean(),
+	freeOpen: z.boolean()
 })
 
 export const bundleArraySchema = z.object({

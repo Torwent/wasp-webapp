@@ -30,11 +30,11 @@ export const addScriptServerSchema = baseScriptSchema
 		script: scriptFile
 	})
 	.refine(
-		(schema) => schema.min_xp <= schema.max_xp,
+		(schema) => schema.xp_min <= schema.xp_max,
 		"Minimum experience cannot exceed the maximum experience."
 	)
 	.refine(
-		(schema) => schema.min_gp <= schema.max_gp,
+		(schema) => schema.gp_min <= schema.gp_max,
 		"Minimum gold cannot exceed the maximum gold."
 	)
 
@@ -55,10 +55,10 @@ export const updateScriptServerSchema = baseScriptSchema
 		script: scriptFile.optional()
 	})
 	.refine(
-		(schema) => schema.min_xp <= schema.max_xp,
+		(schema) => schema.xp_min <= schema.xp_max,
 		"Minimum experience cannot exceed the maximum experience."
 	)
 	.refine(
-		(schema) => schema.min_gp <= schema.max_gp,
+		(schema) => schema.gp_min <= schema.gp_max,
 		"Minimum gold cannot exceed the maximum gold."
 	)

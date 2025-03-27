@@ -1,7 +1,6 @@
 import { createServerClient } from "@supabase/ssr"
 import { type Handle, redirect } from "@sveltejs/kit"
 import { sequence } from "@sveltejs/kit/hooks"
-
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from "$env/static/public"
 import type { Database } from "$lib/types/supabase"
 
@@ -117,26 +116,26 @@ const authGuard: Handle = async ({ event, resolve }) => {
 	}
 
 	event.locals.getSubscriptions = async () => {
-		if (!user) return null
+		if (!user) return []
 		const { data, error: err } = await event.locals.supabaseServer
 			.schema("profiles")
 			.from("subscription")
 			.select("subscription, product, price, date_start, date_end, cancel, disabled")
 			.eq("id", user.id)
 
-		if (err) return null
+		if (err) return []
 		return data
 	}
 
 	event.locals.getFreeAccess = async () => {
-		if (!user) return null
+		if (!user) return []
 		const { data, error: err } = await event.locals.supabaseServer
 			.schema("profiles")
 			.from("free_access")
 			.select("id, product, date_start, date_end")
 			.eq("id", user.id)
 
-		if (err) return null
+		if (err) return []
 		return data
 	}
 
@@ -168,12 +167,12 @@ const theme: Handle = async ({ event, resolve }) => {
 	const cookieTheme = event.cookies.get("theme")
 
 	if (!cookieTheme) {
-		event.cookies.set("theme", "skeleton", { path: "/" })
+		event.cookies.set("theme", "wasp", { path: "/" })
 	}
 
 	return await resolve(event, {
 		transformPageChunk: ({ html }) =>
-			html.replace('data-theme=""', `data-theme="${cookieTheme ?? "fennec"}"`)
+			html.replace('data-theme=""', `data-theme="${cookieTheme ?? "wasp"}"`)
 	})
 }
 

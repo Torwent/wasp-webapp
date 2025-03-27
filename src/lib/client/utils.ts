@@ -1,6 +1,6 @@
 import { browser } from "$app/environment"
 import { goto } from "$app/navigation"
-import type { Script } from "$lib/types/collection"
+import type { Script, ScriptLimits, ScriptPublic } from "$lib/types/collection"
 import { ACCEPTED_IMAGE_TYPES, formatNumber } from "$lib/utils"
 import { error } from "@sveltejs/kit"
 
@@ -40,9 +40,51 @@ export const pad = (n: number, size: number) => {
 	return s
 }
 
-export function replaceScriptContent(script: Script): string
-export function replaceScriptContent(script: Script): string
-export function replaceScriptContent(script: Script): string
+export function getScriptContent(
+	script: ScriptPublic,
+	limits: ScriptLimits,
+	username: string,
+	locale: string = "pt-PT"
+) {
+	const date: Intl.DateTimeFormatOptions = {
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric"
+	}
+
+	const time: Intl.DateTimeFormatOptions = {
+		hour: "2-digit",
+		minute: "2-digit",
+		second: "2-digit",
+		hour12: false
+	}
+
+	const placeholders: { [key: string]: string } = {
+		id: script.id,
+		title: script.title,
+		description: script.description,
+		author: username,
+		revision: "1",
+		revision_full_date: new Date(Date.now()).toLocaleString(locale),
+		last_revision_full_date: new Date(Date.now()).toLocaleString(locale),
+		revision_date: new Date(Date.now()).toLocaleString(locale, date),
+		last_revision_date: new Date(Date.now()).toLocaleString(locale, date),
+		last_revision_time: new Date(Date.now()).toLocaleString(locale, time),
+		revision_time: new Date(Date.now()).toLocaleString(locale, time),
+		min_xp: formatNumber(Number(limits.xp_min * 12)),
+		max_xp: formatNumber(Number(limits.xp_max * 12)),
+		min_gp: formatNumber(Number(limits.gp_min * 12)),
+		max_gp: formatNumber(Number(limits.gp_max * 12))
+	}
+
+	const result = script.content.replace(/\{\$([^{}\s$]+)\}/g, (match, placeholder) => {
+		const value = placeholders[placeholder]
+		return value !== undefined ? value : match
+	})
+
+	return result
+}
+
 export function replaceScriptContent(script: Script, locale: string = "pt-PT") {
 	const date: Intl.DateTimeFormatOptions = {
 		day: "2-digit",

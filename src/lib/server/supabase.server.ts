@@ -1,7 +1,5 @@
 import { SUPABASE_SERVICE_KEY } from "$env/static/private"
 import { PUBLIC_SUPABASE_URL } from "$env/static/public"
-import type { AddScriptSchema, UpdateScriptSchema } from "$lib/client/schemas"
-import { pad } from "$lib/client/utils"
 import type { Price, Product, Profile, ProfileSubscription } from "$lib/types/collection"
 import type { Database } from "$lib/types/supabase"
 import { UUID_V4_REGEX, formatError } from "$lib/utils"
@@ -105,14 +103,19 @@ function updateRevision(str: string, rev: number) {
 	return str
 }
 
-async function updateScriptFile(file: File, id: string, revision: number) {
+export async function updateScriptFile(file: File, id: string, revision: number) {
 	let fileString = await file.text()
 	fileString = updateID(updateRevision(fileString, revision), id)
 
 	return new File([fileString], file.name, { type: "text/plain" })
 }
 
-async function uploadFile(supabase: SupabaseClient, bucket: string, path: string, file: File) {
+export async function uploadFile(
+	supabase: SupabaseClient,
+	bucket: string,
+	path: string,
+	file: File
+) {
 	const { error: err } = await supabase.storage.from(bucket).upload(path, file, { upsert: true })
 	if (err) {
 		return (
@@ -126,7 +129,12 @@ async function uploadFile(supabase: SupabaseClient, bucket: string, path: string
 	}
 }
 
-async function updateImgFile(supabase: SupabaseClient, bucket: string, path: string, file: File) {
+export async function updateImgFile(
+	supabase: SupabaseClient,
+	bucket: string,
+	path: string,
+	file: File
+) {
 	const { error: err } = await supabase.storage.from(bucket).update(path, file, { upsert: true })
 	if (err) {
 		return (
@@ -138,126 +146,6 @@ async function updateImgFile(supabase: SupabaseClient, bucket: string, path: str
 			JSON.stringify(err)
 		)
 	}
-}
-
-export async function uploadScript(supabase: SupabaseClient, script: AddScriptSchema) {
-	console.log("📜 Uploading ", script.title)
-	if (!script.script) {
-		return { error: "Script file is missing!" }
-	}
-
-	if (!script.cover) {
-		return { error: "Cover image is missing!" }
-	}
-
-	if (!script.banner) {
-		return { error: "Banner image is missing!" }
-	}
-
-	const publicData = {
-		title: script.title,
-		description: script.description,
-		content: script.content,
-		categories: script.categories,
-		subcategories: script.subcategories,
-		min_xp: script.min_xp,
-		max_xp: script.max_xp,
-		min_gp: script.min_gp,
-		max_gp: script.max_gp
-	}
-
-	const { data, error: errScript } = await supabase
-		.schema("scripts")
-		.from("scripts")
-		.insert(publicData)
-		.select("id, url")
-		.single()
-
-	if (errScript) return { error: "INSERT scripts.scripts failed!\n\n" + JSON.stringify(errScript) }
-
-	script.script = await updateScriptFile(script.script, data.id as string, 1)
-
-	//rename all scripts to script so we can always fetch them later regardless of name changes.
-	const path = data.id + "/" + pad(1, 9) + "/script.simba"
-
-	const promises = await Promise.all([
-		uploadFile(supabase, "scripts", path, script.script),
-		uploadFile(supabase, "imgs", "scripts/" + data.id + "/cover.jpg", script.cover),
-		uploadFile(supabase, "imgs", "scripts/" + data.id + "/banner.jpg", script.banner)
-	])
-
-	let err: string | undefined
-
-	for (let i = 0; i < promises.length; i++) {
-		if (promises[i]) {
-			err += "File upload failed " + promises[i]
-		}
-	}
-
-	return { url: data.url, error: err }
-}
-
-export async function updateScript(
-	supabase: SupabaseClient,
-	id: string,
-	script: UpdateScriptSchema,
-	revision: number
-) {
-	console.log("📜 Updating script: ", script.title, " (", id + ")")
-
-	const publicData = {
-		title: script.title,
-		description: script.description,
-		content: script.content,
-		categories: script.categories,
-		subcategories: script.subcategories,
-		min_xp: script.min_xp,
-		max_xp: script.max_xp,
-		min_gp: script.min_gp,
-		max_gp: script.max_gp,
-		published: script.published
-	}
-
-	const { data, error: errScript } = await supabase
-		.schema("scripts")
-		.from("scripts")
-		.update(publicData)
-		.eq("id", id)
-		.select("url")
-		.single()
-
-	if (errScript) return { error: "UPDATE scripts.scripts failed\n\n" + JSON.stringify(errScript) }
-
-	const promises = []
-
-	if (script.script) {
-		revision = revision + 1
-		console.log("Updating script revision to ", revision)
-		script.script = await updateScriptFile(script.script, id, revision)
-		const path = id + "/" + pad(revision, 9) + "/script.simba"
-		promises.push(uploadFile(supabase, "scripts", path, script.script))
-	}
-
-	if (script.cover) {
-		console.log("Updating script cover")
-		promises.push(updateImgFile(supabase, "imgs", "scripts/" + id + "/cover.jpg", script.cover))
-	}
-
-	if (script.banner) {
-		console.log("Updating script banner")
-		promises.push(updateImgFile(supabase, "imgs", "scripts/" + id + "/banner.jpg", script.banner))
-	}
-
-	const awaitedPromises = promises.length > 0 ? await Promise.all(promises) : []
-	let err: string | undefined
-	for (let i = 0; i < awaitedPromises.length; i++) {
-		if (awaitedPromises[i]) {
-			err = "File upload failed!\n\n" + JSON.stringify(promises[i])
-			break
-		}
-	}
-
-	return { url: data.url, error: err }
 }
 
 export async function getUsername(id: string) {

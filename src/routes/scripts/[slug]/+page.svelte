@@ -82,14 +82,22 @@
 			<div class="text-center">
 				{#await canDownloadScript()}
 					<div class="grid animate-pulse justify-center justify-items-center gap-8 py-12">
-						<AdvancedButton id={script.id} title={script.title} rev={script.protected.revision} />
-						<ZipDownload id={script.id} />
+						<div class="my-8 flex flex-col gap-8 lg:flex-row">
+							<AdvancedButton id={script.id} title={script.title} rev={script.protected.revision} />
+							<ZipDownload id={script.id} />
+						</div>
 					</div>
 				{:then has_access}
 					{#if has_access}
 						<div class="grid justify-center justify-items-center gap-8 py-12">
-							<AdvancedButton id={script.id} title={script.title} rev={script.protected.revision} />
-							<ZipDownload id={script.id} />
+							<div class="my-8 flex flex-col gap-8 lg:flex-row">
+								<AdvancedButton
+									id={script.id}
+									title={script.title}
+									rev={script.protected.revision}
+								/>
+								<ZipDownload id={script.id} />
+							</div>
 							{#if canEdit(profile?.id, roles, script.protected.author_id)}
 								<div class="my-8 grid place-items-center">
 									<a href="{page.url.pathname}/edit" class="btn preset-filled-secondary-500">Edit</a
@@ -138,7 +146,7 @@
 
 													<TableCell padding={0}>
 														<div
-															class="btn-group-vertical rounded-md preset-outlined-surface-500 md:btn-group"
+															class="btn-group flex flex-col rounded-md preset-outlined-surface-500 md:flex-row"
 														>
 															{#each bundle.prices as price, j}
 																<button
@@ -187,7 +195,7 @@
 
 													<TableCell padding={0}>
 														<div
-															class="btn-group-vertical rounded-md preset-outlined-surface-500 md:btn-group"
+															class="btn-group flex flex-col rounded-md preset-outlined-surface-500 md:flex-row"
 														>
 															{#each script.prices as price, j}
 																<button

@@ -4,14 +4,19 @@
 	import { Tooltip } from "@skeletonlabs/skeleton-svelte"
 	import { onMount } from "svelte"
 
-	let data = $props()
-	let script: Script | null = $derived(data.script)
-	let imgElement: HTMLImageElement | undefined = $state(data.imgElement ?? undefined)
+	let {
+		script,
+		customCover = $bindable(undefined)
+	}: { script: Script; customCover: string | undefined } = $props()
 
-	let imgLink = $state(data.script?.protected.assets + "cover.jpg")
+	let imgLink = $state(customCover ?? script?.protected.assets + "cover.jpg")
 
 	$effect(() => {
-		imgLink = data.script?.protected.assets + "cover.jpg"
+		imgLink = customCover ?? script?.protected.assets + "cover.jpg"
+	})
+
+	$effect(() => {
+		imgLink = script?.protected.assets + "cover.jpg"
 	})
 
 	onMount(async () => {
@@ -19,12 +24,10 @@
 			const response = await fetch(imgLink)
 			if (response.status != 200) imgLink = "/cover.jpg"
 		} else imgLink = "/cover.jpg"
-
-		imgElement?.src
 	})
 
 	const categoriesTooltip: boolean[] = $state(
-		new Array(data.script?.metadata.categories.length).fill(false)
+		new Array(script?.metadata.categories.length).fill(false)
 	)
 	let status = $state(false)
 	let type = $state(false)
@@ -35,13 +38,7 @@
 		class="card card-hover flex h-96 w-64 flex-col shadow-sm preset-filled-surface-200-800 hover:preset-outlined"
 	>
 		<header class="m-1">
-			<img
-				bind:this={imgElement}
-				src={imgLink}
-				alt="Script cover"
-				class="rounded-md contain-content"
-				loading="lazy"
-			/>
+			<img src={imgLink} alt="Script cover" class="rounded-md contain-content" loading="lazy" />
 		</header>
 		<section class="m-2 flex h-full flex-col">
 			<header class="flex h-fit flex-col">
@@ -52,7 +49,7 @@
 					by
 					<a
 						href="/scripters/{encodeSEO(script.protected.username.normalize('NFKC'))}"
-						class="permalink"
+						class="hover:preset-tonal-secondary"
 					>
 						{script.protected.username}
 					</a>
@@ -106,13 +103,7 @@
 	<div class="card card-hover flex h-96 w-64 flex-col justify-between shadow-sm">
 		<div>
 			<header class="h-48 p-0">
-				<img
-					bind:this={imgElement}
-					src={imgLink}
-					alt="Script cover"
-					class="rounded-t"
-					loading="lazy"
-				/>
+				<img src={imgLink} alt="Script cover" class="rounded-t" loading="lazy" />
 			</header>
 			<section class="mx-3 flex flex-col">
 				<header class="flex h-fit flex-col">

@@ -1,5 +1,5 @@
 import type { AuthError, PostgrestError } from "@supabase/supabase-js"
-import type { Price } from "./types/collection"
+import type { Price, TScriptCategories, TScriptStatus, TScriptTypes } from "./types/collection"
 
 export const API_URL = "https://api.waspscripts.com" //http://localhost:8080
 export const UUID_V4_REGEX =
@@ -165,21 +165,30 @@ Can get {$min_xp}-{$max_xp} xp/h and {$min_gp}-{$max_gp} gp/h.
 You need quest ABC completed to use this.
 `
 
-export const scriptStatus = {
-	official: { name: "Official", value: "official", icon: "🏷️" },
-	community: { name: "community", value: "community", icon: "🚀" }
+interface NameValueIcon {
+	name: string
+	value: string
+	icon: string
 }
 
-export const scriptTypes = {
+export const scriptStatus: Record<TScriptStatus, NameValueIcon> = {
+	official: { name: "Official", value: "official", icon: "🏷️" },
+	community: { name: "Community", value: "community", icon: "🚀" }
+}
+
+export const scriptTypes: Record<TScriptTypes, NameValueIcon> = {
 	premium: { name: "Premium", value: "premium", icon: "👑" },
 	free: { name: "Free", value: "free", icon: "🎈" }
 }
 
-export const scriptCategories = {
+export const scriptCategories: Record<TScriptCategories[number], NameValueIcon> = {
 	combat: { name: "Combat", value: "combat", icon: "⚔" },
+	boss: { name: "Boss", value: "boss", icon: "👹" },
+	minigame: { name: "Minigame", value: "minigame", icon: "🎲" },
+	moneymaker: { name: "Money Maker", value: "moneymaker", icon: "💰" },
+	tool: { name: "Tool", value: "tool", icon: "🪛" },
 	magic: { name: "Magic", value: "magic", icon: "✨" },
 	prayer: { name: "Prayer", value: "prayer", icon: "🌟" },
-	hitpoints: { name: "Hitpoints", value: "hitpoints", icon: "❤️" },
 	mining: { name: "Mining", value: "mining", icon: "⛏️" },
 	fishing: { name: "Fishing", value: "fishing", icon: "🎣" },
 	woodcutting: { name: "Woodcutting", value: "woodcutting", icon: "🪓" },
@@ -195,9 +204,5 @@ export const scriptCategories = {
 	agility: { name: "Agility", value: "agility", icon: "🏃" },
 	slayer: { name: "Slayer", value: "slayer", icon: "💀" },
 	thieving: { name: "Thieving", value: "thieving", icon: "🦝" },
-	runecrafting: { name: "Runecrafting", value: "runecrafting", icon: "⚡" },
-	tool: { name: "Tool", value: "tool", icon: "🪛" },
-	minigame: { name: "Minigame", value: "minigame", icon: "🎲" },
-	moneymaker: { name: "Money Maker", value: "moneymaker", icon: "💰" },
-	boss: { name: "Boss", value: "boss", icon: "👹" }
+	runecrafting: { name: "Runecrafting", value: "runecrafting", icon: "⚡" }
 }

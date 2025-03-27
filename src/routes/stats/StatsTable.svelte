@@ -30,38 +30,40 @@
 	}
 </script>
 
-<table class="table-hover table mx-auto my-8 w-full overflow-auto text-left text-xs md:text-sm">
-	<thead class="text-primary-600-400">
-		<tr>
-			{#each headers as header}
-				<th scope="col" class="px-6 py-3" onclick={async () => await sortBy(header)}>
-					<div class="flex justify-between text-sm">
-						<span class="my-auto h-full align-middle">
-							{header}
-							{#if header === "levels"}
-								<a
-									href="/tutorials/waspstats-virtual-levels-by-torwent"
-									class="text-surface-700-300 hover:text-primary-600-400"
-								>
-									*
-								</a>
+<div class="table-wrap">
+	<table class="table mx-auto my-8 w-full overflow-auto text-left text-xs md:text-sm">
+		<thead class="text-lg font-bold uppercase preset-filled-surface-100-900">
+			<tr>
+				{#each headers as header}
+					<th scope="col" class="px-6 py-3" onclick={async () => await sortBy(header)}>
+						<div class="flex justify-between text-sm">
+							<span class="my-auto h-full align-middle">
+								{header}
+								{#if header === "levels"}
+									<a
+										href="/tutorials/waspstats-virtual-levels-by-torwent"
+										class="text-surface-700-300 hover:text-primary-600-400"
+									>
+										*
+									</a>
+								{/if}
+							</span>
+							{#if selectedHeader === header}
+								{#if ascending}
+									<ChevronDown />
+								{:else}
+									<ChevronUp />
+								{/if}
 							{/if}
-						</span>
-						{#if selectedHeader === header}
-							{#if ascending}
-								<ChevronDown />
-							{:else}
-								<ChevronUp />
-							{/if}
-						{/if}
-					</div>
-				</th>
-			{/each}
-		</tr>
-	</thead>
-	<tbody>
-		{@render children()}
-	</tbody>
-</table>
+						</div>
+					</th>
+				{/each}
+			</tr>
+		</thead>
+		<tbody class="hover:[&>tr]:preset-tonal">
+			{@render children()}
+		</tbody>
+	</table>
+</div>
 
 <Paginator {data} {currentPage} bind:pageSize {count} />

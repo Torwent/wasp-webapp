@@ -1,0 +1,50 @@
+<script lang="ts">
+	import CheckoutTable from "./CheckoutTable.svelte"
+	import FreeAccessTable from "./FreeAccessTable.svelte"
+	import SubscriptionsForm from "./SubscriptionTable.svelte"
+
+	const { data } = $props()
+	let { profile, pageData, prices, subscriptions, freeAccess } = $derived(data)
+</script>
+
+<main class="my-8 grid">
+	{#if profile}
+		{#await subscriptions then subscriptions}
+			{#if subscriptions.length > 0}
+				<SubscriptionsForm
+					data={data.subscriptionsform}
+					bundles={pageData.bundles}
+					scripts={pageData.scripts}
+					{subscriptions}
+					{prices}
+				/>
+			{/if}
+		{/await}
+
+		{#await freeAccess then freeAccess}
+			{#if freeAccess.length > 0}
+				<FreeAccessTable {freeAccess} bundles={pageData.bundles} scripts={pageData.scripts} />
+			{/if}
+		{/await}
+
+		<form method="POST" action="?/portal" class="my-8 mt-8 grid place-items-center">
+			<button class="btn preset-filled-secondary-500">Customer portal</button>
+		</form>
+	{/if}
+
+	<CheckoutTable data={data.checkoutForm} bundles={pageData.bundles} scripts={pageData.scripts} />
+</main>
+
+<h5 class="my-8 text-center">
+	By making any purchase you automatically accept the
+	<a href="/legal/user_tos">user terms or service</a>
+	.
+</h5>
+<p class="mx-auto my-8 text-center">
+	If you have any issues please contact <a
+		href="mailto: support@waspscripts.com"
+		class="font-semibold hover:underline"
+	>
+		support@waspscripts.com
+	</a>
+</p>

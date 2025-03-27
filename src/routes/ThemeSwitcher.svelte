@@ -6,7 +6,7 @@
 		{ label: "Cerberus", value: "cerberus" },
 		{ label: "Concord", value: "concord" },
 		{ label: "Fennec", value: "fennec" },
-		{ label: "Modern", value: "modern" }
+		{ label: "Wasp", value: "wasp" }
 	]
 
 	let theme = $state(page.data.theme)

@@ -356,12 +356,12 @@ export async function fetchScriptByID(supabase: SupabaseClient<Database>, id: st
 		.from("scripts")
 		.select(
 			`id, title, description, content, url, published,
-				protected!inner (assets, username, avatar, author_id, revision, revision_date, broken),
-				metadata!inner (status, type, categories),
-				stats_limits!inner (xp_min, xp_max, gp_min, gp_max)`
+			protected!inner (assets, username, avatar, author_id, revision, revision_date, broken),
+			metadata!inner (status, type, categories),
+			stats_limits!inner (xp_min, xp_max, gp_min, gp_max)`
 		)
 		.eq("id", id)
-		.returns<Script>()
+		.single<Script>()
 
 	if (error) {
 		console.error(error)
@@ -385,7 +385,7 @@ export async function getScriptByURL(
 				stats_limits!inner (xp_min, xp_max, gp_min, gp_max)`
 		)
 		.eq("url", url)
-		.returns<Script>()
+		.single<Script>()
 
 	if (error) {
 		console.error(error)

@@ -14,8 +14,8 @@ declare global {
 			user: User | null
 			getProfile: () => Promise<ProfileBase | null> | null
 			getRoles: () => Promise<ProfileRoles | null> | null
-			getSubscriptions: () => Promise<Subscription[] | null> | null
-			getFreeAccess: () => Promise<FreeAccess[] | null> | null
+			getSubscriptions: () => Promise<Subscription[]>
+			getFreeAccess: () => Promise<FreeAccess[]>
 		}
 		interface PageData {
 			darkMode: boolean

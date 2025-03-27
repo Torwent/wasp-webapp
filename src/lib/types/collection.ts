@@ -112,10 +112,14 @@ export interface ScriptProtected {
 	broken: Database["scripts"]["Tables"]["protected"]["Row"]["broken"]
 }
 
+export type TScriptStatus = Database["scripts"]["Tables"]["metadata"]["Row"]["status"]
+export type TScriptTypes = Database["scripts"]["Tables"]["metadata"]["Row"]["type"]
+export type TScriptCategories = Database["scripts"]["Tables"]["metadata"]["Row"]["categories"]
+
 export interface ScriptMetaData {
-	status: Database["scripts"]["Tables"]["metadata"]["Row"]["status"]
-	type: Database["scripts"]["Tables"]["metadata"]["Row"]["type"]
-	categories: Database["scripts"]["Tables"]["metadata"]["Row"]["categories"]
+	status: TScriptStatus
+	type: TScriptTypes
+	categories: TScriptCategories
 }
 
 export interface ScriptLimits {
@@ -212,6 +216,30 @@ export interface FreeAccess {
 export type Bundle = Database["scripts"]["Tables"]["bundles"]["Row"]
 
 export type Product = Database["scripts"]["Tables"]["products"]["Row"]
+
+export interface BundleProduct {
+	index: number
+	id: string
+	user_id: string
+	name: string
+	username: Promise<string | null>
+	bundle: string
+	prices: Price[]
+	scripts: ScriptSimple[]
+	active: boolean
+	open: boolean
+}
+
+export interface ScriptProduct {
+	index: number
+	id: string
+	user_id: string
+	name: string
+	username: Promise<string | null>
+	url: string
+	prices: Price[]
+	active: boolean
+}
 
 export interface Category {
 	name: string

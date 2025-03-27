@@ -5,7 +5,7 @@ import { imgLazyload } from "@mdit/plugin-img-lazyload"
 
 const shikiHighlighter = await Shiki({
 	themes: { light: "github-light", dark: "github-dark" },
-	langs: ["javascript", "typescript", "bash", "cmd", "yml", "yaml", "pascal"]
+	langs: ["javascript", "typescript", "bash", "cmd", "yml", "yaml", "pascal", "java"]
 })
 
 export const mardownRenderer = new markdownit("commonmark", {
