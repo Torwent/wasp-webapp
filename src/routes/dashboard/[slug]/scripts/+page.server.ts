@@ -1,18 +1,20 @@
-import { bundleArraySchema, newBundleSchema } from "$lib/client/schemas"
+import { newScriptSchema, scriptArraySchema } from "$lib/client/schemas"
 import { getScripter } from "$lib/client/supabase"
 import {
-	createStripeBundleProduct,
+	createStripePrice,
+	createStripeScriptProduct,
 	stripe,
 	updateStripePrice,
 	updateStripeProduct
 } from "$lib/server/stripe.server"
 import { addFreeAccess, cancelFreeAccess, doLogin } from "$lib/server/supabase.server"
 import { formatError, UUID_V4_REGEX } from "$lib/utils"
-import { error } from "@sveltejs/kit"
+import { error, redirect } from "@sveltejs/kit"
 import { fail, setError, superValidate } from "sveltekit-superforms"
 import { zod } from "sveltekit-superforms/adapters"
 
-export const load = async ({ locals: { supabaseServer }, params: { slug }, parent }) => {
+export const load = async ({ params: { slug }, parent, depends }) => {
+	depends("wasp:dashboardscripts")
 	const { scripts, scripter, products, prices, data } = await parent()
 	if (!scripter.stripe)
 		error(
@@ -26,111 +28,89 @@ export const load = async ({ locals: { supabaseServer }, params: { slug }, paren
 		{ amount: 50, currency: "eur", interval: "year" }
 	]
 
-	const bundleProducts = products.filter((p) => p.bundle)
+	const scriptProducts = products.filter((p) => p.script)
 	const subs: (typeof data.data)[] = []
 	const free: (typeof data.freeData)[] = []
 
-	async function getBundles() {
-		const { data: bundleData, error: err } = await supabaseServer
-			.schema("scripts")
-			.from("bundles")
-			.select(`id, name, scripts, quantity, user_id, username, product`)
-			.order("name", { ascending: true })
-			.eq("user_id", slug)
+	let available = scripts
+	const scriptData = scriptProducts.map((product) => {
+		available = available.filter((script) => script.id !== product.script)
+		subs.push(data.data.filter((s) => s.product === product.id))
+		free.push(data.freeData.filter((f) => f.product === product.id))
 
-		if (err) {
-			error(
-				500,
-				"Server error, this is probably not an issue on your end!\n" +
-					"SELECT scripts.bundles failed!\n\n" +
-					formatError(err)
-			)
-		}
-
-		return await Promise.all(
-			bundleData.map(async (bundle) => {
-				const product = bundleProducts.find((p) => p.id == bundle.product)!
-				subs.push(data.data.filter((s) => s.product === product.id))
-				free.push(data.freeData.filter((f) => f.product === product.id))
-
-				let productPrices = prices.filter((price) => price.product == product.id)
-				if (productPrices.length < 3) {
-					const intervals = ["week", "month", "year"]
-					intervals.forEach((interval) => {
-						const i = productPrices.findIndex((price) => price.interval === interval)
-						if (i === -1) {
-							productPrices.push({
-								active: true,
-								amount: 0,
-								currency: "eur",
-								id: "price_noID",
-								interval: interval,
-								product: product.id
-							})
-						}
+		let productPrices = prices.filter((price) => price.product == product.id)
+		if (productPrices.length < 3) {
+			const intervals = ["week", "month", "year"]
+			intervals.forEach((interval) => {
+				const i = productPrices.findIndex((price) => price.interval === interval)
+				if (i === -1) {
+					productPrices.push({
+						active: true,
+						amount: 0,
+						currency: "eur",
+						id: "price_noID",
+						interval: interval,
+						product: product.id
 					})
-
-					productPrices.sort((priceA, priceB) => {
-						return (
-							intervals.findIndex((p) => p === priceA.interval) -
-							intervals.findIndex((p) => p === priceB.interval)
-						)
-					})
-				}
-
-				return {
-					id: product.id,
-					name: bundle.name,
-					user_id: bundle.user_id,
-					prices: productPrices,
-					bundledScripts: scripts.map((script) => ({
-						...script,
-						active: bundle.scripts.includes(script.id)
-					})),
-					open: false,
-					subsOpen: false,
-					freeOpen: false
 				}
 			})
-		)
-	}
 
-	const bundles = await getBundles()
+			productPrices.sort((priceA, priceB) => {
+				return (
+					intervals.findIndex((p) => p === priceA.interval) -
+					intervals.findIndex((p) => p === priceB.interval)
+				)
+			})
+		}
+
+		return {
+			id: product.id,
+			script: product.script!,
+			user_id: slug,
+			name: product.name,
+			prices: productPrices,
+			subsOpen: false,
+			freeOpen: false
+		}
+	})
 
 	const promises = await Promise.all([
-		superValidate({ bundles }, zod(bundleArraySchema)),
+		superValidate({ scripts: scriptData }, zod(scriptArraySchema)),
 		superValidate(
-			{ user_id: slug, prices: newPrices, bundledScripts: scripts },
-			zod(newBundleSchema)
+			{ id: available.length > 0 ? available[0].id : "", user_id: slug, prices: newPrices },
+			zod(newScriptSchema)
 		)
 	])
 
 	return {
-		bundlesForm: promises[0],
-		newBundleForm: promises[1],
+		scriptsForm: promises[0],
+		newScriptForm: promises[1],
+		available,
 		subscriptions: subs,
 		freeAccess: free
 	}
 }
 
 export const actions = {
-	bundleEdit: async ({
+	scriptEdit: async ({
 		request,
 		locals: { supabaseServer, user, getRoles },
-		url: { origin, searchParams },
+		url: { origin, searchParams, pathname },
 		params: { slug }
 	}) => {
-		if (!user)
+		if (!user) {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
 
 		if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
 
-		const promises = await Promise.all([getRoles(), superValidate(request, zod(bundleArraySchema))])
+		const promises = await Promise.all([getRoles(), superValidate(request, zod(scriptArraySchema))])
 		const roles = promises[0]
 		const form = promises[1]
 
-		if (user.id !== slug && !roles?.administrator)
+		if (user.id !== slug && !roles?.administrator) {
 			error(403, "You cannot access another scripter dashboard.")
+		}
 
 		if (!form.valid) return setError(form, "", "The form is not valid!")
 
@@ -139,7 +119,6 @@ export const actions = {
 		if (!scripter.stripe) return setError(form, "", "Stripe account is not setup!")
 
 		const productID = searchParams.get("product")
-
 		if (!productID) {
 			return setError(
 				form,
@@ -148,50 +127,45 @@ export const actions = {
 			)
 		}
 
-		const product = form.data.bundles.find((bundle) => bundle.id === productID)
+		const product = form.data.scripts.find((script) => script.id === productID)
 
 		if (!product) {
 			return setError(
 				form,
 				"",
-				"Something went wrong! Seems like the selected bundle product is invalid. If this keeps occuring please contact support@waspscripts.com"
+				"Something went wrong! Seems like the selected script product is invalid. If this keeps occuring please contact support@waspscripts.com"
 			)
 		}
-
-		if (product.bundledScripts.length < 2)
-			return setError(form, "", "You need to add at least 2 scripts to a bundle.")
 
 		const { data: productsData, error: errProducts } = await supabaseServer
 			.schema("scripts")
 			.from("products")
-			.select("name, bundle")
+			.select("name")
 			.eq("id", product.id)
 			.single()
 
-		if (errProducts) return setError(form, "", formatError(errProducts))
-
-		if (!productsData.bundle) return setError(form, "", "That product is missing a bundle ID!")
+		if (errProducts) return setError(form, "", errProducts.message)
 
 		if (product.name !== productsData.name) await updateStripeProduct(product.id, product.name)
 
 		const { data: pricesData, error: errPrices } = await supabaseServer
 			.schema("scripts")
 			.from("prices")
-			.select("id, amount")
+			.select("id, amount, interval")
 			.eq("product", product.id)
 			.eq("active", true)
 
-		if (errPrices) return setError(form, "", formatError(errPrices))
+		if (errPrices) return setError(form, "", errPrices.message)
 
 		for (let i = 0; i < pricesData.length; i++) {
 			const currentPrice = pricesData[i]
-			const newPrice = product.prices.find((price) => price.id === currentPrice.id)
+			const j = product.prices.findIndex((price) => price.id === currentPrice.id)
+			if (j === -1) continue
+			const newPrice = product.prices[j]
 
-			if (!newPrice) continue
-
-			const promises = []
+			const updatePricesPromises = []
 			if (Math.round(newPrice.amount * 100) !== currentPrice.amount)
-				promises.push(
+				updatePricesPromises.push(
 					updateStripePrice({
 						active: true,
 						amount: newPrice.amount,
@@ -202,41 +176,43 @@ export const actions = {
 					})
 				)
 
-			if (promises.length > 0) await Promise.all(promises)
+			await Promise.all(updatePricesPromises)
+			product.prices.splice(j, 1)
 		}
 
-		const scripts = product.bundledScripts.reduce((acc: string[], script) => {
-			if (script.active) acc.push(script.id)
-			return acc
-		}, [])
+		const createPricePromises = []
+		for (let i = 0; i < product.prices.length; i++) {
+			const currentPrice = product.prices[i]
+			const j = pricesData.findIndex((price) => price.interval === currentPrice.interval)
+			if (j > -1) {
+				pricesData.splice(j, 1)
+				continue
+			}
+			createPricePromises.push(createStripePrice(currentPrice, product.id))
+		}
 
-		const { error: err } = await supabaseServer
-			.schema("scripts")
-			.from("bundles")
-			.update({ scripts: scripts })
-			.eq("id", productsData.bundle)
-
-		if (err) return setError(form, "", err.message)
-
-		return { form }
+		await Promise.all(createPricePromises)
+		redirect(303, pathname)
 	},
-	bundleAdd: async ({
+	scriptAdd: async ({
 		request,
 		locals: { supabaseServer, user, getRoles },
-		url: { origin },
+		url: { origin, pathname },
 		params: { slug }
 	}) => {
-		if (!user)
+		if (!user) {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
-
+		}
 		if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
 
-		const promises = await Promise.all([getRoles(), superValidate(request, zod(newBundleSchema))])
+		const promises = await Promise.all([getRoles(), superValidate(request, zod(newScriptSchema))])
+
 		const roles = promises[0]
 		const form = promises[1]
 
-		if (user.id !== slug && !roles?.administrator)
+		if (user.id !== slug && !roles?.administrator) {
 			error(403, "You cannot access another scripter dashboard.")
+		}
 
 		if (!form.valid) return setError(form, "", "The form is not valid!")
 
@@ -244,13 +220,37 @@ export const actions = {
 
 		if (!scripter.stripe) return setError(form, "", "Stripe account is not setup!")
 
-		if (!roles?.moderator || !roles?.administrator) form.data.user_id = user.id
+		const { data: prodData, error: err } = await supabaseServer
+			.schema("scripts")
+			.from("products")
+			.select(`id`)
+			.eq("user_id", form.data.user_id)
+			.eq("script", form.data.id)
+			.maybeSingle()
 
-		const err = await createStripeBundleProduct(supabaseServer, form.data)
+		if (err) {
+			error(
+				500,
+				"Server error, this is probably not an issue on your end!\n" +
+					"SELECT product failed!\n\n" +
+					formatError(err)
+			)
+		}
 
-		if (err) return setError(form, "", err.message)
+		if (prodData) return setError(form, "", "You already have a product for that script!")
 
-		return { form }
+		const { data, error: errProtected } = await supabaseServer
+			.schema("scripts")
+			.from("protected")
+			.select("author_id, scripts!inner (title)")
+			.eq("id", form.data.id)
+			.single()
+
+		if (errProtected) return setError(form, "", formatError(errProtected))
+
+		await createStripeScriptProduct(form.data, data.scripts.title, data.author_id)
+
+		redirect(303, pathname)
 	},
 
 	addFree: async ({

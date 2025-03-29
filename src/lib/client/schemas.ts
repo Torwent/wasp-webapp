@@ -236,7 +236,7 @@ const bundledScriptSchema = z.object({
 const bundleSchema = z.object({
 	id: z.string().startsWith("prod_"),
 	name: z.string(),
-	author: z.string(),
+	user_id: z.string(),
 	prices: z
 		.array(priceSchema)
 		.min(1, "You need to pass at least 1 price!")
@@ -256,10 +256,7 @@ const bundleSchema = z.object({
 			}
 			return true
 		}, "Bundle prices are not in order"),
-	bundledScripts: z.array(bundledScriptSchema).min(2, "A bundle must have at least 2 scripts!"),
-	open: z.boolean(),
-	subsOpen: z.boolean(),
-	freeOpen: z.boolean()
+	bundledScripts: z.array(bundledScriptSchema).min(2, "A bundle must have at least 2 scripts!")
 })
 
 export const bundleArraySchema = z.object({
@@ -268,7 +265,6 @@ export const bundleArraySchema = z.object({
 
 export const newBundleSchema = z.object({
 	name: z.string().min(3, "Your name is too short."),
-	author: z.string(),
 	user_id: z.string(),
 	prices: z
 		.array(newPriceSchema)
@@ -298,8 +294,6 @@ const premiumScriptSchema = z.object({
 	script: z.string().uuid("Script IDs must be valid UUIDs"),
 	user_id: z.string().uuid("User id must be a valid UUID"),
 	name: z.string(),
-	author: z.string(),
-	url: z.string().url(),
 	prices: z
 		.array(priceSchema)
 		.min(1, "You need to pass at least 1 price!")
@@ -319,8 +313,8 @@ const premiumScriptSchema = z.object({
 			}
 			return true
 		}, "Script prices are not in order"),
-	subsOpen: z.boolean().default(false).optional(),
-	freeOpen: z.boolean().default(false).optional()
+	subsOpen: z.boolean(),
+	freeOpen: z.boolean()
 })
 
 export const scriptArraySchema = z.object({
@@ -329,9 +323,7 @@ export const scriptArraySchema = z.object({
 
 export const newScriptSchema = z.object({
 	id: z.string().uuid("Script ID must be a valid UUID"),
-	name: z.string().min(3, "Your name is too short."),
-	author: z.string(),
-	url: z.string().url(),
+	user_id: z.string(),
 	prices: z
 		.array(newPriceSchema)
 		.min(1, "You need to pass at least 1 price!")
@@ -351,10 +343,6 @@ export const newScriptSchema = z.object({
 			}
 			return true
 		}, "New script prices are not in order")
-})
-
-export const newScriptArraySchema = z.object({
-	newScripts: z.array(newScriptSchema)
 })
 
 export const countryCodeSchema = z.object({
@@ -378,9 +366,3 @@ export type NewScriptSchema = z.infer<typeof newScriptSchema>
 export type BundleArraySchema = typeof bundleArraySchema
 export type NewBundleSchema = typeof newBundleSchema
 export type ScriptArraySchema = typeof scriptArraySchema
-export type NewScriptArraySchema = typeof newScriptArraySchema
-
-export type TBundleArraySchema = z.infer<BundleArraySchema>
-export type TNewBundleSchema = z.infer<NewBundleSchema>
-export type TScriptArraySchema = z.infer<ScriptArraySchema>
-export type TNewScriptArraySchema = z.infer<NewScriptArraySchema>

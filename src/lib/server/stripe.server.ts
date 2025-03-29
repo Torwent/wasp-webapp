@@ -4,7 +4,7 @@ import type { Bundle, Price, Scripter } from "$lib/types/collection"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import Stripe from "stripe"
 
-export const stripe = new Stripe(STRIPE_KEY, { apiVersion: "2025-01-27.acacia", typescript: true })
+export const stripe = new Stripe(STRIPE_KEY, { apiVersion: "2025-02-24.acacia", typescript: true })
 
 export async function createCustomerPortal(customer: string, origin: string) {
 	let portal: Stripe.BillingPortal.Session
@@ -379,13 +379,17 @@ export async function createStripeBundleProduct(supabase: SupabaseClient, bundle
 	await Promise.all(stripePromises)
 }
 
-export async function createStripeScriptProduct(script: NewScriptSchema, user_id: string) {
+export async function createStripeScriptProduct(
+	script: NewScriptSchema,
+	name: string,
+	user_id: string
+) {
 	script.prices = script.prices.filter((price) => price.amount > 0)
 	if (script.prices.length === 0) return
 
 	const product = await stripe.products
 		.create({
-			name: script.name,
+			name: name,
 			tax_code: "txcd_10202000",
 			metadata: { user_id: user_id, script: script.id }
 		})

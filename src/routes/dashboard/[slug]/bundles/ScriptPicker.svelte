@@ -3,8 +3,7 @@
 	import { PanelBottomOpen, PanelTopOpen } from "svelte-lucide"
 
 	let {
-		scripts = $bindable(),
-		state = $bindable()
+		scripts = $bindable()
 	}: {
 		scripts: {
 			name: string
@@ -13,18 +12,19 @@
 			id: string
 			url: string
 		}[]
-		state: boolean
 	} = $props()
+
+	let open = $state(false)
 </script>
 
 <Modal
-	bind:open={state}
+	bind:open
 	triggerBase="btn preset-tonal"
 	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm p-12 w-full"
 	backdropClasses="backdrop-blur-sm"
 >
 	{#snippet trigger()}
-		{#if state}
+		{#if open}
 			<PanelBottomOpen size="16" />
 		{:else}
 			<PanelTopOpen size="16" />
@@ -54,8 +54,7 @@
 			</table>
 		</article>
 		<footer class="flex justify-end gap-4">
-			<button type="button" class="btn preset-tonal" onclick={() => (state = false)}>Confirm</button
-			>
+			<button type="button" class="btn preset-tonal" onclick={() => (open = false)}>Confirm</button>
 		</footer>
 	{/snippet}
 </Modal>

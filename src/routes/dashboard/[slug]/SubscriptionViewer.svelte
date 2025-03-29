@@ -7,12 +7,10 @@
 	let {
 		id,
 		name,
-		state = $bindable(),
-		count = $bindable()
+		count
 	}: {
 		id: string
 		name: string
-		state: boolean
 		count: number
 	} = $props()
 
@@ -38,8 +36,6 @@
 			console.error(priceError)
 			return []
 		}
-
-		console.log(priceData)
 
 		return subData.map((sub) => {
 			const i = priceData.findIndex((price) => price.id === sub.price)
@@ -69,10 +65,11 @@
 	]
 
 	let userLocale = navigator.language ?? "pt-PT"
+	let open = $state(false)
 </script>
 
 <Modal
-	bind:open={state}
+	bind:open
 	triggerBase="btn preset-filled-secondary-500 font-bold"
 	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-5/7 max-w-screen max-h-screen"
 	backdropClasses="backdrop-blur-sm"
@@ -142,9 +139,7 @@
 				CANCEL All SUBSCRIPTIONS
 			</button>
 
-			<button type="button" class="btn preset-tonal" onclick={() => (state = false)}>
-				Close
-			</button>
+			<button type="button" class="btn preset-tonal" onclick={() => (open = false)}> Close </button>
 		</footer>
 	{/snippet}
 </Modal>

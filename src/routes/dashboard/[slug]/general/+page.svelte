@@ -59,9 +59,9 @@
 						{stats.month_premium_user_downloads} / {stats.month_premium_downloads}
 					</TableCell>
 
-					<TableCell>{subscriptions.total.subscribers}</TableCell>
-					<TableCell>{subscriptions.total.cancelling}</TableCell>
-					<TableCell>{subscriptions.total.free_access}</TableCell>
+					<TableCell>{subscriptions.subscribers}</TableCell>
+					<TableCell>{subscriptions.cancelling}</TableCell>
+					<TableCell>{subscriptions.free_access}</TableCell>
 				</tr>
 			</tbody>
 		</table>

@@ -14,7 +14,9 @@ import {
 	updateStripeConnectAccount
 } from "$lib/server/stripe.server"
 
-export const load = async ({ locals: { supabaseServer }, params: { slug } }) => {
+export const load = async ({ locals: { supabaseServer }, params: { slug }, depends }) => {
+	depends("dashboard:stripe_session")
+
 	const scripter = await getScripter(supabaseServer, slug)
 	const promises = await Promise.all([
 		superValidate(zod(countryCodeSchema)),

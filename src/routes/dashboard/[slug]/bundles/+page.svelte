@@ -8,13 +8,9 @@
 	import FreeAccessViewer from "../FreeAccessViewer.svelte"
 
 	const { data } = $props()
-	const { scripter, subscriptions } = $derived(data)
+	const { subscriptions, freeAccess } = $derived(data)
 
-	const {
-		form: bundlesForm,
-		errors: bundlesErrors,
-		enhance: bundlesEnhance
-	} = superForm(data.forms.bundles, {
+	const { form: bundlesForm, enhance: bundlesEnhance } = superForm(data.bundlesForm, {
 		id: "bundles",
 		dataType: "json",
 		multipleSubmits: "prevent",
@@ -23,12 +19,8 @@
 		resetForm: true
 	})
 
-	const {
-		form: newBundleForm,
-		errors: newBundleErrors,
-		enhance: newBundleEnhance
-	} = superForm(data.forms.newBundle, {
-		id: "bundles",
+	const { form: newBundleForm, enhance: newBundleEnhance } = superForm(data.newBundleForm, {
+		id: "newbundle",
 		dataType: "json",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors-and-message",
@@ -38,7 +30,9 @@
 
 	const headers = [
 		"Title",
-		"Price (Week/Month/Year)",
+		"Weekly Price",
+		"Monthly Price",
+		"Yearly Price",
 		"Subscribers",
 		"Cancelling",
 		"Free Access",
@@ -48,172 +42,153 @@
 </script>
 
 <main class="m-4">
-	{#if !scripter.stripe}
-		<h1 class="my-24 text-center">
-			To use this section of the dashboard you need to go through and finish the stripe on-boarding.
-		</h1>
-	{:else}
-		<h1 class="my-24 text-center">
-			By making premium scripts you automatically accept the
-			<a href="/legal/scripter_tos" class="text-tertiary-500"> scripter terms or service</a>
-			.
-		</h1>
+	<h1 class="my-24 text-center">
+		By making premium scripts you automatically accept the
+		<a href="/legal/scripter_tos" class="text-tertiary-500"> scripter terms or service</a>
+		.
+	</h1>
 
-		<form
-			method="POST"
-			class="xl:mx-w-7xl table-wrap mx-auto max-w-md rounded-md preset-outlined-surface-400-600 md:max-w-3xl lg:max-w-6xl"
-			use:bundlesEnhance
-		>
-			<table class="table border-separate space-y-6 text-xs">
-				<thead class="rounded-md text-lg font-bold preset-filled-surface-200-800">
-					<tr>
-						{#each headers as header}
-							<th>
-								<span class="flex justify-center text-center text-secondary-950-50">{header}</span>
-							</th>
-						{/each}
-					</tr>
-				</thead>
+	<div class="my-12 text-center">
+		<p>All prices are displayed in EUR (Euros €).</p>
+		<p>
+			Setting a price to 0 disables that interval. Setting all prices to 0 disables and hides the
+			product from the subscriptions page.
+		</p>
+	</div>
 
-				<tbody class="preset-filled-surface-100-900 hover:[&>tr]:preset-tonal-surface">
-					{#each $bundlesForm.bundles as _, i}
-						<tr>
-							<TableCell>
-								<div class="mx-3">
-									<input
-										name="name"
-										class="input w-fit preset-outlined-surface-500"
-										type="text"
-										bind:value={$bundlesForm.bundles[i].name}
-									/>
-								</div>
-							</TableCell>
-
-							<TableCell>
-								<div>
-									<div class="grid md:flex">
-										{#each $bundlesForm.bundles[i].prices as _, j}
-											<input
-												name="prices"
-												class="input mx-1 preset-outlined-surface-500"
-												type="number"
-												bind:value={$bundlesForm.bundles[i].prices[j].amount}
-												step="0.01"
-											/>
-										{/each}
-									</div>
-									{#if $bundlesErrors.bundles && $bundlesErrors.bundles[i].prices?._errors}
-										{#each $bundlesErrors.bundles[i].prices._errors as error}
-											<small class="text-error-500">
-												{error}
-											</small>
-										{/each}
-									{/if}
-								</div>
-							</TableCell>
-
-							<TableCell>
-								<SubscriptionViewer
-									id={$bundlesForm.bundles[i].id}
-									name={$bundlesForm.bundles[i].name}
-									bind:state={$bundlesForm.bundles[i].subsOpen}
-									bind:count={subscriptions.bundles[i].count}
-								/>
-							</TableCell>
-							<TableCell>{subscriptions.bundles[i].cancelling}</TableCell>
-							<TableCell>
-								<FreeAccessViewer
-									id={$bundlesForm.bundles[i].id}
-									name={$bundlesForm.bundles[i].name}
-									bind:state={$bundlesForm.bundles[i].freeOpen}
-									bind:count={subscriptions.bundles[i].free}
-								/>
-							</TableCell>
-
-							<TableCell>
-								<ScriptPicker
-									bind:scripts={$bundlesForm.bundles[i].bundledScripts}
-									bind:state={$bundlesForm.bundles[i].open}
-								/>
-							</TableCell>
-							<TableCell>
-								<button
-									id="button-{$bundlesForm.bundles[i].id}"
-									type="submit"
-									class="btn font-bold preset-filled-secondary-500"
-									formaction="?/bundleEdit={$bundlesForm.bundles[i].id}"
-								>
-									Save
-								</button>
-							</TableCell>
-						</tr>
-
-						{#if $bundlesForm.bundles[i].freeOpen}
-							<tr class="table-row">
-								<td colspan={headers.length}>
-									<!-- <TableFreeAccess index={i} bind:products {action} /> -->
-								</td>
-							</tr>
-						{/if}
+	<form
+		method="POST"
+		class="xl:mx-w-7xl table-wrap mx-auto max-w-md rounded-md preset-outlined-surface-400-600 md:max-w-3xl lg:max-w-6xl"
+		use:bundlesEnhance
+	>
+		<table class="table border-separate space-y-6 text-xs">
+			<thead class="rounded-md text-lg font-bold preset-filled-surface-200-800">
+				<tr>
+					{#each headers as header}
+						<th>
+							<span class="flex justify-center text-center text-secondary-950-50">{header}</span>
+						</th>
 					{/each}
-				</tbody>
-			</table>
-		</form>
+				</tr>
+			</thead>
 
-		<form
-			method="POST"
-			action="?/addFree"
-			class="xl:mx-w-7xl mx-auto my-12 flex max-w-md flex-col rounded-md text-center preset-outlined-surface-400-600 md:max-w-3xl lg:max-w-6xl"
-			use:newBundleEnhance
-		>
-			<h1 class="my-4 text-lg">New Bundle</h1>
-			<label class="my-4">
-				<span class="label-text">Name:</span>
+			<tbody class="preset-filled-surface-100-900 hover:[&>tr]:preset-tonal-surface">
+				{#each $bundlesForm.bundles as _, i}
+					<tr>
+						<TableCell>
+							<div class="mx-3">
+								<input
+									name="name"
+									class="input w-fit preset-outlined-surface-500"
+									type="text"
+									bind:value={$bundlesForm.bundles[i].name}
+								/>
+							</div>
+						</TableCell>
+
+						{#each $bundlesForm.bundles[i].prices as _, j}
+							<td>
+								<input
+									name="prices"
+									class="input mx-1 preset-outlined-surface-500"
+									type="number"
+									bind:value={$bundlesForm.bundles[i].prices[j].amount}
+									step="0.01"
+								/>
+							</td>
+						{/each}
+
+						<TableCell>
+							<SubscriptionViewer
+								id={$bundlesForm.bundles[i].id}
+								name={$bundlesForm.bundles[i].name}
+								count={subscriptions[i].length}
+							/>
+						</TableCell>
+						<TableCell>{subscriptions[i].filter((s) => s.cancel).length}</TableCell>
+						<TableCell>
+							<FreeAccessViewer
+								id={$bundlesForm.bundles[i].id}
+								name={$bundlesForm.bundles[i].name}
+								count={freeAccess[i].length}
+							/>
+						</TableCell>
+
+						<TableCell>
+							<ScriptPicker bind:scripts={$bundlesForm.bundles[i].bundledScripts} />
+						</TableCell>
+						<TableCell>
+							<button
+								id="button-{$bundlesForm.bundles[i].id}"
+								type="submit"
+								class="btn font-bold preset-filled-secondary-500"
+								formaction="?/bundleEdit&product={$bundlesForm.bundles[i].id}"
+							>
+								Save
+							</button>
+						</TableCell>
+					</tr>
+				{/each}
+			</tbody>
+		</table>
+	</form>
+
+	<form
+		method="POST"
+		action="?/bundleAdd"
+		class="xl:mx-w-7xl mx-auto my-12 flex max-w-md flex-col rounded-md text-center preset-outlined-surface-400-600 md:max-w-3xl lg:max-w-6xl"
+		use:newBundleEnhance
+	>
+		<h1 class="my-4 text-lg">New Bundle</h1>
+		<label class="my-4">
+			<span class="label-text">Name:</span>
+			<input
+				name="bundlename"
+				type="text"
+				placeholder="Bundle name"
+				class="input mx-auto w-96"
+				bind:value={$newBundleForm.name}
+			/>
+		</label>
+
+		<div class="my-12 flex flex-col justify-around md:flex-row">
+			<label>
+				<span class="label-text">Weekly price:</span>
 				<input
-					name="bundlename"
-					type="text"
-					placeholder="Bundle name"
-					class="input mx-auto w-96"
-					bind:value={$newBundleForm.name}
+					name="weekprice"
+					type="number"
+					placeholder="X €"
+					class="input"
+					bind:value={$newBundleForm.prices[0].amount}
+					step="0.01"
 				/>
 			</label>
+			<label>
+				<span class="label-text">Weekly price:</span>
+				<input
+					name="weekprice"
+					type="number"
+					placeholder="X €"
+					class="input"
+					bind:value={$newBundleForm.prices[1].amount}
+					step="0.01"
+				/>
+			</label>
+			<label>
+				<span class="label-text">Weekly price:</span>
+				<input
+					name="weekprice"
+					type="number"
+					placeholder="X €"
+					class="input"
+					bind:value={$newBundleForm.prices[2].amount}
+					step="0.01"
+				/>
+			</label>
+		</div>
 
-			<div class="my-12 flex flex-col justify-around md:flex-row">
-				<label>
-					<span class="label-text">Weekly price:</span>
-					<input
-						name="weekprice"
-						type="number"
-						placeholder="X €"
-						class="input"
-						bind:value={$newBundleForm.prices[0].amount}
-					/>
-				</label>
-				<label>
-					<span class="label-text">Weekly price:</span>
-					<input
-						name="weekprice"
-						type="number"
-						placeholder="X €"
-						class="input"
-						bind:value={$newBundleForm.prices[1].amount}
-					/>
-				</label>
-				<label>
-					<span class="label-text">Weekly price:</span>
-					<input
-						name="weekprice"
-						type="number"
-						placeholder="X €"
-						class="input"
-						bind:value={$newBundleForm.prices[2].amount}
-					/>
-				</label>
-			</div>
+		<ScriptPicker bind:scripts={$newBundleForm.bundledScripts} />
 
-			<ScriptPicker bind:scripts={$newBundleForm.bundledScripts} bind:state={$newBundleForm.open} />
-
-			<button class="btn mx-auto my-8 w-32 preset-filled-primary-500">Add</button>
-		</form>
-	{/if}
+		<button class="btn mx-auto my-8 w-32 preset-filled-primary-500">Add</button>
+	</form>
 </main>
