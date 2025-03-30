@@ -16,7 +16,7 @@
 	id="theme-form"
 	method="POST"
 	action="/?/setTheme"
-	class="input-group mx-1 my-auto hidden grid-cols-[auto_1fr] hover:preset-tonal xl:flex"
+	class="input-group mx-1 my-auto flex grid-cols-[auto_1fr] hover:preset-tonal"
 	use:enhance={() => document.body.setAttribute("data-theme", theme)}
 	onchange={(e) => e.currentTarget.requestSubmit()}
 >

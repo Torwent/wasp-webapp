@@ -25,7 +25,6 @@ export function searchTutorialsIndex(searchTerm: string) {
 
 export async function getTutorials() {
 	let tutorials: Tutorial[] = []
-
 	const paths = import.meta.glob("/src/wasp-info/tutorials/*.md", { eager: true })
 
 	for (const path in paths) {

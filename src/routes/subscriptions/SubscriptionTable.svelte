@@ -48,7 +48,7 @@
 	})
 </script>
 
-<div class="mx-auto my-4 items-center justify-center">
+<div class="mx-auto w-screen">
 	<h3 class="my-12 justify-center text-center">Current subscriptions</h3>
 
 	{#if $errors._errors}

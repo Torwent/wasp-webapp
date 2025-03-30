@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { goto } from "$app/navigation"
+
 	const { assets = "", title = "Loading...", username = null } = $props()
 </script>
 
@@ -15,9 +17,12 @@
 	</span>
 	<span class="lg:text-md text-xs xl:text-lg">
 		{#if username}
-			<a href="/scripters/{username}" class="text-shadow-strong font-semibold drop-shadow-2xl">
+			<button
+				onclick={async () => goto("/scripters/{username}")}
+				class="text-shadow-strong font-semibold drop-shadow-2xl"
+			>
 				by {username}
-			</a>
+			</button>
 		{:else}
 			<span class="text-shadow-strong font-semibold drop-shadow-2xl"> by Loading... </span>
 		{/if}

@@ -48,7 +48,8 @@ export const load = async ({ locals: { supabaseServer, user, session } }) => {
 
 	return {
 		form: await superValidate({ content: scriptDefaultContent }, zod(addScriptServerSchema), {
-			allowFiles: true
+			allowFiles: true,
+			errors: false
 		})
 	}
 }

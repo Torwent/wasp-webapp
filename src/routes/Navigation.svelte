@@ -55,14 +55,14 @@
 	const avatarName = $derived(profile?.username ?? "Avatar")
 </script>
 
-<nav class="col-span-12 row-span-1 w-full flex-col">
+<nav class="col-span-12 row-span-1 w-full flex-col text-sm xl:text-base">
 	<div
-		class="flex h-full justify-between font-semibold backdrop-blur preset-filled-surface-100-900"
+		class="flex h-full justify-between bg-surface-200/30 font-semibold backdrop-blur-md dark:bg-surface-800/30"
 	>
 		<button
 			name="Menu"
 			aria-label="Open the navigation menu"
-			class="justify-left my-auto flex h-full p-2 align-middle text-primary-500 lg:hidden"
+			class="justify-left my-auto flex h-full p-2 align-middle text-primary-500 xl:hidden"
 			onclick={() => {
 				showMenu = !showMenu
 				if (showMenu) showProfile = false
@@ -76,7 +76,7 @@
 			<Logo selected={true} />
 		</button>
 
-		<ul class="my-auto hidden w-9/12 justify-evenly lg:flex xl:w-7/12">
+		<ul class="my-auto hidden w-9/12 justify-evenly xl:flex xl:w-7/12">
 			<li class="h-12">
 				<a
 					href="/"
@@ -137,15 +137,17 @@
 				/>
 			</button>
 
-			<Lightswitch />
-			<ThemeSwitcher />
-			<GitHub />
-			<Discord />
+			<div class="hidden lg:flex">
+				<Lightswitch />
+				<ThemeSwitcher />
+				<GitHub />
+				<Discord />
+			</div>
 		</div>
 	</div>
 
 	<ul
-		class="preset-filled-surface-500/20 absolute z-50 w-full backdrop-blur-sm {showMenu
+		class="absolute z-50 w-full bg-surface-200/30 backdrop-blur-md xl:hidden dark:bg-surface-800/30 {showMenu
 			? 'flex flex-col'
 			: 'hidden'}"
 	>
@@ -172,19 +174,21 @@
 			</li>
 		{/each}
 
-		<li class="flex h-12">
-			<div class="mx-auto my-auto">
+		<li class="my-2 flex h-12 lg:hidden">
+			<div class="flex w-full justify-evenly">
 				<ThemeSwitcher />
-				<Lightswitch />
-				<GitHub />
-				<Discord />
+				<div class="flex">
+					<Lightswitch />
+					<GitHub />
+					<Discord />
+				</div>
 			</div>
 		</li>
 	</ul>
 
 	<form
 		method="POST"
-		class="absolute z-50 w-full bg-surface-200/30 py-14 backdrop-blur dark:bg-surface-800/30 {showProfile
+		class="absolute z-50 w-full bg-surface-200/30 py-14 backdrop-blur-md dark:bg-surface-800/30 {showProfile
 			? 'flex flex-col'
 			: 'hidden'}"
 		use:enhance

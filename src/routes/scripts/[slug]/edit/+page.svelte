@@ -171,7 +171,7 @@
 						</span>
 					</label>
 				</div>
-				<div class="my-8 flex justify-evenly">
+				<div class="my-8 flex flex-col justify-evenly">
 					<label class="label">
 						<span class="label-text">Title:</span>
 						<input
@@ -179,7 +179,7 @@
 							id="title"
 							name="title"
 							class="input"
-							class:input-error={$errors.title != null}
+							class:ring-error-500={$errors.title != null}
 							bind:value={$form.title}
 						/>
 					</label>
@@ -189,14 +189,14 @@
 					{/if}
 				</div>
 
-				<div class="my-8">
+				<div class="my-8 flex flex-col">
 					<label class="label">
 						<span class="label-text">Description (recommended 60-80 characters):</span>
 						<textarea
 							id="description"
 							name="description"
 							class="textarea"
-							class:input-error={$errors.description != null}
+							class:ring-error-500={$errors.description != null}
 							bind:value={$form.description}
 						>
 						</textarea>
@@ -206,14 +206,14 @@
 					{/if}
 				</div>
 
-				<div class="my-8">
+				<div class="my-8 flex flex-col">
 					<label class="label">
 						<span class="label-text">Content:</span>
 						<textarea
 							id="content"
 							name="content"
 							class="textarea h-64"
-							class:input-error={$errors.content != null}
+							class:ring-error-500={$errors.content != null}
 							bind:value={$form.content}
 						>
 						</textarea>
@@ -230,7 +230,7 @@
 							id="categories"
 							name="categories"
 							class="select overflow-y-scroll"
-							class:input-error={$errors.categories != null}
+							class:ring-error-500={$errors.categories != null}
 							bind:value={$form.categories}
 							multiple
 						>
@@ -440,7 +440,7 @@
 										id="xp_min"
 										name="xp_min"
 										class="input"
-										class:input-error={$errors.xp_min != null}
+										class:ring-error-500={$errors.xp_min != null}
 										bind:value={$form.xp_min}
 									/>
 								</label>
@@ -457,7 +457,7 @@
 										id="xp_max"
 										name="xp_max"
 										class="input"
-										class:input-error={$errors.xp_max}
+										class:ring-error-500={$errors.xp_max}
 										bind:value={$form.xp_max}
 									/>
 								</label>
@@ -476,7 +476,7 @@
 										id="gp_min"
 										name="gp_min"
 										class="input"
-										class:input-error={$errors.gp_min != null}
+										class:ring-error-500={$errors.gp_min != null}
 										bind:value={$form.gp_min}
 									/>
 								</label>
@@ -493,7 +493,7 @@
 										id="gp_max"
 										name="gp_max"
 										class="input"
-										class:input-error={$errors.gp_max}
+										class:ring-error-500={$errors.gp_max}
 										bind:value={$form.gp_max}
 									/>
 								</label>

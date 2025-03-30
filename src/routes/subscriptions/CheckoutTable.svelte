@@ -121,69 +121,70 @@
 	}
 </script>
 
-<div class="mx-auto my-8 w-full items-center justify-center md:max-w-3xl lg:max-w-6xl xl:max-w-7xl">
-	<h3 class="my-12 justify-center text-center">New subscriptions</h3>
+<div class="mx-auto my-8 w-screen">
+	<div class="mx-4">
+		<h3 class="my-12 justify-center text-center">New subscriptions</h3>
 
-	<div class="mx-auto my-2 flex flex-col justify-center gap-4 md:flex-row">
-		<label class="label">
-			<span class="label-text">Search:</span>
-			<input
-				type="text"
-				placeholder="🔍Search products by id, name or author"
-				class="input"
-				bind:value={search}
-				oninput={searchFilter}
-			/>
-		</label>
-		<label class="label">
-			<span class="label-text">Type:</span>
-			<select
-				class="select"
-				bind:value={type}
-				onchange={() => {
-					search = ""
-					filter()
-				}}
-			>
-				<option value="all">All</option>
-				<option value="bundles">Bundles</option>
-				<option value="scripts">Scripts</option>
-			</select>
-		</label>
-		<label class="label">
-			<span class="label-text">Author:</span>
-			<select
-				class="select"
-				bind:value={author}
-				onchange={() => {
-					search = ""
-					filter()
-				}}
-			>
-				<option value="all">All</option>
-				{#await authorsPromise}
-					<option value="all">Loading...</option>
-					<option value="all">Loading...</option>
-					<option value="all">Loading...</option>
-				{:then authors}
-					{#each authors as a}
-						{#if a}
-							<option value={a}>{a}</option>
-						{/if}
-					{/each}
-				{/await}
-			</select>
+		<div class="mx-auto my-2 flex flex-col justify-center gap-4 md:flex-row">
+			<label class="label">
+				<span class="label-text">Search:</span>
+				<input
+					type="text"
+					placeholder="🔍Search products by id, name or author"
+					class="input"
+					bind:value={search}
+					oninput={searchFilter}
+				/>
+			</label>
+			<label class="label md:max-w-96">
+				<span class="label-text">Type:</span>
+				<select
+					class="select"
+					bind:value={type}
+					onchange={() => {
+						search = ""
+						filter()
+					}}
+				>
+					<option value="all">All</option>
+					<option value="bundles">Bundles</option>
+					<option value="scripts">Scripts</option>
+				</select>
+			</label>
+			<label class="label md:max-w-96">
+				<span class="label-text">Author:</span>
+				<select
+					class="select"
+					bind:value={author}
+					onchange={() => {
+						search = ""
+						filter()
+					}}
+				>
+					<option value="all">All</option>
+					{#await authorsPromise}
+						<option value="all">Loading...</option>
+						<option value="all">Loading...</option>
+						<option value="all">Loading...</option>
+					{:then authors}
+						{#each authors as a}
+							{#if a}
+								<option value={a}>{a}</option>
+							{/if}
+						{/each}
+					{/await}
+				</select>
+			</label>
+		</div>
+
+		<label class="label mx-auto my-2 justify-center md:max-w-96">
+			<span class="label-text">Discount code:</span>
+			<input type="text" placeholder="Discount code" class="input" bind:value={code} />
 		</label>
 	</div>
-
-	<label class="label mx-auto my-2 max-w-2xl justify-center">
-		<span class="label-text">Discount code:</span>
-		<input type="text" placeholder="Discount code" class="input" bind:value={code} />
-	</label>
-
 	<!-- class="xl:mx-w-7xl table-wrap mx-auto w-full max-w-md rounded-md preset-outlined-surface-500 md:max-w-3xl lg:max-w-6xl" -->
-	<form method="POST" class="rounded-md preset-outlined-surface-500" use:enhance>
-		<table class="table table-fixed border-separate space-y-6 text-sm">
+	<form method="POST" class="overflow-x-auto rounded-md preset-outlined-surface-500" use:enhance>
+		<table class="table table-auto border-separate space-y-6 text-xs md:text-sm">
 			<colgroup>
 				<col class="w-2/6 xl:w-5/12" />
 				<col class="w-1/5" />

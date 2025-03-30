@@ -20,12 +20,12 @@ export async function doLogin(
 
 	if (!provider) error(403, "Failed to login! Provider not specified!")
 
-	let href = origin + "/auth/callback/"
+	let href = origin + "/auth/callback/" + (path?.slice(3) ?? "")
 
 	const { data, error: err } = await supabase.auth.signInWithOAuth({
 		provider: provider,
 		options: {
-			redirectTo: href + (path?.slice(3) ?? ""),
+			redirectTo: href,
 			scopes: "identify email guilds guilds.members.read"
 		}
 	})
@@ -157,7 +157,6 @@ export async function getUsername(id: string) {
 		.single()
 
 	if (err) throw error(500, formatError(err))
-
 	return data.username
 }
 

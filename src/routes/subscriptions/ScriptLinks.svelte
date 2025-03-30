@@ -24,7 +24,7 @@
 		{:else}
 			<PanelTopOpen size="16" />
 		{/if}
-		<span>Bundle</span>
+		Bundle
 	{/snippet}
 	{#snippet content()}
 		<header class="flex justify-between">

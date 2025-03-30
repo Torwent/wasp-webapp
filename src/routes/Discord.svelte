@@ -1,6 +1,6 @@
 <a
 	href="https://discord.com/invite/YMYUahmww9"
-	class="btn mx-1 my-auto hidden hover:preset-tonal lg:block"
+	class="btn mx-1 my-auto flex hover:preset-tonal"
 	aria-label="Join WaspScripts Discord server"
 	target="_blank"
 >

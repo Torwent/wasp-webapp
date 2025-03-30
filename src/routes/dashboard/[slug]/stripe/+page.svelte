@@ -27,8 +27,7 @@
 	const {
 		form: dbaForm,
 		errors: dbaErrors,
-		enhance: dbaEnhance,
-		allErrors: dbaAllErrors
+		enhance: dbaEnhance
 	} = superForm(data.dbaForm, {
 		dataType: "json",
 		multipleSubmits: "prevent",
@@ -157,27 +156,12 @@
 				<div class="my-4">
 					<label for="dba">Invoice display name:</label>
 					<input class="input my-2" name="dba" id="dba" bind:value={$dbaForm.dba} />
-					{#if $dbaErrors && $dbaErrors.dba}
+					{#if $dbaErrors.dba}
 						<div
 							class="max-h-24 overflow-x-hidden overflow-y-scroll rounded-md bg-surface-700 text-error-500"
 						>
-							{$dbaErrors.dba}
-						</div>
-					{/if}
-					{#if $dbaAllErrors}
-						<div
-							class="max-h-24 overflow-x-hidden overflow-y-scroll rounded-md bg-surface-700 text-error-500"
-						>
-							{#each $dbaAllErrors as error, i}
-								{#if i === 0}
-									Errors:
-								{/if}
-								<small class="mx-8 flex rounded-md text-error-500">
-									Error path: {error.path}
-									{#each error.messages as messages}
-										{messages}
-									{/each}
-								</small>
+							{#each $dbaErrors.dba as err}
+								{err}
 							{/each}
 						</div>
 					{/if}
@@ -211,8 +195,8 @@
 
 		{#if stripeAccount}
 			{#if stripeAccount.requirements?.currently_due && stripeAccount.requirements?.currently_due.length > 0}
-				<div class="mb-24">
-					<span class="my-2">Missing account information:</span>
+				<div class="mb-24 flex flex-col">
+					<span class="my-2 text-error-500">Missing account information:</span>
 
 					<div class="my-2 grid bg-surface-700 text-error-500">
 						{#each stripeAccount.requirements?.currently_due as requirement}
@@ -222,6 +206,9 @@
 					<small>
 						This can be updated on the "Update stripe connected account" button. Ask Torwent for
 						help if needed.
+					</small>
+					<small class="text-error-500">
+						Not having this complete may result in you not getting paid.
 					</small>
 				</div>
 			{/if}

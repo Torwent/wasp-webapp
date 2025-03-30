@@ -10,7 +10,11 @@
 	const { data } = $props()
 	const { subscriptions, freeAccess } = $derived(data)
 
-	const { form: bundlesForm, enhance: bundlesEnhance } = superForm(data.bundlesForm, {
+	const {
+		form: bundlesForm,
+		errors: bundlesErrors,
+		enhance: bundlesEnhance
+	} = superForm(data.bundlesForm, {
 		id: "bundles",
 		dataType: "json",
 		multipleSubmits: "prevent",
@@ -19,7 +23,11 @@
 		resetForm: true
 	})
 
-	const { form: newBundleForm, enhance: newBundleEnhance } = superForm(data.newBundleForm, {
+	const {
+		form: newBundleForm,
+		errors: newBundleErrors,
+		enhance: newBundleEnhance
+	} = superForm(data.newBundleForm, {
 		id: "newbundle",
 		dataType: "json",
 		multipleSubmits: "prevent",
@@ -149,42 +157,30 @@
 				class="input mx-auto w-96"
 				bind:value={$newBundleForm.name}
 			/>
+			{#if $newBundleErrors.name}
+				{#each $newBundleErrors.name as err}
+					<small class="text-error-500">{err}</small>
+				{/each}
+			{/if}
 		</label>
 
 		<div class="my-12 flex flex-col justify-around md:flex-row">
-			<label>
-				<span class="label-text">Weekly price:</span>
-				<input
-					name="weekprice"
-					type="number"
-					placeholder="X €"
-					class="input"
-					bind:value={$newBundleForm.prices[0].amount}
-					step="0.01"
-				/>
-			</label>
-			<label>
-				<span class="label-text">Weekly price:</span>
-				<input
-					name="weekprice"
-					type="number"
-					placeholder="X €"
-					class="input"
-					bind:value={$newBundleForm.prices[1].amount}
-					step="0.01"
-				/>
-			</label>
-			<label>
-				<span class="label-text">Weekly price:</span>
-				<input
-					name="weekprice"
-					type="number"
-					placeholder="X €"
-					class="input"
-					bind:value={$newBundleForm.prices[2].amount}
-					step="0.01"
-				/>
-			</label>
+			{#each ["Weekly", "Monthly", "Yearly"] as interval, i}
+				<label>
+					<span class="label-text">{interval} price:</span>
+					<input
+						type="number"
+						class="input"
+						step="0.01"
+						bind:value={$newBundleForm.prices[i].amount}
+					/>
+					{#if $newBundleErrors.prices && $newBundleErrors.prices[i]?.amount}
+						{#each $newBundleErrors.prices[i].amount as err}
+							<small class="text-error-500">{err}</small>
+						{/each}
+					{/if}
+				</label>
+			{/each}
 		</div>
 
 		<ScriptPicker bind:scripts={$newBundleForm.bundledScripts} />

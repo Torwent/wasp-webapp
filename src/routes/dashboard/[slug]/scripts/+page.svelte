@@ -171,7 +171,6 @@
 					<span class="label-text">{interval} price:</span>
 					<input
 						type="number"
-						placeholder="X €"
 						class="input"
 						step="0.01"
 						bind:value={$newScriptForm.prices[i].amount}
