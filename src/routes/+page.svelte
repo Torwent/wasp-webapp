@@ -1,42 +1,16 @@
 <script lang="ts">
-	import { page } from "$app/state"
 	import { formatTime, formatNumber } from "$lib/utils"
-	import Discord from "$lib/components/Discord.svelte"
 	import CanvasAnimation from "./CanvasAnimation.svelte"
+	import Head from "$lib/components/Head.svelte"
 
 	const { data } = $props()
 	const { totals } = $derived(data)
-
-	const headTitle = "WaspScripts"
-	const headDescription =
-		"OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
-	const headKeywords = "OldSchool, RuneScape, OSRS, 2007, Color, Bot, Wasp, Scripts"
-	const headAuthor = "Torwent"
-	const headImage = "/multi-color-logo.png"
 </script>
 
-<svelte:head>
-	<title>{headTitle}</title>
-	<meta name="description" content={headDescription} />
-	<meta name="keywords" content={headKeywords} />
-	<meta name="author" content={headAuthor} />
-	<meta name="robots" content="all" />
-
-	<!-- OpenGraph tags -->
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content={headTitle} />
-	<meta property="og:url" content={page.url.href} />
-	<meta property="og:image" content={headImage} />
-	<meta property="og:image:type" content="image/png" />
-	<meta property="og:image:alt" content="WaspScripts Logo" />
-	<meta property="og:description" content={headDescription} />
-
-	<!-- Twitter tags -->
-	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content={headTitle} />
-	<meta name="twitter:description" content={headDescription} />
-	<meta name="twitter:image" content={headImage} />
-</svelte:head>
+<Head
+	title="WaspScripts"
+	description="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
+/>
 
 <main class="container mx-auto my-8 max-w-2xl flex-grow">
 	<header>
@@ -51,16 +25,16 @@
 	</header>
 
 	<header class="text-lg sm:text-xl md:text-2xl">
-		<h2 class="mx-6 mt-6 whitespace-nowrap text-center font-bold">
+		<h2 class="mx-6 mt-6 text-center font-bold whitespace-nowrap">
 			Total Experience Earned: {formatNumber(totals.experience)}
 		</h2>
-		<h2 class="mx-6 whitespace-nowrap text-center font-bold">
+		<h2 class="mx-6 text-center font-bold whitespace-nowrap">
 			Total Gold Earned: {formatNumber(totals.gold)}
 		</h2>
-		<h2 class="mx-6 whitespace-nowrap text-center font-bold">
+		<h2 class="mx-6 text-center font-bold whitespace-nowrap">
 			Total Levels Earned: {formatNumber(totals.levels)}
 		</h2>
-		<h2 class="mx-6 mb-4 whitespace-nowrap text-center font-bold">
+		<h2 class="mx-6 mb-4 text-center font-bold whitespace-nowrap">
 			Total Runtime: {formatTime(totals.runtime)}
 		</h2>
 	</header>

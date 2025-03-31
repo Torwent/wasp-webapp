@@ -23,12 +23,12 @@ export const load = async ({
 		const { data, error: err } = await supabaseServer
 			.schema("scripts")
 			.from("scripts")
-			.select(`id, title, url, product, protected!inner (username)`)
+			.select(`id, title, url, product, protected!inner (username), metadata (type)`)
 			.limit(1, { foreignTable: "protected" })
 			.order("title", { ascending: true })
-			.contains("categories", "{Premium}")
 			.eq("published", true)
 			.eq("protected.author_id", slug)
+			.eq("metadata.type", "premium")
 			.overrideTypes<Script[]>()
 
 		if (err) {
@@ -40,21 +40,15 @@ export const load = async ({
 			)
 		}
 
-		const result = []
-		for (let i = 0; i < data.length; i++) {
-			const script = data[i]
-			if (script.protected) {
-				result.push({
-					id: script.id,
-					name: script.title,
-					author: script.protected.username,
-					url: url.protocol + "//" + url.host + "/" + script.url,
-					active: false
-				})
+		return data.map((script) => {
+			return {
+				id: script.id,
+				name: script.title,
+				author: script.protected.username,
+				url: url.protocol + "//" + url.host + "/" + script.url,
+				active: false
 			}
-		}
-
-		return result
+		})
 	}
 
 	async function getPrices(products: string[]) {

@@ -1,6 +1,17 @@
-@import "tailwindcss/base";
-@import "tailwindcss/components";
-@import "tailwindcss/utilities";
+@import "tailwindcss";
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@import "@skeletonlabs/skeleton";
+@import "@skeletonlabs/skeleton/optional/presets";
+@import "@skeletonlabs/skeleton/themes/cerberus";
+@import "@skeletonlabs/skeleton/themes/concord";
+@import "@skeletonlabs/skeleton/themes/fennec";
+@import "../wasp";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source '../node_modules/@skeletonlabs/skeleton-svelte/dist';
 
 @layer utilities {
 	/* Hide scrollbar for Chrome, Safari and Opera */

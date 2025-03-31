@@ -3,6 +3,7 @@
 	import TutorialCard from "./TutorialCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
 	import { replaceQuery } from "$lib/client/utils"
+	import Head from "$lib/components/Head.svelte"
 
 	const { data } = $props()
 	const { tutorials, count } = $derived(data)
@@ -20,38 +21,13 @@
 
 	const levelColors = ["sky", "orange", "red"]
 	const levelNames = ["Basic", "Intermidiate", "Advanced"]
-
-	const headTitle = "Tutorials - WaspScripts"
-	const headDescription =
-		"Guides and tutorials to bot and develop scripts for OldSchool RuneScape. Find the large collection of Simba tutorials available and unleach the power of Simba and max on osrs."
-	const headKeywords =
-		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide"
-	const headAuthor = "Torwent"
-	const headImage = "/multi-color-logo.png"
 </script>
 
-<svelte:head>
-	<title>{headTitle}</title>
-	<meta name="description" content={headDescription} />
-	<meta name="keywords" content={headKeywords} />
-	<meta name="author" content={headAuthor} />
-	<meta name="robots" content="all" />
-
-	<!-- OpenGraph tags -->
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content={headTitle} />
-	<meta property="og:url" content={page.url.href} />
-	<meta property="og:image" content={headImage} />
-	<meta property="og:image:type" content="image/png" />
-	<meta property="og:image:alt" content="WaspScripts Logo" />
-	<meta property="og:description" content={headDescription} />
-
-	<!-- Twitter tags -->
-	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content={headTitle} />
-	<meta name="twitter:description" content={headDescription} />
-	<meta name="twitter:image" content={headImage} />
-</svelte:head>
+<Head
+	title="Tutorials"
+	description="Guides and tutorials to bot and develop scripts for OldSchool RuneScape. Find the large collection of Simba tutorials available and unleach the power of Simba and max on osrs."
+	keywords="Tutorial, Tutorials, Guide, Guides, Learn, Coding"
+/>
 
 <main class="mx-auto flex flex-col py-8">
 	<header class="py-8 text-center">

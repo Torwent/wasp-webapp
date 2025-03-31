@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from "$app/forms"
 	import { page } from "$app/state"
+	import { Palette } from "svelte-lucide"
 
 	const themesData = [
 		{ label: "Cerberus", value: "cerberus" },
@@ -10,45 +11,29 @@
 	]
 
 	let theme = $state(page.data.theme)
+	let selectElement: HTMLSelectElement
 </script>
 
 <form
 	id="theme-form"
 	method="POST"
 	action="/?/setTheme"
-	class="input-group mx-1 my-auto flex grid-cols-[auto_1fr] hover:preset-tonal"
+	class="input-group hover:preset-tonal mx-1 my-auto flex"
 	use:enhance={() => document.body.setAttribute("data-theme", theme)}
 	onchange={(e) => e.currentTarget.requestSubmit()}
 >
-	<svg
-		xmlns="http://www.w3.org/2000/svg"
-		width="18"
-		height="18"
-		viewBox="0 0 24 24"
-		fill="none"
-		stroke="currentColor"
-		stroke-width="2"
-		stroke-linecap="round"
-		stroke-linejoin="round"
-		class="lucide lucide-palette mx-2 my-auto"
+	<div class="ig-cell preset-tonal">
+		<Palette size="16" />
+	</div>
+	<select
+		bind:this={selectElement}
+		name="theme"
+		id="theme-select"
+		class="ig-select my-auto"
+		bind:value={theme}
 	>
-		<circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle>
-		<circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle>
-		<circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle><circle
-			cx="6.5"
-			cy="12.5"
-			r=".5"
-			fill="currentColor"
-		>
-		</circle>
-		<path
-			d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"
-		>
-		</path>
-	</svg>
-	<select name="theme" id="theme-select" class="my-auto" bind:value={theme}>
 		{#each themesData as entry}
-			<option value={entry.value} selected={entry.value === theme}> {entry.label}</option>
+			<option value={entry.value} selected={entry.value === theme}> {entry.label} </option>
 		{/each}
 	</select>
 </form>

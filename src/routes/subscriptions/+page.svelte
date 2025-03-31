@@ -1,4 +1,5 @@
 <script lang="ts">
+	import Head from "$lib/components/Head.svelte"
 	import CheckoutTable from "./CheckoutTable.svelte"
 	import FreeAccessTable from "./FreeAccessTable.svelte"
 	import SubscriptionsForm from "./SubscriptionTable.svelte"
@@ -6,6 +7,12 @@
 	const { data } = $props()
 	let { profile, pageData, prices, subscriptions, freeAccess } = $derived(data)
 </script>
+
+<Head
+	title="Subscriptions"
+	description="Start and/or manage your WaspScripts subscriptions."
+	keywords="Stats, Scores, Premium, Subscribe, Member"
+/>
 
 <main class="my-8 grid">
 	{#if profile}

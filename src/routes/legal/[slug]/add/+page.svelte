@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { page } from "$app/state"
 	import { superForm } from "sveltekit-superforms"
 	import { zodClient } from "sveltekit-superforms/adapters"
 	import { legalSchema } from "$lib/client/schemas"
+	import Head from "$lib/components/Head.svelte"
 
 	let { data } = $props()
 	let show: boolean = $state(false)
@@ -14,37 +14,13 @@
 		taintedMessage: "Are you sure you want to leave?",
 		validators: zodClient(legalSchema)
 	})
-
-	const headTitle = "Add Legal - WaspScripts"
-	const headDescription = "Add Legal document in WaspScripts."
-	const headKeywords =
-		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Tutorials, Tutorial, Guides, Guide"
-	const headAuthor = ""
-	const headImage = "/multi-color-logo.png"
 </script>
 
-<svelte:head>
-	<title>{headTitle}</title>
-	<meta name="description" content={headDescription} />
-	<meta name="keywords" content={headKeywords} />
-	<meta name="author" content={headAuthor} />
-	<meta name="robots" content="noindex" />
-
-	<!-- OpenGraph tags -->
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content={headTitle} />
-	<meta property="og:url" content={page.url.href} />
-	<meta property="og:image" content={headImage} />
-	<meta property="og:image:type" content="image/png" />
-	<meta property="og:image:alt" content="WaspScripts Logo" />
-	<meta property="og:description" content={headDescription} />
-
-	<!-- Twitter tags -->
-	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content={headTitle} />
-	<meta name="twitter:description" content={headDescription} />
-	<meta name="twitter:image" content={headImage} />
-</svelte:head>
+<Head
+	title="Add Legal"
+	description="Add Legal document in WaspScripts."
+	keywords="Privacy, Policy, Terms, Conditions"
+/>
 
 <div class="container mx-auto my-6 max-w-2xl flex-grow">
 	{#if show}

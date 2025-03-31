@@ -2,18 +2,7 @@
 	import { Modal } from "@skeletonlabs/skeleton-svelte"
 	import { PanelBottomOpen, PanelTopOpen } from "svelte-lucide"
 
-	let {
-		scripts = $bindable()
-	}: {
-		scripts: {
-			name: string
-			author: string
-			active: boolean
-			id: string
-			url: string
-		}[]
-	} = $props()
-
+	let { children } = $props()
 	let open = $state(false)
 </script>
 
@@ -37,22 +26,18 @@
 				Choose the scripts you want on this bundle:
 			</h5>
 		</header>
-		<article class="table-wrap">
+		<article class="table-wrap my-12">
 			<table class="table-compact table">
 				<tbody class="preset-filled-surface-100-900 hover:[&>tr]:preset-tonal">
-					{#each scripts as _, i}
-						<tr class="flex h-full w-full" onclick={() => {}}>
-							<td class="h-full w-full p-0 text-xs">
-								<label class="flex h-full w-full items-center space-x-2">
-									<input class="checkbox" type="checkbox" bind:checked={scripts[i].active} />
-									<span class="select-none">{scripts[i].name}</span>
-								</label>
-							</td>
-						</tr>
-					{/each}
+					{@render children()}
 				</tbody>
 			</table>
 		</article>
+		<small class="mx-auto my-16 py-8">
+			You can also use your keyboard:
+			<kbd class="kbd">Tab, Shift + Tab and Space</kbd>
+		</small>
+
 		<footer class="flex justify-end gap-4">
 			<button type="button" class="btn preset-tonal" onclick={() => (open = false)}>Confirm</button>
 		</footer>

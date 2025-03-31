@@ -1,3 +1,4 @@
+test-results
 node_modules
 
 # Output
@@ -21,3 +22,6 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Paraglide
+src/lib/paraglide

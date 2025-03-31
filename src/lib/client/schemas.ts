@@ -233,6 +233,14 @@ const bundledScriptSchema = z.object({
 	active: z.boolean()
 })
 
+const bundledScriptArray = z
+	.array(bundledScriptSchema)
+	.min(2, "A bundle must have at least 2 scripts!")
+	.refine(
+		(scripts) => scripts.filter((script) => script.active).length > 1,
+		"A bundle must have at least 2 active scripts!"
+	)
+
 const bundleSchema = z.object({
 	id: z.string().startsWith("prod_"),
 	name: z.string(),
@@ -256,7 +264,7 @@ const bundleSchema = z.object({
 			}
 			return true
 		}, "Bundle prices are not in order"),
-	bundledScripts: z.array(bundledScriptSchema).min(2, "A bundle must have at least 2 scripts!")
+	bundledScripts: bundledScriptArray
 })
 
 export const bundleArraySchema = z.object({
@@ -285,7 +293,7 @@ export const newBundleSchema = z.object({
 			}
 			return true
 		}, "New bundle prices are not in order"),
-	bundledScripts: z.array(bundledScriptSchema).min(2, "A bundle must have at least 2 scripts!"),
+	bundledScripts: bundledScriptArray,
 	open: z.boolean()
 })
 

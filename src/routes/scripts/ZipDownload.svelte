@@ -62,7 +62,7 @@
 
 	onMount(async () => {
 		dismissed = await WaspProfile.getWarning(supabaseClient, profile?.id)
-		permited = await permissionsPromise
+		permited = (await permissionsPromise) ? true : false
 		zipName = permited ? "wasp-premium.zip" : "wasp-free.zip"
 
 		if (dismissed) zipsAvailable = ["wasp-free.zip", "community-free.zip", "all-free.zip"]

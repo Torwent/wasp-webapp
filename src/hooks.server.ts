@@ -1,5 +1,7 @@
-import { createServerClient } from "@supabase/ssr"
 import { type Handle, redirect } from "@sveltejs/kit"
+import { paraglideMiddleware } from "$lib/paraglide/server"
+
+import { createServerClient } from "@supabase/ssr"
 import { sequence } from "@sveltejs/kit/hooks"
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from "$env/static/public"
 import type { Database } from "$lib/types/supabase"
@@ -66,7 +68,6 @@ const supabase: Handle = async ({ event, resolve }) => {
 			console.log(`└😄 user ${user.id} accessing from NO IP`)
 		}
 
-		// @ts-expect-error
 		delete session.user
 
 		return {
@@ -185,11 +186,21 @@ const performanceCheck: Handle = async ({ event, resolve }) => {
 	return response
 }
 
+const handleParaglide: Handle = ({ event, resolve }) =>
+	paraglideMiddleware(event.request, ({ request, locale }) => {
+		event.request = request
+
+		return resolve(event, {
+			transformPageChunk: ({ html }) => html.replace("%paraglide.lang%", locale)
+		})
+	})
+
 export const handle: Handle = sequence(
 	redirects,
 	darkMode,
 	theme,
 	supabase,
 	authGuard,
+	handleParaglide,
 	performanceCheck
 )

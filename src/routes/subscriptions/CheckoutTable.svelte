@@ -121,22 +121,24 @@
 	}
 </script>
 
-<div class="mx-auto my-8 w-screen">
-	<div class="mx-4">
+<div class="mx-auto my-8 w-screen max-w-fit">
+	<div class="mx-auto my-8">
 		<h3 class="my-12 justify-center text-center">New subscriptions</h3>
 
+		<label class="label w-full">
+			<span class="label-text">Search:</span>
+			<input
+				type="text"
+				placeholder="🔍Search products by id, name or author"
+				class="input"
+				bind:value={search}
+				oninput={searchFilter}
+			/>
+		</label>
+
 		<div class="mx-auto my-2 flex flex-col justify-center gap-4 md:flex-row">
+
 			<label class="label">
-				<span class="label-text">Search:</span>
-				<input
-					type="text"
-					placeholder="🔍Search products by id, name or author"
-					class="input"
-					bind:value={search}
-					oninput={searchFilter}
-				/>
-			</label>
-			<label class="label md:max-w-96">
 				<span class="label-text">Type:</span>
 				<select
 					class="select"
@@ -151,7 +153,7 @@
 					<option value="scripts">Scripts</option>
 				</select>
 			</label>
-			<label class="label md:max-w-96">
+			<label class="label">
 				<span class="label-text">Author:</span>
 				<select
 					class="select"
@@ -177,13 +179,13 @@
 			</label>
 		</div>
 
-		<label class="label mx-auto my-2 justify-center md:max-w-96">
+		<label class="label">
 			<span class="label-text">Discount code:</span>
 			<input type="text" placeholder="Discount code" class="input" bind:value={code} />
 		</label>
 	</div>
 	<!-- class="xl:mx-w-7xl table-wrap mx-auto w-full max-w-md rounded-md preset-outlined-surface-500 md:max-w-3xl lg:max-w-6xl" -->
-	<form method="POST" class="overflow-x-auto rounded-md preset-outlined-surface-500" use:enhance>
+	<form method="POST" class="overflow-x-auto rounded-md preset-outlined-surface-500 max-w-fit mx-auto" use:enhance>
 		<table class="table table-auto border-separate space-y-6 text-xs md:text-sm">
 			<colgroup>
 				<col class="w-2/6 xl:w-5/12" />

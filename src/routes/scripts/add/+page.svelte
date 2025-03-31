@@ -22,7 +22,8 @@
 		dataType: "form",
 		multipleSubmits: "prevent",
 		taintedMessage: "Are you sure you want to leave?",
-		validators: zodClient(addScriptClientSchema)
+		validators: zodClient(addScriptClientSchema),
+		scrollToError: true
 	})
 
 	const categories = Object.values(scriptCategories)
@@ -228,9 +229,10 @@
 							bind:value={$form.title}
 						/>
 					</label>
-
 					{#if $errors.title}
-						<small class="text-error-500">{$errors.title}</small>
+						{#each $errors.title as err}
+							<small class="text-error-500">{err}</small>
+						{/each}
 					{/if}
 				</div>
 
@@ -247,7 +249,9 @@
 						</textarea>
 					</label>
 					{#if $errors.description}
-						<small class="text-error-500">{$errors.description}</small>
+						{#each $errors.description as err}
+							<small class="text-error-500">{err}</small>
+						{/each}
 					{/if}
 				</div>
 
@@ -264,11 +268,13 @@
 						</textarea>
 					</label>
 					{#if $errors.content}
-						<small class="text-error-500">{$errors.content}</small>
+						{#each $errors.content as err}
+							<small class="text-error-500">{err}</small>
+						{/each}
 					{/if}
 				</div>
 
-				<div class="my-8 flex flex-col">
+				<div class="my-16 flex flex-col">
 					<label class="label">
 						<span class="label-text">Categories:</span>
 						<select
@@ -293,16 +299,19 @@
 							</span>
 						{/each}
 					</small>
+
+					{#if $errors.categories?._errors}
+						{#each $errors.categories._errors as err}
+							<small class="text-error-500">{err}</small>
+						{/each}
+					{/if}
+
 					<span class="mx-auto">
 						<kbd class="kbd">CTRL + Click</kbd>
 						or
 						<kbd class="kbd">SHIFT + Click</kbd>
 						to select multiple categories
 					</span>
-
-					{#if $errors.categories}
-						<small class="text-error-500">{$errors.categories}</small>
-					{/if}
 				</div>
 
 				<header class="my-8 text-center">

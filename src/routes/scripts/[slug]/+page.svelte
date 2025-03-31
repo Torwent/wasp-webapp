@@ -11,6 +11,7 @@
 	import { getCurrentPrice, getPriceIntervalEx, setPriceInterval } from "$lib/utils"
 	import ScriptArticle from "../ScriptArticle.svelte"
 	import { replaceScriptContent } from "$lib/client/utils"
+	import Head from "$lib/components/Head.svelte"
 
 	const { data } = $props()
 	const { script, dismissed, profile, roles, supabaseClient } = $derived(data)
@@ -24,6 +25,14 @@
 		return result
 	}
 </script>
+
+<Head
+	title="{script.title} - Scripts"
+	description="The best open source OSRS botting scripts."
+	keywords="Premium, Free, Automation, ComputerVision"
+	author={script.protected.username}
+	img={script.protected.assets + "banner.jpg"}
+/>
 
 <main class="mx-auto flex w-[90%] flex-col">
 	<ScriptHeader

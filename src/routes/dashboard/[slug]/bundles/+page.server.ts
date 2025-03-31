@@ -101,7 +101,8 @@ export const load = async ({ locals: { supabaseServer }, params: { slug }, paren
 		superValidate({ bundles }, zod(bundleArraySchema)),
 		superValidate(
 			{ user_id: slug, prices: newPrices, bundledScripts: scripts },
-			zod(newBundleSchema)
+			zod(newBundleSchema),
+			{ errors: false }
 		)
 	])
 

@@ -61,15 +61,15 @@
 
 	<form
 		method="POST"
-		class="xl:mx-w-7xl table-wrap mx-auto max-w-md rounded-md preset-outlined-surface-400-600 md:max-w-3xl lg:max-w-6xl"
+		class="table-wrap preset-outlined-surface-400-600 mx-auto max-w-fit rounded-md"
 		use:scriptsEnhance
 	>
 		<table class="table border-separate space-y-6 text-xs">
-			<thead class="rounded-md text-lg font-bold preset-filled-surface-200-800">
+			<thead class="preset-filled-surface-200-800 rounded-md text-lg font-bold">
 				<tr>
 					{#each headers as header}
 						<th>
-							<span class="flex justify-center text-center text-secondary-950-50">{header}</span>
+							<span class="text-secondary-950-50 flex justify-center text-center">{header}</span>
 						</th>
 					{/each}
 				</tr>
@@ -78,27 +78,25 @@
 			<tbody class="preset-filled-surface-100-900 hover:[&>tr]:preset-tonal-surface">
 				{#each $scriptsForm.scripts as _, i}
 					<tr>
-						<TableCell>
-							<div class="mx-3">
-								<input
-									name="name"
-									class="input w-fit preset-outlined-surface-500"
-									type="text"
-									bind:value={$scriptsForm.scripts[i].name}
-								/>
-								{#if $scriptErrors.scripts && $scriptErrors.scripts[i].name}
-									{#each $scriptErrors.scripts[i].name as err}
-										<small class="text-error-500">{err}</small>
-									{/each}
-								{/if}
-							</div>
-						</TableCell>
+						<td>
+							<input
+								name="name"
+								class="input preset-outlined-surface-500 mx-auto w-fit"
+								type="text"
+								bind:value={$scriptsForm.scripts[i].name}
+							/>
+							{#if $scriptErrors.scripts && $scriptErrors.scripts[i].name}
+								{#each $scriptErrors.scripts[i].name as err}
+									<small class="text-error-500">{err}</small>
+								{/each}
+							{/if}
+						</td>
 
 						{#each $scriptsForm.scripts[i].prices as _, j}
 							<td>
 								<input
 									name="prices"
-									class="input mx-1 preset-outlined-surface-500"
+									class="input preset-outlined-surface-500 mx-auto w-24"
 									type="number"
 									bind:value={$scriptsForm.scripts[i].prices[j].amount}
 									step="0.01"
@@ -131,7 +129,7 @@
 							<button
 								id="button-{$scriptsForm.scripts[i].id}"
 								type="submit"
-								class="btn font-bold preset-filled-primary-500"
+								class="btn preset-filled-primary-500 font-bold"
 								formaction="?/scriptEdit&product={$scriptsForm.scripts[i].id}"
 							>
 								Save
@@ -146,14 +144,26 @@
 	<form
 		method="POST"
 		action="?/scriptAdd"
-		class="xl:mx-w-7xl mx-auto my-12 flex max-w-md flex-col rounded-md text-center preset-outlined-surface-400-600 md:max-w-3xl lg:max-w-6xl"
+		class="xl:mx-w-7xl preset-outlined-surface-400-600 mx-auto my-12 flex max-w-md flex-col rounded-md text-center md:max-w-3xl lg:max-w-6xl"
 		use:newScriptEnhance
 	>
 		<h1 class="my-4 text-lg">New Script</h1>
 
+		{#if available.length === 0}
+			<h2 class="text-warning-500 my-24 text-center text-lg">
+				You either have no premium scripts or all your premium scripts are already products in the
+				table above.
+			</h2>
+		{/if}
+
 		<label class="my-4">
 			<span class="label-text">Script:</span>
-			<select class="select mx-auto w-96" bind:value={$newScriptForm.id}>
+			<select
+				class="select mx-auto w-96"
+				bind:value={$newScriptForm.id}
+				class:disabled={available.length === 0}
+				class:ring-error-500={$newScriptErrors.id}
+			>
 				{#each available as script}
 					<option value={script.id}>{script.name}</option>
 				{/each}
@@ -174,6 +184,8 @@
 						class="input"
 						step="0.01"
 						bind:value={$newScriptForm.prices[i].amount}
+						class:disabled={available.length === 0}
+						class:ring-error-500={$newScriptErrors.prices && $newScriptErrors.prices[i]?.amount}
 					/>
 					{#if $newScriptErrors.prices && $newScriptErrors.prices[i]?.amount}
 						{#each $newScriptErrors.prices[i].amount as err}
@@ -184,6 +196,6 @@
 			{/each}
 		</div>
 
-		<button class="btn mx-auto my-8 w-32 preset-filled-primary-500">Add</button>
+		<button type="submit" class="btn preset-filled-primary-500 mx-auto my-8 w-32">Add</button>
 	</form>
 </main>

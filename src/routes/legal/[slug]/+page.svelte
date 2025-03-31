@@ -1,45 +1,22 @@
 <script lang="ts">
 	import { page } from "$app/state"
+	import Head from "$lib/components/Head.svelte"
 	import AdvancedButton from "./AdvancedButton.svelte"
 
 	let { data } = $props()
-	let { policies, roles } = $derived(data)
+	let { policies } = $derived(data)
 	let index = $state(0)
 
 	let currentPolicy: (typeof policies)[number] = $derived(policies[index])
 
 	let userLocale = "pt-PT"
-
-	const headTitle = "Terms and Conditions - WaspScripts"
-	const headDescription = "WaspScripts Terms and Conditions"
-	const headKeywords =
-		"OldSchool, RuneScape, OSRS, 2007, Color, Bot, Wasp, Scripts, Simba, Privacy, Policy, Terms, Conditions"
-	const headAuthor = "Torwent"
-	const headImage = "/multi-color-logo.png"
 </script>
 
-<svelte:head>
-	<title>{headTitle}</title>
-	<meta name="description" content={headDescription} />
-	<meta name="keywords" content={headKeywords} />
-	<meta name="author" content={headAuthor} />
-	<meta name="robots" content="all" />
-
-	<!-- OpenGraph tags -->
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content={headTitle} />
-	<meta property="og:url" content={page.url.href} />
-	<meta property="og:image" content={headImage} />
-	<meta property="og:image:type" content="image/png" />
-	<meta property="og:image:alt" content="WaspScripts Logo" />
-	<meta property="og:description" content={headDescription} />
-
-	<!-- Twitter tags -->
-	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content={headTitle} />
-	<meta name="twitter:description" content={headDescription} />
-	<meta name="twitter:image" content={headImage} />
-</svelte:head>
+<Head
+	title="Terms and Conditions"
+	description="WaspScripts Terms and Conditions"
+	keywords="Privacy, Policy, Terms, Conditions"
+/>
 
 <main class="container mx-auto my-6 max-w-4xl flex-grow">
 	<div class="mx-auto grid max-w-4xl">

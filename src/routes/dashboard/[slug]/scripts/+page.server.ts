@@ -13,8 +13,7 @@ import { error, redirect } from "@sveltejs/kit"
 import { fail, setError, superValidate } from "sveltekit-superforms"
 import { zod } from "sveltekit-superforms/adapters"
 
-export const load = async ({ params: { slug }, parent, depends }) => {
-	depends("wasp:dashboardscripts")
+export const load = async ({ params: { slug }, parent }) => {
 	const { scripts, scripter, products, prices, data } = await parent()
 	if (!scripter.stripe)
 		error(
@@ -78,7 +77,8 @@ export const load = async ({ params: { slug }, parent, depends }) => {
 		superValidate({ scripts: scriptData }, zod(scriptArraySchema)),
 		superValidate(
 			{ id: available.length > 0 ? available[0].id : "", user_id: slug, prices: newPrices },
-			zod(newScriptSchema)
+			zod(newScriptSchema),
+			{ errors: false }
 		)
 	])
 

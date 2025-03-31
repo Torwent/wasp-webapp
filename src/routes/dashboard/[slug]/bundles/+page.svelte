@@ -19,8 +19,7 @@
 		dataType: "json",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors-and-message",
-		validators: zodClient(bundleArraySchema),
-		resetForm: true
+		validators: zodClient(bundleArraySchema)
 	})
 
 	const {
@@ -32,8 +31,7 @@
 		dataType: "json",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors-and-message",
-		validators: zodClient(newBundleSchema),
-		resetForm: true
+		validators: zodClient(newBundleSchema)
 	})
 
 	const headers = [
@@ -66,15 +64,15 @@
 
 	<form
 		method="POST"
-		class="xl:mx-w-7xl table-wrap mx-auto max-w-md rounded-md preset-outlined-surface-400-600 md:max-w-3xl lg:max-w-6xl"
+		class="table-wrap preset-outlined-surface-400-600 mx-auto max-w-fit rounded-md"
 		use:bundlesEnhance
 	>
 		<table class="table border-separate space-y-6 text-xs">
-			<thead class="rounded-md text-lg font-bold preset-filled-surface-200-800">
+			<thead class="preset-filled-surface-200-800 rounded-md text-lg font-bold">
 				<tr>
 					{#each headers as header}
 						<th>
-							<span class="flex justify-center text-center text-secondary-950-50">{header}</span>
+							<span class="text-secondary-950-50 flex justify-center text-center">{header}</span>
 						</th>
 					{/each}
 				</tr>
@@ -83,26 +81,39 @@
 			<tbody class="preset-filled-surface-100-900 hover:[&>tr]:preset-tonal-surface">
 				{#each $bundlesForm.bundles as _, i}
 					<tr>
-						<TableCell>
-							<div class="mx-3">
-								<input
-									name="name"
-									class="input w-fit preset-outlined-surface-500"
-									type="text"
-									bind:value={$bundlesForm.bundles[i].name}
-								/>
-							</div>
-						</TableCell>
+						<td>
+							<input
+								name="name"
+								class="input preset-outlined-surface-500 mx-auto w-fit"
+								type="text"
+								bind:value={$bundlesForm.bundles[i].name}
+								class:ring-error-500={$bundlesErrors.bundles && $bundlesErrors.bundles[i].name}
+							/>
+
+							{#if $bundlesErrors.bundles && $bundlesErrors.bundles[i].name}
+								{#each $bundlesErrors.bundles[i].name as err}
+									<small class="text-error-500">{err}</small>
+								{/each}
+							{/if}
+						</td>
 
 						{#each $bundlesForm.bundles[i].prices as _, j}
 							<td>
 								<input
 									name="prices"
-									class="input mx-1 preset-outlined-surface-500"
+									class="input preset-outlined-surface-500 mx-auto w-24"
 									type="number"
 									bind:value={$bundlesForm.bundles[i].prices[j].amount}
 									step="0.01"
+									class:ring-error-500={$bundlesErrors.bundles &&
+										$bundlesErrors.bundles[i].prices &&
+										$bundlesErrors.bundles[i].prices[j].amount}
 								/>
+								{#if $bundlesErrors.bundles && $bundlesErrors.bundles[i].prices && $bundlesErrors.bundles[i].prices[j].amount}
+									{#each $bundlesErrors.bundles[i].prices[j].amount as err}
+										<small class="text-error-500">{err}</small>
+									{/each}
+								{/if}
 							</td>
 						{/each}
 
@@ -122,14 +133,36 @@
 							/>
 						</TableCell>
 
-						<TableCell>
-							<ScriptPicker bind:scripts={$bundlesForm.bundles[i].bundledScripts} />
-						</TableCell>
+						<td>
+							<ScriptPicker>
+								{#each $bundlesForm.bundles[i].bundledScripts as _, j}
+									<tr class="flex h-full w-full">
+										<td class="h-full w-full p-0 text-xs">
+											<label class="flex h-full w-full items-center space-x-2">
+												<input
+													class="checkbox"
+													type="checkbox"
+													bind:checked={$bundlesForm.bundles[i].bundledScripts[j].active}
+												/>
+												<span class="select-none">
+													{$bundlesForm.bundles[i].bundledScripts[j].name}</span
+												>
+											</label>
+										</td>
+									</tr>
+								{/each}
+							</ScriptPicker>
+							{#if $bundlesErrors.bundles && $bundlesErrors.bundles[i].bundledScripts?._errors}
+								{#each $bundlesErrors.bundles[i].bundledScripts?._errors as err}
+									<small class="text-error-500">{err}</small>
+								{/each}
+							{/if}
+						</td>
 						<TableCell>
 							<button
 								id="button-{$bundlesForm.bundles[i].id}"
 								type="submit"
-								class="btn font-bold preset-filled-secondary-500"
+								class="btn preset-filled-secondary-500 font-bold"
 								formaction="?/bundleEdit&product={$bundlesForm.bundles[i].id}"
 							>
 								Save
@@ -144,7 +177,7 @@
 	<form
 		method="POST"
 		action="?/bundleAdd"
-		class="xl:mx-w-7xl mx-auto my-12 flex max-w-md flex-col rounded-md text-center preset-outlined-surface-400-600 md:max-w-3xl lg:max-w-6xl"
+		class="xl:mx-w-7xl preset-outlined-surface-400-600 mx-auto my-12 flex max-w-md flex-col rounded-md text-center md:max-w-3xl lg:max-w-6xl"
 		use:newBundleEnhance
 	>
 		<h1 class="my-4 text-lg">New Bundle</h1>
@@ -156,6 +189,7 @@
 				placeholder="Bundle name"
 				class="input mx-auto w-96"
 				bind:value={$newBundleForm.name}
+				class:ring-error-500={$newBundleErrors.name}
 			/>
 			{#if $newBundleErrors.name}
 				{#each $newBundleErrors.name as err}
@@ -164,7 +198,7 @@
 			{/if}
 		</label>
 
-		<div class="my-12 flex flex-col justify-around md:flex-row">
+		<div class="mx-auto my-12 flex flex-col justify-around gap-4 md:flex-row">
 			{#each ["Weekly", "Monthly", "Yearly"] as interval, i}
 				<label>
 					<span class="label-text">{interval} price:</span>
@@ -173,6 +207,7 @@
 						class="input"
 						step="0.01"
 						bind:value={$newBundleForm.prices[i].amount}
+						class:ring-error-500={$newBundleErrors.prices && $newBundleErrors.prices[i]?.amount}
 					/>
 					{#if $newBundleErrors.prices && $newBundleErrors.prices[i]?.amount}
 						{#each $newBundleErrors.prices[i].amount as err}
@@ -183,8 +218,28 @@
 			{/each}
 		</div>
 
-		<ScriptPicker bind:scripts={$newBundleForm.bundledScripts} />
+		<ScriptPicker>
+			{#each $newBundleForm.bundledScripts as _, i}
+				<tr class="flex h-full w-full">
+					<td class="h-full w-full p-0 text-xs">
+						<label class="flex h-full w-full items-center space-x-2">
+							<input
+								class="checkbox"
+								type="checkbox"
+								bind:checked={$newBundleForm.bundledScripts[i].active}
+							/>
+							<span class="select-none">{$newBundleForm.bundledScripts[i].name}</span>
+						</label>
+					</td>
+				</tr>
+			{/each}
+		</ScriptPicker>
+		{#if $newBundleErrors.bundledScripts?._errors}
+			{#each $newBundleErrors.bundledScripts._errors as err}
+				<small class="text-error-500">{err}</small>
+			{/each}
+		{/if}
 
-		<button class="btn mx-auto my-8 w-32 preset-filled-primary-500">Add</button>
+		<button type="submit" class="btn preset-filled-primary-500 mx-auto my-8 w-32">Add</button>
 	</form>
 </main>

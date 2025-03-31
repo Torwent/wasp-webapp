@@ -6,5 +6,5 @@
 </script>
 
 <button class="mx-auto" onclick={() => goto(link)}>
-	<ScriptCardBase script={data.script} />
+	<ScriptCardBase script={data.script} customCover={undefined} />
 </button>

@@ -8,6 +8,7 @@
 	import { goto, invalidate } from "$app/navigation"
 	import ScriptCard from "$lib/components/ScriptCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
+	import Head from "$lib/components/Head.svelte"
 
 	const { data } = $props()
 	const { scripts, featured, roles } = $derived(data)
@@ -62,6 +63,12 @@
 		invalidate("wasp:scripts")
 	}
 </script>
+
+<Head
+	title="Scripts"
+	description="The best open source OSRS botting scripts."
+	keywords="Premium, Free, Automation, ComputerVision"
+/>
 
 <header class="my-4 flex h-full grid-cols-12 justify-evenly">
 	<!-- Button: Left -->

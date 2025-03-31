@@ -5,6 +5,7 @@
 	import { formatTime, formatNumber } from "$lib/utils"
 	import StatsTable from "./StatsTable.svelte"
 	import { replaceQuery } from "$lib/client/utils"
+	import Head from "$lib/components/Head.svelte"
 
 	const { data } = $props()
 
@@ -33,37 +34,9 @@
 
 		return () => subscription.unsubscribe()
 	})
-
-	const headTitle = "Stats - WaspScripts"
-	const headDescription = "WaspScripts usage stats."
-	const headKeywords =
-		"OldSchool, RuneScape, OSRS, 2007, Color, Colour,  Bot, Wasp, Scripts, Simba, Stats"
-	const headAuthor = "Torwent"
-	const headImage = "/multi-color-logo.png"
 </script>
 
-<svelte:head>
-	<title>{headTitle}</title>
-	<meta name="description" content={headDescription} />
-	<meta name="keywords" content={headKeywords} />
-	<meta name="author" content={headAuthor} />
-	<meta name="robots" content="all" />
-
-	<!-- OpenGraph tags -->
-	<meta property="og:type" content="website" />
-	<meta property="og:title" content={headTitle} />
-	<meta property="og:url" content={page.url.href} />
-	<meta property="og:image" content={headImage} />
-	<meta property="og:image:type" content="image/png" />
-	<meta property="og:image:alt" content="WaspScripts Logo" />
-	<meta property="og:description" content={headDescription} />
-
-	<!-- Twitter tags -->
-	<meta name="twitter:card" content="summary" />
-	<meta name="twitter:title" content={headTitle} />
-	<meta name="twitter:description" content={headDescription} />
-	<meta name="twitter:image" content={headImage} />
-</svelte:head>
+<Head title="Stats" description="WaspScripts usage stats." keywords="Stats, Scores" />
 
 <main class="mx-4 my-8 h-fit flex-grow md:mx-16 lg:mx-24">
 	<header class="my-4 flex-col text-center text-sm lg:text-lg">
