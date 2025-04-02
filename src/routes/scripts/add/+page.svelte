@@ -318,7 +318,7 @@
 						<kbd class="kbd">CTRL + Click</kbd>
 						or
 						<kbd class="kbd">SHIFT + Click</kbd>
-						to select multiple categories
+						to select multiple categories on Desktop
 					</span>
 				</div>
 

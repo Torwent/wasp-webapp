@@ -267,7 +267,7 @@
 						<kbd class="kbd">CTRL + Click</kbd>
 						or
 						<kbd class="kbd">SHIFT + Click</kbd>
-						to select multiple categories
+						to select multiple categories on Desktop
 					</span>
 					{#if $errors.categories?._errors}
 						{#each $errors.categories._errors as err (err)}

@@ -34,7 +34,7 @@
 			</table>
 		</article>
 		<small class="mx-auto my-16 py-8">
-			You can also use your keyboard:
+			On Desktop you can also use your keyboard:
 			<kbd class="kbd">Tab, Shift + Tab and Space</kbd>
 		</small>
 

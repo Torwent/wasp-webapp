@@ -101,7 +101,7 @@
 </header>
 
 <div class="flex h-full w-full">
-	<aside class="mx-4 my-4 h-full">
+	<aside class="mx-2 my-4 hidden h-full lg:block lg:text-sm xl:text-base">
 		<label class="label my-4">
 			<span class="label-text">Status:</span>
 			<select
@@ -146,7 +146,7 @@
 			<span class="label-text">Categories</span>
 			<div class="select flex h-auto w-auto flex-col gap-1 overflow-y-scroll p-3">
 				{#each categories as category, idx (category.value)}
-					<label class="flex gap-2">
+					<label class="flex gap-1 xl:gap-2">
 						<input
 							type="checkbox"
 							id={category.value}
@@ -160,7 +160,7 @@
 								handleFilter("categories", categoriesFilter.join("-"))
 							}}
 						/>
-						<span class="my-auto text-lg whitespace-nowrap select-none">
+						<span class="my-auto whitespace-nowrap select-none xl:text-lg">
 							{category.icon}
 							{category.name}
 						</span>
@@ -176,6 +176,65 @@
 				<button class="btn preset-filled-secondary-500">Add Script</button>
 			</a>
 		{/if}
+
+		<div class="mx-4 my-4 h-full lg:hidden">
+			<label class="label my-4">
+				<span class="label-text">Status:</span>
+				<select
+					name="status"
+					id="script-status"
+					class="select w-full"
+					bind:value={statusFilter}
+					onchange={() => handleFilter("status", statusFilter)}
+				>
+					<option value="" selected={statusFilter == null || statusFilter == ""}>🎮All</option>
+					{#each Object.values(scriptStatus) as status (status.value)}
+						<option value={status.value} selected={status.value == statusFilter}>
+							{status.icon}{status.name}
+						</option>
+					{/each}
+				</select>
+			</label>
+
+			<label class="label my-4">
+				<span class="label-text">Type:</span>
+				<select
+					name="type"
+					id="script-type"
+					class="select w-full"
+					bind:value={typeFilter}
+					onchange={() => handleFilter("type", typeFilter)}
+				>
+					<option
+						value=""
+						selected={typeFilter == null || typeFilter == ""}
+						class="selection:bg-primary-500">🕹️All</option
+					>
+					{#each Object.values(scriptTypes) as type (type.value)}
+						<option value={type.value} selected={type.value == typeFilter}>
+							{type.icon}{type.name}
+						</option>
+					{/each}
+				</select>
+			</label>
+
+			<label class="label">
+				<span class="label-text">Categories</span>
+				<select
+					class="select"
+					bind:value={categoriesFilter}
+					onchange={() => handleFilter("categories", categoriesFilter.join("-"))}
+					multiple
+				>
+					{#each categories as category (category.value)}
+						<option value={category.value}>
+							{category.icon}
+							{category.name}
+						</option>
+					{/each}
+				</select>
+			</label>
+		</div>
 
 		<input
 			type="text"

@@ -33,7 +33,7 @@
 </script>
 
 <div
-	class="card card-hover preset-filled-surface-200-800 hover:preset-outlined flex h-96 w-64 flex-col shadow-sm"
+	class="card card-hover preset-filled-surface-200-800 hover:preset-outlined mx-auto flex h-96 w-64 flex-col shadow-sm"
 >
 	<button
 		class="m-1"
@@ -99,7 +99,7 @@
 			</Tooltip>
 		</div>
 		<div class="flex">
-			{#each script.metadata.categories as category, i (category)}
+			{#each script.metadata.categories as category, i (i)}
 				<Tooltip
 					open={categoriesTooltip[i]}
 					onOpenChange={(e) => (categoriesTooltip[i] = e.open)}
