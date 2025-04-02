@@ -4,7 +4,7 @@
 	import ChevronsDownUp from "svelte-lucide/ChevronsDownUp.svelte"
 	import ChevronsUpDown from "svelte-lucide/ChevronsUpDown.svelte"
 	import type { FAQEntry } from "$lib/types/collection"
-	const { title, entries } = $props()
+	const { title, entries }: { title: string; entries: FAQEntry[] } = $props()
 
 	let show = $state(false)
 	let searchQuery = $state("")
@@ -43,7 +43,7 @@
 <div>
 	<button
 		type="button"
-		class="inline-flex w-full justify-between px-4 py-2 text-sm font-medium preset-outlined-surface-500 hover:preset-outlined-primary-500"
+		class="preset-outlined-surface-500 hover:preset-outlined-primary-500 inline-flex w-full justify-between px-4 py-2 text-sm font-medium"
 		aria-expanded={show}
 		aria-haspopup="true"
 		onclick={() => (show = !show)}
@@ -58,24 +58,18 @@
 					name="search"
 					placeholder={placeholderText}
 					autocomplete="off"
-					class="input my-1 rounded-none font-semibold hover:preset-outlined-primary-500"
+					class="input hover:preset-outlined-primary-500 my-1 rounded-none font-semibold"
 					bind:value={searchQuery}
 				/>
 			</form>
 			{#if filteredEntries.length !== 0}
-				{#each filteredEntries as entry}
+				{#each filteredEntries as entry (entry.title)}
 					<DropDownEntry {entry} />
 				{/each}
 			{:else}
-				{#await entries}
-					{#each Array(5) as entry}
-						<DropDownEntry {entry} />
-					{/each}
-				{:then entries}
-					{#each entries as entry}
-						<DropDownEntry {entry} />
-					{/each}
-				{/await}
+				{#each entries as entry (entry.title)}
+					<DropDownEntry {entry} />
+				{/each}
 			{/if}
 		</div>
 	{/if}

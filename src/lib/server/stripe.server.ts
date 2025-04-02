@@ -40,7 +40,7 @@ export async function createCheckoutSession(
 			console.log(
 				`└────🪙 Account currency took ${(performance.now() - start).toFixed(2)} ms to check!`
 			)
-		} catch (err: any) {
+		} catch (err: unknown) {
 			console.error(err)
 			return null
 		}
@@ -69,7 +69,7 @@ export async function createCheckoutSession(
 		console.log(
 			`└────🛒 Checkout session took ${(performance.now() - start).toFixed(2)} ms to create!`
 		)
-	} catch (err: any) {
+	} catch (err: unknown) {
 		console.error(err)
 		return null
 	}
@@ -287,7 +287,7 @@ export async function updateStripeProduct(id: string, name: string) {
 			.update(id, {
 				name: name
 			})
-			.catch((error: any) => console.error(error.raw.message))
+			.catch((err: unknown) => console.error(err))
 	} catch (err) {
 		console.error(err)
 	}
@@ -305,7 +305,7 @@ async function createStripePriceEx(product: string, amount: number, interval: In
 			product: product,
 			recurring: { interval: interval }
 		})
-		.catch((error: any) => console.error(error.raw.message))
+		.catch((err: unknown) => console.error(err))
 }
 
 export async function createStripePrice(price: PriceSchema, product: string) {
@@ -318,7 +318,7 @@ export async function createStripePrice(price: PriceSchema, product: string) {
 			product: product,
 			recurring: { interval: price.interval as Interval }
 		})
-		.catch((error: any) => console.error(error.raw.message))
+		.catch((err: unknown) => console.error(err))
 }
 
 export async function updateStripePrice(price: Price) {
@@ -354,7 +354,7 @@ export async function createStripeBundleProduct(supabase: SupabaseClient, bundle
 		.from("bundles")
 		.insert({ name: bundle.name, user_id: bundle.user_id, scripts: scripts })
 		.select()
-		.returns<Bundle[]>()
+		.overrideTypes<Bundle[]>()
 
 	if (error) return error
 
@@ -364,14 +364,14 @@ export async function createStripeBundleProduct(supabase: SupabaseClient, bundle
 			tax_code: "txcd_10202000",
 			metadata: { user_id: data[0].user_id, bundle: data[0].id }
 		})
-		.catch((error: any) => console.error(error.raw.message))
+		.catch((err: unknown) => console.error(err))
 
 	if (!product) return { message: "Failed to create bundle product in Stripe" }
 
 	const stripePromises: Promise<void>[] = []
 
 	bundle.prices.forEach((price) => {
-		if (Boolean(price.amount)) {
+		if (price.amount) {
 			stripePromises.push(createStripePriceEx(product.id, price.amount, price.interval as Interval))
 		}
 	})
@@ -393,14 +393,14 @@ export async function createStripeScriptProduct(
 			tax_code: "txcd_10202000",
 			metadata: { user_id: user_id, script: script.id }
 		})
-		.catch((error: any) => console.error(error.raw.message))
+		.catch((err: unknown) => console.error(err))
 
 	if (!product) return { message: "Failed to create script product in Stripe" }
 
 	const stripePromises: Promise<void>[] = []
 
 	script.prices.forEach((price) => {
-		if (Boolean(price.amount)) {
+		if (price.amount) {
 			stripePromises.push(createStripePriceEx(product.id, price.amount, price.interval as Interval))
 		}
 	})

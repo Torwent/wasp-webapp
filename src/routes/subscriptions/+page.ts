@@ -1,4 +1,3 @@
-import { streamedErrorHandler } from "$lib/client/utils"
 import type { ProductData, ScriptSimple } from "$lib/types/collection"
 import { formatError } from "$lib/utils"
 import { error } from "@sveltejs/kit"
@@ -65,7 +64,7 @@ export const load = async ({ parent, data }) => {
 			.order("bundle", { ascending: true })
 			.order("user_id", { ascending: true })
 			.order("name", { ascending: true })
-			.returns<ProductData[]>()
+			.overrideTypes<ProductData[]>()
 
 		if (err) {
 			error(
@@ -100,7 +99,7 @@ export const load = async ({ parent, data }) => {
 			.eq("published", true)
 			.contains("categories", "{Premium}")
 			.order("title", { ascending: true })
-			.returns<ScriptSimple[]>()
+			.overrideTypes<ScriptSimple[]>()
 
 		if (err) {
 			error(
@@ -211,8 +210,7 @@ export const load = async ({ parent, data }) => {
 					bundle: product.bundle,
 					prices: productPrices,
 					scripts: bundledScripts,
-					active: product.active && productPrices.length > 0,
-					open: false
+					active: product.active && productPrices.length > 0
 				})
 			} else if (product.script) {
 				scriptProduct.push({

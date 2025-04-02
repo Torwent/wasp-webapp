@@ -13,7 +13,7 @@ export const load = async ({ locals: { supabaseServer } }) => {
 			faq.map(async (entry) => {
 				return {
 					title: entry.title,
-					content: await mdvsvexCompile(entry.content)
+					content: (await mdvsvexCompile(entry.content)).code
 				}
 			})
 		)

@@ -20,7 +20,7 @@
 
 <main class="container mx-auto my-6 max-w-4xl flex-grow">
 	<div class="mx-auto grid max-w-4xl">
-		<a href={page.url.pathname + "/add"} class="btn mx-auto preset-filled">Add</a>
+		<a href={page.url.pathname + "/add"} class="btn preset-filled mx-auto">Add</a>
 		<div class="mx-auto my-6 flex">
 			<AdvancedButton bind:index bind:total={policies.length} />
 		</div>
@@ -31,7 +31,7 @@
 		</div>
 
 		{#if index !== 0}
-			<div class="mx-auto my-6 grid max-w-4xl text-center text-secondary-500">
+			<div class="text-secondary-500 mx-auto my-6 grid max-w-4xl text-center">
 				<p>
 					Old versions of this document are merely informative and for the sake of transparency.
 				</p>
@@ -42,7 +42,7 @@
 			</div>
 		{/if}
 	</div>
-	<article class="prose mx-auto max-w-md py-6 dark:prose-invert md:max-w-4xl">
+	<article class="prose dark:prose-invert mx-auto max-w-md py-6 md:max-w-4xl">
 		{@html currentPolicy.content?.code}
 	</article>
 </main>

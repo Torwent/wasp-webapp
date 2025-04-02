@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { onMount } from "svelte"
-	import { page } from "$app/state"
 	import Head from "$lib/components/Head.svelte"
 
 	let checkedOS: boolean = $state(false)
@@ -64,11 +63,11 @@
 	description="Setup Simba and WaspScripts from scratch to bot OldSchool RuneScape. Start your road to max on osrs today!"
 />
 
-<div class="container mx-auto my-6 max-w-2xl flex-grow">
+<main class="container mx-auto my-6 min-h-screen max-w-2xl flex-grow">
 	{#if checkedOS}
 		<div class="my-8 h-screen">
 			<header>
-				<h1 class="py-16 text-center text-xl text-primary-500 md:text-3xl dark:text-primary-100">
+				<h1 class="text-primary-500 dark:text-primary-100 py-16 text-center text-xl md:text-3xl">
 					{currentOS.OS} OS detected!
 				</h1>
 				{#if !hasMac}
@@ -89,7 +88,7 @@
 						For a manual instalation guide for {currentOS.OS} you can go
 						<a
 							href="/tutorials/{currentOS.tutorialID}"
-							class="font-semibold text-primary-500 hover:underline dark:text-primary-200"
+							class="text-primary-500 dark:text-primary-200 font-semibold hover:underline"
 						>
 							here
 						</a>
@@ -109,7 +108,7 @@
 					For a Windows install script you can get it here:
 					<a
 						href="https://github.com/torwent/wasp-setup/releases/latest/download/simba-setup.{currentOS.Extension}"
-						class="font-semibold text-primary-400 hover:underline dark:text-primary-100"
+						class="text-primary-400 dark:text-primary-100 font-semibold hover:underline"
 					>
 						setup.{currentOS.Extension}
 					</a>
@@ -118,7 +117,7 @@
 					For a manual instalation guide for {currentOS.OS} you can go
 					<a
 						href="/tutorials/{currentOS.tutorialID}"
-						class="font-semibold text-primary-400 hover:underline dark:text-primary-100"
+						class="text-primary-400 dark:text-primary-100 font-semibold hover:underline"
 					>
 						here
 					</a>
@@ -129,7 +128,7 @@
 				For a {secondaryOS.OS} install script you can get it here:
 				<a
 					href="https://github.com/torwent/wasp-setup/releases/latest/download/simba-setup.{secondaryOS.Extension}"
-					class="font-semibold text-primary-400 hover:underline dark:text-primary-100"
+					class="text-primary-400 dark:text-primary-100 font-semibold hover:underline"
 				>
 					setup.{secondaryOS.Extension}
 				</a>
@@ -138,7 +137,7 @@
 				For a manual instalation guide for {secondaryOS.OS} you can go
 				<a
 					href="/tutorials/{secondaryOS.tutorialID}"
-					class="font-semibold text-primary-400 hover:underline dark:text-primary-100"
+					class="text-primary-400 dark:text-primary-100 font-semibold hover:underline"
 				>
 					here
 				</a>
@@ -147,9 +146,9 @@
 		</div>
 	{:else}
 		<header>
-			<h1 class="py-16 text-center text-xl text-primary-500 md:text-3xl dark:text-primary-100">
+			<h1 class="text-primary-500 dark:text-primary-100 py-16 text-center text-xl md:text-3xl">
 				Checking your operating system...
 			</h1>
 		</header>
 	{/if}
-</div>
+</main>

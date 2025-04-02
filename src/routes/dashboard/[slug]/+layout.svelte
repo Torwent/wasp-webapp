@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { goto } from "$app/navigation"
 	import { page } from "$app/state"
+	import Head from "$lib/components/Head.svelte"
 	import { Tabs } from "@skeletonlabs/skeleton-svelte"
 	import { FileCode, Landmark, Package, Settings } from "svelte-lucide"
 	const { data, children } = $props()
@@ -9,9 +10,15 @@
 	let tab = $derived(page.url.pathname.split("/").pop())
 </script>
 
+<Head
+	title="Dashboard"
+	description="Scripter dashboard"
+	keywords="Dashboard, Scripter, Developer"
+/>
+
 <main class="m-4">
 	{#if profile.id != data.scripter.id}
-		<h3 class="my-4 text-center font-bold text-primary-500">
+		<h3 class="text-primary-500 my-4 text-center font-bold">
 			Current user: {profile.username}
 			<small>{profile.id}</small>
 		</h3>

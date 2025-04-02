@@ -57,21 +57,21 @@
 
 <nav class="col-span-12 row-span-1 w-full flex-col text-sm xl:text-base">
 	<div
-		class="flex h-full justify-between bg-surface-200/30 font-semibold backdrop-blur-md dark:bg-surface-800/30"
+		class="bg-surface-200/30 dark:bg-surface-800/30 flex h-full justify-between font-semibold backdrop-blur-md"
 	>
 		<button
 			name="Menu"
 			aria-label="Open the navigation menu"
-			class="justify-left my-auto flex h-full p-2 align-middle text-primary-500 xl:hidden"
+			class="justify-left text-primary-500 my-auto flex h-full p-2 align-middle xl:hidden"
 			onclick={() => {
 				showMenu = !showMenu
 				if (showMenu) showProfile = false
 			}}
 		>
 			{#if showMenu}
-				<X class="mx-2 my-auto text-surface-900-100" />
+				<X class="text-surface-900-100 mx-2 my-auto" />
 			{:else}
-				<Menu class="mx-2 my-auto text-surface-900-100" />
+				<Menu class="text-surface-900-100 mx-2 my-auto" />
 			{/if}
 			<Logo selected={true} />
 		</button>
@@ -80,23 +80,23 @@
 			<li class="h-12">
 				<a
 					href="/"
-					class="flex h-full place-content-center place-items-center hover:text-primary-600-400"
+					class="hover:text-primary-600-400 flex h-full place-content-center place-items-center"
 					class:text-primary-600-400={"Home" === currentPage}
 					aria-label="Navigate to home page"
 				>
 					<Logo selected={false} />
 				</a>
 			</li>
-			{#each routes as route, index}
-				{#if index > 0}
+			{#each routes as route, idx (route)}
+				{#if idx > 0}
 					<li class="h-12">
 						<a
 							href={getLink(route)}
-							class="flex h-full place-content-center place-items-center hover:text-primary-600-400"
+							class="hover:text-primary-600-400 flex h-full place-content-center place-items-center"
 							class:text-primary-600-400={route === currentPage}
 							aria-label="Navigate to {route.toLowerCase()} page"
 						>
-							{#if index === 0}
+							{#if idx === 0}
 								{route}
 							{:else if route === "Dashboard"}
 								{#if roles?.scripter}
@@ -122,7 +122,7 @@
 				}}
 			>
 				{#if profile}
-					<span class="mx-2 my-auto hidden group-hover:text-primary-500 md:block">
+					<span class="group-hover:text-primary-500 mx-2 my-auto hidden md:block">
 						{profile.username}
 					</span>
 				{/if}
@@ -147,21 +147,21 @@
 	</div>
 
 	<ul
-		class="absolute z-50 w-full bg-surface-200/30 backdrop-blur-md xl:hidden dark:bg-surface-800/30 {showMenu
+		class="bg-surface-200/30 dark:bg-surface-800/30 absolute z-50 w-full backdrop-blur-md xl:hidden {showMenu
 			? 'flex flex-col'
 			: 'hidden'}"
 	>
-		{#each routes as route, index}
+		{#each routes as route, idx (route)}
 			<li class="h-12">
 				<a
 					href={getLink(route)}
-					class="flex h-full place-content-center place-items-center hover:text-primary-400 dark:hover:text-primary-100"
+					class="hover:text-primary-400 dark:hover:text-primary-100 flex h-full place-content-center place-items-center"
 					class:text-primary-500={route === currentPage}
 					class:dark:text-primary-400={route === currentPage}
 					aria-label="Navigate to {route.toLowerCase()} page"
 					onclick={() => (showMenu = !showMenu)}
 				>
-					{#if index === 0}
+					{#if idx === 0}
 						{route}
 					{:else if route === "Dashboard"}
 						{#if roles?.scripter}
@@ -188,7 +188,7 @@
 
 	<form
 		method="POST"
-		class="absolute z-50 w-full bg-surface-200/30 py-14 backdrop-blur-md dark:bg-surface-800/30 {showProfile
+		class="bg-surface-200/30 dark:bg-surface-800/30 absolute z-50 w-full py-14 backdrop-blur-md {showProfile
 			? 'flex flex-col'
 			: 'hidden'}"
 		use:enhance
@@ -202,7 +202,7 @@
 						<button
 							name="Profile"
 							aria-label="Open profile page"
-							class="btn mx-auto flex preset-filled-secondary-500"
+							class="btn preset-filled-secondary-500 mx-auto flex"
 						>
 							<UserRound />
 							Profile
@@ -213,7 +213,7 @@
 
 			<section class="flex flex-col p-4">
 				<h3 class="mx-auto my-4 text-center">Roles</h3>
-				<div class="flex pb-8 pt-2">
+				<div class="flex pt-2 pb-8">
 					<RoleBadges />
 				</div>
 			</section>
@@ -221,7 +221,7 @@
 				<button
 					name="Logout"
 					aria-label="Logout"
-					class="btn mx-auto preset-filled-secondary-500"
+					class="btn preset-filled-secondary-500 mx-auto"
 					formaction="/auth?/logout"
 				>
 					<LogOut />

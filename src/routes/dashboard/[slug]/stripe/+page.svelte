@@ -3,7 +3,6 @@
 	import { invalidate } from "$app/navigation"
 	import { PUBLIC_STRIPE_PUBLISHABLE_KEY } from "$env/static/public"
 	import { countryCodeSchema, dbaSchema } from "$lib/client/schemas"
-	import type { StripeConnectInstance } from "@stripe/connect-js"
 	import { onMount } from "svelte"
 	import { superForm } from "sveltekit-superforms"
 	import { zodClient } from "sveltekit-superforms/adapters"
@@ -119,23 +118,23 @@
 			</div>
 			{#if $countryErrors && $countryErrors.code}
 				<div
-					class="max-h-24 overflow-x-hidden overflow-y-scroll rounded-md bg-surface-700 text-error-500"
+					class="bg-surface-700 text-error-500 max-h-24 overflow-x-hidden overflow-y-scroll rounded-md"
 				>
 					{$countryErrors.code}
 				</div>
 			{/if}
 			{#if $countryAllErrors}
 				<div
-					class="max-h-24 overflow-x-hidden overflow-y-scroll rounded-md bg-surface-700 text-error-500"
+					class="bg-surface-700 text-error-500 max-h-24 overflow-x-hidden overflow-y-scroll rounded-md"
 				>
-					{#each $countryAllErrors as error, i}
+					{#each $countryAllErrors as err, i (err.path)}
 						{#if i === 0}
 							Errors:
 						{/if}
-						<small class="mx-8 flex rounded-md text-error-500">
-							Error path: {error.path}
-							{#each error.messages as messages}
-								{messages}
+						<small class="text-error-500 mx-8 flex rounded-md">
+							Error path: {err.path}
+							{#each err.messages as message (message)}
+								{message}
 							{/each}
 						</small>
 					{/each}
@@ -158,21 +157,21 @@
 					<input class="input my-2" name="dba" id="dba" bind:value={$dbaForm.dba} />
 					{#if $dbaErrors.dba}
 						<div
-							class="max-h-24 overflow-x-hidden overflow-y-scroll rounded-md bg-surface-700 text-error-500"
+							class="bg-surface-700 text-error-500 max-h-24 overflow-x-hidden overflow-y-scroll rounded-md"
 						>
-							{#each $dbaErrors.dba as err}
+							{#each $dbaErrors.dba as err (err)}
 								{err}
 							{/each}
 						</div>
 					{/if}
 				</div>
-				<button class="btn mx-4 mt-6 h-10 preset-filled-secondary-500">Update</button>
+				<button class="btn preset-filled-secondary-500 mx-4 mt-6 h-10">Update</button>
 			</form>
 
 			<form method="POST" action="?/updateStripe" class="my-32 block place-items-center">
 				<div class="my-4 grid">
 					<span>Account information</span>
-					<button class="btn my-2 h-10 preset-filled-secondary-500">
+					<button class="btn preset-filled-secondary-500 my-2 h-10">
 						Update stripe connected account
 					</button>
 				</div>
@@ -196,10 +195,10 @@
 		{#if stripeAccount}
 			{#if stripeAccount.requirements?.currently_due && stripeAccount.requirements?.currently_due.length > 0}
 				<div class="mb-24 flex flex-col">
-					<span class="my-2 text-error-500">Missing account information:</span>
+					<span class="text-error-500 my-2">Missing account information:</span>
 
-					<div class="my-2 grid bg-surface-700 text-error-500">
-						{#each stripeAccount.requirements?.currently_due as requirement}
+					<div class="bg-surface-700 text-error-500 my-2 grid">
+						{#each stripeAccount.requirements?.currently_due as requirement (requirement)}
 							<small class="mx-auto w-full">{requirement}</small>
 						{/each}
 					</div>
@@ -214,7 +213,7 @@
 			{/if}
 		{/if}
 
-		<h5 class="mb-4 mt-12 text-center">Payments</h5>
+		<h5 class="mt-12 mb-4 text-center">Payments</h5>
 		<div id="paymentContainer" class="my-8"></div>
 		<h5 class="my-4 text-center">Payouts</h5>
 		<div id="payoutContainer" class="my-8"></div>

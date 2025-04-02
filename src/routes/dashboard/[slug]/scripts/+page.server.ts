@@ -37,7 +37,7 @@ export const load = async ({ params: { slug }, parent }) => {
 		subs.push(data.data.filter((s) => s.product === product.id))
 		free.push(data.freeData.filter((f) => f.product === product.id))
 
-		let productPrices = prices.filter((price) => price.product == product.id)
+		const productPrices = prices.filter((price) => price.product == product.id)
 		if (productPrices.length < 3) {
 			const intervals = ["week", "month", "year"]
 			intervals.forEach((interval) => {
@@ -406,7 +406,7 @@ export const actions = {
 
 			try {
 				await stripe.subscriptions.update(sub.subscription, { cancel_at_period_end: true })
-			} catch (error) {
+			} catch {
 				success = false
 			}
 

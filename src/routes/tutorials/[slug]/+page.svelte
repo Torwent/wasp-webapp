@@ -41,10 +41,10 @@
 		</a>
 	</div>
 	<h2 class="my-4 text-center text-3xl font-bold">{meta.title}</h2>
-	<h3 class="my-4 text-center font-semibold leading-normal">{meta.description}</h3>
+	<h3 class="my-4 text-center leading-normal font-semibold">{meta.description}</h3>
 	<h4 class="my-12 text-center">
 		Author:
-		<span class="flex justify-center text-primary-500">
+		<span class="text-primary-500 flex justify-center">
 			{#await getUsername(meta.author)}
 				Loading...
 			{:then author}
@@ -56,8 +56,8 @@
 	{#if meta.coauthors}
 		<h5 class="justify-center text-center">
 			Co-Authors:
-			<div class="my-2 flex items-baseline justify-center text-sm text-secondary-500">
-				{#each meta.coauthors as coauthor, i}
+			<div class="text-secondary-500 my-2 flex items-baseline justify-center text-sm">
+				{#each meta.coauthors as coauthor (coauthor)}
 					{#await getUsername(coauthor)}
 						Loading
 					{:then author}
@@ -75,7 +75,7 @@
 		</h5>
 	{/if}
 	<article
-		class="prose mx-auto my-8 border-t-2 border-surface-300 py-6 dark:prose-invert dark:border-surface-800"
+		class="prose border-surface-300 dark:prose-invert dark:border-surface-800 mx-auto my-8 border-t-2 py-6"
 	>
 		<div>
 			<Content />

@@ -3,13 +3,13 @@ import type { Database } from "./supabase"
 //profile
 export type ProfileBase = Database["profiles"]["Tables"]["profiles"]["Row"]
 export interface ProfileRoles {
-	administrator: Boolean
-	moderator: Boolean
-	scripter: Boolean
-	tester: Boolean
-	vip: Boolean
-	premium: Boolean
-	banned: Boolean
+	administrator: boolean
+	moderator: boolean
+	scripter: boolean
+	tester: boolean
+	vip: boolean
+	premium: boolean
+	banned: boolean
 }
 export interface Profile extends ProfileBase {
 	private: Database["profiles"]["Tables"]["private"]["Row"]
@@ -227,7 +227,6 @@ export interface BundleProduct {
 	prices: Price[]
 	scripts: ScriptSimple[]
 	active: boolean
-	open: boolean
 }
 
 export interface ScriptProduct {

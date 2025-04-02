@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from "$app/state"
-	import TableHeader from "$lib/components/tables/TableHeader.svelte"
+	import TableHeader from "$lib/components/TableHeader.svelte"
 	import { Modal } from "@skeletonlabs/skeleton-svelte"
 	import { UserRoundPlus } from "svelte-lucide"
 
@@ -43,7 +43,8 @@
 </script>
 
 <Modal
-	bind:open
+	{open}
+	onOpenChange={(e) => (open = e.open)}
 	triggerBase="btn preset-filled-secondary-500 font-bold"
 	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-5/7 max-w-screen max-h-screen overflow-x-scroll"
 	backdropClasses="backdrop-blur-sm"
@@ -54,22 +55,22 @@
 	{/snippet}
 	{#snippet content()}
 		<header class="flex flex-col justify-between">
-			<h1 class="my-4 flex flex-col gap-4 text-lg lg:h4 lg:flex-row">{name} subscriptions</h1>
+			<h1 class="lg:h4 my-4 flex flex-col gap-4 text-lg lg:flex-row">{name} subscriptions</h1>
 			<h2>Total: {count}</h2>
 		</header>
-		<div class="rounded-md p-1 preset-outlined-surface-500">
+		<div class="preset-outlined-surface-500 rounded-md p-1">
 			<form method="POST" class="table-wrap max-h-[30rem]">
 				<table class="table-compact table">
 					<TableHeader {headers} />
 					<tbody
-						class="max-h-[30rem] overflow-scroll text-xs preset-filled-surface-100-900 md:text-sm xl:text-base hover:[&>tr]:preset-tonal"
+						class="preset-filled-surface-100-900 [&>tr]:hover:preset-tonal max-h-[30rem] overflow-scroll text-xs md:text-sm xl:text-base"
 					>
 						{#await getFreeAccess(id)}
 							<tr class="flex w-full">
 								<td class="h-full w-full p-0 text-xs"> Loading... </td>
 							</tr>
-						{:then subscriptions}
-							{#each subscriptions as row}
+						{:then freeAccess}
+							{#each freeAccess as row (row.id)}
 								<tr>
 									<td>{row.id}</td>
 									<td class="text-center">{row.username}</td>
@@ -95,7 +96,7 @@
 		</div>
 		<form
 			method="POST"
-			class="mx-auto flex flex-col justify-around rounded-md p-8 preset-outlined-surface-500 md:flex-row"
+			class="preset-outlined-surface-500 mx-auto flex flex-col justify-around rounded-md p-8 md:flex-row"
 		>
 			<label>
 				<span class="label-text">Add user:</span>
@@ -109,7 +110,7 @@
 
 			<button
 				type="submit"
-				class="btn my-4 preset-filled-success-500"
+				class="btn preset-filled-success-500 my-4"
 				formaction="?/addFree&product={id}"
 			>
 				<UserRoundPlus /> Add user</button

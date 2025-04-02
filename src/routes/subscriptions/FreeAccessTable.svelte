@@ -1,6 +1,5 @@
 <script lang="ts">
-	import TableCell from "$lib/components/tables/TableCell.svelte"
-	import TableHeader from "$lib/components/tables/TableHeader.svelte"
+	import TableHeader from "$lib/components/TableHeader.svelte"
 	import type { BundleProduct, FreeAccess, ScriptProduct } from "$lib/types/collection"
 	import ExternalLink from "svelte-lucide/ExternalLink.svelte"
 	import ScriptLinks from "./ScriptLinks.svelte"
@@ -35,15 +34,15 @@
 	<h3 class="my-12 justify-center text-center">Free access</h3>
 
 	<div
-		class="xl:mx-w-7xl table-wrap mx-auto max-w-md rounded-md preset-outlined-surface-500 md:max-w-3xl lg:max-w-6xl"
+		class="xl:mx-w-7xl table-wrap preset-outlined-surface-500 mx-auto max-w-md rounded-md md:max-w-3xl lg:max-w-6xl"
 	>
 		<table class="table border-separate space-y-6 text-xs">
 			<TableHeader headers={["Product", "Type", "Start date", "End date"]} />
-			<tbody class="preset-filled-surface-200-800 hover:[&>tr]:preset-tonal">
-				{#each freeAccess as access, i}
+			<tbody class="preset-filled-surface-200-800 [&>tr]:hover:preset-tonal">
+				{#each freeAccess as access, i (access.id)}
 					{#if bundleArray[i]}
 						<tr class="table-row">
-							<TableCell alignment="left" padding={0}>
+							<td>
 								<div class="mx-3">
 									<div>{bundleArray[i].name}</div>
 
@@ -53,26 +52,26 @@
 										<div class="text-left text-xs">by {username}</div>
 									{/await}
 								</div>
-							</TableCell>
+							</td>
 
-							<TableCell padding={0}>
-								<ScriptLinks bind:bundle={bundleArray[i]} />
-							</TableCell>
+							<td class="text-center">
+								<ScriptLinks bundle={bundleArray[i]} />
+							</td>
 
-							<TableCell>
+							<td class="text-center">
 								{new Date(access.date_start).toLocaleString(userLocale)}
-							</TableCell>
+							</td>
 
-							<TableCell>
+							<td class="text-center">
 								{new Date(access.date_end).toLocaleString(userLocale)}
-							</TableCell>
+							</td>
 						</tr>
 					{:else}
 						{@const script = getScript(access.product)}
 
 						{#if script}
 							<tr class="table-row">
-								<TableCell alignment="left" padding={0}>
+								<td>
 									<div class="mx-3">
 										<div>{script.name}</div>
 										{#await script.username}
@@ -81,24 +80,24 @@
 											<div class="text-left text-xs">by {username}</div>
 										{/await}
 									</div>
-								</TableCell>
+								</td>
 
-								<TableCell padding={0}>
+								<td class="text-center">
 									<a href="/scripts/{script.url}" class="permalink">
-										<button class="btn hover:cursor-pointer hover:text-primary-500">
+										<button class="btn hover:text-primary-500 hover:cursor-pointer">
 											<ExternalLink size="16" />
 											<span>Script</span>
 										</button>
 									</a>
-								</TableCell>
+								</td>
 
-								<TableCell>
+								<td class="text-center">
 									{new Date(access.date_start).toLocaleString(userLocale)}
-								</TableCell>
+								</td>
 
-								<TableCell>
+								<td class="text-center">
 									{new Date(access.date_end).toLocaleString(userLocale)}
-								</TableCell>
+								</td>
 							</tr>
 						{/if}
 					{/if}

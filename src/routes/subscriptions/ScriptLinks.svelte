@@ -5,21 +5,19 @@
 	import { PanelBottomOpen, PanelTopOpen } from "svelte-lucide"
 	import ExternalLink from "svelte-lucide/ExternalLink.svelte"
 
-	let { bundle = $bindable() }: { bundle: BundleProduct } = $props()
-
-	function close() {
-		bundle.open = false
-	}
+	let { bundle }: { bundle: BundleProduct } = $props()
+	let open = $state(false)
 </script>
 
 <Modal
-	bind:open={bundle.open}
+	{open}
+	onOpenChange={(e) => (open = e.open)}
 	triggerBase="btn preset-tonal"
 	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm p-12"
 	backdropClasses="backdrop-blur-sm"
 >
 	{#snippet trigger()}
-		{#if bundle.open}
+		{#if open}
 			<PanelBottomOpen size="16" />
 		{:else}
 			<PanelTopOpen size="16" />
@@ -28,7 +26,7 @@
 	{/snippet}
 	{#snippet content()}
 		<header class="flex justify-between">
-			<h5 class="h5 flex flex-col gap-4 lg:h4 lg:flex-row">
+			<h5 class="h5 lg:h4 flex flex-col gap-4 lg:flex-row">
 				<span>{bundle.name}</span>
 				<span>
 					{#await bundle.username}
@@ -41,8 +39,8 @@
 		</header>
 		<article class="table-wrap">
 			<table class="table-compact table">
-				<tbody class="preset-filled-surface-100-900 hover:[&>tr]:preset-tonal">
-					{#each bundle.scripts as script}
+				<tbody class="[&>tr]:hover:preset-tonal">
+					{#each bundle.scripts as script (script.id)}
 						<tr
 							class="flex h-full w-full cursor-pointer"
 							onclick={() => goto("/scripts/" + script.url)}
@@ -59,7 +57,7 @@
 			</table>
 		</article>
 		<footer class="flex justify-end gap-4">
-			<button type="button" class="btn preset-tonal" onclick={close}>Confirm</button>
+			<button type="button" class="btn preset-tonal" onclick={() => (open = false)}>Confirm</button>
 		</footer>
 	{/snippet}
 </Modal>

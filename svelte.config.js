@@ -34,7 +34,32 @@ const config = {
 		}
 	},
 	preprocess: [vitePreprocess(), mdsvex(mdsvexOptions)],
-	kit: { adapter: adapter() },
+	kit: {
+		adapter: adapter(),
+		csp: {
+			mode: "auto",
+			directives: {
+				"connect-src": ["self", "ws://localhost:*", "https://db.waspscripts.com"],
+				"form-action": ["self"],
+				"frame-src": [
+					"self",
+					"https://stripe-data-exports.s3.amazonaws.com/",
+					"https://js.stripe.com",
+					"https://connect-js.stripe.com",
+					"https://www.youtube.com/"
+				],
+				"script-src": [
+					"self",
+					"https://js.stripe.com/",
+					"https://connect-js.stripe.com",
+					"unsafe-inline",
+					"wasm-unsafe-eval"
+				],
+				"base-uri": ["self"],
+				"object-src": ["none"]
+			}
+		}
+	},
 	extensions: [".svelte", ".svx", ".md"]
 }
 

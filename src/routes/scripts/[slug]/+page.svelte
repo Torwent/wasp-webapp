@@ -1,20 +1,19 @@
 <script lang="ts">
 	import { BadgeAlert, BadgeCheck, ExternalLink } from "svelte-lucide"
 	import ScriptHeader from "../ScriptHeader.svelte"
-	import { WaspProfile, canDownload, canEdit, getProducts } from "$lib/client/supabase"
+	import { canDownload, canEdit, getProducts } from "$lib/client/supabase"
 	import ScriptData from "./ScriptData.svelte"
 	import AdvancedButton from "../AdvancedButton.svelte"
 	import ZipDownload from "../ZipDownload.svelte"
 	import { page } from "$app/state"
-	import TableHeader from "$lib/components/tables/TableHeader.svelte"
-	import TableCell from "$lib/components/tables/TableCell.svelte"
+	import TableHeader from "$lib/components/TableHeader.svelte"
 	import { getCurrentPrice, getPriceIntervalEx, setPriceInterval } from "$lib/utils"
 	import ScriptArticle from "../ScriptArticle.svelte"
 	import { replaceScriptContent } from "$lib/client/utils"
 	import Head from "$lib/components/Head.svelte"
 
 	const { data } = $props()
-	const { script, dismissed, profile, roles, supabaseClient } = $derived(data)
+	const { script, profile, roles, supabaseClient } = $derived(data)
 
 	let products: Awaited<ReturnType<typeof getProducts>> | null = $state(null)
 
@@ -53,7 +52,7 @@
 		<header class="my-8">
 			<form method="POST" class="grid">
 				{#if script.protected.broken}
-					<h4 class="my-2 text-error-500">
+					<h4 class="text-error-500 my-2">
 						This script has been reported broken and it might not work.
 					</h4>
 				{/if}
@@ -61,16 +60,16 @@
 					{#if roles?.tester}
 						<button
 							type="submit"
-							class="btn mx-auto preset-outlined-success-500"
+							class="btn preset-outlined-success-500 mx-auto"
 							formaction="?/clear&id={script.id}"
 						>
 							<BadgeCheck class="mr-2" />
-							{"Clear reports"}
+							Clear reports
 						</button>
 					{/if}
 					<button
 						type="submit"
-						class="btn mx-auto preset-outlined-error-500"
+						class="btn preset-outlined-error-500 mx-auto"
 						formaction="?/report&id={script.id}"
 					>
 						Report broken
@@ -80,7 +79,7 @@
 			</form>
 
 			{#if !script.published && canEdit(profile?.id, roles, script.protected.author_id)}
-				<h4 class="text-shadow my-4 text-center text-error-500 drop-shadow-2xl">Unpublished</h4>
+				<h4 class="text-shadow text-error-500 my-4 text-center drop-shadow-2xl">Unpublished</h4>
 			{/if}
 		</header>
 		{#if canEdit(profile?.id, roles, script.protected.author_id)}
@@ -115,14 +114,14 @@
 							{/if}
 						</div>
 					{:else}
-						<div class="my-8 rounded-md p-4 preset-outlined-surface-500">
+						<div class="preset-outlined-surface-500 my-8 rounded-md p-4">
 							<h4 class="py-2">
 								This is a <span class="text-secondary-500">premium</span>
 								script that you don't have access to.
 							</h4>
 							<h5>
 								To be able to download this script buy a
-								<a href="/subscriptions" class="font-semibold text-secondary-500 hover:underline">
+								<a href="/subscriptions" class="text-secondary-500 font-semibold hover:underline">
 									subscription
 								</a>
 								that gives you access to it! You can buy it with the following products
@@ -132,32 +131,32 @@
 								<form method="POST" class="table-wrap my-12 flex justify-evenly overflow-auto">
 									<table class="table">
 										<TableHeader headers={["Product", "Type", "Price", "Interval", "Checkout"]} />
-										<tbody class="hover:[&>tr]:preset-tonal">
-											{#each products.bundles as bundle}
+										<tbody class="[&>tr]:hover:preset-tonal">
+											{#each products.bundles as bundle (bundle.id)}
 												<tr class="table-row">
-													<TableCell alignment="left" padding={0}>
+													<td>
 														<div class="mx-3">
 															<div>{bundle.name}</div>
 														</div>
-													</TableCell>
+													</td>
 
-													<TableCell padding={0}>
+													<td>
 														<a
 															href="/subscriptions"
-															class="btn hover:cursor-pointer hover:text-primary-500"
+															class="btn hover:text-primary-500 hover:cursor-pointer"
 														>
 															<ExternalLink size="16" />
 															<span>Bundle</span>
 														</a>
-													</TableCell>
+													</td>
 
-													<TableCell>{getCurrentPrice(bundle.prices)}</TableCell>
+													<td>{getCurrentPrice(bundle.prices)}</td>
 
-													<TableCell padding={0}>
+													<td>
 														<div
-															class="btn-group flex flex-col rounded-md preset-outlined-surface-500 md:flex-row"
+															class="btn-group preset-outlined-surface-500 flex flex-col rounded-md md:flex-row"
 														>
-															{#each bundle.prices as price, j}
+															{#each bundle.prices as price, j (price.id)}
 																<button
 																	class="btn"
 																	class:preset-outlined-primary-500={price.active}
@@ -167,9 +166,9 @@
 																</button>
 															{/each}
 														</div>
-													</TableCell>
+													</td>
 
-													<TableCell padding={0}>
+													<td>
 														<button
 															class="btn preset-filled-secondary-500"
 															formaction="?/checkout&product={bundle.id}&price={bundle.prices.find(
@@ -178,35 +177,35 @@
 														>
 															Checkout
 														</button>
-													</TableCell>
+													</td>
 												</tr>
 											{/each}
 
-											{#each products.scripts as script}
+											{#each products.scripts as script (script.id)}
 												<tr>
-													<TableCell alignment="left" padding={0}>
+													<td>
 														<div class="mx-3">
 															<div class="">{script.name}</div>
 														</div>
-													</TableCell>
+													</td>
 
-													<TableCell padding={0}>
+													<td>
 														<a
 															href="/subscriptions"
-															class="btn hover:cursor-pointer hover:text-primary-500"
+															class="btn hover:text-primary-500 hover:cursor-pointer"
 														>
 															<ExternalLink size="16" />
 															<span>Script</span>
 														</a>
-													</TableCell>
+													</td>
 
-													<TableCell>{getCurrentPrice(script.prices)}</TableCell>
+													<td>{getCurrentPrice(script.prices)}</td>
 
-													<TableCell padding={0}>
+													<td>
 														<div
-															class="btn-group flex flex-col rounded-md preset-outlined-surface-500 md:flex-row"
+															class="btn-group preset-outlined-surface-500 flex flex-col rounded-md md:flex-row"
 														>
-															{#each script.prices as price, j}
+															{#each script.prices as price, j (price.id)}
 																<button
 																	class="btn"
 																	class:preset-outlined-primary-500={price.active}
@@ -219,9 +218,9 @@
 																</button>
 															{/each}
 														</div>
-													</TableCell>
+													</td>
 
-													<TableCell padding={0}>
+													<td>
 														<button
 															class="btn preset-filled-secondary-500"
 															formaction="?/checkout&product={script.id}&price={script.prices.find(
@@ -230,7 +229,7 @@
 														>
 															Checkout
 														</button>
-													</TableCell>
+													</td>
 												</tr>
 											{/each}
 										</tbody>

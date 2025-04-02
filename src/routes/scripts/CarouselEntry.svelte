@@ -11,7 +11,7 @@
 	loading="lazy"
 />
 
-<div class="absolute left-1/2 top-1/2 grid -translate-x-1/2 -translate-y-1/2">
+<div class="absolute top-1/2 left-1/2 grid -translate-x-1/2 -translate-y-1/2">
 	<span class="text-md text-shadow-strong font-bold drop-shadow-2xl lg:text-lg xl:text-4xl">
 		{title}
 	</span>

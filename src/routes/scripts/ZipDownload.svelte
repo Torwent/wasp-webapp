@@ -44,7 +44,7 @@
 			.order("title", { ascending: true })
 			.eq("published", true)
 			.eq("protected.broken", false)
-			.returns<ScriptResponse[]>()
+			.overrideTypes<ScriptResponse[]>()
 
 		if (err) {
 			console.error(error)
@@ -69,8 +69,6 @@
 		if (permited) zipsAvailable = ["wasp-premium.zip", "wasp-free.zip", "wasp-all.zip"]
 		if (permited && dismissed) zipsAvailable = ALL_ZIPS
 	})
-
-	let progress: number = -1
 
 	async function downloadFile(url: string) {
 		const response = await fetch(url)
@@ -102,8 +100,7 @@
 		}
 
 		const zipBlob = await zip.generateAsync({ type: "blob" })
-		progress = 1
-		setTimeout(async () => (progress = -1), 2000)
+
 		const { saveAs } = await import("file-saver")
 		return saveAs(zipBlob, zipName)
 	}
@@ -144,7 +141,6 @@
 						script.id + "/" + pad(script.protected.revision, 9),
 						"script.simba"
 					)
-					progress += 1
 					resolve(result)
 				})
 			)
@@ -163,7 +159,6 @@
 	async function download() {
 		if (noDownload) return
 		const start = performance.now()
-		progress = 0
 		await downloadAndZip()
 		console.log("Took ", performance.now() - start, "ms to download all files 🚀")
 	}
@@ -173,7 +168,7 @@
 	<button
 		name={zipName}
 		aria-label="Download zip"
-		class="btn h-full rounded-r-none uppercase preset-filled-primary-500 hover:preset-tonal-primary"
+		class="btn preset-filled-primary-500 hover:preset-tonal-primary h-full rounded-r-none uppercase"
 		onclick={download}
 	>
 		<FileArchive />
@@ -182,10 +177,10 @@
 	<select
 		name="revision"
 		id="revision-select"
-		class="select rounded-l-none uppercase preset-filled-surface-500 hover:preset-tonal-surface"
+		class="select preset-filled-surface-500 hover:preset-tonal-surface rounded-l-none uppercase"
 		bind:value={zipName}
 	>
-		{#each zipsAvailable as zip}
+		{#each zipsAvailable as zip (zip)}
 			<option value={zip} selected={zipName === zip}> {zip}</option>
 		{/each}
 	</select>

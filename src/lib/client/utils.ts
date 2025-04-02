@@ -126,7 +126,7 @@ export function replaceScriptContent(script: Script, locale: string = "pt-PT") {
 }
 
 export async function checkClientImageDimensions(
-	file: any,
+	file: File,
 	w: number,
 	h: number
 ): Promise<boolean> {

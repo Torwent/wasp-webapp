@@ -1,6 +1,5 @@
 <script lang="ts">
-	import TableCell from "$lib/components/tables/TableCell.svelte"
-	import TableHeader from "$lib/components/tables/TableHeader.svelte"
+	import TableHeader from "$lib/components/TableHeader.svelte"
 	import { superForm, type Infer, type SuperValidated } from "sveltekit-superforms"
 	import { subscriptionsSchema } from "$lib/client/schemas"
 	import { Switch } from "@skeletonlabs/skeleton-svelte"
@@ -53,7 +52,7 @@
 
 	{#if $errors._errors}
 		<div class="mx-auto my-8 w-full text-center">
-			{#each $errors._errors as err}
+			{#each $errors._errors as err (err)}
 				<span class="text-error-500">{err}</span>
 			{/each}
 		</div>
@@ -62,7 +61,7 @@
 	<form
 		id="subsform"
 		method="POST"
-		class="xl:mx-w-7xl table-wrap mx-auto max-w-md rounded-md preset-outlined-surface-500 md:max-w-3xl lg:max-w-6xl"
+		class="xl:mx-w-7xl table-wrap preset-outlined-surface-500 mx-auto max-w-md rounded-md md:max-w-3xl lg:max-w-6xl"
 		use:enhance
 		bind:this={form}
 		action="?/subscriptions"
@@ -71,13 +70,13 @@
 			<TableHeader
 				headers={["Product", "Type", "Price", "Interval", "Start date", "End date", "Renew"]}
 			/>
-			<tbody class="preset-filled-surface-200-800 hover:[&>tr]:preset-tonal">
-				{#each subscriptions as subscription, i}
-					{@const price = getPrice(subscription.price, prices)}
+			<tbody class="preset-filled-surface-200-800 [&>tr]:hover:preset-tonal">
+				{#each subscriptions as { subscription, product, price, date_start, date_end, cancel, disabled }, i (subscription)}
+					{@const priceEx = getPrice(price, prices)}
 
 					{#if bundleArray[i]}
 						<tr>
-							<TableCell alignment="left" padding={0}>
+							<td>
 								<div class="mx-3">
 									<div>{bundleArray[i].name}</div>
 									<div class="text-left text-xs">
@@ -88,115 +87,108 @@
 										{/await}
 									</div>
 								</div>
-							</TableCell>
+							</td>
 
-							<TableCell padding={0}>
-								<ScriptLinks bind:bundle={bundleArray[i]} />
-							</TableCell>
+							<td class="text-center">
+								<ScriptLinks bundle={bundleArray[i]} />
+							</td>
 
-							<TableCell>{price ? getPriceAmount(price) : "..."}</TableCell>
+							<td class="text-center">{priceEx ? getPriceAmount(priceEx) : "..."}</td>
 
-							<TableCell>{price ? getPriceIntervalEx(price) : "..."}</TableCell>
+							<td class="text-center">{priceEx ? getPriceIntervalEx(priceEx) : "..."}</td>
 
-							<TableCell>
-								{new Date(subscription.date_start).toLocaleString(userLocale)}
-							</TableCell>
+							<td class="text-center">
+								{new Date(date_start).toLocaleString(userLocale)}
+							</td>
 
-							<TableCell>
-								{subscription.cancel ? "Cancels on " : "Renews on "}
-								{new Date(subscription.date_end).toLocaleString(userLocale)}
-							</TableCell>
+							<td class="text-center">
+								{cancel ? "Cancels on " : "Renews on "}
+								{new Date(date_end).toLocaleString(userLocale)}
+							</td>
 
-							<TableCell>
+							<td class="text-center">
 								<Switch
-									name="{subscription.subscription}-slider"
+									name="{subscription}-slider"
 									controlInactive="bg-error-500"
 									controlActive="bg-success-700"
 									controlDisabled="disabled"
-									checked={!subscription.cancel}
+									checked={!cancel}
 									form="subsform"
 									onCheckedChange={() => {
-										if (subscription.disabled) return
-										form.setAttribute(
-											"action",
-											"?/subscriptions&product=" + subscription.subscription
-										)
+										if (disabled) return
+										form.setAttribute("action", "?/subscriptions&product=" + subscription)
 										form.requestSubmit()
 									}}
 								/>
-							</TableCell>
+							</td>
 						</tr>
 					{:else}
-						{@const script = getScript(subscription.product)}
-						{#if script}
-							<tr class="table-row">
-								<TableCell alignment="left" padding={0}>
-									<div class="mx-3">
-										<div>{script.name}</div>
-										<div class="text-left text-xs">
-											{#await script.username}
-												by Loading...
-											{:then username}
-												by {username}
-											{/await}
-										</div>
+						{@const script = getScript(product) as ScriptProduct}
+
+						<tr class="table-row">
+							<td>
+								<div class="mx-3">
+									<div>{script.name}</div>
+									<div class="text-left text-xs">
+										{#await script.username}
+											by Loading...
+										{:then username}
+											by {username}
+										{/await}
 									</div>
-								</TableCell>
+								</div>
+							</td>
 
-								<TableCell padding={0}>
-									<a href="/scripts/{script.url}" class="permalink">
-										<button class="btn hover:cursor-pointer hover:text-primary-500">
-											<ExternalLink size="16" />
-											<span>Script</span>
-										</button>
-									</a>
-								</TableCell>
+							<td>
+								<a href="/scripts/{script.url}" class="permalink">
+									<button class="btn hover:text-primary-500 hover:cursor-pointer">
+										<ExternalLink size="16" />
+										<span>Script</span>
+									</button>
+								</a>
+							</td>
 
-								<TableCell>
-									{#if price}
-										{getPriceAmount(price)}
-									{:else}
-										...
-									{/if}
-								</TableCell>
+							<td>
+								{#if priceEx}
+									{getPriceAmount(priceEx)}
+								{:else}
+									...
+								{/if}
+							</td>
 
-								<TableCell>
-									{#if price}
-										{getPriceIntervalEx(price)}
-									{:else}
-										...
-									{/if}
-								</TableCell>
+							<td>
+								{#if priceEx}
+									{getPriceIntervalEx(priceEx)}
+								{:else}
+									...
+								{/if}
+							</td>
 
-								<TableCell>
-									{new Date(subscription.date_start).toLocaleString(userLocale)}
-								</TableCell>
+							<td>
+								{new Date(date_start).toLocaleString(userLocale)}
+							</td>
 
-								<TableCell>
-									{subscription.cancel ? "Cancels on " : "Renews on "}
-									{new Date(subscription.date_end).toLocaleString(userLocale)}
-								</TableCell>
+							<td>
+								{cancel ? "Cancels on " : "Renews on "}
+								{new Date(date_end).toLocaleString(userLocale)}
+							</td>
 
-								<TableCell>
-									<Switch
-										name="{subscription.subscription}-slider"
-										controlInactive="bg-error-500"
-										controlActive="bg-success-700"
-										controlDisabled="disabled"
-										checked={!subscription.cancel}
-										form="subsform"
-										onCheckedChange={() => {
-											if (subscription.disabled) return
-											form.setAttribute(
-												"action",
-												"?/subscriptions&product=" + subscription.subscription
-											)
-											form.requestSubmit()
-										}}
-									/>
-								</TableCell>
-							</tr>
-						{/if}
+							<td>
+								<Switch
+									name="{subscription}-slider"
+									controlInactive="bg-error-500"
+									controlActive="bg-success-700"
+									controlDisabled="disabled"
+									checked={!cancel}
+									form="subsform"
+									onCheckedChange={() => {
+										if (disabled) return
+										form.setAttribute("action", "?/subscriptions&product=" + subscription)
+										form.requestSubmit()
+									}}
+								/>
+							</td>
+						</tr>
 					{/if}
 				{/each}
 			</tbody>

@@ -20,7 +20,7 @@ export async function doLogin(
 
 	if (!provider) error(403, "Failed to login! Provider not specified!")
 
-	let href = origin + "/auth/callback/" + (path?.slice(3) ?? "")
+	const href = origin + "/auth/callback/" + (path?.slice(3) ?? "")
 
 	const { data, error: err } = await supabase.auth.signInWithOAuth({
 		provider: provider,

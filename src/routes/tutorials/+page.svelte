@@ -40,24 +40,24 @@
 
 		<div class="my-4 flex flex-col gap-2 lg:flex-row">
 			<a href="https://torwent.github.io/SRL-T/" class="mx-auto">
-				<button class="btn ring-2 ring-primary-500 preset-filled-primary-200-800">
+				<button class="btn ring-primary-500 preset-filled-primary-200-800 ring-2">
 					SRL-T Documentation
 				</button>
 			</a>
 			<a href="https://torwent.github.io/WaspLib/" class="mx-auto">
-				<button class="btn ring-2 ring-primary-500 preset-filled-primary-200-800">
+				<button class="btn ring-primary-500 preset-filled-primary-200-800 ring-2">
 					WaspLib Documentation
 				</button>
 			</a>
 
 			<a href="https://api.waspscripts.com/docs" class="mx-auto">
-				<button class="btn ring-2 ring-primary-500 preset-filled-primary-200-800">
+				<button class="btn ring-primary-500 preset-filled-primary-200-800 ring-2">
 					Stats API Documentation
 				</button>
 			</a>
 
 			<a href="https://map.waspscripts.com" class="mx-auto">
-				<button class="btn ring-2 ring-primary-500 preset-filled-primary-200-800">
+				<button class="btn ring-primary-500 preset-filled-primary-200-800 ring-2">
 					Interactive Map
 				</button>
 			</a>
@@ -68,7 +68,7 @@
 		<div class="form text-center">
 			<h3 class="my-8">Filter by level or search the a blog post:</h3>
 			<div class="mx-auto my-4 flex flex-col justify-center gap-2 md:flex-row">
-				{#each levelNames as name, i}
+				{#each levelNames as name, i (name)}
 					<button
 						class="mx-auto rounded-md p-2 text-xs font-bold text-white md:mx-0 bg-{levelColors[
 							i
@@ -107,7 +107,7 @@
 		<div class="my-8 grid place-items-center">
 			<a
 				href="https://github.com/Torwent/wasp-info/new/main/tutorials"
-				class="btn ring-2 ring-secondary-500 preset-filled-secondary-200-800"
+				class="btn ring-secondary-500 preset-filled-secondary-200-800 ring-2"
 			>
 				Add a tutorial through GitHub!
 			</a>
@@ -115,7 +115,7 @@
 	</div>
 
 	<div class="mx-auto max-w-2xl flex-grow">
-		{#each tutorials as tutorial}
+		{#each tutorials as tutorial (tutorial)}
 			<TutorialCard {tutorial} />
 		{/each}
 	</div>

@@ -6,8 +6,7 @@ import type {
 	Script,
 	Scripter,
 	StatsTotal,
-	SubCategory,
-	Tutorial
+	SubCategory
 } from "$lib/types/collection"
 import type { Database } from "$lib/types/supabase"
 import { UUID_V4_REGEX, formatError } from "$lib/utils"
@@ -160,7 +159,7 @@ export class WaspScripters {
 			.limit(5)
 			.limit(1, { foreignTable: "profiles" })
 			.order("id", { ascending: true })
-			.returns<SimpleScripter[]>()
+			.overrideTypes<SimpleScripter[]>()
 
 		console.log(`└──💻 5 Random scripters loaded in ${(performance.now() - start).toFixed(2)} ms!`)
 		if (err) {
@@ -433,7 +432,7 @@ export async function canDownload(
 	const { data } = await supabase
 		.schema("profiles")
 		.rpc("can_access", { script_id: script_id })
-		.returns<boolean>()
+		.overrideTypes<boolean>()
 
 	return data ?? false
 }
@@ -498,7 +497,7 @@ export class WaspFAQ {
 
 		const store = get(this.#persistedStore)
 
-		let cached = table === "questions" ? store.faqs : table === "errors" ? store.errors : null
+		const cached = table === "questions" ? store.faqs : table === "errors" ? store.errors : null
 
 		if (cached && now - cached.timestamp < this.#CACHE_MAX_AGE) {
 			return cached.data

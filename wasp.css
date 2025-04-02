@@ -1,8 +1,9 @@
-[data-theme='wasp'] {
+[data-theme="wasp"] {
 	--text-scaling: 1.067;
 	--base-font-color: var(--color-surface-950);
 	--base-font-color-dark: var(--color-surface-50);
-	--base-font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, 'DejaVu Sans Mono', monospace;
+	--base-font-family:
+		ui-monospace, "Cascadia Code", "Source Code Pro", Menlo, Consolas, "DejaVu Sans Mono", monospace;
 	--base-font-size: inherit;
 	--base-line-height: inherit;
 	--base-font-weight: normal;

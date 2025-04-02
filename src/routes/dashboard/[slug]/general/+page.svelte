@@ -1,6 +1,5 @@
 <script lang="ts">
-	import TableCell from "$lib/components/tables/TableCell.svelte"
-	import TableHeader from "$lib/components/tables/TableHeader.svelte"
+	import TableHeader from "$lib/components/TableHeader.svelte"
 	const { data } = $props()
 	const { supabaseClient, roles, stats, subscriptions } = $derived(data)
 
@@ -35,7 +34,7 @@
 	<h1 class="my-12 justify-center text-center">General stats</h1>
 
 	<div
-		class="xl:mx-w-7xl table-wrap mx-auto max-w-md rounded-md preset-outlined-surface-500 md:max-w-3xl lg:max-w-6xl"
+		class="xl:mx-w-7xl table-wrap preset-outlined-surface-500 mx-auto max-w-md rounded-md md:max-w-3xl lg:max-w-6xl"
 	>
 		<table class="table border-separate space-y-6 text-xs">
 			<TableHeader
@@ -50,18 +49,18 @@
 				]}
 			/>
 
-			<tbody class="preset-filled-surface-200-800 hover:[&>tr]:preset-tonal">
+			<tbody class="preset-filled-surface-200-800 [&>tr]:hover:preset-tonal">
 				<tr class="table-row">
-					<TableCell>{stats.total_user_scripts} / {stats.total_scripts}</TableCell>
-					<TableCell>{stats.total_user_premium_scripts} / {stats.total_premium_scripts}</TableCell>
-					<TableCell>{stats.month_user_downloads} / {stats.month_downloads}</TableCell>
-					<TableCell>
+					<td>{stats.total_user_scripts} / {stats.total_scripts}</td>
+					<td>{stats.total_user_premium_scripts} / {stats.total_premium_scripts}</td>
+					<td>{stats.month_user_downloads} / {stats.month_downloads}</td>
+					<td>
 						{stats.month_premium_user_downloads} / {stats.month_premium_downloads}
-					</TableCell>
+					</td>
 
-					<TableCell>{subscriptions.subscribers}</TableCell>
-					<TableCell>{subscriptions.cancelling}</TableCell>
-					<TableCell>{subscriptions.free_access}</TableCell>
+					<td>{subscriptions.subscribers}</td>
+					<td>{subscriptions.cancelling}</td>
+					<td>{subscriptions.free_access}</td>
 				</tr>
 			</tbody>
 		</table>
@@ -76,10 +75,10 @@
 				{#await fetchcripters()}
 					Loading...
 				{:then scripters}
-					{#each scripters as scripter}
+					{#each scripters as scripter (scripter.id)}
 						<a
 							href="/dashboard/{scripter.id}/general"
-							class="btn m-2 mx-auto w-full font-bold preset-outlined-tertiary-100-900"
+							class="btn preset-outlined-tertiary-100-900 m-2 mx-auto w-full font-bold"
 						>
 							{scripter.profiles.username}
 						</a>

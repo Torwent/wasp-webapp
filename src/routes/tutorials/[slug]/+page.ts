@@ -9,7 +9,7 @@ export const load = async ({ data, params: { slug } }) => {
 			content: tutorial.default,
 			meta: data.meta
 		}
-	} catch (e) {
+	} catch {
 		error(404, `Could not find ${slug}`)
 	}
 }

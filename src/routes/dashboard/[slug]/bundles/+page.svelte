@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { bundleArraySchema, newBundleSchema } from "$lib/client/schemas"
-	import TableCell from "$lib/components/tables/TableCell.svelte"
 	import { superForm } from "sveltekit-superforms"
 	import { zodClient } from "sveltekit-superforms/adapters"
 	import ScriptPicker from "./ScriptPicker.svelte"
@@ -70,7 +69,7 @@
 		<table class="table border-separate space-y-6 text-xs">
 			<thead class="preset-filled-surface-200-800 rounded-md text-lg font-bold">
 				<tr>
-					{#each headers as header}
+					{#each headers as header (header)}
 						<th>
 							<span class="text-secondary-950-50 flex justify-center text-center">{header}</span>
 						</th>
@@ -78,8 +77,8 @@
 				</tr>
 			</thead>
 
-			<tbody class="preset-filled-surface-100-900 hover:[&>tr]:preset-tonal-surface">
-				{#each $bundlesForm.bundles as _, i}
+			<tbody class="preset-filled-surface-100-900 [&>tr]:hover:preset-tonal-surface">
+				{#each $bundlesForm.bundles, i}
 					<tr>
 						<td>
 							<input
@@ -91,13 +90,13 @@
 							/>
 
 							{#if $bundlesErrors.bundles && $bundlesErrors.bundles[i].name}
-								{#each $bundlesErrors.bundles[i].name as err}
+								{#each $bundlesErrors.bundles[i].name as err (err)}
 									<small class="text-error-500">{err}</small>
 								{/each}
 							{/if}
 						</td>
 
-						{#each $bundlesForm.bundles[i].prices as _, j}
+						{#each $bundlesForm.bundles[i].prices, j}
 							<td>
 								<input
 									name="prices"
@@ -110,32 +109,33 @@
 										$bundlesErrors.bundles[i].prices[j].amount}
 								/>
 								{#if $bundlesErrors.bundles && $bundlesErrors.bundles[i].prices && $bundlesErrors.bundles[i].prices[j].amount}
-									{#each $bundlesErrors.bundles[i].prices[j].amount as err}
+									{#each $bundlesErrors.bundles[i].prices[j].amount as err (err)}
 										<small class="text-error-500">{err}</small>
 									{/each}
 								{/if}
 							</td>
 						{/each}
 
-						<TableCell>
+						<td>
 							<SubscriptionViewer
 								id={$bundlesForm.bundles[i].id}
 								name={$bundlesForm.bundles[i].name}
 								count={subscriptions[i].length}
 							/>
-						</TableCell>
-						<TableCell>{subscriptions[i].filter((s) => s.cancel).length}</TableCell>
-						<TableCell>
+						</td>
+
+						<td>{subscriptions[i].filter((s) => s.cancel).length}</td>
+						<td>
 							<FreeAccessViewer
 								id={$bundlesForm.bundles[i].id}
 								name={$bundlesForm.bundles[i].name}
 								count={freeAccess[i].length}
 							/>
-						</TableCell>
+						</td>
 
 						<td>
 							<ScriptPicker>
-								{#each $bundlesForm.bundles[i].bundledScripts as _, j}
+								{#each $bundlesForm.bundles[i].bundledScripts, j}
 									<tr class="flex h-full w-full">
 										<td class="h-full w-full p-0 text-xs">
 											<label class="flex h-full w-full items-center space-x-2">
@@ -153,12 +153,12 @@
 								{/each}
 							</ScriptPicker>
 							{#if $bundlesErrors.bundles && $bundlesErrors.bundles[i].bundledScripts?._errors}
-								{#each $bundlesErrors.bundles[i].bundledScripts?._errors as err}
+								{#each $bundlesErrors.bundles[i].bundledScripts?._errors as err (err)}
 									<small class="text-error-500">{err}</small>
 								{/each}
 							{/if}
 						</td>
-						<TableCell>
+						<td>
 							<button
 								id="button-{$bundlesForm.bundles[i].id}"
 								type="submit"
@@ -167,7 +167,7 @@
 							>
 								Save
 							</button>
-						</TableCell>
+						</td>
 					</tr>
 				{/each}
 			</tbody>
@@ -192,14 +192,14 @@
 				class:ring-error-500={$newBundleErrors.name}
 			/>
 			{#if $newBundleErrors.name}
-				{#each $newBundleErrors.name as err}
+				{#each $newBundleErrors.name as err (err)}
 					<small class="text-error-500">{err}</small>
 				{/each}
 			{/if}
 		</label>
 
 		<div class="mx-auto my-12 flex flex-col justify-around gap-4 md:flex-row">
-			{#each ["Weekly", "Monthly", "Yearly"] as interval, i}
+			{#each ["Weekly", "Monthly", "Yearly"] as interval, i (interval)}
 				<label>
 					<span class="label-text">{interval} price:</span>
 					<input
@@ -210,7 +210,7 @@
 						class:ring-error-500={$newBundleErrors.prices && $newBundleErrors.prices[i]?.amount}
 					/>
 					{#if $newBundleErrors.prices && $newBundleErrors.prices[i]?.amount}
-						{#each $newBundleErrors.prices[i].amount as err}
+						{#each $newBundleErrors.prices[i].amount as err (err)}
 							<small class="text-error-500">{err}</small>
 						{/each}
 					{/if}
@@ -219,7 +219,7 @@
 		</div>
 
 		<ScriptPicker>
-			{#each $newBundleForm.bundledScripts as _, i}
+			{#each $newBundleForm.bundledScripts, i}
 				<tr class="flex h-full w-full">
 					<td class="h-full w-full p-0 text-xs">
 						<label class="flex h-full w-full items-center space-x-2">
@@ -235,7 +235,7 @@
 			{/each}
 		</ScriptPicker>
 		{#if $newBundleErrors.bundledScripts?._errors}
-			{#each $newBundleErrors.bundledScripts._errors as err}
+			{#each $newBundleErrors.bundledScripts._errors as err (err)}
 				<small class="text-error-500">{err}</small>
 			{/each}
 		{/if}

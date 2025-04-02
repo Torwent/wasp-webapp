@@ -5,7 +5,7 @@
 
 <div class="input-group">
 	<select name="Versions" id="versions" aria-label="Open the versions list" bind:value={index}>
-		{#each versions as version}
+		{#each versions as version (version)}
 			<option class="flex" value={total - version}>Version {version}</option>
 		{/each}
 	</select>

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { page } from "$app/state"
-	import type { ScriptMetaData, ScriptPublic, TScriptCategories } from "$lib/types/collection"
+	import type { ScriptMetaData, ScriptPublic } from "$lib/types/collection"
 	import { cropString, encodeSEO, scriptCategories, scriptStatus, scriptTypes } from "$lib/utils"
 	import { Tooltip } from "@skeletonlabs/skeleton-svelte"
 	import { onMount } from "svelte"
@@ -31,17 +31,17 @@
 </script>
 
 <div
-	class="card card-hover flex h-96 w-64 flex-col shadow-sm preset-filled-surface-200-800 hover:preset-outlined"
+	class="card card-hover preset-filled-surface-200-800 hover:preset-outlined flex h-96 w-64 flex-col shadow-sm"
 >
 	<header class="m-1">
 		<img src={imgLink} alt="Script cover" class="rounded-md contain-content" loading="lazy" />
 	</header>
 	<section class="m-2 flex h-full flex-col">
 		<header class="flex h-fit flex-col">
-			<span class="whitespace-break-spaces font-semibold text-primary-600 dark:text-primary-500">
+			<span class="text-primary-600 dark:text-primary-500 font-semibold whitespace-break-spaces">
 				{script.title}
 			</span>
-			<span class="text-xs text-primary-600 drop-shadow dark:text-secondary-500">
+			<span class="text-primary-600 dark:text-secondary-500 text-xs drop-shadow">
 				by
 				<a
 					href="/scripters/{encodeSEO(username.normalize('NFKC'))}"
@@ -53,7 +53,7 @@
 			</span>
 		</header>
 		<article
-			class="my-4 h-full overflow-y-auto break-words text-sm text-surface-600 dark:text-surface-300"
+			class="text-surface-600 dark:text-surface-300 my-4 h-full overflow-y-auto text-sm break-words"
 		>
 			{cropString(script.description, 80)}
 		</article>
@@ -81,7 +81,7 @@
 			</Tooltip>
 		</div>
 		<div class="flex">
-			{#each metadata.categories as category, i}
+			{#each metadata.categories as category, i (category)}
 				<Tooltip
 					open={categoriesTooltip[i]}
 					positioning={{ placement: "top" }}

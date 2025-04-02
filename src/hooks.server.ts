@@ -53,10 +53,10 @@ const supabase: Handle = async ({ event, resolve }) => {
 
 		const {
 			data: { user },
-			error
+			error: err
 		} = await event.locals.supabaseServer.auth.getUser()
 
-		if (error) return { session: null, user: null, getProfile: null }
+		if (err) return { session: null, user: null, getProfile: null }
 
 		console.log(`└🔥 user took ${(performance.now() - start).toFixed(2)} ms to check!`)
 
@@ -64,10 +64,11 @@ const supabase: Handle = async ({ event, resolve }) => {
 
 		try {
 			console.log(`└😄 user ${user.id} accessing from ${event.getClientAddress()}`)
-		} catch (error) {
+		} catch {
 			console.log(`└😄 user ${user.id} accessing from NO IP`)
 		}
 
+		// @ts-expect-error workaround supabase ssr session user weirdness
 		delete session.user
 
 		return {

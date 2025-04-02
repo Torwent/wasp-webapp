@@ -6,7 +6,7 @@
 	import { WaspScripters } from "$lib/client/supabase"
 </script>
 
-<footer class="z-40 my-auto h-fit preset-filled-surface-100-900">
+<footer class="preset-filled-surface-100-900 z-40 my-auto h-fit">
 	<div class="mx-8 md:mx-0">
 		<header class="grid md:m-8 md:flex md:justify-between md:pt-8">
 			<div class="mx-auto my-6 lg:mx-0">
@@ -36,11 +36,11 @@
 					<span class="mb-6 text-sm font-semibold uppercase">Special thanks:</span>
 					<ul>
 						{#await WaspScripters.getRandomScripters(page.data.supabaseClient)}
-							{#each Array(5) as _}
+							{#each { length: 5 }}
 								<li>Loading...</li>
 							{/each}
 						{:then scripters}
-							{#each scripters as scripter}
+							{#each scripters as scripter (scripter.url)}
 								<li><a href="/scripters/{scripter.url}">{scripter.profiles.username}</a></li>
 							{/each}
 							<li><a href="/scripters">Many more devs...</a></li>

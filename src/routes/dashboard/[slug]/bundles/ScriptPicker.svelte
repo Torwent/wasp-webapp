@@ -7,7 +7,7 @@
 </script>
 
 <Modal
-	bind:open
+	{open}
 	triggerBase="btn preset-tonal"
 	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm p-12 w-full"
 	backdropClasses="backdrop-blur-sm"
@@ -22,13 +22,13 @@
 	{/snippet}
 	{#snippet content()}
 		<header class="flex justify-between">
-			<h5 class="my-4 flex flex-col gap-4 text-lg lg:h4 lg:flex-row">
+			<h5 class="lg:h4 my-4 flex flex-col gap-4 text-lg lg:flex-row">
 				Choose the scripts you want on this bundle:
 			</h5>
 		</header>
 		<article class="table-wrap my-12">
 			<table class="table-compact table">
-				<tbody class="preset-filled-surface-100-900 hover:[&>tr]:preset-tonal">
+				<tbody class="preset-filled-surface-100-900 [&>tr]:hover:preset-tonal">
 					{@render children()}
 				</tbody>
 			</table>

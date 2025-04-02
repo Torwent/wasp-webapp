@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { newScriptSchema, scriptArraySchema } from "$lib/client/schemas"
-	import TableCell from "$lib/components/tables/TableCell.svelte"
 	import { superForm } from "sveltekit-superforms"
 	import { zodClient } from "sveltekit-superforms/adapters"
 	import SubscriptionViewer from "../SubscriptionViewer.svelte"
@@ -67,7 +66,7 @@
 		<table class="table border-separate space-y-6 text-xs">
 			<thead class="preset-filled-surface-200-800 rounded-md text-lg font-bold">
 				<tr>
-					{#each headers as header}
+					{#each headers as header (header)}
 						<th>
 							<span class="text-secondary-950-50 flex justify-center text-center">{header}</span>
 						</th>
@@ -75,8 +74,8 @@
 				</tr>
 			</thead>
 
-			<tbody class="preset-filled-surface-100-900 hover:[&>tr]:preset-tonal-surface">
-				{#each $scriptsForm.scripts as _, i}
+			<tbody class="preset-filled-surface-100-900 [&>tr]:hover:preset-tonal-surface">
+				{#each $scriptsForm.scripts, i}
 					<tr>
 						<td>
 							<input
@@ -86,13 +85,13 @@
 								bind:value={$scriptsForm.scripts[i].name}
 							/>
 							{#if $scriptErrors.scripts && $scriptErrors.scripts[i].name}
-								{#each $scriptErrors.scripts[i].name as err}
+								{#each $scriptErrors.scripts[i].name as err (err)}
 									<small class="text-error-500">{err}</small>
 								{/each}
 							{/if}
 						</td>
 
-						{#each $scriptsForm.scripts[i].prices as _, j}
+						{#each $scriptsForm.scripts[i].prices, j}
 							<td>
 								<input
 									name="prices"
@@ -102,30 +101,30 @@
 									step="0.01"
 								/>
 								{#if $scriptErrors.scripts && $scriptErrors.scripts[i].prices && $scriptErrors.scripts[i].prices[j].amount}
-									{#each $scriptErrors.scripts[i].prices[j].amount as err}
+									{#each $scriptErrors.scripts[i].prices[j].amount as err (err)}
 										<small class="text-error-500">{err}</small>
 									{/each}
 								{/if}
 							</td>
 						{/each}
 
-						<TableCell>
+						<td>
 							<SubscriptionViewer
 								id={$scriptsForm.scripts[i].id}
 								name={$scriptsForm.scripts[i].name}
 								count={subscriptions[i].length}
 							/>
-						</TableCell>
-						<TableCell>{subscriptions[i].filter((s) => s.cancel).length}</TableCell>
-						<TableCell>
+						</td>
+						<td>{subscriptions[i].filter((s) => s.cancel).length}</td>
+						<td>
 							<FreeAccessViewer
 								id={$scriptsForm.scripts[i].id}
 								name={$scriptsForm.scripts[i].name}
 								count={freeAccess[i].length}
 							/>
-						</TableCell>
+						</td>
 
-						<TableCell>
+						<td>
 							<button
 								id="button-{$scriptsForm.scripts[i].id}"
 								type="submit"
@@ -134,7 +133,7 @@
 							>
 								Save
 							</button>
-						</TableCell>
+						</td>
 					</tr>
 				{/each}
 			</tbody>
@@ -164,19 +163,19 @@
 				class:disabled={available.length === 0}
 				class:ring-error-500={$newScriptErrors.id}
 			>
-				{#each available as script}
+				{#each available as script (script.id)}
 					<option value={script.id}>{script.name}</option>
 				{/each}
 			</select>
 			{#if $newScriptErrors.id}
-				{#each $newScriptErrors.id as err}
+				{#each $newScriptErrors.id as err (err)}
 					<small class="text-error-500">{err}</small>
 				{/each}
 			{/if}
 		</label>
 
 		<div class="my-12 flex flex-col justify-around md:flex-row">
-			{#each ["Weekly", "Monthly", "Yearly"] as interval, i}
+			{#each ["Weekly", "Monthly", "Yearly"] as interval, i (interval)}
 				<label>
 					<span class="label-text">{interval} price:</span>
 					<input
@@ -188,7 +187,7 @@
 						class:ring-error-500={$newScriptErrors.prices && $newScriptErrors.prices[i]?.amount}
 					/>
 					{#if $newScriptErrors.prices && $newScriptErrors.prices[i]?.amount}
-						{#each $newScriptErrors.prices[i].amount as err}
+						{#each $newScriptErrors.prices[i].amount as err (err)}
 							<small class="text-error-500">{err}</small>
 						{/each}
 					{/if}

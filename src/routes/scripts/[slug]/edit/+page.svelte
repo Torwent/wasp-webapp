@@ -6,12 +6,12 @@
 	import { FileCode, ImagePlus } from "svelte-lucide"
 	import ScriptHeader from "../../ScriptHeader.svelte"
 	import ScriptArticle from "../../ScriptArticle.svelte"
-	import ScriptCardBase from "$lib/components/ScriptCardBase.svelte"
+	import ScriptCard from "$lib/components/ScriptCard.svelte"
 	import { updateScriptClientSchema } from "$lib/client/schemas"
 	import { FileUpload, Switch } from "@skeletonlabs/skeleton-svelte"
 	import AdvancedButton from "../../AdvancedButton.svelte"
 	import ZipDownload from "../../ZipDownload.svelte"
-	// svelte-ignore state_snapshot_uncloneable
+
 	const { data } = $props()
 	let script = $derived(data.script)
 	let profile = $derived(data.profile!)
@@ -78,7 +78,7 @@
 	{#if show[1]}
 		<div class="max-w-2x m-8">
 			<div class="grid grid-cols-1 justify-items-center">
-				<ScriptCardBase {script} customCover={coverURL} />
+				<ScriptCard {script} customCover={coverURL} />
 			</div>
 		</div>
 	{/if}
@@ -115,8 +115,8 @@
 	{/if}
 
 	<div class="max-w-2x container mx-auto my-8 mb-6 flex flex-col">
-		<div class="btn-group mx-auto flex flex-col preset-outlined-surface-500 md:flex-row">
-			{#each [" script page", " script card", " search result example"] as str, idx}
+		<div class="btn-group preset-outlined-surface-500 mx-auto flex flex-col md:flex-row">
+			{#each [" script page", " script card", " search result example"] as str, idx (str)}
 				<button
 					class="btn {show[idx] ? 'preset-filled' : 'hover:preset-tonal'}"
 					onclick={() => {
@@ -131,7 +131,7 @@
 		</div>
 
 		<article
-			class="xs:w-full md:w-6/7 mx-auto my-8 rounded-md p-8 preset-outlined-surface-500 lg:w-3/4"
+			class="xs:w-full preset-outlined-surface-500 mx-auto my-8 rounded-md p-8 md:w-6/7 lg:w-3/4"
 		>
 			<header class="my-8 text-center">
 				<h3>Edit Script</h3>
@@ -139,7 +139,11 @@
 			<form method="POST" enctype="multipart/form-data" use:enhance>
 				<div class="mx-auto my-8 flex flex-col justify-evenly md:flex-row">
 					<label class="label mx-auto my-4 flex w-fit place-items-center">
-						<Switch name="published" bind:checked={$form.published} />
+						<Switch
+							name="published"
+							checked={$form.published}
+							onCheckedChange={(e) => ($form.published = e.checked)}
+						/>
 						<span class="label-text mx-2 text-center">
 							{#if $form.published}Public{:else}Hidden{/if}
 						</span>
@@ -148,7 +152,8 @@
 					<label class="label mx-auto my-4 flex w-fit place-items-center">
 						<Switch
 							name="status"
-							bind:checked={$form.status}
+							checked={$form.status}
+							onCheckedChange={(e) => ($form.status = e.checked)}
 							disabled={!roles.administrator}
 							classes={roles.administrator ? "" : "disabled"}
 						/>
@@ -162,7 +167,11 @@
 					</label>
 
 					<label class="label mx-auto my-4 flex w-fit place-items-center">
-						<Switch name="type" bind:checked={$form.type} />
+						<Switch
+							name="type"
+							checked={$form.type}
+							onCheckedChange={(e) => ($form.type = e.checked)}
+						/>
 						<span class="label-text mx-2 text-center">
 							{#if $form.type}
 								{scriptTypes.premium.icon}{scriptTypes.premium.name}
@@ -185,7 +194,7 @@
 						/>
 					</label>
 					{#if $errors.title}
-						{#each $errors.title as err}
+						{#each $errors.title as err (err)}
 							<small class="text-error-500">{err}</small>
 						{/each}
 					{/if}
@@ -204,7 +213,7 @@
 						</textarea>
 					</label>
 					{#if $errors.description}
-						{#each $errors.description as err}
+						{#each $errors.description as err (err)}
 							<small class="text-error-500">{err}</small>
 						{/each}
 					{/if}
@@ -223,7 +232,7 @@
 						</textarea>
 					</label>
 					{#if $errors.content}
-						{#each $errors.content as err}
+						{#each $errors.content as err (err)}
 							<small class="text-error-500">{err}</small>
 						{/each}
 					{/if}
@@ -240,7 +249,7 @@
 							bind:value={$form.categories}
 							multiple
 						>
-							{#each categories as category}
+							{#each categories as category (category.value)}
 								<option value={category.value} class="selection:bg-primary-500">
 									{category.icon}{category.name}
 								</option>
@@ -248,7 +257,7 @@
 						</select>
 					</label>
 					<small class="my-2">
-						{#each $form.categories as category}
+						{#each $form.categories as category (category)}
 							<span class="mx-2">
 								{scriptCategories[category].icon}{scriptCategories[category].name}
 							</span>
@@ -261,7 +270,7 @@
 						to select multiple categories
 					</span>
 					{#if $errors.categories?._errors}
-						{#each $errors.categories._errors as err}
+						{#each $errors.categories._errors as err (err)}
 							<small class="text-error-500">{err}</small>
 						{/each}
 					{/if}
@@ -433,7 +442,7 @@
 					</FileUpload>
 				</div>
 
-				<div class="my-8 rounded-md p-8 preset-filled-surface-100-900">
+				<div class="preset-filled-surface-100-900 my-8 rounded-md p-8">
 					<header class="my-8 text-center">
 						<h5>Stats limits (every 5 minutes)</h5>
 					</header>
@@ -514,8 +523,8 @@
 
 				{#if $errors._errors && $errors._errors.length > 0}
 					<div class="my-8">
-						{#each $errors._errors as error}
-							<div class="flex justify-center text-error-500">{error}</div>
+						{#each $errors._errors as err (err)}
+							<div class="text-error-500 flex justify-center">{err}</div>
 						{/each}
 					</div>
 				{/if}

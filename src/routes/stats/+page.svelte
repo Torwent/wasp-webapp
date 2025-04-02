@@ -64,15 +64,15 @@
 	</div>
 
 	<StatsTable data={stats} bind:pageSize={amount} {count}>
-		{#each stats as entry}
+		{#each stats, i}
 			<tr>
 				<th scope="row" class="text-surface-900-50-token px-4 font-medium md:whitespace-nowrap">
-					{entry.username !== "" ? entry.username : "Anonymous"}
+					{stats[i].username !== "" ? stats[i].username : "Anonymous"}
 				</th>
-				<td class="w-64 px-4">{formatNumber(entry.experience)}</td>
-				<td class="w-64 px-4">{formatNumber(entry.gold)}</td>
-				<td class="w-64 px-4">{formatNumber(entry.levels)}</td>
-				<td class="w-64 px-4">{formatTime(entry.runtime)}</td>
+				<td class="w-64 px-4">{formatNumber(stats[i].experience)}</td>
+				<td class="w-64 px-4">{formatNumber(stats[i].gold)}</td>
+				<td class="w-64 px-4">{formatNumber(stats[i].levels)}</td>
+				<td class="w-64 px-4">{formatTime(stats[i].runtime)}</td>
 			</tr>
 		{/each}
 	</StatsTable>

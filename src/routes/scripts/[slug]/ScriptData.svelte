@@ -62,8 +62,8 @@
 </script>
 
 <header class="text-center">
-	<div class="btn-group flex-col p-2 preset-outlined-surface-200-800 md:flex-row">
-		{#each authorButtons as btn, idx}
+	<div class="btn-group preset-outlined-surface-200-800 flex-col p-2 md:flex-row">
+		{#each authorButtons as btn, idx (btn)}
 			{#if idx > 0}
 				<button
 					class="btn w-full {selectedBtn === btn ? 'preset-filled' : 'hover:preset-tonal'} "
@@ -88,11 +88,11 @@
 			{/await}
 		</h4>
 
-		<div class="text-small max-h-[10rem] overflow-auto preset-outlined-surface-500">
+		<div class="text-small preset-outlined-surface-500 max-h-[10rem] overflow-auto">
 			{#await scriptStats}
 				Loading...
 			{:then data}
-				{#each data.online_users as user}
+				{#each data.online_users as user (user)}
 					{#if user && Object.values(user).length > 0}
 						{Object.values(user)[0]}
 						<br />
@@ -110,11 +110,11 @@
 			{/await}
 		</h4>
 
-		<div class="text-small max-h-[10rem] overflow-auto preset-outlined-surface-500">
+		<div class="text-small preset-outlined-surface-500 max-h-[10rem] overflow-auto">
 			{#await scriptData}
 				Loading...
 			{:then data}
-				{#each data.unique_downloads as user}
+				{#each data.unique_downloads as user (user)}
 					{user}
 					<br />
 				{/each}
@@ -130,11 +130,11 @@
 			{/await}
 		</h4>
 
-		<div class="text-small max-h-[10rem] overflow-auto preset-outlined-surface-500">
+		<div class="text-small preset-outlined-surface-500 max-h-[10rem] overflow-auto">
 			{#await scriptData}
 				Loading...
 			{:then data}
-				{#each data.month_downloads as user}
+				{#each data.month_downloads as user (user)}
 					{user}
 					<br />
 				{/each}

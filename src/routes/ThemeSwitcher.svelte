@@ -32,7 +32,7 @@
 		class="ig-select my-auto"
 		bind:value={theme}
 	>
-		{#each themesData as entry}
+		{#each themesData as entry (entry.value)}
 			<option value={entry.value} selected={entry.value === theme}> {entry.label} </option>
 		{/each}
 	</select>

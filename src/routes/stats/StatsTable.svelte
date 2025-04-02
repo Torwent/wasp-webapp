@@ -31,10 +31,10 @@
 </script>
 
 <div class="table-wrap">
-	<table class="table mx-auto my-8 w-full overflow-auto text-left text-xs md:text-sm">
-		<thead class="text-lg font-bold uppercase preset-filled-surface-100-900">
+	<table class="mx-auto my-8 table w-full overflow-auto text-left text-xs md:text-sm">
+		<thead class="preset-filled-surface-100-900 text-lg font-bold uppercase">
 			<tr>
-				{#each headers as header}
+				{#each headers as header (header)}
 					<th scope="col" class="px-6 py-3" onclick={async () => await sortBy(header)}>
 						<div class="flex justify-between text-sm">
 							<span class="my-auto h-full align-middle">
@@ -60,7 +60,7 @@
 				{/each}
 			</tr>
 		</thead>
-		<tbody class="hover:[&>tr]:preset-tonal">
+		<tbody class="[&>tr]:hover:preset-tonal">
 			{@render children()}
 		</tbody>
 	</table>

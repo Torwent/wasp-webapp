@@ -1,17 +1,17 @@
 <script lang="ts">
+	import type { FAQEntry } from "$lib/types/collection"
 	import ChevronsDownUp from "svelte-lucide/ChevronsDownUp.svelte"
 	import ChevronsUpDown from "svelte-lucide/ChevronsUpDown.svelte"
 	import { slide } from "svelte/transition"
 
-	const data = $props()
-	const entry = $state(data.entry)
+	const { entry }: { entry: FAQEntry } = $props()
 	let show = $state(false)
 </script>
 
 <button
 	type="button"
-	class="inline-flex w-full justify-between border px-4 py-2 text-left text-sm font-medium shadow-sm
-		text-surface-900-100 border-surface-200-800 hover:preset-outlined-primary-500"
+	class="text-surface-900-100 border-surface-200-800 hover:preset-outlined-primary-500 inline-flex w-full justify-between border px-4 py-2 text-left
+		text-sm font-medium shadow-sm"
 	aria-expanded={show}
 	aria-haspopup="true"
 	onclick={() => (show = !show)}
@@ -27,11 +27,11 @@
 	<article
 		in:slide={{ duration: 200 }}
 		out:slide={{ duration: 150 }}
-		class="prose max-w-full p-6 preset-outlined-surface-500 dark:prose-invert"
+		class="prose preset-outlined-surface-500 dark:prose-invert max-w-full p-6"
 	>
 		<!-- {@html entry.content.code
 			.replace(/>{@html `<code class="language-/g, '><code class="language-')
 			.replace(/<\/code>`}<\/pre>/g, "</code></pre>")} -->
-		{@html entry.content.code}
+		{@html entry.content}
 	</article>
 {/if}

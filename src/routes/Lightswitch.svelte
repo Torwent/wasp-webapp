@@ -18,7 +18,7 @@
 >
 	<button
 		id="lightswitch"
-		class="btn my-auto hover:preset-tonal"
+		class="btn hover:preset-tonal my-auto"
 		title="Toggle dark mode."
 		type="submit"
 	>

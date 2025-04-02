@@ -10,7 +10,7 @@ const loadScripts = async (supabase: SupabaseClient) => {
 		.from("scripts")
 		.select(`title,	protected (username, avatar)`)
 		.order("title", { ascending: true })
-		.returns<Script[]>()
+		.overrideTypes<Script[]>()
 
 	if (error) return console.error("scripts.scripts SELECT failed:" + error.message)
 
@@ -28,7 +28,7 @@ const loadTutorials = async (supabase: SupabaseClient) => {
 	const { data, error } = await supabase
 		.from("tutorials")
 		.select("title,  username")
-		.returns<Tutorial[]>()
+		.overrideTypes<Tutorial[]>()
 
 	if (error) return console.error("tutorials SELECT failed: " + error.message)
 
@@ -45,7 +45,7 @@ const loadDevelopers = async (supabase: SupabaseClient) => {
 		.schema("profiles")
 		.from("scripters")
 		.select("profiles (username)")
-		.returns<ScripterProfile[]>()
+		.overrideTypes<ScripterProfile[]>()
 
 	if (error) return console.error("developers SELECT failed: " + error.message)
 

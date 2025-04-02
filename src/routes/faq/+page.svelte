@@ -1,7 +1,6 @@
 <script lang="ts">
 	import DropDown from "./DropDown.svelte"
 	import Discord from "$lib/components/Discord.svelte"
-	import { page } from "$app/state"
 	import Head from "$lib/components/Head.svelte"
 
 	const { data } = $props()

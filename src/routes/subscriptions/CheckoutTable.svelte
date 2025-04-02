@@ -1,6 +1,5 @@
 <script lang="ts">
-	import TableCell from "$lib/components/tables/TableCell.svelte"
-	import TableHeader from "$lib/components/tables/TableHeader.svelte"
+	import TableHeader from "$lib/components/TableHeader.svelte"
 	import { superForm, type Infer, type SuperValidated } from "sveltekit-superforms"
 	import { checkoutSchema } from "$lib/client/schemas"
 	import type { BundleProduct, Price, ScriptProduct } from "$lib/types/collection"
@@ -137,7 +136,6 @@
 		</label>
 
 		<div class="mx-auto my-2 flex flex-col justify-center gap-4 md:flex-row">
-
 			<label class="label">
 				<span class="label-text">Type:</span>
 				<select
@@ -169,7 +167,7 @@
 						<option value="all">Loading...</option>
 						<option value="all">Loading...</option>
 					{:then authors}
-						{#each authors as a}
+						{#each authors as a (a)}
 							{#if a}
 								<option value={a}>{a}</option>
 							{/if}
@@ -185,7 +183,11 @@
 		</label>
 	</div>
 	<!-- class="xl:mx-w-7xl table-wrap mx-auto w-full max-w-md rounded-md preset-outlined-surface-500 md:max-w-3xl lg:max-w-6xl" -->
-	<form method="POST" class="overflow-x-auto rounded-md preset-outlined-surface-500 max-w-fit mx-auto" use:enhance>
+	<form
+		method="POST"
+		class="preset-outlined-surface-500 mx-auto max-w-fit overflow-x-auto rounded-md"
+		use:enhance
+	>
 		<table class="table table-auto border-separate space-y-6 text-xs md:text-sm">
 			<colgroup>
 				<col class="w-2/6 xl:w-5/12" />
@@ -195,11 +197,11 @@
 				<col class="w-1/5" />
 			</colgroup>
 			<TableHeader headers={["Product", "Type", "Price", "Interval", "Checkout"]} />
-			<tbody class="preset-filled-surface-200-800 hover:[&>tr]:preset-tonal">
+			<tbody class="preset-filled-surface-200-800 [&>tr]:hover:preset-tonal">
 				{#each bundleArray, i}
 					{#if bundleArray[i].active}
 						<tr class="table-row">
-							<TableCell alignment="left" padding={0}>
+							<td>
 								<div class="mx-3">
 									<div>{bundleArray[i].name}</div>
 									<div class="text-left text-xs">
@@ -210,45 +212,49 @@
 										{/await}
 									</div>
 								</div>
-							</TableCell>
+							</td>
 
-							<TableCell padding={0}>
-								<ScriptLinks bind:bundle={bundleArray[i]} />
-							</TableCell>
+							<td class="text-center">
+								<ScriptLinks bundle={bundleArray[i]} />
+							</td>
 
-							<TableCell>
+							<td class="text-center">
 								{#if bundleArray[i].active}
 									{getCurrentPrice(bundleArray[i].prices)}
 								{:else}
 									-
 								{/if}
-							</TableCell>
+							</td>
 
-							<TableCell padding={bundleArray[i].active ? 0 : 3}>
-								<div class="btn-group flex flex-col preset-outlined-surface-500 lg:flex-row">
-									{#each bundleArray[i].prices, j}
-										<button
-											class="btn"
-											class:preset-outlined-primary-500={bundleArray[i].prices[j].active}
-											onclick={(e) => {
-												e.preventDefault()
-												changePriceInterval(bundleArray[i].prices, j, bundleArray[i].index)
-											}}
-										>
-											{getPriceIntervalEx(bundleArray[i].prices[j])}
-										</button>
-									{/each}
-								</div>
-							</TableCell>
+							<td class="text-center">
+								{#if bundleArray[i].active}
+									<div class="btn-group mx-auto flex w-fit flex-col lg:flex-row">
+										{#each bundleArray[i].prices, j}
+											<button
+												class="btn preset-outlined-surface-500 w-full"
+												class:border-primary-500={bundleArray[i].prices[j].active}
+												onclick={(e) => {
+													e.preventDefault()
+													changePriceInterval(bundleArray[i].prices, j, bundleArray[i].index)
+												}}
+											>
+												{getPriceIntervalEx(bundleArray[i].prices[j])}
+											</button>
+										{/each}
+									</div>
+								{:else}
+									Unavailable
+								{/if}
+							</td>
 
-							<TableCell padding={0}>
+							<td>
 								<button
 									class="btn preset-filled-secondary-500"
 									formaction="?/checkout&product={bundleArray[i].id}&code={code}"
 								>
 									Checkout
 								</button>
-							</TableCell>
+							</td>
 						</tr>
 					{/if}
 				{/each}
@@ -256,7 +262,7 @@
 				{#each scriptArray, i}
 					{#if scriptArray[i].active}
 						<tr>
-							<TableCell alignment="left" padding={0}>
+							<td>
 								<div class="mx-3">
 									<div class="">{scriptArray[i].name}</div>
 									<div class="text-xs">
@@ -267,27 +273,27 @@
 										{/await}
 									</div>
 								</div>
-							</TableCell>
+							</td>
 
-							<TableCell padding={0}>
+							<td class="text-center">
 								<button
-									class="btn hover:cursor-pointer hover:text-primary-500"
+									class="btn hover:text-primary-500 hover:cursor-pointer"
 									onclick={() => goto("/scripts/" + scriptArray[i].url)}
 								>
 									<ExternalLink size="16" />
 									<span>Script</span>
 								</button>
-							</TableCell>
+							</td>
 
-							<TableCell>{getCurrentPrice(scriptArray[i].prices)}</TableCell>
+							<td class="text-center">{getCurrentPrice(scriptArray[i].prices)}</td>
 
-							<TableCell padding={scriptArray[i].active ? 0 : 3}>
+							<td class="text-center">
 								{#if scriptArray[i].active}
-									<div class="btn-group flex flex-col preset-outlined-surface-500 lg:flex-row">
+									<div class="btn-group mx-auto flex w-fit flex-col lg:flex-row">
 										{#each scriptArray[i].prices, j}
 											<button
-												class="btn"
-												class:preset-outlined-primary-500={scriptArray[i].prices[j].active}
+												class="btn preset-outlined-surface-500 w-full"
+												class:border-primary-500={scriptArray[i].prices[j].active}
 												onclick={(e) => {
 													e.preventDefault()
 													changePriceInterval(scriptArray[i].prices, j, scriptArray[i].index)
@@ -300,16 +306,16 @@
 								{:else}
 									Unavailable
 								{/if}
-							</TableCell>
+							</td>
 
-							<TableCell padding={0}>
+							<td>
 								<button
 									class="btn preset-filled-secondary-500"
 									formaction="?/checkout&product={scriptArray[i].id}&code={code}"
 								>
 									Checkout
 								</button>
-							</TableCell>
+							</td>
 						</tr>
 					{/if}
 				{/each}
@@ -320,7 +326,7 @@
 	<div class="mx-auto max-w-7xl">
 		{#if $errors._errors}
 			<div class="mx-auto my-8 w-full text-center">
-				{#each $errors._errors as err}
+				{#each $errors._errors as err (err)}
 					<span class="text-error-500">{err}</span>
 				{/each}
 			</div>

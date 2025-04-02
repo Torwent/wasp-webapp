@@ -25,7 +25,7 @@
 <div class="container mx-auto my-6 max-w-2xl flex-grow">
 	{#if show}
 		<div class="container mx-auto my-6 max-w-4xl flex-grow">
-			<article class="prose mx-auto py-6 dark:prose-invert">
+			<article class="prose dark:prose-invert mx-auto py-6">
 				{$form.content}
 			</article>
 		</div>
@@ -33,7 +33,7 @@
 
 	{#if data.profile && data.roles?.administrator}
 		<div class="flex">
-			<button class="btn mx-auto my-auto preset-filled" onclick={() => (show = !show)}>
+			<button class="btn preset-filled mx-auto my-auto" onclick={() => (show = !show)}>
 				{#if show}Hide{:else}Show{/if} Post Preview
 			</button>
 		</div>
@@ -65,7 +65,7 @@
 			{#if $errors._errors}
 				<div class="mt-8 grid">
 					Errors:
-					{#each $errors._errors as err}
+					{#each $errors._errors as err (err)}
 						<small class="text-error-500">- {err}</small>
 					{/each}
 				</div>

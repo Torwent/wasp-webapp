@@ -19,12 +19,12 @@ export function createTutorialsIndex(data: Tutorial[]) {
 
 export function searchTutorialsIndex(searchTerm: string) {
 	const match = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") //escape special regex characters
-	const results = tutorialsIndex.search(match)
-	return results.map((index) => tutorials[index as number])
+	const indices = tutorialsIndex.search(match) as number[]
+	return indices.map((index) => tutorials[index])
 }
 
 export async function getTutorials() {
-	let tutorials: Tutorial[] = []
+	const tutorials: Tutorial[] = []
 	const paths = import.meta.glob("/src/wasp-info/tutorials/*.md", { eager: true })
 
 	for (const path in paths) {

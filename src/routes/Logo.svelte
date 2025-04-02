@@ -5,7 +5,7 @@
 
 <!-- Website Logo -->
 <div
-	class="my-auto flex fill-current transition duration-300 hover:text-primary-700-300"
+	class="hover:text-primary-700-300 my-auto flex fill-current transition duration-300"
 	class:text-primary-800-200={selected}
 >
 	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 701.99 552.97" class="mr-3 h-8">

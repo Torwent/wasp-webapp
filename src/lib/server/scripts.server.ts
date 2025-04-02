@@ -18,8 +18,8 @@ function createScriptsIndex(data: Script[]) {
 
 export function searchScriptsIndex(searchTerm: string) {
 	const match = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") //escape special regex characters
-	const results = scriptsIndex.search(match)
-	return results.map((index) => scripts[index as number])
+	const indices = scriptsIndex.search(match) as number[]
+	return indices.map((index) => scripts[index])
 }
 
 export async function getScripts(): Promise<Script[]> {
@@ -35,7 +35,7 @@ export async function getScripts(): Promise<Script[]> {
 			stats_limits!inner (xp_min, xp_max, gp_min, gp_max)`
 		)
 		.order("title", { ascending: true })
-		.returns<Script[]>()
+		.overrideTypes<Script[]>()
 
 	if (error) {
 		console.error(error)

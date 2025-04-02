@@ -8,7 +8,7 @@ export const load = async ({ url: { searchParams }, parent }) => {
 	const pageN = Number(searchParams.get("page") || "-1")
 	const page = pageN < 0 || Number.isNaN(pageN) ? 1 : pageN
 
-	const amountN = Number(searchParams.get("amount") || "10")
+	const amountN = Number(searchParams.get("amount") || "12")
 	const amount = amountN < 0 || Number.isNaN(amountN) ? 1 : amountN
 
 	const search = decodeURIComponent(searchParams.get("search") || "").trim()
@@ -30,7 +30,7 @@ export const load = async ({ url: { searchParams }, parent }) => {
 				? query.order("url").range(start, finish)
 				: query.ilike("search", "%" + search + "%")
 
-		const { data, error: err, count } = await query.returns<ScripterBase[]>()
+		const { data, error: err, count } = await query.overrideTypes<ScripterBase[]>()
 
 		if (err) error(500, formatError(err))
 

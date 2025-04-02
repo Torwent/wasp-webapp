@@ -72,7 +72,7 @@
 
 <header class="my-4 flex h-full grid-cols-12 justify-evenly">
 	<!-- Button: Left -->
-	<button type="button" class="btn-icon ml-4 h-auto hover:preset-tonal" onclick={carouselLeft}>
+	<button type="button" class="btn-icon hover:preset-tonal ml-4 h-auto" onclick={carouselLeft}>
 		<ArrowRight class="rotate-180" />
 	</button>
 
@@ -80,7 +80,7 @@
 		bind:this={carousel}
 		class="hide-scrollbar col-span-10 flex snap-x snap-mandatory overflow-x-auto scroll-smooth text-white"
 	>
-		{#each featured as feature}
+		{#each featured as feature (feature.id)}
 			<a
 				href="/scripts/{feature.url}"
 				class="relative w-full shrink-0 snap-center rounded-lg text-center"
@@ -95,7 +95,7 @@
 	</div>
 
 	<!-- Button: Right -->
-	<button type="button" class="btn-icon mr-4 h-auto hover:preset-tonal" onclick={carouselRight}>
+	<button type="button" class="btn-icon hover:preset-tonal mr-4 h-auto" onclick={carouselRight}>
 		<ArrowRight />
 	</button>
 </header>
@@ -112,7 +112,7 @@
 				onchange={() => handleFilter("status", statusFilter)}
 			>
 				<option value="" selected={statusFilter == null || statusFilter == ""}>🎮All</option>
-				{#each Object.values(scriptStatus) as status}
+				{#each Object.values(scriptStatus) as status (status.value)}
 					<option value={status.value} selected={status.value == statusFilter}>
 						{status.icon}{status.name}
 					</option>
@@ -134,7 +134,7 @@
 					selected={typeFilter == null || typeFilter == ""}
 					class="selection:bg-primary-500">🕹️All</option
 				>
-				{#each Object.values(scriptTypes) as type}
+				{#each Object.values(scriptTypes) as type (type.value)}
 					<option value={type.value} selected={type.value == typeFilter}>
 						{type.icon}{type.name}
 					</option>
@@ -145,7 +145,7 @@
 		<div class="label my-4 h-auto">
 			<span class="label-text">Categories</span>
 			<div class="select flex h-auto w-auto flex-col gap-1 overflow-y-scroll p-3">
-				{#each categories as category, idx}
+				{#each categories as category, idx (category.value)}
 					<label class="flex gap-2">
 						<input
 							type="checkbox"
@@ -160,7 +160,7 @@
 								handleFilter("categories", categoriesFilter.join("-"))
 							}}
 						/>
-						<span class="my-auto select-none whitespace-nowrap text-lg">
+						<span class="my-auto text-lg whitespace-nowrap select-none">
 							{category.icon}
 							{category.name}
 						</span>
@@ -193,8 +193,8 @@
 			<div
 				class="3xl:grid-cols-5 mx-8 my-8 grid gap-10 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
 			>
-				{#each scripts as script}
-					<ScriptCard {script} />
+				{#each scripts as script (script.id)}
+					<ScriptCard {script} link={"/scripts/" + script.url} />
 				{/each}
 			</div>
 			<div class="mx-8">
