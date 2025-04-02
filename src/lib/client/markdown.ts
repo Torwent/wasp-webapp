@@ -1,5 +1,5 @@
 import markdownit from "markdown-it"
-import Shiki from "@shikijs/markdown-it"
+//import Shiki from "@shikijs/markdown-it"
 import { full as emoji } from "markdown-it-emoji"
 import { imgLazyload } from "@mdit/plugin-img-lazyload"
 
