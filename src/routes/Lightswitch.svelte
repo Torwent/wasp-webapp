@@ -10,7 +10,7 @@
 	id="dark-form"
 	method="POST"
 	action="/?/toggleDark"
-	class="mx-1 my-auto flex"
+	class="my-auto flex"
 	use:enhance={() => {
 		dark = !dark
 		document.documentElement.classList.toggle("dark", dark)

@@ -62,7 +62,7 @@
 		<button
 			name="Menu"
 			aria-label="Open the navigation menu"
-			class="justify-left text-primary-500 my-auto flex h-full p-2 align-middle xl:hidden"
+			class="justify-left text-primary-500 my-auto flex h-full p-2 align-middle lg:hidden"
 			onclick={() => {
 				showMenu = !showMenu
 				if (showMenu) showProfile = false
@@ -76,7 +76,7 @@
 			<Logo selected={true} />
 		</button>
 
-		<ul class="my-auto hidden w-9/12 justify-evenly xl:flex xl:w-7/12">
+		<ul class="my-auto hidden w-9/12 justify-evenly lg:flex lg:text-xs xl:w-7/12 xl:text-base">
 			<li class="h-12">
 				<a
 					href="/"
@@ -130,14 +130,14 @@
 				<Avatar
 					{src}
 					name={avatarName}
-					classes="mx-2 w-11 md:w-12 h-11 md:h-11"
+					classes="xl:mx-1 mx-2 w-11 md:w-12 h-11 md:h-11"
 					border="border-2 group-hover:preset-tonal {showProfile
 						? 'border-primary-500'
 						: 'border-surface-500'}"
 				/>
 			</button>
 
-			<div class="hidden lg:flex">
+			<div class="hidden gap-1 lg:flex">
 				<Lightswitch />
 				<ThemeSwitcher />
 				<GitHub />
@@ -147,7 +147,7 @@
 	</div>
 
 	<ul
-		class="bg-surface-200/30 dark:bg-surface-800/30 absolute z-50 w-full backdrop-blur-md xl:hidden {showMenu
+		class="bg-surface-200/30 dark:bg-surface-800/30 absolute z-50 w-full backdrop-blur-md lg:hidden {showMenu
 			? 'flex flex-col'
 			: 'hidden'}"
 	>
@@ -198,15 +198,14 @@
 				<div class="mx-auto">
 					<h3 class="my-6 text-center md:hidden">{profile.username}</h3>
 
-					<a href="/user/{profile.id}" aria-label="Open profile page">
-						<button
-							name="Profile"
-							aria-label="Open profile page"
-							class="btn preset-filled-secondary-500 mx-auto flex"
-						>
-							<UserRound />
-							Profile
-						</button>
+					<a
+						href="/user/{profile.id}"
+						class="btn preset-filled-secondary-500 mx-auto flex"
+						aria-label="Open profile page"
+						onclick={() => (showProfile = false)}
+					>
+						<UserRound />
+						Profile
 					</a>
 				</div>
 			</header>

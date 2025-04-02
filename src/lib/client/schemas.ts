@@ -14,10 +14,15 @@ const description = z
 	.max(160, "Must be less than 160 characters long.")
 	.includes(" ", { message: "You have no spaces, this is supposed to be a sentence." })
 
-const content = z.string().min(10).includes(" ", {
-	message:
-		"You have no spaces, this is supposed to be at least a couple of words, ideally a few sentences."
-})
+const content = z
+	.string()
+	.refine((str) => str === null || str === "" || str.length >= 10, {
+		message: "Must be at least 10 characters long"
+	})
+	.refine((str) => str === null || str === "" || str.includes(" "), {
+		message:
+			"You have no spaces, this is supposed to be at least a couple of words, ideally a few sentences."
+	})
 
 const categoryKeys = Object.keys(scriptCategories) as TScriptCategories
 const ScriptCategoryEnum = z.enum(categoryKeys as [TScriptCategories[number], ...TScriptCategories])
@@ -365,12 +370,6 @@ export const loginAsSchema = z.object({
 	refresh_token: z.string().min(2, "A refresh token should be longer.")
 })
 
-export const nullSchema = z.object({})
-
 export type PriceSchema = z.infer<typeof priceSchema>
 export type BundleSchema = z.infer<typeof newBundleSchema>
 export type NewScriptSchema = z.infer<typeof newScriptSchema>
-
-export type BundleArraySchema = typeof bundleArraySchema
-export type NewBundleSchema = typeof newBundleSchema
-export type ScriptArraySchema = typeof scriptArraySchema

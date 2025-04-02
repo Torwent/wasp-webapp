@@ -7,9 +7,12 @@
 	import { replaceQuery } from "$lib/client/utils"
 	import ScriptCard from "$lib/components/ScriptCard.svelte"
 	import Paginator from "$lib/components/Paginator.svelte"
+	import { superForm } from "sveltekit-superforms/client"
+	import { zodClient } from "sveltekit-superforms/adapters"
+	import { scripterSchema } from "$lib/client/schemas"
 
 	const { data } = $props()
-	const { scripter, count, scripts } = $derived(data)
+	const { profile, roles, count, scripts, scripter } = $derived(data)
 
 	let { amount } = $state(data)
 
@@ -21,15 +24,23 @@
 	let search = $state(decodeURIComponent(page.url.searchParams.get("search") || "").trim())
 
 	let tab = $state("info")
+
+	const { form, errors, enhance } = superForm(data.form, {
+		dataType: "json",
+		multipleSubmits: "prevent",
+		clearOnSubmit: "errors",
+		taintedMessage: "Are you sure you want to leave?",
+		validators: zodClient(scripterSchema),
+		resetForm: true
+	})
 </script>
 
 <Head
 	title={scripter.profiles.username}
-	description={scripter.profiles.username +
-		(scripter.description ? ", " + scripter.description : "")}
+	description={scripter.profiles.username + ($form.description ? ", " + $form.description : "")}
 	keywords={"Scripter, Scripters, Developer, Developers, " +
 		scripter.profiles.username +
-		(scripter.realname ? ", " + scripter.realname : "")}
+		($form.realname ? ", " + $form.realname : "")}
 	author={scripter.profiles.username}
 	img={scripter.profiles.avatar}
 />
@@ -39,26 +50,26 @@
 		<div class="my-auto flex">
 			<header>
 				<h3 class="text-2xl font-bold">
-					{#if scripter.realname && scripter.realname != ""}
-						{scripter.realname} /
+					{#if $form.realname && $form.realname != ""}
+						{$form.realname} /
 					{/if}
 					{scripter.profiles.username}
 				</h3>
 			</header>
 		</div>
-		{#if scripter.github || (scripter.paypal_id && scripter.paypal_id != "")}
+		{#if $form.github || ($form.paypal_id && $form.paypal_id != "")}
 			<div class="my-auto flex">
-				{#if scripter.github}
+				{#if $form.github}
 					<a
-						href={scripter.github}
+						href={$form.github}
 						class="btn preset-filled-surface-300-700 hover:text-secondary-500 mx-5 h-full"
 					>
 						<Github />
 					</a>
 				{/if}
-				{#if scripter.paypal_id && scripter.paypal_id != ""}
+				{#if $form.paypal_id && $form.paypal_id != ""}
 					<div class="mx-auto w-full">
-						<PayPal id={scripter.paypal_id} username={scripter.profiles.username} />
+						<PayPal id={$form.paypal_id} username={scripter.profiles.username} />
 					</div>
 				{/if}
 			</div>
@@ -68,16 +79,19 @@
 	<Tabs value={tab} onValueChange={(e) => (tab = e.value)} listJustify="justify-center">
 		{#snippet list()}
 			<Tabs.Control value="info">Information</Tabs.Control>
+			{#if $form.id === profile?.id || roles?.moderator || roles?.administrator}
+				<Tabs.Control value="edit">Edit</Tabs.Control>
+			{/if}
 			<Tabs.Control value="scripts">Scripts</Tabs.Control>
 		{/snippet}
 		{#snippet content()}
 			<Tabs.Panel value="info">
 				<h4 class="my-24 text-center">
-					{scripter.description ?? "This scripter did not add a description."}
+					{$form.description ?? "This scripter did not add a description."}
 				</h4>
 				<article class="prose dark:prose-invert mx-auto my-24">
-					{#if scripter.content}
-						{@html scripter.content}
+					{#if $form.content}
+						{@html $form.content}
 					{:else}
 						This scripter did not add information about him.
 					{/if}
@@ -85,10 +99,64 @@
 
 				<div class="mx-auto flex justify-around">
 					<a href="./" class="btn preset-filled-secondary-500">Back</a>
-
-					<a href={page.url.pathname + "/edit"} class="btn preset-filled-primary-500">Edit</a>
 				</div>
 			</Tabs.Panel>
+			{#if $form.id === profile?.id || roles?.moderator || roles?.administrator}
+				<Tabs.Panel value="edit">
+					<form method="POST" class="mx-auto my-24 w-2/4 min-w-xs text-center" use:enhance>
+						<h1 class="my-2">All fields are optional</h1>
+						<h2 class="mb-12">
+							You can preview your changes in the "Information" tab but don't forget to save.
+						</h2>
+						<label class="label my-4">
+							<span class="label-text">Real name:</span>
+							<input class="input" bind:value={$form.realname} />
+							{#if $errors.id}
+								{#each $errors.id as err}
+									<small class="text-error-500">{err}</small>
+								{/each}
+							{/if}
+						</label>
+						<label class="label my-4">
+							<span class="label-text">GitHub:</span>
+							<input class="input" bind:value={$form.github} />
+							{#if $errors.github}
+								{#each $errors.github as err}
+									<small class="text-error-500">{err}</small>
+								{/each}
+							{/if}
+						</label>
+						<label class="label my-4">
+							<span class="label-text">Paypal ID:</span>
+							<input class="input" bind:value={$form.paypal_id} />
+							{#if $errors.paypal_id}
+								{#each $errors.paypal_id as err}
+									<small class="text-error-500">{err}</small>
+								{/each}
+							{/if}
+						</label>
+						<label class="label my-4">
+							<span class="label-text">Description:</span>
+							<input class="input" bind:value={$form.description} />
+							{#if $errors.description}
+								{#each $errors.description as err}
+									<small class="text-error-500">{err}</small>
+								{/each}
+							{/if}
+						</label>
+						<label class="label my-4">
+							<span class="label-text">Content:</span>
+							<textarea class="textarea h-44" bind:value={$form.content}> </textarea>
+							{#if $errors.content}
+								{#each $errors.content as err}
+									<small class="text-error-500">{err}</small>
+								{/each}
+							{/if}
+						</label>
+						<button type="submit" class="btn preset-filled-secondary-500">Save</button>
+					</form>
+				</Tabs.Panel>
+			{/if}
 			<Tabs.Panel value="scripts">
 				<input
 					type="text"

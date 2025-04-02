@@ -1,6 +1,6 @@
 <a
 	href="https://github.com/torwent/wasp-webapp"
-	class="btn hover:preset-tonal mx-1 my-auto flex"
+	class="btn hover:preset-tonal my-auto flex"
 	aria-label="GitHug Link"
 	target="_blank"
 >

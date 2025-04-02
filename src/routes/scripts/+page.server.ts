@@ -1,4 +1,4 @@
-import { getPublishedScripts, searchScriptsIndex } from "$lib/server/scripts.server.js"
+import { getPublishedScripts, searchScriptsIndex } from "$lib/server/scripts.server"
 import { formatError } from "$lib/utils"
 import { error } from "@sveltejs/kit"
 

@@ -77,7 +77,7 @@
 			<tbody class="preset-filled-surface-100-900 [&>tr]:hover:preset-tonal-surface">
 				{#each $scriptsForm.scripts, i}
 					<tr>
-						<td>
+						<td class="text-center">
 							<input
 								name="name"
 								class="input preset-outlined-surface-500 mx-auto w-fit"
@@ -92,7 +92,7 @@
 						</td>
 
 						{#each $scriptsForm.scripts[i].prices, j}
-							<td>
+							<td class="text-center">
 								<input
 									name="prices"
 									class="input preset-outlined-surface-500 mx-auto w-24"
@@ -108,15 +108,15 @@
 							</td>
 						{/each}
 
-						<td>
+						<td class="text-center">
 							<SubscriptionViewer
 								id={$scriptsForm.scripts[i].id}
 								name={$scriptsForm.scripts[i].name}
 								count={subscriptions[i].length}
 							/>
 						</td>
-						<td>{subscriptions[i].filter((s) => s.cancel).length}</td>
-						<td>
+						<td class="text-center">{subscriptions[i].filter((s) => s.cancel).length}</td>
+						<td class="text-center">
 							<FreeAccessViewer
 								id={$scriptsForm.scripts[i].id}
 								name={$scriptsForm.scripts[i].name}
@@ -124,7 +124,7 @@
 							/>
 						</td>
 
-						<td>
+						<td class="text-center">
 							<button
 								id="button-{$scriptsForm.scripts[i].id}"
 								type="submit"

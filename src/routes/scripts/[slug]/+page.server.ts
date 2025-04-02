@@ -6,7 +6,7 @@ import {
 	updateCustomerID,
 	updateReporters
 } from "$lib/server/supabase.server"
-import { formatError } from "$lib/utils.js"
+import { formatError } from "$lib/utils"
 import { error, redirect } from "@sveltejs/kit"
 
 export const load = async ({ cookies }) => {

@@ -51,16 +51,18 @@
 
 			<tbody class="preset-filled-surface-200-800 [&>tr]:hover:preset-tonal">
 				<tr class="table-row">
-					<td>{stats.total_user_scripts} / {stats.total_scripts}</td>
-					<td>{stats.total_user_premium_scripts} / {stats.total_premium_scripts}</td>
-					<td>{stats.month_user_downloads} / {stats.month_downloads}</td>
-					<td>
+					<td class="text-center">{stats.total_user_scripts} / {stats.total_scripts}</td>
+					<td class="text-center"
+						>{stats.total_user_premium_scripts} / {stats.total_premium_scripts}</td
+					>
+					<td class="text-center">{stats.month_user_downloads} / {stats.month_downloads}</td>
+					<td class="text-center">
 						{stats.month_premium_user_downloads} / {stats.month_premium_downloads}
 					</td>
 
-					<td>{subscriptions.subscribers}</td>
-					<td>{subscriptions.cancelling}</td>
-					<td>{subscriptions.free_access}</td>
+					<td class="text-center">{subscriptions.subscribers}</td>
+					<td class="text-center">{subscriptions.cancelling}</td>
+					<td class="text-center">{subscriptions.free_access}</td>
 				</tr>
 			</tbody>
 		</table>

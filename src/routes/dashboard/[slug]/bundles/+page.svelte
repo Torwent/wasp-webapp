@@ -80,7 +80,7 @@
 			<tbody class="preset-filled-surface-100-900 [&>tr]:hover:preset-tonal-surface">
 				{#each $bundlesForm.bundles, i}
 					<tr>
-						<td>
+						<td class="text-center">
 							<input
 								name="name"
 								class="input preset-outlined-surface-500 mx-auto w-fit"
@@ -97,7 +97,7 @@
 						</td>
 
 						{#each $bundlesForm.bundles[i].prices, j}
-							<td>
+							<td class="text-center">
 								<input
 									name="prices"
 									class="input preset-outlined-surface-500 mx-auto w-24"
@@ -116,7 +116,7 @@
 							</td>
 						{/each}
 
-						<td>
+						<td class="text-center">
 							<SubscriptionViewer
 								id={$bundlesForm.bundles[i].id}
 								name={$bundlesForm.bundles[i].name}
@@ -124,8 +124,8 @@
 							/>
 						</td>
 
-						<td>{subscriptions[i].filter((s) => s.cancel).length}</td>
-						<td>
+						<td class="text-center">{subscriptions[i].filter((s) => s.cancel).length}</td>
+						<td class="text-center">
 							<FreeAccessViewer
 								id={$bundlesForm.bundles[i].id}
 								name={$bundlesForm.bundles[i].name}
@@ -133,32 +133,36 @@
 							/>
 						</td>
 
-						<td>
-							<ScriptPicker>
-								{#each $bundlesForm.bundles[i].bundledScripts, j}
-									<tr class="flex h-full w-full">
-										<td class="h-full w-full p-0 text-xs">
-											<label class="flex h-full w-full items-center space-x-2">
-												<input
-													class="checkbox"
-													type="checkbox"
-													bind:checked={$bundlesForm.bundles[i].bundledScripts[j].active}
-												/>
-												<span class="select-none">
-													{$bundlesForm.bundles[i].bundledScripts[j].name}</span
-												>
-											</label>
-										</td>
-									</tr>
-								{/each}
-							</ScriptPicker>
-							{#if $bundlesErrors.bundles && $bundlesErrors.bundles[i].bundledScripts?._errors}
-								{#each $bundlesErrors.bundles[i].bundledScripts?._errors as err (err)}
-									<small class="text-error-500">{err}</small>
-								{/each}
-							{/if}
+						<td class="flex flex-col">
+							<div class="mx-auto">
+								<ScriptPicker>
+									{#each $bundlesForm.bundles[i].bundledScripts, j}
+										<tr class="flex h-full w-full">
+											<td class="h-full w-full p-0 text-xs">
+												<label class="flex h-full w-full items-center space-x-2">
+													<input
+														class="checkbox"
+														type="checkbox"
+														bind:checked={$bundlesForm.bundles[i].bundledScripts[j].active}
+													/>
+													<span class="select-none">
+														{$bundlesForm.bundles[i].bundledScripts[j].name}</span
+													>
+												</label>
+											</td>
+										</tr>
+									{/each}
+								</ScriptPicker>
+							</div>
+							<div class="flex flex-col text-center">
+								{#if $bundlesErrors.bundles && $bundlesErrors.bundles[i].bundledScripts?._errors}
+									{#each $bundlesErrors.bundles[i].bundledScripts?._errors as err (err)}
+										<small class="text-error-500">{err}</small>
+									{/each}
+								{/if}
+							</div>
 						</td>
-						<td>
+						<td class="text-center">
 							<button
 								id="button-{$bundlesForm.bundles[i].id}"
 								type="submit"

@@ -1,6 +1,6 @@
 import { browser } from "$app/environment"
 import type { ScripterBase } from "$lib/types/collection"
-import { encodeSEO, formatError } from "$lib/utils.js"
+import { encodeSEO, formatError } from "$lib/utils"
 import { error, redirect } from "@sveltejs/kit"
 
 export const load = async ({ url: { searchParams }, parent }) => {

@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { enhance } from "$app/forms"
 	import { page } from "$app/state"
-	import { Palette } from "svelte-lucide"
+	import { Popover } from "@skeletonlabs/skeleton-svelte"
+	import { ChevronDown, Palette, X } from "svelte-lucide"
 
 	const themesData = [
 		{ label: "Cerberus", value: "cerberus" },
@@ -11,29 +12,48 @@
 	]
 
 	let theme = $state(page.data.theme)
-	let selectElement: HTMLSelectElement
+	let open = $state(false)
 </script>
 
 <form
 	id="theme-form"
 	method="POST"
 	action="/?/setTheme"
-	class="input-group hover:preset-tonal mx-1 my-auto flex"
-	use:enhance={() => document.body.setAttribute("data-theme", theme)}
-	onchange={(e) => e.currentTarget.requestSubmit()}
+	class="input-group hover:preset-tonal my-auto flex"
 >
-	<div class="ig-cell preset-tonal">
-		<Palette size="16" />
-	</div>
-	<select
-		bind:this={selectElement}
-		name="theme"
-		id="theme-select"
-		class="ig-select my-auto"
-		bind:value={theme}
+	<Popover
+		{open}
+		onOpenChange={(e) => (open = e.open)}
+		positioning={{ placement: "bottom" }}
+		triggerBase="btn hover:preset-tonal h-full"
+		contentBase="card bg-surface-200-800 p-4 space-y-4 max-w-[320px]"
+		zIndex="50"
 	>
-		{#each themesData as entry (entry.value)}
-			<option value={entry.value} selected={entry.value === theme}> {entry.label} </option>
-		{/each}
-	</select>
+		{#snippet trigger()}
+			<Palette size="16" />
+			<span class="mx-4 my-auto flex lg:hidden xl:flex">{theme}</span>
+			<ChevronDown size="16" />{/snippet}
+		{#snippet content()}
+			<div class="card w-52">
+				<header class="flex justify-between">
+					<p class="text-xl font-bold">Themes</p>
+					<button class="btn-icon hover:preset-tonal" onclick={() => (open = false)}><X /></button>
+				</header>
+				<div class="my-4 flex flex-col">
+					{#each themesData as entry (entry.value)}
+						<button
+							type="submit"
+							class="btn preset-outlined-surface-500 hover:border-primary-500 my-2"
+							onclick={() => {
+								theme = entry.value
+								document.body.setAttribute("data-theme", theme)
+							}}
+						>
+							{entry.label}
+						</button>
+					{/each}
+				</div>
+			</div>
+		{/snippet}
+	</Popover>
 </form>
