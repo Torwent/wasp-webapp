@@ -1,9 +1,25 @@
-import {
-	tutorialsPromise,
-	createTutorialsIndex,
-	searchTutorialsIndex
-} from "$lib/server/tutorials.server"
+import { tutorialsPromise } from "$lib/server/tutorials.server"
 import type { Tutorial } from "$lib/types/collection"
+import FlexSearch from "flexsearch"
+
+let tutorialsIndex = new FlexSearch.Index({ tokenize: "forward" })
+let tutorials: Tutorial[]
+
+function createTutorialsIndex(data: Tutorial[]) {
+	tutorialsIndex = new FlexSearch.Index({ tokenize: "forward" })
+	data.forEach((tutorial, i) => {
+		const item = `${tutorial.title} ${tutorial.description} ${tutorial.content}`
+		tutorialsIndex.add(i, item)
+	})
+
+	tutorials = data
+}
+
+function searchTutorialsIndex(searchTerm: string) {
+	const match = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") //escape special regex characters
+	const indices = tutorialsIndex.search(match) as number[]
+	return indices.map((index) => tutorials[index])
+}
 
 async function getPublishedTutorials() {
 	const tutorials = await tutorialsPromise

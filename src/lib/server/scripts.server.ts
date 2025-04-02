@@ -3,7 +3,7 @@ import type { Script } from "$lib/types/collection"
 import { supabaseAdmin } from "./supabase.server"
 import { fetchScriptByID } from "$lib/client/supabase"
 
-let scriptsIndex: FlexSearch.Index
+let scriptsIndex = new FlexSearch.Index({ tokenize: "forward" })
 let scripts: Script[] = []
 let publishedScripts: Script[] = []
 

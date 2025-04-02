@@ -1,27 +1,6 @@
-import FlexSearch from "flexsearch"
 import type { Tutorial } from "$lib/types/collection"
 import { getUsername } from "$lib/server/supabase.server"
 import { encodeSEO } from "$lib/utils"
-
-let tutorialsIndex: FlexSearch.Index
-let tutorials: Tutorial[]
-
-export function createTutorialsIndex(data: Tutorial[]) {
-	tutorialsIndex = new FlexSearch.Index({ tokenize: "forward" })
-
-	data.forEach((tutorial, i) => {
-		const item = `${tutorial.title} ${tutorial.description} ${tutorial.content}`
-		tutorialsIndex.add(i, item)
-	})
-
-	tutorials = data
-}
-
-export function searchTutorialsIndex(searchTerm: string) {
-	const match = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") //escape special regex characters
-	const indices = tutorialsIndex.search(match) as number[]
-	return indices.map((index) => tutorials[index])
-}
 
 export async function getTutorials() {
 	const tutorials: Tutorial[] = []
