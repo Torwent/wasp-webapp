@@ -1,5 +1,4 @@
 import { type Handle, redirect } from "@sveltejs/kit"
-import { paraglideMiddleware } from "$lib/paraglide/server"
 
 import { createServerClient } from "@supabase/ssr"
 import { sequence } from "@sveltejs/kit/hooks"
@@ -187,21 +186,11 @@ const performanceCheck: Handle = async ({ event, resolve }) => {
 	return response
 }
 
-const handleParaglide: Handle = ({ event, resolve }) =>
-	paraglideMiddleware(event.request, ({ request, locale }) => {
-		event.request = request
-
-		return resolve(event, {
-			transformPageChunk: ({ html }) => html.replace("%paraglide.lang%", locale)
-		})
-	})
-
 export const handle: Handle = sequence(
 	redirects,
 	darkMode,
 	theme,
 	supabase,
 	authGuard,
-	handleParaglide,
 	performanceCheck
 )
