@@ -2,7 +2,7 @@ import { tutorialsPromise } from "$lib/server/tutorials.server"
 import type { Tutorial } from "$lib/types/collection"
 import FlexSearch from "flexsearch"
 
-let tutorialsIndex = new FlexSearch.Index({ tokenize: "forward" })
+let tutorialsIndex: FlexSearch.Index
 let tutorials: Tutorial[]
 
 function createTutorialsIndex(data: Tutorial[]) {
