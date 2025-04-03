@@ -1,7 +1,8 @@
 import { scripterSchema } from "$lib/client/schemas"
 import { canEdit, getScripter } from "$lib/client/supabase"
 import { mdvsvexCompile } from "$lib/server/markdown.server"
-import { getScripts, searchScriptsIndex } from "$lib/server/scripts.server"
+import { getPublishedScripts, getScripts, searchScriptsIndex } from "$lib/server/scripts.server"
+import type { Script } from "$lib/types/collection"
 import { formatError } from "$lib/utils"
 import { redirect } from "@sveltejs/kit"
 import { zod } from "sveltekit-superforms/adapters"
@@ -28,12 +29,15 @@ export const load = async ({
 	const scripter = promises[0]
 	const roles = promises[1]
 
-	let scripts = search !== "" ? searchScriptsIndex(search) : await getScripts()
-	scripts = scripts.filter((script) => script.protected.author_id === scripter.id)
-
-	if (search !== "" && scripter.id != user?.id && !roles?.moderator && !roles?.administrator) {
-		scripts = scripts.filter((script) => script.published === true)
+	let scripts: Script[]
+	if (search !== "") scripts = searchScriptsIndex(search)
+	else {
+		if (scripter.id === user?.id || roles?.moderator || roles?.administrator)
+			scripts = await getScripts()
+		else scripts = await getPublishedScripts()
 	}
+
+	scripts = scripts.filter((script) => script.protected.author_id === scripter.id)
 
 	const filteredScripts = scripts.slice(Math.max(0, start), Math.min(scripts.length, finish + 1))
 

@@ -1,23 +1,17 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { encodeSEO } from "$lib/utils"
-import type { Script, Tutorial, ScripterProfile } from "$lib/types/collection"
-import type { Database } from "$lib/types/supabase.js"
+import type { ScripterProfile } from "$lib/types/collection"
+import type { Database } from "$lib/types/supabase"
+import { getPublishedScripts } from "$lib/server/scripts.server"
+import { tutorialsPromise } from "$lib/server/tutorials.server"
 
 const website = "https://waspscripts.com"
 
-const getScripts = async (supabase: SupabaseClient<Database>) => {
-	const { data, error } = await supabase
-		.schema("scripts")
-		.from("scripts")
-		.select(`title, description, url,	protected (username)`)
-		.order("title", { ascending: true })
-		.eq("published", true)
-		.overrideTypes<Script[]>()
-
-	if (error) return console.error("scripts.scripts SELECT failed:" + error.message)
+const getScripts = async () => {
+	const scripts = await getPublishedScripts()
 
 	const result: string[] = []
-	data.forEach((script) => {
+	scripts.forEach((script) => {
 		result.push(
 			`[${encodeSEO(script.title + " by " + script.protected.username)}](${website + "/scripts/" + script.url}): ${script.description}`
 		)
@@ -26,9 +20,14 @@ const getScripts = async (supabase: SupabaseClient<Database>) => {
 	return result
 }
 
-const getTutorials = async (supabase: SupabaseClient<Database>) => {
-	//todo
-	const result: string[] = ["TODO..."]
+const getTutorials = async () => {
+	const tutorials = await tutorialsPromise
+	const result: string[] = []
+	tutorials.forEach((tutorial) => {
+		result.push(
+			`[${tutorial.title} by ${tutorial.username}](${website}/tutorials/${tutorial.url}): ${tutorial.description}`
+		)
+	})
 	return result
 }
 

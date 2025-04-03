@@ -1,46 +1,35 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { encodeSEO } from "$lib/utils"
-import type { Script, Tutorial, ScripterProfile } from "$lib/types/collection"
+import type { ScripterProfile } from "$lib/types/collection"
+import { tutorialsPromise } from "$lib/server/tutorials.server"
+import { getPublishedScripts } from "$lib/server/scripts.server"
+import type { Database } from "$lib/types/supabase"
 
 const website = "https://waspscripts.com"
 
-const loadScripts = async (supabase: SupabaseClient) => {
-	const { data, error } = await supabase
-		.schema("scripts")
-		.from("scripts")
-		.select(`title,	protected (username, avatar)`)
-		.order("title", { ascending: true })
-		.overrideTypes<Script[]>()
-
-	if (error) return console.error("scripts.scripts SELECT failed:" + error.message)
-
-	const scriptData = data
+const getScripts = async () => {
+	const scripts = await getPublishedScripts()
 
 	const result: string[] = []
-	scriptData.forEach((script) => {
-		result.push(encodeSEO(script.title + " by " + script.protected.username))
+	scripts.forEach((script) => {
+		result.push(script.url ?? "")
 	})
 
 	return result
 }
 
-const loadTutorials = async (supabase: SupabaseClient) => {
-	const { data, error } = await supabase
-		.from("tutorials")
-		.select("title,  username")
-		.overrideTypes<Tutorial[]>()
-
-	if (error) return console.error("tutorials SELECT failed: " + error.message)
+const getTutorials = async () => {
+	const tutorials = await tutorialsPromise
 
 	const result: string[] = []
-	data.forEach((tutorial) => {
+	tutorials.forEach((tutorial) => {
 		result.push(encodeSEO(tutorial.title + " by " + tutorial.username))
 	})
 
 	return result
 }
 
-const loadDevelopers = async (supabase: SupabaseClient) => {
+const getScripters = async (supabase: SupabaseClient<Database>) => {
 	const { data, error } = await supabase
 		.schema("profiles")
 		.from("scripters")
@@ -57,14 +46,14 @@ const loadDevelopers = async (supabase: SupabaseClient) => {
 	return result
 }
 
-const buildLoc = async (supabase: SupabaseClient, loc: string) => {
+const buildLoc = async (supabase: SupabaseClient<Database>, loc: string) => {
 	let data: string[] = []
 	if (loc === "scripts") {
-		data = (await loadScripts(supabase)) as string[]
+		data = (await getScripts()) as string[]
 	} else if (loc === "tutorials") {
-		data = (await loadTutorials(supabase)) || []
+		data = (await getTutorials()) || []
 	} else {
-		data = (await loadDevelopers(supabase)) || []
+		data = (await getScripters(supabase)) || []
 	}
 
 	let result = ""
@@ -89,7 +78,7 @@ export const GET = async ({ locals: { supabaseServer } }) => {
 	])
 	const scripts = promises[0]
 	const tutorials = promises[1]
-	const developers = promises[2]
+	const scripters = promises[2]
 
 	const headers = {
 		"Cache-Control": "max-age=0, s-maxage=3600",
@@ -147,7 +136,7 @@ export const GET = async ({ locals: { supabaseServer } }) => {
         <changefreq>daily</changefreq>
         <priority>0.7</priority>
       </url>
-      ${developers}
+      ${scripters}
 	  <url>
         <loc>${website}/legal/user_terms_of_service</loc>
         <changefreq>daily</changefreq>
