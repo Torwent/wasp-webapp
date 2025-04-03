@@ -63,5 +63,10 @@
 		"svelte-lucide": "^2.0.1",
 		"svelte-persisted-store": "^0.12.0",
 		"sveltekit-superforms": "^2.24.0"
+	},
+	"overrides": {
+		"vite": {
+			"esbuild": "0.24.0"
+		}
 	}
 }

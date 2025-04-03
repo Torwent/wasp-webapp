@@ -135,31 +135,29 @@
 											{#each products.bundles as bundle (bundle.id)}
 												<tr class="table-row">
 													<td>
-														<div class="mx-3">
-															<div>{bundle.name}</div>
-														</div>
+														{bundle.name}
 													</td>
 
-													<td>
+													<td class="text-center">
 														<a
 															href="/subscriptions"
 															class="btn hover:text-primary-500 hover:cursor-pointer"
 														>
 															<ExternalLink size="16" />
-															<span>Bundle</span>
+															Bundle
 														</a>
 													</td>
 
-													<td>{getCurrentPrice(bundle.prices)}</td>
+													<td class="text-center">{getCurrentPrice(bundle.prices)}</td>
 
 													<td>
 														<div
-															class="btn-group preset-outlined-surface-500 flex flex-col rounded-md md:flex-row"
+															class="btn-group mx-auto flex w-fit flex-col rounded-md md:flex-row"
 														>
 															{#each bundle.prices as price, j (price.id)}
 																<button
-																	class="btn"
-																	class:preset-outlined-primary-500={price.active}
+																	class="btn preset-outlined-surface-500"
+																	class:border-primary-500={price.active}
 																	onclick={() => setPriceInterval(j, bundle.prices)}
 																>
 																	{getPriceIntervalEx(price)}
@@ -168,7 +166,7 @@
 														</div>
 													</td>
 
-													<td>
+													<td class="text-center">
 														<button
 															class="btn preset-filled-secondary-500"
 															formaction="?/checkout&product={bundle.id}&price={bundle.prices.find(
@@ -184,12 +182,10 @@
 											{#each products.scripts as script (script.id)}
 												<tr>
 													<td>
-														<div class="mx-3">
-															<div class="">{script.name}</div>
-														</div>
+														{script.name}
 													</td>
 
-													<td>
+													<td class="text-center">
 														<a
 															href="/subscriptions"
 															class="btn hover:text-primary-500 hover:cursor-pointer"
@@ -199,16 +195,16 @@
 														</a>
 													</td>
 
-													<td>{getCurrentPrice(script.prices)}</td>
+													<td class="text-center">{getCurrentPrice(script.prices)}</td>
 
 													<td>
 														<div
-															class="btn-group preset-outlined-surface-500 flex flex-col rounded-md md:flex-row"
+															class="btn-group mx-auto flex w-fit flex-col rounded-md md:flex-row"
 														>
 															{#each script.prices as price, j (price.id)}
 																<button
-																	class="btn"
-																	class:preset-outlined-primary-500={price.active}
+																	class="btn preset-outlined-surface-500"
+																	class:border-primary-500={price.active}
 																	onclick={() => {
 																		setPriceInterval(j, script.prices)
 																		products = products
@@ -220,7 +216,7 @@
 														</div>
 													</td>
 
-													<td>
+													<td class="text-center">
 														<button
 															class="btn preset-filled-secondary-500"
 															formaction="?/checkout&product={script.id}&price={script.prices.find(
