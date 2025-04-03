@@ -29,7 +29,7 @@
 		dataType: "json",
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
-		taintedMessage: "Are you sure you want to leave?",
+		taintedMessage: false,
 		validators: zodClient(scripterSchema),
 		resetForm: true
 	})
