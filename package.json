@@ -36,7 +36,6 @@
 		"prettier-plugin-svelte": "^3.3.3",
 		"prettier-plugin-tailwindcss": "^0.6.11",
 		"svelte": "^5.25.6",
-		"svelte-adapter-bun": "^0.5.2",
 		"svelte-check": "^4.1.5",
 		"svelte-lucide": "^2.0.1",
 		"tailwindcss": "^4.1.1",
@@ -61,6 +60,7 @@
 		"sharp": "^0.33.5",
 		"shiki": "^3.2.1",
 		"stripe": "^17.7.0",
+		"svelte-adapter-bun": "^0.5.2",
 		"svelte-persisted-store": "^0.12.0",
 		"sveltekit-superforms": "^2.24.0"
 	}
