@@ -52,9 +52,9 @@ const getScripters = async (supabase: SupabaseClient<Database>) => {
 const getLoc = async (supabase: SupabaseClient<Database>, loc: string) => {
 	let data: string[] = []
 	if (loc === "scripts") {
-		data = (await getScripts(supabase)) as string[]
+		data = (await getScripts()) as string[]
 	} else if (loc === "tutorials") {
-		data = (await getTutorials(supabase)) || []
+		data = (await getTutorials()) || []
 	} else {
 		data = (await getScripters(supabase)) || []
 	}
