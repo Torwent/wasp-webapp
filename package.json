@@ -1,8 +1,9 @@
 {
-	"name": "wasp-webapp2",
+	"name": "wasp-webapp",
 	"private": true,
-	"version": "0.0.1",
+	"version": "2.0.0",
 	"type": "module",
+	"engines": { "node": "23" },
 	"scripts": {
 		"dev": "vite dev",
 		"build": "vite build",
@@ -63,10 +64,5 @@
 		"svelte-lucide": "^2.0.1",
 		"svelte-persisted-store": "^0.12.0",
 		"sveltekit-superforms": "^2.24.0"
-	},
-	"overrides": {
-		"vite": {
-			"esbuild": "0.24.0"
-		}
 	}
 }
