@@ -13,7 +13,7 @@ const getScripts = async () => {
 	const result: string[] = []
 	scripts.forEach((script) => {
 		result.push(
-			`[${encodeSEO(script.title + " by " + script.protected.username)}](${website + "/scripts/" + script.url}): ${script.description}`
+			`[${script.title} by ${script.protected.username}](${website + "/scripts/" + script.url}): ${script.description}`
 		)
 	})
 
@@ -61,7 +61,7 @@ const getLoc = async (supabase: SupabaseClient<Database>, loc: string) => {
 
 	let result = ""
 	data.forEach((el) => {
-		result += `- [${website}/${loc}/${el}\r\n`
+		result += `- ${el}\r\n`
 	})
 
 	return result
