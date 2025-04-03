@@ -8,7 +8,7 @@ let scripts: Script[] = []
 let publishedScripts: Script[] = []
 
 function getScriptString(script: Script) {
-	return `${script.title} ${script.description} ${script.content} ${script.id} ${script.protected.username} ${script.metadata.status} ${script.metadata.type} ${script.metadata.categories.toString()}`
+	return `${script.title} ${script.description} ${script.content} ${script.protected.username}`
 }
 
 function createScriptsIndex(data: Script[]) {
@@ -19,7 +19,7 @@ function createScriptsIndex(data: Script[]) {
 export function searchScriptsIndex(searchTerm: string) {
 	const match = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") //escape special regex characters
 	const indices = scriptsIndex.search(match) as number[]
-	return indices.map((index) => scripts[index])
+	return indices.map((index) => publishedScripts[index])
 }
 
 export async function getScripts(): Promise<Script[]> {
