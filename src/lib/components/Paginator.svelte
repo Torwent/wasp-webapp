@@ -43,14 +43,17 @@
 			page={currentPage}
 			{pageSize}
 			siblingCount={2}
-			onPageChange={(e) => replaceQuery(page.url, { page: e.page.toString() })}
+			onPageChange={(e) => {
+				currentPage = e.page
+				replaceQuery(page.url, { page: e.page.toString() })
+			}}
 			onPageSizeChange={(e) => (pageSize = e.pageSize)}
 		>
-			{#snippet labelEllipsis()}<Ellipsis size="4" />{/snippet}
-			{#snippet labelNext()}<ArrowRight size="4" />{/snippet}
-			{#snippet labelPrevious()}<ArrowLeft size="4" />{/snippet}
-			{#snippet labelFirst()}<ChevronLeft size="4" />{/snippet}
-			{#snippet labelLast()}<ChevronRight size="4" />{/snippet}
+			{#snippet labelEllipsis()}<Ellipsis class="size-4" />{/snippet}
+			{#snippet labelNext()}<ArrowRight class="size-4" />{/snippet}
+			{#snippet labelPrevious()}<ArrowLeft class="size-4" />{/snippet}
+			{#snippet labelFirst()}<ChevronLeft class="size-4" />{/snippet}
+			{#snippet labelLast()}<ChevronRight class="size-4" />{/snippet}
 		</Pagination>
 	</footer>
 {/if}

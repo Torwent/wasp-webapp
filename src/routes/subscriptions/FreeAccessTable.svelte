@@ -39,7 +39,7 @@
 		<table class="table border-separate space-y-6 text-xs">
 			<TableHeader headers={["Product", "Type", "Start date", "End date"]} />
 			<tbody class="preset-filled-surface-200-800 [&>tr]:hover:preset-tonal">
-				{#each freeAccess as access, i (access.id)}
+				{#each freeAccess as access, i (access.product)}
 					{#if bundleArray[i]}
 						<tr class="table-row">
 							<td>
