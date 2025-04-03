@@ -34,16 +34,17 @@ export const actions = {
 		if (!user) {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
+		console.log("HERE")
 
 		const promises = await Promise.all([getProfile(), getSubscriptions(), getFreeAccess()])
 		const profile = promises[0]
 		const subs = promises[1]
 		const free = promises[2]
-
+console.log("HERE1")
 		if (!profile) {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
-
+console.log("HERE2")
 		if (!profile.customer_id) {
 			const customerSearch = await stripe.customers.search({ query: 'name: "' + profile.id + '"' })
 
@@ -72,14 +73,14 @@ export const actions = {
 
 		const productID = searchParams.get("product")
 		const priceID = searchParams.get("price")
-
+console.log("HERE2")
 		if (!productID) {
 			error(
 				500,
 				"Something went wrong! Seems like no product was selected. If this keeps occuring please contact support@waspscripts.com"
 			)
 		}
-
+console.log("HERE3")
 		if (!priceID) {
 			error(
 				500,

@@ -156,9 +156,13 @@
 														>
 															{#each bundle.prices as price, j (price.id)}
 																<button
+																	type="button"
 																	class="btn preset-outlined-surface-500"
 																	class:border-primary-500={price.active}
-																	onclick={() => setPriceInterval(j, bundle.prices)}
+																	onclick={(e) => {
+																		e.preventDefault()
+																		setPriceInterval(j, bundle.prices)
+																	}}
 																>
 																	{getPriceIntervalEx(price)}
 																</button>
@@ -203,9 +207,11 @@
 														>
 															{#each script.prices as price, j (price.id)}
 																<button
+																	type="button"
 																	class="btn preset-outlined-surface-500"
 																	class:border-primary-500={price.active}
-																	onclick={() => {
+																	onclick={(e) => {
+																		e.preventDefault()
 																		setPriceInterval(j, script.prices)
 																		products = products
 																	}}

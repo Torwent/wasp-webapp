@@ -32,7 +32,6 @@ const config = {
 			mode: "auto",
 			directives: {
 				"connect-src": ["self", "ws://localhost:*", "https://db.waspscripts.com"],
-				"form-action": ["self"],
 				"frame-src": [
 					"self",
 					"https://stripe-data-exports.s3.amazonaws.com/",
