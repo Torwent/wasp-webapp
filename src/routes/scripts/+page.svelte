@@ -16,8 +16,8 @@
 	let { amount } = $state(data)
 	const { count } = $derived(data)
 
-	const pageStr = page.url.searchParams.get("page") || "-1"
-	let currentPage = $state(
+	const pageStr = $derived(page.url.searchParams.get("page") || "-1")
+	const currentPage = $derived(
 		Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 0 : Number(pageStr)
 	)
 
@@ -59,6 +59,7 @@
 	async function handleFilter(key: string, value: string) {
 		if (value == "") page.url.searchParams.delete(key)
 		else page.url.searchParams.set(key, value)
+		page.url.searchParams.delete("page")
 		await goto(page.url, { noScroll: true, keepFocus: true })
 		invalidate("wasp:scripts")
 	}
