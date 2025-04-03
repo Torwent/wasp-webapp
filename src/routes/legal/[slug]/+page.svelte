@@ -20,7 +20,7 @@
 
 <main class="container mx-auto my-6 max-w-4xl flex-grow">
 	<div class="mx-auto grid max-w-4xl">
-		<a href={page.url.pathname + "/add"} class="btn preset-filled mx-auto">Add</a>
+		<a href={page.url.pathname + "/add"} class="btn preset-filled-secondary-500 mx-auto">Add</a>
 		<div class="mx-auto my-6 flex">
 			<AdvancedButton bind:index bind:total={policies.length} />
 		</div>
