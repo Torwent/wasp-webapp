@@ -30,6 +30,11 @@ export const tutorialsPromise = getTutorials()
 
 export async function getTutorial(slug: string) {
 	const tutorials = await tutorialsPromise
+
+	if (/^\d+$/.test(slug)) {
+		const n = parseInt(slug, 10)
+		return tutorials.find((tutorial) => tutorial.order === n)
+	}
+
 	return tutorials.find((tutorial) => tutorial.url === slug)
 }
-clearInterval
