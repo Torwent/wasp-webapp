@@ -1,5 +1,5 @@
 import { mdsvex, escapeSvelte } from "mdsvex"
-import adapter from "@sveltejs/adapter-node"
+import adapter from "svelte-adapter-bun"
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte"
 import { getSingletonHighlighter } from "shiki"
 
@@ -25,14 +25,6 @@ const mdsvexOptions = {
 }
 
 const config = {
-	compilerOptions: { runes: true },
-	vitePlugin: {
-		dynamicCompileOptions({ filename }) {
-			if (filename.includes("node_modules")) {
-				return { runes: undefined }
-			}
-		}
-	},
 	preprocess: [vitePreprocess(), mdsvex(mdsvexOptions)],
 	kit: {
 		adapter: adapter(),

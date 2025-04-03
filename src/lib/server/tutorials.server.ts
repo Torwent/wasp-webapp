@@ -32,3 +32,4 @@ export async function getTutorial(slug: string) {
 	const tutorials = await tutorialsPromise
 	return tutorials.find((tutorial) => tutorial.url === slug)
 }
+clearInterval
