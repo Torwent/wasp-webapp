@@ -143,7 +143,7 @@
 	<form
 		method="POST"
 		action="?/scriptAdd"
-		class="xl:mx-w-7xl preset-outlined-surface-400-600 mx-auto my-12 flex max-w-md flex-col rounded-md text-center md:max-w-3xl lg:max-w-6xl"
+		class="preset-outlined-surface-400-600 mx-auto my-12 flex flex-col rounded-md p-4 text-center"
 		use:newScriptEnhance
 	>
 		<h1 class="my-4 text-lg">New Script</h1>
@@ -155,10 +155,10 @@
 			</h2>
 		{/if}
 
-		<label class="my-4">
+		<label class="label mx-auto max-w-96">
 			<span class="label-text">Script:</span>
 			<select
-				class="select mx-auto w-96"
+				class="select"
 				bind:value={$newScriptForm.id}
 				class:disabled={available.length === 0}
 				class:ring-error-500={$newScriptErrors.id}
@@ -174,9 +174,9 @@
 			{/if}
 		</label>
 
-		<div class="my-12 flex flex-col justify-around md:flex-row">
+		<div class="mx-auto my-12 flex flex-col justify-center gap-4 md:flex-row">
 			{#each ["Weekly", "Monthly", "Yearly"] as interval, i (interval)}
-				<label>
+				<label class="label max-w-80">
 					<span class="label-text">{interval} price:</span>
 					<input
 						type="number"

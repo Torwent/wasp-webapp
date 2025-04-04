@@ -16,7 +16,7 @@
 	keywords="Dashboard, Scripter, Developer"
 />
 
-<main class="m-4">
+<main class="">
 	{#if profile.id != data.scripter.id}
 		<h3 class="text-primary-500 my-4 text-center font-bold">
 			Current user: {profile.username}

@@ -10,14 +10,14 @@
 	)
 </script>
 
-<button
-	class="preset-filled-surface-100-900 hover:preset-tonal-surface m-4 block w-[40rem] rounded-md ring-2 {tutorial.level ===
+<a
+	href={link}
+	class="preset-filled-surface-100-900 hover:preset-tonal-surface m-4 block max-w-[40rem] rounded-md ring-2 {tutorial.level ===
 	0
 		? 'ring-sky-400 dark:ring-sky-500'
 		: tutorial.level === 1
 			? 'ring-orange-400 dark:ring-orange-500'
 			: 'ring-red-400 dark:ring-red-500'}"
-	onclick={async () => await goto(link)}
 >
 	<div>
 		<div class="flex flex-col p-3">
@@ -27,12 +27,7 @@
 			</div>
 
 			<small class="text-surface-400 mt-1 truncate text-xs">
-				by <a
-					href="/scripters/{encodeSEO(tutorial.username)}"
-					class="permalink text-shadow text-secondary-500 font-semibold"
-				>
-					{tutorial.username}
-				</a>
+				by {tutorial.username}
 			</small>
 
 			<div class="text-surface-600 dark:text-surface-300 mt-4 mb-1 text-sm">
@@ -50,4 +45,4 @@
 			</span>
 		</div>
 	</div>
-</button>
+</a>

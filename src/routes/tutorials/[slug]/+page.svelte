@@ -35,9 +35,10 @@
 	<div class="my-8 grid place-items-center">
 		<a
 			href="https://github.com/Torwent/wasp-info/edit/main/tutorials/{meta.order}.md"
-			class="variant-filled-tertiary btn"
+			class="preset-filled-tertiary-500 btn flex flex-col md:flex-row"
 		>
-			Found something wrong? Edit on GitHub!
+			<span>Found something wrong?</span>
+			<span> Edit on GitHub! </span>
 		</a>
 	</div>
 	<h2 class="my-4 text-center text-3xl font-bold">{meta.title}</h2>
@@ -77,7 +78,7 @@
 	<article
 		class="prose border-surface-300 dark:prose-invert dark:border-surface-800 mx-auto my-8 border-t-2 py-6"
 	>
-		<div>
+		<div class="mx-8 md:mx-auto">
 			<Content />
 		</div>
 	</article>

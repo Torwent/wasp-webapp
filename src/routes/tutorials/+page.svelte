@@ -114,7 +114,7 @@
 		</div>
 	</div>
 
-	<div class="mx-auto max-w-2xl flex-grow">
+	<div class="mx-auto">
 		{#each tutorials as tutorial (tutorial)}
 			<TutorialCard {tutorial} />
 		{/each}
