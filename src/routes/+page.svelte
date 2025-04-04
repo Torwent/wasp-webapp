@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { formatTime, formatNumber } from "$lib/utils"
-	import CanvasAnimation from "./CanvasAnimation.svelte"
 	import Head from "$lib/components/Head.svelte"
 
 	const { data } = $props()
@@ -12,7 +11,7 @@
 	description="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
 />
 
-<main class="container mx-auto my-8 max-w-2xl flex-grow">
+<main class="container mx-auto my-24 max-w-2xl flex-grow">
 	<header>
 		<h1 class="py-12 text-center text-xl font-bold sm:text-2xl md:text-3xl">
 			<div class="py-4">WaspScripts</div>
@@ -53,16 +52,6 @@
 		</a>
 		or join the discord community!
 	</p>
-
-	<div class="my-6">
-		<header>
-			<h2 class="py-16 text-center text-2xl font-bold md:text-3xl">
-				<span>Advanced mouse movements and click patterns</span>
-			</h2>
-		</header>
-
-		<CanvasAnimation />
-	</div>
 </main>
 
 <style>
