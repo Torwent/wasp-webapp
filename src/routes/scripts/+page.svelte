@@ -257,7 +257,7 @@
 					<ScriptCard {script} link={"/scripts/" + script.url} />
 				{/each}
 			</div>
-			<div class="mx-8">
+			<div class="mx-auto md:mx-8">
 				<Paginator data={scripts} {currentPage} bind:pageSize={amount} {count} />
 			</div>
 		</main>

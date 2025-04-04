@@ -24,11 +24,11 @@
 </script>
 
 {#if pageSize < count}
-	<footer class="flex justify-between">
+	<footer class="flex w-full flex-col justify-between gap-2 md:flex-row">
 		<select
 			name="size"
 			id="size"
-			class="select max-w-[150px]"
+			class="select mx-auto max-w-[150px] md:mx-0"
 			bind:value={pageSize}
 			onchange={() => replaceQuery(page.url, { amount: pageSize.toString() })}
 		>
@@ -42,12 +42,14 @@
 			{count}
 			page={currentPage}
 			{pageSize}
-			siblingCount={2}
+			siblingCount={1}
 			onPageChange={(e) => {
 				currentPage = e.page
 				replaceQuery(page.url, { page: e.page.toString() })
 			}}
 			onPageSizeChange={(e) => (pageSize = e.pageSize)}
+			classes="w-fit mx-auto md:mx-0"
+			buttonClasses="text-xs md:text-base px-2 md:px-3"
 		>
 			{#snippet labelEllipsis()}<Ellipsis class="size-4" />{/snippet}
 			{#snippet labelNext()}<ArrowRight class="size-4" />{/snippet}

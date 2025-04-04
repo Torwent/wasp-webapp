@@ -30,7 +30,7 @@ export const load = async ({
 	const roles = promises[1]
 
 	let scripts: Script[]
-	if (search !== "") scripts = searchScriptsIndex(search)
+	if (search !== "") scripts = await searchScriptsIndex(search)
 	else {
 		if (scripter.id === user?.id || roles?.moderator || roles?.administrator)
 			scripts = await getScripts()

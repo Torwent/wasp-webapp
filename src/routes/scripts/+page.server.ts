@@ -23,7 +23,7 @@ export async function load({ depends, url, locals: { supabaseServer } }) {
 	const finish = start + amount - 1
 
 	const allScripts = getPublishedScripts()
-	let scripts = search !== "" ? searchScriptsIndex(search) : await allScripts
+	let scripts = await (search !== "" ? searchScriptsIndex(search) : allScripts)
 
 	async function getFeatured() {
 		const { data, error: err } = await supabaseServer

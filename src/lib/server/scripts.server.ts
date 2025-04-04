@@ -16,7 +16,8 @@ function createScriptsIndex(data: Script[]) {
 	data.forEach((script, i) => scriptsIndex.add(i, getScriptString(script)))
 }
 
-export function searchScriptsIndex(searchTerm: string) {
+export async function searchScriptsIndex(searchTerm: string) {
+	if (scripts.length === 0 || publishedScripts.length === 0) await getPublishedScripts()
 	const match = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") //escape special regex characters
 	const indices = scriptsIndex.search(match) as number[]
 	return indices.map((index) => publishedScripts[index])
@@ -76,18 +77,22 @@ export async function updateScript(id: string) {
 	const script = await fetchScriptByID(supabaseAdmin, id)
 	if (script == null) return
 
-	const index = scripts.findIndex((s) => s.id === id)
+	let index = scripts.findIndex((s) => s.id === id)
 	if (index === -1) {
 		scripts.push(script)
-		scriptsIndex.add(scripts.length, getScriptString(script))
+		if (script.published) publishedScripts.push(script)
+		scriptsIndex.add(publishedScripts.length, getScriptString(script))
 		return
 	}
 
 	scripts[index] = script
 
-	if (!scriptsIndex) await getPublishedScripts()
-	else {
-		const scriptStr = getScriptString(script)
-		scriptsIndex.update(index, scriptStr)
+	if (!scriptsIndex || publishedScripts.length === 0) {
+		return
 	}
+
+	index = publishedScripts.findIndex((s) => s.id === id)
+	publishedScripts[index] = script
+
+	scriptsIndex.update(index, getScriptString(script))
 }
