@@ -323,16 +323,17 @@ export async function createStripePrice(price: PriceSchema, product: string) {
 
 export async function updateStripePrice(price: Price) {
 	const promises = []
-
 	if (price.amount > 0)
 		promises.push(
-			stripe.prices.create({
-				unit_amount: Math.round(price.amount * 100),
-				currency: "EUR",
-				active: true,
-				product: price.product,
-				recurring: { interval: price.interval as Interval }
-			})
+			stripe.prices
+				.create({
+					unit_amount: Math.round(price.amount * 100),
+					currency: "EUR",
+					active: true,
+					product: price.product,
+					recurring: { interval: price.interval as Interval }
+				})
+				.catch((err) => console.error(err))
 		)
 	promises.push(stripe.prices.update(price.id, { active: false }))
 

@@ -2,13 +2,14 @@ import { bundleArraySchema, newBundleSchema } from "$lib/client/schemas"
 import { getScripter } from "$lib/client/supabase"
 import {
 	createStripeBundleProduct,
+	createStripePrice,
 	stripe,
 	updateStripePrice,
 	updateStripeProduct
 } from "$lib/server/stripe.server"
 import { addFreeAccess, cancelFreeAccess, doLogin } from "$lib/server/supabase.server"
 import { formatError, UUID_V4_REGEX } from "$lib/utils"
-import { error } from "@sveltejs/kit"
+import { error, redirect } from "@sveltejs/kit"
 import { fail, setError, superValidate } from "sveltekit-superforms"
 import { zod } from "sveltekit-superforms/adapters"
 
@@ -118,7 +119,7 @@ export const actions = {
 	bundleEdit: async ({
 		request,
 		locals: { supabaseServer, user, getRoles },
-		url: { origin, searchParams },
+		url: { origin, searchParams, pathname },
 		params: { slug }
 	}) => {
 		if (!user)
@@ -178,7 +179,7 @@ export const actions = {
 		const { data: pricesData, error: errPrices } = await supabaseServer
 			.schema("scripts")
 			.from("prices")
-			.select("id, amount")
+			.select("id, amount, interval")
 			.eq("product", product.id)
 			.eq("active", true)
 
@@ -186,13 +187,13 @@ export const actions = {
 
 		for (let i = 0; i < pricesData.length; i++) {
 			const currentPrice = pricesData[i]
-			const newPrice = product.prices.find((price) => price.id === currentPrice.id)
+			const j = product.prices.findIndex((price) => price.id === currentPrice.id)
+			if (j === -1) continue
+			const newPrice = product.prices[j]
 
-			if (!newPrice) continue
-
-			const promises = []
+			const updatePricesPromises = []
 			if (Math.round(newPrice.amount * 100) !== currentPrice.amount)
-				promises.push(
+				updatePricesPromises.push(
 					updateStripePrice({
 						active: true,
 						amount: newPrice.amount,
@@ -203,8 +204,22 @@ export const actions = {
 					})
 				)
 
-			if (promises.length > 0) await Promise.all(promises)
+			await Promise.all(updatePricesPromises)
+			product.prices.splice(j, 1)
 		}
+
+		const createPricePromises = []
+		for (let i = 0; i < product.prices.length; i++) {
+			const currentPrice = product.prices[i]
+			const j = pricesData.findIndex((price) => price.interval === currentPrice.interval)
+			if (j > -1) {
+				pricesData.splice(j, 1)
+				continue
+			}
+			createPricePromises.push(createStripePrice(currentPrice, product.id))
+		}
+
+		await Promise.all(createPricePromises)
 
 		const scripts = product.bundledScripts.reduce((acc: string[], script) => {
 			if (script.active) acc.push(script.id)
@@ -219,12 +234,12 @@ export const actions = {
 
 		if (err) return setError(form, "", err.message)
 
-		return { form }
+		redirect(303, pathname)
 	},
 	bundleAdd: async ({
 		request,
 		locals: { supabaseServer, user, getRoles },
-		url: { origin },
+		url: { origin, pathname },
 		params: { slug }
 	}) => {
 		if (!user)
@@ -251,7 +266,7 @@ export const actions = {
 
 		if (err) return setError(form, "", err.message)
 
-		return { form }
+		redirect(303, pathname)
 	},
 
 	addFree: async ({
