@@ -66,6 +66,7 @@
 
 	let userLocale = navigator.language ?? "pt-PT"
 	let open = $state(false)
+	let allOpen = $state(false)
 </script>
 
 <Modal
@@ -116,9 +117,11 @@
 
 								<td class="text-center">
 									<button
-										type="button"
+										type="submit"
 										class="btn preset-outlined-error-500"
 										formaction="?/cancelSub&subscription={row.subscription}"
+										class:disabled={row.state === 2}
+										disabled={row.state === 2}
 									>
 										Cancel
 									</button>
@@ -130,15 +133,36 @@
 			</table>
 		</form>
 		<footer class="flex flex-col justify-between gap-2 text-xs md:flex-row md:text-sm lg:text-base">
-			<button
-				type="submit"
-				class="btn preset-outlined-error-500 hover:text-error-500"
-				formaction="?/cancelAllSubs={id}"
-			>
-				CANCEL All SUBSCRIPTIONS
-			</button>
+			<form method="POST" class="flex">
+				<button
+					type="button"
+					class="btn preset-outlined-warning-500"
+					class:hidden={allOpen}
+					onclick={() => (allOpen = true)}
+				>
+					CANCEL ALL SUBSCRIPTIONS
+				</button>
+				<div class:hidden={!allOpen}>
+					<h1 class="h2">ARE YOU SURE?</h1>
+					<p>This cannot be undone!</p>
+					<button type="button" class="btn preset-tonal" onclick={() => (allOpen = false)}>
+						Go Back
+					</button>
+					<button
+						type="submit"
+						class="btn preset-filled-error-500 hover:text-error-500"
+						formaction="?/cancelAllSubs&product={id}"
+					>
+						I AM SURE!
+					</button>
+				</div>
+			</form>
 
-			<button type="button" class="btn preset-tonal" onclick={() => (open = false)}> Close </button>
+			<div class="my-auto">
+				<button type="button" class="btn preset-tonal m-auto" onclick={() => (open = false)}>
+					Close
+				</button>
+			</div>
 		</footer>
 	{/snippet}
 </Modal>
