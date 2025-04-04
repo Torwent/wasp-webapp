@@ -8,8 +8,9 @@
 
 <Modal
 	{open}
+	onOpenChange={(e) => (open = e.open)}
 	triggerBase="btn preset-tonal"
-	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm p-12 w-full"
+	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-[95%] max-w-fit max-h-[95%] overflow-y-auto"
 	backdropClasses="backdrop-blur-sm"
 >
 	{#snippet trigger()}
@@ -26,20 +27,22 @@
 				Choose the scripts you want on this bundle:
 			</h5>
 		</header>
-		<article class="table-wrap my-12">
-			<table class="table-compact table">
-				<tbody class="preset-filled-surface-100-900 [&>tr]:hover:preset-tonal">
+		<article class="table-wrap my-12 max-h-[28rem] w-full">
+			<table class="table">
+				<tbody class="[&>tr]:hover:preset-tonal">
 					{@render children()}
 				</tbody>
 			</table>
 		</article>
-		<small class="mx-auto my-16 py-8">
+		<small class="mb-12 hidden justify-center md:flex">
 			On Desktop you can also use your keyboard:
 			<kbd class="kbd">Tab, Shift + Tab and Space</kbd>
 		</small>
 
-		<footer class="flex justify-end gap-4">
-			<button type="button" class="btn preset-tonal" onclick={() => (open = false)}>Confirm</button>
+		<footer class="my-4 flex gap-4">
+			<button type="button" class="btn preset-tonal mx-auto" onclick={() => (open = false)}
+				>Confirm</button
+			>
 		</footer>
 	{/snippet}
 </Modal>

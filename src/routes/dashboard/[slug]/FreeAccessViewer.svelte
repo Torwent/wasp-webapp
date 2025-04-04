@@ -46,7 +46,7 @@
 	{open}
 	onOpenChange={(e) => (open = e.open)}
 	triggerBase="btn preset-filled-secondary-500 font-bold"
-	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-5/7 max-w-screen max-h-screen overflow-x-scroll"
+	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-[95%] max-w-fit max-h-[95%] overflow-y-auto"
 	backdropClasses="backdrop-blur-sm"
 >
 	{#snippet trigger()}
@@ -59,12 +59,10 @@
 			<h2>Total: {count}</h2>
 		</header>
 		<div class="preset-outlined-surface-500 rounded-md p-1">
-			<form method="POST" class="table-wrap max-h-[30rem]">
-				<table class="table-compact table">
+			<form method="POST" class="table-wrap max-h-[28rem]">
+				<table class="table">
 					<TableHeader {headers} />
-					<tbody
-						class="preset-filled-surface-100-900 [&>tr]:hover:preset-tonal max-h-[30rem] overflow-scroll text-xs md:text-sm xl:text-base"
-					>
+					<tbody class="[&>tr]:hover:preset-tonal text-xs md:text-sm xl:text-base">
 						{#await getFreeAccess(id)}
 							<tr class="flex w-full">
 								<td class="h-full w-full p-0 text-xs"> Loading... </td>

@@ -73,14 +73,14 @@
 			<h1>Admin Powers</h1>
 
 			<h1>View other scripters dashboard</h1>
-			<div class="grid grid-cols-5 gap-4">
+			<div class="grid gap-4 sm:grid-cols-1 md:grid-cols-3 lg:grid-cols-5">
 				{#await fetchcripters()}
 					Loading...
 				{:then scripters}
 					{#each scripters as scripter (scripter.id)}
 						<a
 							href="/dashboard/{scripter.id}/general"
-							class="btn preset-outlined-tertiary-100-900 m-2 mx-auto w-full font-bold"
+							class="btn preset-outlined-tertiary-300-700 hover:border-secondary-500 m-2 mx-auto w-full font-bold"
 						>
 							{scripter.profiles.username}
 						</a>

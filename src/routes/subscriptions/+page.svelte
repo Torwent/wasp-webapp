@@ -48,7 +48,7 @@
 	<CheckoutTable data={data.checkoutForm} {bundles} {scripts} />
 </main>
 
-<h5 class="my-8 text-center">
+<!-- <h5 class="my-8 text-center">
 	By making any purchase you automatically accept the
 	<a href="/legal/user_tos">user terms or service</a>
 	.
@@ -60,4 +60,4 @@
 	>
 		support@waspscripts.com
 	</a>
-</p>
+</p> -->

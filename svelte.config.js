@@ -31,7 +31,13 @@ const config = {
 		csp: {
 			mode: "auto",
 			directives: {
-				"connect-src": ["self", "ws://localhost:*", "https://db.waspscripts.com"],
+				"connect-src": [
+					"self",
+					"ws://localhost:*",
+					"https://db.waspscripts.com",
+					"ws://db.waspscripts.com",
+					"wss://db.waspscripts.com"
+				],
 				"frame-src": [
 					"self",
 					"https://stripe-data-exports.s3.amazonaws.com/",

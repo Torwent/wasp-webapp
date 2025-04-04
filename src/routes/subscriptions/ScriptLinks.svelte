@@ -13,7 +13,7 @@
 	{open}
 	onOpenChange={(e) => (open = e.open)}
 	triggerBase="btn preset-tonal"
-	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl max-w-screen-sm p-12"
+	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-[95%] max-w-fit max-h-[95%] overflow-y-auto"
 	backdropClasses="backdrop-blur-sm"
 >
 	{#snippet trigger()}
@@ -38,7 +38,7 @@
 			</h5>
 		</header>
 		<article class="table-wrap">
-			<table class="table-compact table">
+			<table class="table">
 				<tbody class="[&>tr]:hover:preset-tonal">
 					{#each bundle.scripts as script (script.id)}
 						<tr

@@ -11,7 +11,7 @@
 
 	const pageStr = page.url.searchParams.get("page") || "-1"
 	let currentPage = $state(
-		Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 0 : Number(pageStr)
+		Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 	)
 
 	let search = $state(decodeURIComponent(page.url.searchParams.get("search") || "").trim())

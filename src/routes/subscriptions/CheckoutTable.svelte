@@ -120,9 +120,9 @@
 	}
 </script>
 
-<div class="mx-auto my-8 w-screen max-w-fit">
-	<div class="mx-auto my-8">
-		<h3 class="my-12 justify-center text-center">New subscriptions</h3>
+<div class="mx-auto my-8 w-screen max-w-screen">
+	<div class="mx-auto my-8 w-[95%] min-w-4/5 lg:w-fit">
+		<h1 class="my-12 justify-center text-center font-bold">New subscriptions</h1>
 
 		<label class="label w-full">
 			<span class="label-text">Search:</span>
@@ -185,10 +185,10 @@
 	<!-- class="xl:mx-w-7xl table-wrap mx-auto w-full max-w-md rounded-md preset-outlined-surface-500 md:max-w-3xl lg:max-w-6xl" -->
 	<form
 		method="POST"
-		class="preset-outlined-surface-500 mx-auto max-w-fit overflow-x-auto rounded-md"
+		class="table-wrap preset-outlined-surface-500 mx-auto w-[95%] rounded-md lg:w-4/5"
 		use:enhance
 	>
-		<table class="table table-auto border-separate space-y-6 text-xs md:text-sm">
+		<table class="table border-separate space-y-6 text-xs md:text-sm">
 			<colgroup>
 				<col class="w-2/6 xl:w-5/12" />
 				<col class="w-1/5" />

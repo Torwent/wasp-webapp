@@ -72,7 +72,7 @@
 	{open}
 	onOpenChange={(e) => (open = e.open)}
 	triggerBase="btn preset-filled-secondary-500 font-bold"
-	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-5/7 max-w-screen max-h-screen"
+	contentBase="card bg-surface-100-900 p-4 space-y-4 shadow-xl w-[95%] max-w-fit max-h-[95%] overflow-y-auto"
 	backdropClasses="backdrop-blur-sm"
 >
 	{#snippet trigger()}
@@ -84,18 +84,16 @@
 			<h1 class="lg:h4 my-4 flex flex-col gap-4 text-lg lg:flex-row">{name} subscriptions</h1>
 			<h2>Total: {count}</h2>
 		</header>
-		<form method="POST" class="table-wrap max-h-[30rem]">
-			<table class="table-compact table">
+		<form method="POST" class="table-wrap max-h-[28rem]">
+			<table class="table">
 				<TableHeader {headers} />
-				<tbody
-					class="preset-filled-surface-100-900 [&>tr]:hover:preset-tonal max-h-[30rem] overflow-scroll text-xs md:text-sm xl:text-base"
-				>
+				<tbody class="[&>tr]:hover:preset-tonal text-xs md:text-sm xl:text-base">
 					{#await getSubscriptions(id)}
 						<tr class="flex w-full">
 							<td class="h-full w-full p-0 text-xs"> Loading... </td>
 						</tr>
 					{:then subscriptions}
-						{#each subscriptions as row (row.id)}
+						{#each subscriptions as row (row.subscription)}
 							<tr>
 								<td>{row.id}</td>
 								<td class="text-center">{row.username}</td>
@@ -131,7 +129,7 @@
 				</tbody>
 			</table>
 		</form>
-		<footer class="flex justify-between text-xs md:text-sm lg:text-base">
+		<footer class="flex flex-col justify-between gap-2 text-xs md:flex-row md:text-sm lg:text-base">
 			<button
 				type="submit"
 				class="btn preset-outlined-error-500 hover:text-error-500"

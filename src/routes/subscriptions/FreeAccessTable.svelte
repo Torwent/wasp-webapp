@@ -30,13 +30,11 @@
 	})
 </script>
 
-<div class="mx-auto my-4 items-center justify-center">
-	<h3 class="my-12 justify-center text-center">Free access</h3>
+<div class="mx-auto w-screen max-w-fit">
+	<h1 class="my-12 justify-center text-center font-bold">Free access</h1>
 
-	<div
-		class="xl:mx-w-7xl table-wrap preset-outlined-surface-500 mx-auto max-w-md rounded-md md:max-w-3xl lg:max-w-6xl"
-	>
-		<table class="table border-separate space-y-6 text-xs">
+	<div class="table-wrap preset-outlined-surface-500 mx-auto max-w-[95%] rounded-md">
+		<table class="table border-separate space-y-6 text-xs md:text-sm">
 			<TableHeader headers={["Product", "Type", "Start date", "End date"]} />
 			<tbody class="preset-filled-surface-200-800 [&>tr]:hover:preset-tonal">
 				{#each freeAccess as access, i (access.product)}

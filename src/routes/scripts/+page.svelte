@@ -18,7 +18,7 @@
 
 	const pageStr = $derived(page.url.searchParams.get("page") || "-1")
 	const currentPage = $derived(
-		Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 0 : Number(pageStr)
+		Number(pageStr) < 0 || Number.isNaN(Number(pageStr)) ? 1 : Number(pageStr)
 	)
 
 	let search = $state(decodeURIComponent(page.url.searchParams.get("search") || "").trim())

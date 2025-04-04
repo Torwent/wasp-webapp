@@ -38,7 +38,11 @@
 		</a>
 	</div>
 
-	<Tabs value={tab} onValueChange={(e) => goto(e.value)} listJustify="justify-center">
+	<Tabs
+		value={tab}
+		onValueChange={(e) => goto(e.value)}
+		listJustify="justify-center flex flex-col sm:flex-row"
+	>
 		{#snippet list()}
 			<Tabs.Control value="general">
 				{#snippet lead()}<Settings />{/snippet} General
