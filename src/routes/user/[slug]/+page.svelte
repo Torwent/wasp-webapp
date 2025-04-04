@@ -1,9 +1,9 @@
 <script lang="ts">
 	import RoleBadges from "$lib/components/RoleBadges.svelte"
 	import { profileSchema } from "$lib/client/schemas"
-	import { superForm } from "sveltekit-superforms/client"
 	import { zodClient } from "sveltekit-superforms/adapters"
 	import Head from "$lib/components/Head.svelte"
+	import { superForm } from "sveltekit-superforms"
 
 	const { data, form } = $props()
 	const profile = $derived(data.profile!)
@@ -12,10 +12,11 @@
 		form: authForm,
 		errors,
 		enhance
-	} = superForm(data.form, {
+	} = superForm(data.form!, {
 		multipleSubmits: "prevent",
 		clearOnSubmit: "errors",
 		taintedMessage: null,
+		dataType: "json",
 		validators: zodClient(profileSchema)
 	})
 </script>
@@ -39,7 +40,7 @@
 		discord for developing purposes. (e.g. github actions.)
 	</h5>
 
-	<form class="my-6 flex w-full flex-col" method="POST" enctype="multipart/form-data" use:enhance>
+	<form class="my-6 flex w-full flex-col" method="POST" use:enhance>
 		{#if $errors._errors}
 			{#each $errors._errors as error}
 				<small class="text-error-500 flex">{error}</small>
