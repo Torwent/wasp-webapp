@@ -4,7 +4,7 @@
 	import { subscriptionsSchema } from "$lib/client/schemas"
 	import { Switch } from "@skeletonlabs/skeleton-svelte"
 	import type { BundleProduct, Price, ScriptProduct, Subscription } from "$lib/types/collection"
-	import { getPrice, getPriceAmount, getPriceIntervalEx } from "$lib/utils"
+	import { getPriceAmount, getPriceIntervalEx } from "$lib/utils"
 	import ExternalLink from "svelte-lucide/ExternalLink.svelte"
 	import ScriptLinks from "./ScriptLinks.svelte"
 
@@ -45,6 +45,10 @@
 	subscriptions.forEach((sub) => {
 		bundleArray.push(getBundle(sub.product))
 	})
+
+	function getPrice(id: string, prices: Price[]) {
+		return prices.find((price) => price.id === id)
+	}
 </script>
 
 <div class="mx-auto w-screen max-w-fit">

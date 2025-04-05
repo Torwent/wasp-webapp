@@ -251,7 +251,7 @@
 
 		<main class="my-4 flex h-fit flex-col">
 			<div
-				class="3xl:grid-cols-5 mx-8 my-8 grid gap-10 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
+				class="3xl:grid-cols-5 mx-8 my-8 grid justify-center gap-10 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
 			>
 				{#each scripts as script (script.id)}
 					<ScriptCard {script} link={"/scripts/" + script.url} />

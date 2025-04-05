@@ -141,6 +141,7 @@ export interface ScriptSimple {
 	url: string
 	product: string
 	protected: { username: string }
+	metadata: { type: TScriptTypes }
 }
 
 export interface ScriptFeatured {

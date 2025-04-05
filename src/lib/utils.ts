@@ -100,10 +100,6 @@ export function cropString(str: string, length = 80) {
 }
 
 //Prices
-export function getActivePrice(prices: Price[]) {
-	return prices.find((price) => price.active)
-}
-
 export function getPriceAmount(price: Price) {
 	return new Intl.NumberFormat("pt-PT", {
 		style: "currency",
@@ -112,20 +108,12 @@ export function getPriceAmount(price: Price) {
 }
 
 export function getCurrentPrice(prices: Price[]) {
-	const price = getActivePrice(prices)
+	const price = prices.find((price) => price.active)
 	if (price) return getPriceAmount(price)
 }
 
-export function getPrice(id: string, prices: Price[]) {
-	return prices.find((price) => price.id === id)
-}
-
-export function getPriceInterval(interval: string) {
-	return interval.slice(0)[0].toUpperCase() + interval.slice(1) + "ly"
-}
-
 export function getPriceIntervalEx(price: Price) {
-	return getPriceInterval(price.interval)
+	return price.interval.slice(0)[0].toUpperCase() + price.interval.slice(1) + "ly"
 }
 
 export function setPriceInterval(index: number, prices: Price[]) {

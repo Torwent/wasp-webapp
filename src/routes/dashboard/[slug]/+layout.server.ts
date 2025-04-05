@@ -15,8 +15,7 @@ export const load = async ({
 
 	if (user.id !== slug) {
 		const roles = await getRoles()
-		if (!roles?.administrator)
-			error(403, "You cannot access another scripter dashboard.")
+		if (!roles?.administrator) error(403, "You cannot access another scripter dashboard.")
 	}
 
 	async function getScripts() {

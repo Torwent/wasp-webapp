@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { goto } from "$app/navigation"
 	import type { Tutorial } from "$lib/types/collection"
 	import { encodeSEO } from "$lib/utils"
 

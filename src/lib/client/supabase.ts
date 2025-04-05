@@ -1,12 +1,10 @@
 import type {
-	SimpleScripter,
-	Category,
 	FAQEntry,
 	ProfileRoles,
 	Script,
 	Scripter,
-	StatsTotal,
-	SubCategory
+	SimpleScripter,
+	StatsTotal
 } from "$lib/types/collection"
 import type { Database } from "$lib/types/supabase"
 import { UUID_V4_REGEX, formatError } from "$lib/utils"
@@ -15,36 +13,18 @@ import { error } from "@sveltejs/kit"
 import { persisted } from "svelte-persisted-store"
 import { get } from "svelte/store"
 
-//Cache
-const SCRIPT_CACHE_MAX_AGE = 2 * 60 * 1000
-
 interface CachedStatsTotal {
 	data: StatsTotal
 	timestamp: number
 }
 
-interface CachedScripters {
-	data: SimpleScripter[]
-	timestamp: number
-}
-
-interface CachedCategories {
-	data: Awaited<Category[]>
-	timestamp: number
-}
-
-interface CachedSubcategories {
-	data: Awaited<SubCategory[]>
-	timestamp: number
-}
-
-interface CachedTooltips {
-	data: Awaited<Category[]>
-	timestamp: number
-}
-
 interface CachedScript {
 	data: Script
+	timestamp: number
+}
+
+interface CachedScripters {
+	data: SimpleScripter[]
 	timestamp: number
 }
 
@@ -187,168 +167,6 @@ export class WaspScripters {
 	}
 }
 
-export class WaspCategories {
-	static #CACHE_MAX_AGE = 60 * 60 * 1000
-	static #persistedStore = persisted("wasp_categories", {
-		categories: null as CachedCategories | null,
-		subcategories: null as CachedSubcategories | null,
-		tooltips: null as CachedTooltips | null
-	})
-
-	static async #fetchCategories(supabase: SupabaseClient) {
-		const start = performance.now()
-		const { data, error: err } = await supabase
-			.schema("scripts")
-			.from("categories")
-			.select("name, emoji")
-
-		console.log(`└──🔨 Categories loaded in ${(performance.now() - start).toFixed(2)} ms!`)
-		if (err) {
-			error(
-				500,
-				"Server error, this is probably not an issue on your end!\n" +
-					"SELECT scripts.categories failed!\n\n" +
-					formatError(err)
-			)
-		}
-
-		return data
-	}
-
-	static async getCategories(supabase: SupabaseClient) {
-		const now = Date.now()
-
-		const store = get(this.#persistedStore)
-		if (store.categories && now - store.categories.timestamp < this.#CACHE_MAX_AGE) {
-			return store.categories.data
-		}
-
-		const data = await this.#fetchCategories(supabase)
-		store.categories = { data, timestamp: now }
-		this.#persistedStore.set(store)
-		return data
-	}
-
-	static async #fetchSubCategories(supabase: SupabaseClient) {
-		const start = performance.now()
-		const { data, error: err } = await supabase
-			.schema("scripts")
-			.from("subcategories")
-			.select("category, name, emoji")
-
-		console.log(`└──🔧 Categories loaded in ${(performance.now() - start).toFixed(2)} ms!`)
-		if (err) {
-			error(
-				500,
-				"Server error, this is probably not an issue on your end!\n" +
-					"SELECT scripts.subcategories failed!\n\n" +
-					formatError(err)
-			)
-		}
-
-		return data
-	}
-
-	static async getSubCategories(supabase: SupabaseClient) {
-		const now = Date.now()
-
-		const store = get(this.#persistedStore)
-		if (store.subcategories && now - store.subcategories.timestamp < this.#CACHE_MAX_AGE) {
-			return store.subcategories.data
-		}
-
-		const data = await this.#fetchSubCategories(supabase)
-		store.subcategories = { data, timestamp: now }
-		this.#persistedStore.set(store)
-		return data
-	}
-
-	static async #fetchTooltips(
-		categoriesPromise: ReturnType<typeof this.getCategories>,
-		subcategoriesPromise: ReturnType<typeof this.getSubCategories>
-	) {
-		const start = performance.now()
-		const promises = await Promise.all([categoriesPromise, subcategoriesPromise])
-		const converted = promises[1].map((subcategory) => {
-			return { name: subcategory.name, emoji: subcategory.emoji }
-		})
-		console.log(`└────💥 Tooltips processed in ${(performance.now() - start).toFixed(2)} ms!`)
-		return [...promises[0], ...converted]
-	}
-
-	static async getTooltips(supabase: SupabaseClient) {
-		const now = Date.now()
-
-		const store = get(this.#persistedStore)
-		if (store.tooltips && now - store.tooltips.timestamp < this.#CACHE_MAX_AGE) {
-			return store.tooltips.data
-		}
-
-		const data = await this.#fetchTooltips(
-			this.getCategories(supabase),
-			this.getSubCategories(supabase)
-		)
-		store.tooltips = { data, timestamp: now }
-		this.#persistedStore.set(store)
-		return data
-	}
-
-	static async getScriptTooltips(categories: string[], supabase: SupabaseClient) {
-		const tooltips = await this.getTooltips(supabase)
-		const result: typeof tooltips = []
-
-		outter: for (let i = 0; i < tooltips.length; i++) {
-			for (let j = categories.length; j > 0; j--) {
-				if (tooltips[i].name === categories[j]) {
-					result.push(tooltips[i])
-					categories.splice(j, 1)
-					continue outter
-				}
-			}
-		}
-
-		return result
-	}
-}
-
-export async function getScript(
-	supabase: SupabaseClient,
-	slug: string,
-	isUUID: boolean | null = null
-) {
-	const now = Date.now()
-	const cached = scripts.get(slug)
-
-	if (cached && now - cached.timestamp < SCRIPT_CACHE_MAX_AGE) {
-		return cached.data
-	}
-
-	const start = performance.now()
-	const { data, error: err } = await supabase
-		.schema("scripts")
-		.from("scripts")
-		.select(
-			`id, title, description, content, url, categories, subcategories, published,
-				min_xp, max_xp, min_gp, max_gp,
-				protected!inner (assets, username, author_id, revision, revision_date, broken)`
-		)
-		.eq((isUUID == null && UUID_V4_REGEX.test(slug)) || isUUID ? "id" : "url", slug)
-		.single<Script>()
-
-	console.log(`└────📑 Script: ${slug} loaded in ${(performance.now() - start).toFixed(2)} ms!`)
-	if (err) {
-		error(
-			500,
-			"Server error, this is probably not an issue on your end!\n" +
-				"SELECT scripts.scripts failed!\n\n" +
-				formatError(err)
-		)
-	}
-
-	scripts.set(slug, { data, timestamp: now })
-	return data
-}
-
 export async function fetchScriptByID(supabase: SupabaseClient<Database>, id: string) {
 	const { data, error } = await supabase
 		.schema("scripts")
@@ -360,30 +178,6 @@ export async function fetchScriptByID(supabase: SupabaseClient<Database>, id: st
 			stats_limits!inner (xp_min, xp_max, gp_min, gp_max)`
 		)
 		.eq("id", id)
-		.single<Script>()
-
-	if (error) {
-		console.error(error)
-		return null
-	}
-
-	return data
-}
-
-export async function getScriptByURL(
-	supabase: SupabaseClient<Database>,
-	url: string
-): Promise<Script | null> {
-	const { data, error } = await supabase
-		.schema("scripts")
-		.from("scripts")
-		.select(
-			`id, title, description, content, url, published,
-				protected!inner (assets, username, avatar, author_id, revision, revision_date, broken),
-				metadata!inner (status, type, categories),
-				stats_limits!inner (xp_min, xp_max, gp_min, gp_max)`
-		)
-		.eq("url", url)
 		.single<Script>()
 
 	if (error) {
@@ -516,7 +310,7 @@ export class WaspFAQ {
 	}
 }
 
-export async function getPrices(supabase: SupabaseClient<Database>, product: string) {
+async function getPrices(supabase: SupabaseClient<Database>, product: string) {
 	console.log("💸 Fetching prices for ", product)
 	const { data, error: err } = await supabase
 		.schema("scripts")
@@ -539,7 +333,7 @@ export async function getPrices(supabase: SupabaseClient<Database>, product: str
 	return data
 }
 
-export async function getBundles(supabase: SupabaseClient<Database>, script: string) {
+async function getBundles(supabase: SupabaseClient<Database>, script: string) {
 	const { data, error: err } = await supabase
 		.schema("scripts")
 		.from("bundles")

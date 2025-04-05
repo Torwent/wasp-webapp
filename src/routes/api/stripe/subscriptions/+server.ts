@@ -22,7 +22,7 @@ export const POST = async ({ request }) => {
 	console.log(type)
 
 	switch (type) {
-		case "customer.subscription.created":
+		case "customer.subscription.created": {
 			const subscriptionCreated = data.object as Stripe.Subscription
 			if (subscriptionCreated.status !== "active") break
 
@@ -40,8 +40,9 @@ export const POST = async ({ request }) => {
 			if (errInsert) error(404, "Error inserting subscription: " + JSON.stringify(errInsert))
 
 			break
+		}
 
-		case "customer.subscription.updated":
+		case "customer.subscription.updated": {
 			const subscriptionUpdated = data.object as Stripe.Subscription
 			if (subscriptionUpdated.status !== "active" && subscriptionUpdated.status !== "canceled")
 				break
@@ -66,8 +67,9 @@ export const POST = async ({ request }) => {
 			if (errUpsert) error(404, "Error upserting subscription: " + errUpsert)
 
 			break
+		}
 
-		case "customer.subscription.deleted":
+		case "customer.subscription.deleted": {
 			const subscriptionDeleted = data.object as Stripe.Subscription
 			const { error: errDelete } = await WaspSubscription.delete(subscriptionDeleted.id)
 			if (errDelete) error(404, "Error deleting subscription: " + errDelete)
@@ -89,6 +91,7 @@ export const POST = async ({ request }) => {
 				}
 			}
 			break
+		}
 
 		default:
 			error(404, "Subscription event doesn't have a valid type! Type: " + type)

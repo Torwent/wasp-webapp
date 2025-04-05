@@ -20,12 +20,13 @@ export const POST = async ({ request }) => {
 	const { data, type } = event
 
 	switch (type) {
-		case "price.deleted":
+		case "price.deleted": {
 			const priceDeleted = data.object as Stripe.Price
 			await WaspPrice.delete(priceDeleted.id)
 			break
+		}
 
-		case "price.updated":
+		case "price.updated": {
 			const priceUpdated = data.object as Stripe.Price
 			await WaspPrice.update({
 				id: priceUpdated.id,
@@ -36,8 +37,9 @@ export const POST = async ({ request }) => {
 				active: priceUpdated.active
 			})
 			break
+		}
 
-		case "price.created":
+		case "price.created": {
 			const priceCreated = data.object as Stripe.Price
 			await WaspPrice.insert({
 				id: priceCreated.id,
@@ -48,6 +50,7 @@ export const POST = async ({ request }) => {
 				active: priceCreated.active
 			})
 			break
+		}
 
 		default:
 			throw error(404, "Price event doesn't have a valid type! Type: " + type)

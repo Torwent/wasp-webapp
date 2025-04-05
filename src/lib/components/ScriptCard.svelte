@@ -33,11 +33,11 @@
 </script>
 
 <div
-	class="card card-hover preset-filled-surface-200-800 hover:preset-outlined mx-auto flex h-96 w-64 flex-col shadow-sm"
+	class="card card-hover preset-filled-surface-200-800 hover:preset-outlined mx-auto flex h-fit w-fit flex-col shadow-sm"
+	class:cursor-pointer={link}
 >
 	<button
 		class="m-1"
-		class:cursor-pointer={link}
 		onclick={() => {
 			if (link) goto(link)
 		}}
@@ -45,8 +45,7 @@
 		<img src={imgLink} alt="Script cover" class="rounded-md contain-content" loading="lazy" />
 	</button>
 	<button
-		class="m-2 flex h-full flex-col"
-		class:cursor-pointer={link}
+		class="mx-auto my-2 flex h-44 w-64 flex-col"
 		onclick={() => {
 			if (link) goto(link)
 		}}
@@ -73,7 +72,7 @@
 		</article>
 	</button>
 
-	<footer class="m-2 flex justify-between">
+	<footer class="m-2 flex cursor-default justify-between">
 		<div class="flex">
 			<Tooltip
 				open={status}

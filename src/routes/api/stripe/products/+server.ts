@@ -26,12 +26,13 @@ export const POST = async ({ request }) => {
 	}
 
 	switch (type) {
-		case "product.deleted":
+		case "product.deleted": {
 			const productDeleted = data.object as Stripe.Product
 			await WaspProduct.delete(productDeleted.id)
 			break
+		}
 
-		case "product.updated":
+		case "product.updated": {
 			if (!data.previous_attributes || !Object.keys(data.previous_attributes).includes("name"))
 				break
 
@@ -39,8 +40,9 @@ export const POST = async ({ request }) => {
 
 			await WaspProduct.update(productUpdated.id, productUpdated.name)
 			break
+		}
 
-		case "product.created":
+		case "product.created": {
 			console.log(data)
 			const productCreated = data.object as Stripe.Product
 			const { name } = productCreated
@@ -55,6 +57,7 @@ export const POST = async ({ request }) => {
 				stripe_user: null
 			})
 			break
+		}
 
 		default:
 			throw error(404, "Product event doesn't have a valid type! Type: " + type)

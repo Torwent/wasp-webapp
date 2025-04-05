@@ -94,10 +94,11 @@ export const load = async ({ parent, data }) => {
 		const { data, error: err } = await supabaseClient
 			.schema("scripts")
 			.from("scripts")
-			.select(`id, title, url, product, protected!left (username)`)
+			.select(`id, title, url, product, protected!left (username), metadata!left (type)`)
 			.limit(1, { foreignTable: "protected" })
+			.limit(1, { foreignTable: "metadata" })
 			.eq("published", true)
-			.contains("categories", "{Premium}")
+			.eq("metadata.type", "premium")
 			.order("title", { ascending: true })
 			.overrideTypes<ScriptSimple[]>()
 
@@ -146,6 +147,7 @@ export const load = async ({ parent, data }) => {
 
 		for (let i = 0; i < products.length; i++) {
 			const product = products[i]
+
 			const productPrices = []
 			let currentBundle
 			const bundledScripts = []

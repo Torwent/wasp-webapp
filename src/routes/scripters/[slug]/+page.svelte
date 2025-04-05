@@ -112,7 +112,7 @@
 							<span class="label-text">Real name:</span>
 							<input class="input" bind:value={$form.realname} />
 							{#if $errors.id}
-								{#each $errors.id as err}
+								{#each $errors.id as err (err)}
 									<small class="text-error-500">{err}</small>
 								{/each}
 							{/if}
@@ -121,7 +121,7 @@
 							<span class="label-text">GitHub:</span>
 							<input class="input" bind:value={$form.github} />
 							{#if $errors.github}
-								{#each $errors.github as err}
+								{#each $errors.github as err (err)}
 									<small class="text-error-500">{err}</small>
 								{/each}
 							{/if}
@@ -130,7 +130,7 @@
 							<span class="label-text">Paypal ID:</span>
 							<input class="input" bind:value={$form.paypal_id} />
 							{#if $errors.paypal_id}
-								{#each $errors.paypal_id as err}
+								{#each $errors.paypal_id as err (err)}
 									<small class="text-error-500">{err}</small>
 								{/each}
 							{/if}
@@ -139,7 +139,7 @@
 							<span class="label-text">Description:</span>
 							<input class="input" bind:value={$form.description} />
 							{#if $errors.description}
-								{#each $errors.description as err}
+								{#each $errors.description as err (err)}
 									<small class="text-error-500">{err}</small>
 								{/each}
 							{/if}
@@ -148,7 +148,7 @@
 							<span class="label-text">Content:</span>
 							<textarea class="textarea h-44" bind:value={$form.content}> </textarea>
 							{#if $errors.content}
-								{#each $errors.content as err}
+								{#each $errors.content as err (err)}
 									<small class="text-error-500">{err}</small>
 								{/each}
 							{/if}
@@ -172,7 +172,7 @@
 
 				<main class="my-4 flex h-fit flex-col">
 					<div
-						class="3xl:grid-cols-5 mx-8 my-8 grid gap-10 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
+						class="3xl:grid-cols-5 mx-8 my-8 grid justify-center gap-10 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
 					>
 						{#each scripts as script (script.id)}
 							<ScriptCard {script} link={"/scripts/" + script.url} />

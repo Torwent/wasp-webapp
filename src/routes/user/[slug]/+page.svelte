@@ -42,8 +42,8 @@
 
 	<form class="my-6 flex w-full flex-col" method="POST" use:enhance>
 		{#if $errors._errors}
-			{#each $errors._errors as error}
-				<small class="text-error-500 flex">{error}</small>
+			{#each $errors._errors as err (err)}
+				<small class="text-error-500 flex">{err}</small>
 			{/each}
 		{/if}
 
@@ -60,7 +60,7 @@
 			<span class="label-text">Email:</span>
 			<input class="input" class:border-error-500={$errors.email} bind:value={$authForm.email} />
 			{#if $errors.email}
-				{#each $errors.email as err}
+				{#each $errors.email as err (err)}
 					<small class="text-error-500">{err}</small>
 				{/each}
 			{/if}
@@ -73,7 +73,7 @@
 				bind:value={$authForm.password}
 			/>
 			{#if $errors.password}
-				{#each $errors.password as err}
+				{#each $errors.password as err (err)}
 					<small class="text-error-500">{err}</small>
 				{/each}
 			{/if}

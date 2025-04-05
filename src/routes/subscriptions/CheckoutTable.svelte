@@ -7,7 +7,6 @@
 	import ExternalLink from "svelte-lucide/ExternalLink.svelte"
 	import ScriptLinks from "./ScriptLinks.svelte"
 	import { zodClient } from "sveltekit-superforms/adapters"
-	import { goto } from "$app/navigation"
 
 	let {
 		data,
@@ -276,13 +275,13 @@
 							</td>
 
 							<td class="text-center">
-								<button
+								<a
+									href="/scripts/{scriptArray[i].url}"
 									class="btn hover:text-primary-500 hover:cursor-pointer"
-									onclick={() => goto("/scripts/" + scriptArray[i].url)}
 								>
 									<ExternalLink size="16" />
 									<span>Script</span>
-								</button>
+								</a>
 							</td>
 
 							<td class="text-center">{getCurrentPrice(scriptArray[i].prices)}</td>
