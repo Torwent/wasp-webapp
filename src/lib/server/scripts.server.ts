@@ -12,7 +12,7 @@ function getScriptString(script: Script) {
 }
 
 function createScriptsIndex(data: Script[]) {
-	scriptsIndex = new FlexSearch.Index({ tokenize: "forward" })
+	scriptsIndex = new FlexSearch.Index({ tokenize: "full", cache: true, language: "en" })
 	data.forEach((script, i) => scriptsIndex.add(i, getScriptString(script)))
 }
 
