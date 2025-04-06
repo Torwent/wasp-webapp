@@ -393,24 +393,31 @@ export async function getProducts(supabase: SupabaseClient<Database>, script: st
 		)
 	}
 
+	let available: number = 0
 	const formatedScriptData = await Promise.all(
 		scriptData.map(async (product) => {
+			const prices = await getPrices(supabase, product.id)
+			available += prices.length
 			return {
 				id: product.id,
 				name: product.name,
-				prices: await getPrices(supabase, product.id)
+				prices: prices
 			}
 		})
 	)
 
 	const formatedBundleData = await Promise.all(
 		bundleData.map(async (product) => {
+			const prices = await getPrices(supabase, product.id)
+			available += prices.length
 			return {
 				id: product.id,
 				name: product.name,
-				prices: await getPrices(supabase, product.id)
+				prices: prices
 			}
 		})
 	)
+
+	if (available === 0) return null
 	return { bundles: formatedBundleData, scripts: formatedScriptData }
 }

@@ -71,9 +71,9 @@
 	keywords="Premium, Free, Automation, ComputerVision"
 />
 
-<header class="my-4 flex h-full grid-cols-12 justify-evenly">
+<header class="my-4 flex h-full justify-around">
 	<!-- Button: Left -->
-	<button type="button" class="btn-icon hover:preset-tonal ml-4 h-auto" onclick={carouselLeft}>
+	<button type="button" class="btn-icon hover:preset-tonal h-auto lg:ml-4" onclick={carouselLeft}>
 		<ArrowRight class="rotate-180" />
 	</button>
 
@@ -96,7 +96,7 @@
 	</div>
 
 	<!-- Button: Right -->
-	<button type="button" class="btn-icon hover:preset-tonal mr-4 h-auto" onclick={carouselRight}>
+	<button type="button" class="btn-icon hover:preset-tonal h-auto lg:mr-4" onclick={carouselRight}>
 		<ArrowRight />
 	</button>
 </header>

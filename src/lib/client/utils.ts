@@ -4,7 +4,11 @@ import type { Script, ScriptLimits, ScriptPublic } from "$lib/types/collection"
 import { ACCEPTED_IMAGE_TYPES, formatNumber } from "$lib/utils"
 import { error } from "@sveltejs/kit"
 
-export async function replaceQuery(url: URL, values: Record<string, string>) {
+export async function replaceQuery(
+	url: URL,
+	values: Record<string, string>,
+	noscroll: boolean = true
+) {
 	if (!browser) return
 
 	const { origin, pathname, searchParams } = url
@@ -28,7 +32,7 @@ export async function replaceQuery(url: URL, values: Record<string, string>) {
 
 	await goto(path, {
 		keepFocus: true,
-		noScroll: true,
+		noScroll: noscroll,
 		replaceState: false,
 		invalidateAll: invalidate
 	})

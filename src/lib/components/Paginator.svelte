@@ -45,7 +45,7 @@
 			siblingCount={1}
 			onPageChange={(e) => {
 				currentPage = e.page
-				replaceQuery(page.url, { page: e.page.toString() })
+				replaceQuery(page.url, { page: e.page.toString() }, false)
 			}}
 			onPageSizeChange={(e) => (pageSize = e.pageSize)}
 			classes="w-fit mx-auto md:mx-0"

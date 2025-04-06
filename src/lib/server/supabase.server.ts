@@ -1,6 +1,6 @@
 import { SUPABASE_SERVICE_KEY } from "$env/static/private"
 import { PUBLIC_SUPABASE_URL } from "$env/static/public"
-import type { Price, Product, ProfileSubscription } from "$lib/types/collection"
+import type { Price, Product, Profile, ProfileSubscription } from "$lib/types/collection"
 import type { Database } from "$lib/types/supabase"
 import { UUID_V4_REGEX, formatError } from "$lib/utils"
 import { type SupabaseClient, createClient, type Provider } from "@supabase/supabase-js"
@@ -94,6 +94,20 @@ export async function updateImgFile(
 			JSON.stringify(err)
 		)
 	}
+}
+
+export async function getProfile(id: string) {
+	const { data, error } = await supabaseAdmin
+		.schema("profiles")
+		.from("profiles")
+		.select("id, discord, username, avatar, customer_id, private (email)")
+		.eq("id", id)
+		.limit(1)
+		.limit(1, { foreignTable: "private" })
+		.single<Profile>()
+
+	if (error) return null
+	return data
 }
 
 export async function getUsername(id: string) {
@@ -237,6 +251,20 @@ export async function cancelFreeAccess(supabase: SupabaseClient, id: string, pro
 		.eq("product", product)
 
 	return err
+}
+
+export async function updateScripterAccount(id: string, account_id: string) {
+	console.log("Updating profiles.profiles for user: ", id)
+
+	const { error: err } = await supabaseAdmin
+		.schema("profiles")
+		.from("scripters")
+		.update({ stripe: account_id })
+		.eq("id", id)
+
+	if (err) error(500, formatError(err))
+
+	return true
 }
 
 export class WaspSubscription {
