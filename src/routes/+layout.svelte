@@ -2,7 +2,6 @@
 	import "../app.css"
 	import { invalidate } from "$app/navigation"
 	import { onMount } from "svelte"
-	import { ToastProvider } from "@skeletonlabs/skeleton-svelte"
 	import Navigation from "./Navigation.svelte"
 	import Footer from "./Footer.svelte"
 
@@ -20,14 +19,12 @@
 	})
 </script>
 
-<ToastProvider>
-	<div class="flex h-full flex-col">
-		<Navigation />
+<div class="flex h-full flex-col">
+	<Navigation />
 
-		<main class="flex h-full w-full flex-col overflow-auto">
-			{@render children()}
+	<main class="flex h-full w-full flex-col overflow-auto">
+		{@render children()}
 
-			<Footer />
-		</main>
-	</div>
-</ToastProvider>
+		<Footer />
+	</main>
+</div>
