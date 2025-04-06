@@ -32,17 +32,19 @@
 		</p>
 	</header>
 
-	<input
-		type="text"
-		placeholder="🔍 Search username, name, info, ..."
-		class="input mx-auto my-8 max-w-3xl"
-		bind:value={search}
-		oninput={() =>
-			replaceQuery(page.url, {
-				page: "1",
-				search: search
-			})}
-	/>
+	<div class="mx-4 my-8 lg:mx-auto">
+		<input
+			type="text"
+			placeholder="🔍 Search username, name, info, ..."
+			class="input mx-auto max-w-3xl"
+			bind:value={search}
+			oninput={() =>
+				replaceQuery(page.url, {
+					page: "1",
+					search: search
+				})}
+		/>
+	</div>
 
 	<div class="grid-cols-auto m-auto grid gap-8 lg:grid-cols-2 xl:grid-cols-3">
 		{#each scripters as scripter (scripter.url)}

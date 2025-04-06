@@ -237,18 +237,19 @@
 			</label>
 		</div>
 
-		<input
-			type="text"
-			placeholder="🔍Search script by id, name, categories, author, content, ..."
-			class="input mx-auto my-8 max-w-3xl"
-			bind:value={search}
-			oninput={() =>
-				replaceQuery(page.url, {
-					page: "1",
-					search: search
-				})}
-		/>
-
+		<div class="mx-4 my-8 lg:mx-auto">
+			<input
+				type="text"
+				placeholder="🔍Search script by id, name, categories, author, content, ..."
+				class="input mx-auto max-w-3xl"
+				bind:value={search}
+				oninput={() =>
+					replaceQuery(page.url, {
+						page: "1",
+						search: search
+					})}
+			/>
+		</div>
 		<main class="my-4 flex h-fit flex-col">
 			<div
 				class="3xl:grid-cols-5 mx-8 my-8 grid justify-center gap-10 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4"
