@@ -54,7 +54,6 @@
 	})
 
 	const categories = Object.values(scriptCategories)
-	const categoriesCheckboxes: boolean[] = $state(new Array(categories.length).fill(false))
 
 	async function handleFilter(key: string, value: string) {
 		if (value == "") page.url.searchParams.delete(key)
@@ -146,13 +145,12 @@
 		<div class="label my-4 h-auto">
 			<span class="label-text">Categories</span>
 			<div class="select flex h-auto w-auto flex-col gap-1 overflow-y-scroll p-3">
-				{#each categories as category, idx (category.value)}
+				{#each categories as category (category.value)}
 					<label class="flex gap-1 xl:gap-2">
 						<input
 							type="checkbox"
 							id={category.value}
 							name={category.name}
-							bind:checked={categoriesCheckboxes[idx]}
 							class="checkbox my-auto"
 							onchange={() => {
 								const i = categoriesFilter.indexOf(category.value)
@@ -160,6 +158,7 @@
 								else categoriesFilter.splice(i, 1)
 								handleFilter("categories", categoriesFilter.join("-"))
 							}}
+							checked={categoriesFilter.includes(category.value)}
 						/>
 						<span class="my-auto whitespace-nowrap select-none xl:text-lg">
 							{category.icon}

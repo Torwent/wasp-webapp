@@ -1,4 +1,5 @@
 import { getScripter } from "$lib/client/supabase"
+import { getPublishedScripts } from "$lib/server/scripts.server.js"
 import type { Price, ProductEx, Script } from "$lib/types/collection"
 import { formatError, UUID_V4_REGEX } from "$lib/utils"
 import { error } from "@sveltejs/kit"
@@ -19,27 +20,9 @@ export const load = async ({
 	}
 
 	async function getScripts() {
-		const { data, error: err } = await supabaseServer
-			.schema("scripts")
-			.from("scripts")
-			.select(`id, title, url, product, protected!inner (username), metadata (type)`)
-			.limit(1, { foreignTable: "protected" })
-			.order("title", { ascending: true })
-			.eq("published", true)
-			.eq("protected.author_id", slug)
-			.eq("metadata.type", "premium")
-			.overrideTypes<Script[]>()
+		const scripts = await getPublishedScripts()
 
-		if (err) {
-			error(
-				500,
-				"Server error, this is probably not an issue on your end!\n" +
-					"SELECT scripts.scripts failed!\n\n" +
-					formatError(err)
-			)
-		}
-
-		return data.map((script) => {
+		return scripts.map((script) => {
 			return {
 				id: script.id,
 				name: script.title,
