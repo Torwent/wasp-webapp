@@ -177,6 +177,7 @@ export const scripterSchema = z.object({
 export const subscriptionsSchema = z.object({
 	subscriptions: z.array(
 		z.object({
+			subscription: z.string().min(6, "ID is too short").startsWith("sub_"),
 			cancel: z.boolean()
 		})
 	)

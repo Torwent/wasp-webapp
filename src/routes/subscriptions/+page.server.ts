@@ -7,15 +7,22 @@ import { setError, superValidate } from "sveltekit-superforms/server"
 import { zod } from "sveltekit-superforms/adapters"
 
 export const load = async ({ locals: { getSubscriptions, getFreeAccess } }) => {
+	const subscriptions = await getSubscriptions()
+
+	const states = subscriptions.map((sub) => ({
+		subscription: sub.subscription,
+		cancel: sub.cancel
+	}))
+
 	const promises = await Promise.all([
-		superValidate(zod(subscriptionsSchema)),
+		superValidate({ subscriptions: states }, zod(subscriptionsSchema)),
 		superValidate(zod(checkoutSchema))
 	])
 
 	return {
 		subscriptionsform: promises[0],
 		checkoutForm: promises[1],
-		subscriptions: getSubscriptions(),
+		subscriptions,
 		freeAccess: getFreeAccess()
 	}
 }

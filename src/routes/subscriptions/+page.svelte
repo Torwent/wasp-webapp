@@ -2,7 +2,7 @@
 	import Head from "$lib/components/Head.svelte"
 	import CheckoutTable from "./CheckoutTable.svelte"
 	import FreeAccessTable from "./FreeAccessTable.svelte"
-	import SubscriptionsForm from "./SubscriptionTable.svelte"
+	import SubscriptionsTable from "./SubscriptionTable.svelte"
 
 	const { data } = $props()
 	let {
@@ -24,7 +24,7 @@
 	{#if profile}
 		{#await subscriptions then subscriptions}
 			{#if subscriptions.length > 0}
-				<SubscriptionsForm
+				<SubscriptionsTable
 					data={data.subscriptionsform}
 					{bundles}
 					{scripts}

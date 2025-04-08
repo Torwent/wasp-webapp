@@ -7,6 +7,8 @@
 	import { getPriceAmount, getPriceIntervalEx } from "$lib/utils"
 	import ExternalLink from "svelte-lucide/ExternalLink.svelte"
 	import ScriptLinks from "./ScriptLinks.svelte"
+	import { invalidateAll } from "$app/navigation"
+	import { page } from "$app/state"
 
 	let {
 		data,
@@ -22,13 +24,16 @@
 		prices: Price[]
 	} = $props()
 
-	let form: HTMLFormElement
+	let formElement: HTMLFormElement
 
-	const { errors, enhance } = superForm(data, {
+	const { form, errors, enhance } = superForm(data, {
 		id: "subscriptions",
 		dataType: "json",
 		multipleSubmits: "prevent",
-		clearOnSubmit: "errors"
+		clearOnSubmit: "errors",
+		resetForm: false,
+		invalidateAll: false,
+		timeoutMs: 5000
 	})
 
 	function getBundle(id: string) {
@@ -67,7 +72,7 @@
 		method="POST"
 		class="table-wrap preset-outlined-surface-500 mx-auto max-w-[95%] rounded-md"
 		use:enhance
-		bind:this={form}
+		bind:this={formElement}
 		action="?/subscriptions"
 	>
 		<table class="table border-separate space-y-6 text-xs md:text-sm">
@@ -77,9 +82,8 @@
 			<tbody class="preset-filled-surface-200-800 [&>tr]:hover:preset-tonal">
 				{#each subscriptions as { subscription, product, price, date_start, date_end, cancel, disabled }, i (subscription)}
 					{@const priceEx = getPrice(price, prices)}
-
-					{#if bundleArray[i]}
-						<tr>
+					<tr class="table-row">
+						{#if bundleArray[i]}
 							<td>
 								<div class="mx-3">
 									<div>{bundleArray[i].name}</div>
@@ -96,40 +100,9 @@
 							<td class="text-center">
 								<ScriptLinks bundle={bundleArray[i]} />
 							</td>
+						{:else}
+							{@const script = getScript(product) as ScriptProduct}
 
-							<td class="text-center">{priceEx ? getPriceAmount(priceEx) : "..."}</td>
-
-							<td class="text-center">{priceEx ? getPriceIntervalEx(priceEx) : "..."}</td>
-
-							<td class="text-center">
-								{new Date(date_start).toLocaleString(userLocale)}
-							</td>
-
-							<td class="text-center">
-								{cancel ? "Cancels on " : "Renews on "}
-								{new Date(date_end).toLocaleString(userLocale)}
-							</td>
-
-							<td class="text-center">
-								<Switch
-									name="{subscription}-slider"
-									controlInactive="bg-error-500"
-									controlActive="bg-success-700"
-									controlDisabled="disabled"
-									checked={!cancel}
-									form="subsform"
-									onCheckedChange={() => {
-										if (disabled) return
-										form.setAttribute("action", "?/subscriptions&product=" + subscription)
-										form.requestSubmit()
-									}}
-								/>
-							</td>
-						</tr>
-					{:else}
-						{@const script = getScript(product) as ScriptProduct}
-
-						<tr class="table-row">
 							<td>
 								<div class="mx-3">
 									<div>{script.name}</div>
@@ -143,7 +116,7 @@
 								</div>
 							</td>
 
-							<td>
+							<td class="text-center">
 								<a href="/scripts/{script.url}" class="permalink">
 									<button class="btn hover:text-primary-500 hover:cursor-pointer">
 										<ExternalLink size="16" />
@@ -151,49 +124,39 @@
 									</button>
 								</a>
 							</td>
+						{/if}
 
-							<td>
-								{#if priceEx}
-									{getPriceAmount(priceEx)}
-								{:else}
-									...
-								{/if}
-							</td>
+						<td class="text-center">{priceEx ? getPriceAmount(priceEx) : "..."}</td>
 
-							<td>
-								{#if priceEx}
-									{getPriceIntervalEx(priceEx)}
-								{:else}
-									...
-								{/if}
-							</td>
+						<td class="text-center">{priceEx ? getPriceIntervalEx(priceEx) : "..."}</td>
 
-							<td>
-								{new Date(date_start).toLocaleString(userLocale)}
-							</td>
+						<td class="text-center">
+							{new Date(date_start).toLocaleString(userLocale)}
+						</td>
 
-							<td>
-								{cancel ? "Cancels on " : "Renews on "}
-								{new Date(date_end).toLocaleString(userLocale)}
-							</td>
+						<td class="text-center">
+							{$form.subscriptions[i].cancel ? "Cancels on " : "Renews on "}
+							{new Date(date_end).toLocaleString(userLocale)}
+						</td>
 
-							<td>
-								<Switch
-									name="{subscription}-slider"
-									controlInactive="bg-error-500"
-									controlActive="bg-success-700"
-									controlDisabled="disabled"
-									checked={!cancel}
-									form="subsform"
-									onCheckedChange={() => {
-										if (disabled) return
-										form.setAttribute("action", "?/subscriptions&product=" + subscription)
-										form.requestSubmit()
-									}}
-								/>
-							</td>
-						</tr>
-					{/if}
+						<td class="text-center">
+							<Switch
+								name="{subscription}-slider"
+								controlInactive="bg-error-500"
+								controlActive="bg-success-700"
+								controlDisabled="disabled"
+								checked={!$form.subscriptions[i].cancel}
+								form="subsform"
+								{disabled}
+								onCheckedChange={() => {
+									if (disabled) return
+									$form.subscriptions[i].cancel = !$form.subscriptions[i].cancel
+									formElement.setAttribute("action", "?/subscriptions&product=" + subscription)
+									formElement.requestSubmit()
+								}}
+							/>
+						</td>
+					</tr>
 				{/each}
 			</tbody>
 		</table>
