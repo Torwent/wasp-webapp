@@ -6,7 +6,7 @@ let tutorialsIndex: FlexSearch.Index
 let tutorials: Tutorial[]
 
 function createTutorialsIndex(data: Tutorial[]) {
-	tutorialsIndex = new FlexSearch.Index({ tokenize: "forward" })
+	tutorialsIndex = new FlexSearch.Index({ tokenize: "full", cache: true, language: "en" })
 	data.forEach((tutorial, i) => {
 		const item = `${tutorial.title} ${tutorial.description} ${tutorial.content}`
 		tutorialsIndex.add(i, item)
