@@ -1,6 +1,6 @@
 import { getScripter } from "$lib/client/supabase"
 import { getPublishedScripts } from "$lib/server/scripts.server.js"
-import type { Price, ProductEx, Script } from "$lib/types/collection"
+import type { Price, ProductEx } from "$lib/types/collection"
 import { formatError, UUID_V4_REGEX } from "$lib/utils"
 import { error } from "@sveltejs/kit"
 
@@ -22,15 +22,21 @@ export const load = async ({
 	async function getScripts() {
 		const scripts = await getPublishedScripts()
 
-		return scripts.map((script) => {
-			return {
-				id: script.id,
-				name: script.title,
-				author: script.protected.username,
-				url: url.protocol + "//" + url.host + "/" + script.url,
-				active: false
-			}
-		})
+		return scripts.reduce(
+			(result, script) => {
+				if (script.protected.author_id === slug && script.metadata.type === "premium") {
+					result.push({
+						id: script.id,
+						name: script.title,
+						author: script.protected.username,
+						url: url.protocol + "//" + url.host + "/" + script.url,
+						active: false
+					})
+				}
+				return result
+			},
+			[] as Array<{ id: string; name: string; author: string; url: string; active: boolean }>
+		)
 	}
 
 	async function getPrices(products: string[]) {

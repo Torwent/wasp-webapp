@@ -1,29 +1,46 @@
 import type { Tutorial } from "$lib/types/collection"
 import { getUsername } from "$lib/server/supabase.server"
 import { encodeSEO } from "$lib/utils"
+import matter from "gray-matter"
+import removeMd from "remove-markdown"
 
 export async function getTutorials() {
 	const tutorials: Tutorial[] = []
-	const paths = import.meta.glob("/src/wasp-info/tutorials/*.md", { eager: true })
 
-	for (const path in paths) {
-		const file = paths[path]
+	const files = import.meta.glob("/src/wasp-info/tutorials/*.md", {
+		eager: true,
+		query: "?raw",
+		import: "default"
+	})
+
+	for (const path in files) {
+		const raw = files[path] as string
 		const order = path.split("/").at(-1)?.replace(".md", "")
+		if (!order) continue
+		const { data, content } = matter(raw)
 
-		if (file && typeof file === "object" && "metadata" in file && order) {
-			const metadata = file.metadata as Omit<Tutorial, "slug">
-			const username = await getUsername(metadata.author)
+		if (!data.title || !data.author || !data.published) continue
 
-			if (!username) continue
+		const username = await getUsername(data.author)
+		if (!username) continue
 
-			const url = encodeSEO(metadata.title + " by " + username)
+		const url = encodeSEO(data.title + " by " + username)
 
-			const tutorial = { ...metadata, username, order: parseInt(order), url } satisfies Tutorial
+		const tutorial = {
+			...data,
+			username,
+			order: parseInt(order),
+			url,
+			content: removeMd(content)
+		} as Tutorial
+
+		if (tutorial.published) {
+			console.log(tutorial)
 			tutorials.push(tutorial)
 		}
 	}
 
-	return tutorials.sort((first, second) => first.order - second.order)
+	return tutorials.sort((a, b) => a.order - b.order)
 }
 
 export const tutorialsPromise = getTutorials()

@@ -7,8 +7,6 @@
 	import { getPriceAmount, getPriceIntervalEx } from "$lib/utils"
 	import ExternalLink from "svelte-lucide/ExternalLink.svelte"
 	import ScriptLinks from "./ScriptLinks.svelte"
-	import { invalidateAll } from "$app/navigation"
-	import { page } from "$app/state"
 
 	let {
 		data,
@@ -80,7 +78,7 @@
 				headers={["Product", "Type", "Price", "Interval", "Start date", "End date", "Renew"]}
 			/>
 			<tbody class="preset-filled-surface-200-800 [&>tr]:hover:preset-tonal">
-				{#each subscriptions as { subscription, product, price, date_start, date_end, cancel, disabled }, i (subscription)}
+				{#each subscriptions as { subscription, product, price, date_start, date_end, disabled }, i (subscription)}
 					{@const priceEx = getPrice(price, prices)}
 					<tr class="table-row">
 						{#if bundleArray[i]}

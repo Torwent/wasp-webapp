@@ -23,9 +23,9 @@ function searchTutorialsIndex(searchTerm: string) {
 
 async function getPublishedTutorials() {
 	const tutorials = await tutorialsPromise
-	const filtered = tutorials.filter((tutorial) => tutorial.published)
-	createTutorialsIndex(filtered)
-	return filtered
+
+	createTutorialsIndex(tutorials)
+	return tutorials
 }
 
 const publishedTutorialPromise = getPublishedTutorials()
