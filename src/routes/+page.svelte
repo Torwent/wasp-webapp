@@ -7,8 +7,8 @@
 </script>
 
 <Head
-	title="Free and Open Source OSRS® Color Bots for RuneScape®"
-	description="OldSchool RuneScape® Color botting at it's best. Color only and fully open-source Simba scripts for OSRS®."
+	title="Free Open Source Color OSRS Bots for RuneScape"
+	description="OldSchool RuneScape Color botting at it's best. Color only and fully open-source Simba scripts for OSRS."
 />
 
 <main class="container mx-auto my-24 max-w-2xl flex-grow">
