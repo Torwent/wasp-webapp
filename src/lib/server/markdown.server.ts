@@ -3,7 +3,7 @@ import { createHighlighter } from "shiki"
 
 const shikiHighlighter = await createHighlighter({
 	themes: ["github-dark", "github-light"],
-	langs: ["javascript", "typescript", "bash", "cmd", "yml", "yaml", "pascal", "java"]
+	langs: ["javascript", "typescript", "bash", "cmd", "yml", "yaml", "pascal", "java", "json"]
 })
 
 export async function mdvsvexCompile(content: string) {

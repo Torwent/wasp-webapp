@@ -5,7 +5,7 @@ import { getSingletonHighlighter } from "shiki"
 
 const shikiHighlighter = await getSingletonHighlighter({
 	themes: ["github-dark", "github-light"],
-	langs: ["javascript", "typescript", "bash", "cmd", "yml", "yaml", "pascal", "java"]
+	langs: ["javascript", "typescript", "bash", "cmd", "yml", "yaml", "pascal", "java", "json"]
 })
 
 const mdsvexOptions = {
