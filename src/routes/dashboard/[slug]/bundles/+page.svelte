@@ -79,11 +79,12 @@
 
 			<tbody class="preset-filled-surface-100-900 [&>tr]:hover:preset-tonal-surface">
 				{#each $bundlesForm.bundles, i}
-					<tr>
+					<tr class:disabled={!$bundlesForm.bundles[i].active}>
 						<td class="text-center">
 							<input
 								name="name"
 								class="input preset-outlined-surface-500 mx-auto w-fit"
+								class:line-through={!$bundlesForm.bundles[i].active}
 								type="text"
 								bind:value={$bundlesForm.bundles[i].name}
 								class:ring-error-500={$bundlesErrors.bundles && $bundlesErrors.bundles[i].name}

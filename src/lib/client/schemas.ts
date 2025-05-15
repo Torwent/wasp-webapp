@@ -270,7 +270,8 @@ const bundleSchema = z.object({
 			}
 			return true
 		}, "Bundle prices are not in order"),
-	bundledScripts: bundledScriptArray
+	bundledScripts: bundledScriptArray,
+	active: z.boolean()
 })
 
 export const bundleArraySchema = z.object({

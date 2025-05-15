@@ -90,7 +90,8 @@ export const load = async ({ locals: { supabaseServer }, params: { slug }, paren
 					})),
 					open: false,
 					subsOpen: false,
-					freeOpen: false
+					freeOpen: false,
+					active: product.active
 				}
 			})
 		)
