@@ -97,7 +97,7 @@ For setup instructions you visit the setup [page](${website}/setup)
 - [Simba](https://villavu.github.io/Simba/): Simba documentation
 - [SRL-T](https://Torwent.github.io/SRL-T/): SRL-T documentation
 - [WaspLib](https://Torwent.github.io/WaspLib/): SRL-T documentation
-- [SRL-T](https://api.waspscripts.com/docs): Stats API documentation
+- [Wasp Stats API](https://api.waspscripts.com/docs): Stats API documentation
 - [Map](https://map.waspscripts.com/): Interactive OSRS map
 
 ## Scripts
