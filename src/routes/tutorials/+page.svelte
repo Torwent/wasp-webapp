@@ -20,7 +20,7 @@
 	let level = $state(parsedLevel > -1 && parsedLevel < 3 ? parsedLevel : -1)
 
 	const levelColors = ["sky", "orange", "red"]
-	const levelNames = ["Basic", "Intermidiate", "Advanced"]
+	const levelNames = ["Basic", "Intermediate", "Advanced"]
 </script>
 
 <Head
