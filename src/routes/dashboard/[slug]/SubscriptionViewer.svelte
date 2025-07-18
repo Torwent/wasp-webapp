@@ -14,23 +14,13 @@
 		count: number
 	} = $props()
 
-	let income = $state([
-		{
-			active: 0,
-			cancelling: 0,
-			total: 0
-		},
-		{
-			active: 0,
-			cancelling: 0,
-			total: 0
-		},
-		{
-			active: 0,
-			cancelling: 0,
-			total: 0
-		}
-	])
+	const incomeObject = {
+		active: 0,
+		cancelling: 0,
+		total: 0
+	}
+
+	const income = $state([incomeObject, incomeObject, incomeObject])
 
 	async function getSubscriptions(id: string) {
 		const { data: subData, error: subError } = await page.data.supabaseClient
@@ -55,25 +45,19 @@
 			return []
 		}
 
+		const intervals = ["week", "month", "year"]
+
 		const data = subData.map((sub) => {
 			const i = priceData.findIndex((price) => price.id === sub.price)
 			const value = priceData[i].amount / 100
-			if (priceData[i].interval === "week") {
-				if (sub.cancel) income[0].cancelling += value
-				else income[0].active += value
 
-				income[0].total += value
-			} else if (priceData[i].interval === "month") {
-				if (sub.cancel) income[1].cancelling += value
-				else income[1].active += value
-
-				income[1].total += value
-			} else if (priceData[i].interval === "year") {
-				if (sub.cancel) income[2].cancelling += value
-				else income[2].active += value
-
-				income[2].total += value
-			}
+			intervals.forEach((interval, idx) => {
+				if (priceData[i].interval === interval) {
+					if (sub.cancel) income[idx].cancelling += value
+					else income[idx].active += value
+					income[idx].total += value
+				}
+			})
 
 			return {
 				id: sub.id,
@@ -125,27 +109,22 @@
 			</h1>
 			<h2 class="my-4 text-center">Total subscriptions: {count}</h2>
 			<div class="my-4 flex justify-evenly gap-2 text-sm">
-				<div class="flex flex-col gap-2">
-					<span>Weekly active: <span class="text-success-500">{income[0].active}€</span></span>
-					<span>
-						Weekly cancelling: <span class="text-error-500">{income[0].cancelling}€</span>
-					</span>
-					<span>Weekly total: <span class="text-primary-500">{income[0].total}€</span></span>
-				</div>
-				<div class="flex flex-col gap-2">
-					<span>Monthly active: <span class="text-success-500">{income[1].active}€</span></span>
-					<span>
-						Monthly cancelling: <span class="text-error-500">{income[1].cancelling}€</span>
-					</span>
-					<span>Monthly total: <span class="text-primary-500">{income[1].total}€</span></span>
-				</div>
-				<div class="flex flex-col gap-2">
-					<span>Yearly active: <span class="text-success-500">{income[2].active}€</span></span>
-					<span>
-						Yearly cancelling: <span class="text-error-500">{income[2].cancelling}€</span>
-					</span>
-					<span>Yearly total: <span class="text-primary-500">{income[2].total}€</span></span>
-				</div>
+				{#each ["Weekly", "Monthly", "Yearly"] as interval, idx}
+					<div class="flex flex-col gap-2">
+						<span>
+							{interval} active:
+							<span class="text-success-500">{income[idx].active.toFixed(2)}€ </span>
+						</span>
+						<span>
+							{interval} cancelling:
+							<span class="text-error-500">{income[idx].cancelling.toFixed(2)}€</span>
+						</span>
+						<span>
+							{interval} total:
+							<span class="text-primary-500">{income[idx].total.toFixed(2)}€</span>
+						</span>
+					</div>
+				{/each}
 			</div>
 		</header>
 		<form method="POST" class="table-wrap max-h-[28rem]">
