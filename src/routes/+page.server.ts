@@ -1,5 +1,3 @@
-import type { Actions } from "@sveltejs/kit"
-
 export const actions = {
 	toggleDark: async (event) => {
 		let dark = event.cookies.get("darkMode")
@@ -9,9 +7,8 @@ export const actions = {
 			maxAge: 60 * 60 * 24 * 7 * 360
 		})
 	},
-	setTheme: async ({ cookies, request }) => {
-		const formData = await request.formData()
-		const theme = formData.get("theme")?.toString().toLowerCase() ?? "wasp"
+	setTheme: async ({ cookies, url: { searchParams } }) => {
+		const theme = searchParams.get("/setTheme") || "wasp"
 		cookies.set("theme", theme, { path: "/", maxAge: 60 * 60 * 24 * 7 * 360 })
 	}
-} satisfies Actions
+}

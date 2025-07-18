@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { enhance } from "$app/forms"
 	import { page } from "$app/state"
 	import { Popover } from "@skeletonlabs/skeleton-svelte"
 	import { ChevronDown, Palette, X } from "svelte-lucide"
@@ -14,12 +15,7 @@
 	let open = $state(false)
 </script>
 
-<form
-	id="theme-form"
-	method="POST"
-	action="/?/setTheme"
-	class="input-group hover:preset-tonal my-auto flex"
->
+<div class="input-group hover:preset-tonal my-auto flex">
 	<Popover
 		{open}
 		onOpenChange={(e) => (open = e.open)}
@@ -33,7 +29,7 @@
 			<span class="mx-4 my-auto flex lg:hidden xl:flex">{theme}</span>
 			<ChevronDown size="16" />{/snippet}
 		{#snippet content()}
-			<div class="card w-52">
+			<form class="card w-52" id="theme-form" method="POST" action="/?/setTheme" use:enhance>
 				<header class="flex justify-between">
 					<p class="text-xl font-bold">Themes</p>
 					<button class="btn-icon hover:preset-tonal" onclick={() => (open = false)}><X /></button>
@@ -43,6 +39,7 @@
 						<button
 							type="submit"
 							class="btn preset-outlined-surface-500 hover:border-primary-500 my-2"
+							formaction="/?/setTheme={entry.value}"
 							onclick={() => {
 								theme = entry.value
 								document.body.setAttribute("data-theme", theme)
@@ -52,7 +49,7 @@
 						</button>
 					{/each}
 				</div>
-			</div>
+			</form>
 		{/snippet}
 	</Popover>
-</form>
+</div>
