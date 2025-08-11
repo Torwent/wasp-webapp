@@ -281,5 +281,136 @@ export const actions = {
 		})
 
 		return { form, subscription: subscriptionID }
+	},
+
+	refund: async ({
+		request,
+		locals: { supabaseServer, user, getProfile },
+		url: { origin, searchParams }
+	}) => {
+		return
+		if (!user) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
+
+		const promises = await Promise.all([
+			getProfile(),
+			superValidate(request, zod(subscriptionsSchema))
+		])
+
+		const profile = promises[0]
+		const form = promises[1]
+
+		if (!profile) {
+			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
+		}
+
+		if (!profile.customer_id) {
+			return setError(
+				form,
+				"",
+				"You don't have a customer id. This should not be possible! Please contact support@waspscripts.dev"
+			)
+		}
+
+		const subscriptionID = searchParams.get("id")
+
+		if (!subscriptionID) {
+			return setError(
+				form,
+				"",
+				"Something went wrong! Seems like no subscription was selected. If this keeps occuring please contact support@waspscripts.dev"
+			)
+		}
+
+		const customer = await stripe.customers.retrieve(profile.customer_id, {
+			expand: ["subscriptions"]
+		})
+
+		if (customer.deleted) {
+			return setError(
+				form,
+				"",
+				"That customer profile does not exist. Refresh the page, if the issue persists please contact support@waspscripts.dev"
+			)
+		}
+
+		if (!customer.subscriptions) {
+			return setError(form, "", "You don't have any subscription to refund.")
+		}
+
+		const subscription = customer.subscriptions.data.find(
+			(subscription) => subscription.id === subscriptionID
+		)
+
+		if (!subscription) {
+			return setError(
+				form,
+				"",
+				"The subscription you want to refund either doesn't exist or doesn't belong to you. Refresh the page, if this keeps happening, please contact support@waspscripts.dev"
+			)
+		}
+
+		const anchorDate = new Date(subscription.billing_cycle_anchor * 1000)
+		const now = Date.now()
+		const diffMs = now - anchorDate.getTime()
+
+		const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+
+		if (diffDays > 0) {
+			return setError(
+				form,
+				"",
+				"The subscription you want to refund is outside of the refund window. Refresh the page, if this keeps happening, please contact support@waspscripts.dev"
+			)
+		}
+
+		const invoiceID = subscription.latest_invoice as string
+		const invoice = await stripe.invoices.retrieve(invoiceID)
+
+		const payments = invoice.payments?.data
+
+		if (!payments) {
+			return setError(
+				form,
+				"",
+				"Couldn't find payments for the subscription. Refresh the page, if this keeps happening, please contact support@waspscripts.dev"
+			)
+		}
+
+		const last_payment = payments.find((payment) => payment.status === "paid")
+
+		if (!last_payment) {
+			return setError(
+				form,
+				"",
+				"Couldn't find last payment for the subscription. Refresh the page, if this keeps happening, please contact support@waspscripts.dev"
+			)
+		}
+
+		const intent = last_payment.payment.payment_intent as string
+		const amount = last_payment.amount_paid
+		const charge = last_payment.payment.charge
+
+		if (!amount || !charge) {
+			return setError(
+				form,
+				"",
+				"Couldn't setup refund. Refresh the page, if this keeps happening, please contact support@waspscripts.dev"
+			)
+		}
+
+		await stripe.refunds.create({
+			charge: charge as string,
+			payment_intent: intent,
+			amount: amount,
+			currency: last_payment.currency,
+			customer: profile.customer_id,
+			reason: "requested_by_customer",
+			refund_application_fee: true,
+			reverse_transfer: true
+		})
+
+		return { form, subscription: subscriptionID }
 	}
 }

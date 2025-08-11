@@ -7,7 +7,7 @@
 @import "@skeletonlabs/skeleton/themes/cerberus";
 @import "@skeletonlabs/skeleton/themes/concord";
 @import "@skeletonlabs/skeleton/themes/fennec";
-@import "../wasp";
+@import "./wasp";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
