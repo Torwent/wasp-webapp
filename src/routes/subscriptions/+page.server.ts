@@ -391,7 +391,10 @@ export const actions = {
 		try {
 			await stripe.refunds.create({
 				payment_intent: intent,
-				amount: amount - Math.ceil((amount * (subscription.application_fee_percent ?? 0)) / 100),
+				amount: Math.min(
+					amount - Math.ceil((amount * (subscription.application_fee_percent ?? 0)) / 100),
+					500
+				),
 				reason: "requested_by_customer",
 				refund_application_fee: false,
 				reverse_transfer: true

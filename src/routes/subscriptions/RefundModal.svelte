@@ -15,7 +15,7 @@
 	} = $props()
 	let open = $state(false)
 
-	const value = (price?.amount ?? 0) - Math.ceil((price?.amount ?? 0) * 0.22)
+	const value = Math.min((price?.amount ?? 0) - Math.ceil((price?.amount ?? 0) * 0.22), 500)
 
 	const priceStr = new Intl.NumberFormat("pt-PT", {
 		style: "currency",
