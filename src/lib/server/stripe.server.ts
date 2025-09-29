@@ -4,6 +4,7 @@ import type { Bundle, Price, Scripter } from "$lib/types/collection"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import Stripe from "stripe"
 
+//@ts-ignore
 export const stripe = new Stripe(STRIPE_KEY, { apiVersion: "2025-02-24.acacia", typescript: true })
 
 export async function createCustomerPortal(customer: string, origin: string) {
