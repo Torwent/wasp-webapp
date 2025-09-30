@@ -1,4 +1,4 @@
-import { STRIPE_WEBHOOOK_SECRET_PRODUCTS } from "$env/static/private"
+import { STRIPE_WEBHOOK_SECRET_PRODUCTS } from "$env/static/private"
 import { stripe } from "$lib/server/stripe.server"
 import { WaspProduct } from "$lib/server/supabase.server"
 import { error, json } from "@sveltejs/kit"
@@ -11,7 +11,7 @@ export const POST = async ({ request }) => {
 	const body = await request.text()
 
 	try {
-		event = stripe.webhooks.constructEvent(body, sig, STRIPE_WEBHOOOK_SECRET_PRODUCTS)
+		event = stripe.webhooks.constructEvent(body, sig, STRIPE_WEBHOOK_SECRET_PRODUCTS)
 	} catch (err) {
 		console.log(err)
 		throw error(404, "Event is not valid! Body: " + body + " Error: " + err)
