@@ -4,6 +4,7 @@
 	"version": "2.0.0",
 	"type": "module",
 	"scripts": {
+		"gentypes": "bun run src/lib/types/update.ts",
 		"dev": "vite dev",
 		"build": "vite build",
 		"preview": "vite preview",

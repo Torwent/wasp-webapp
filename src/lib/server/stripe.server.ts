@@ -224,22 +224,31 @@ export async function createStripeConnectAccount(
 		return
 	}
 
-	const { error: err } = await supabase
-		.schema("profiles")
-		.from("scripters")
-		.update({ stripe: account.id })
-		.eq("id", scripter.id)
+	const promises = await Promise.all([
+		supabase
+			.schema("profiles")
+			.from("scripters")
+			.update({ stripe: account.id })
+			.eq("id", scripter.id),
+		supabase
+			.schema("profiles")
+			.from("balances")
+			.update({ stripe: account.id })
+			.eq("id", scripter.id)
+	])
 
-	if (err) {
-		console.error(err)
-		return
+	for (let i = 0; i < promises.length; i++) {
+		if (promises[i].error) {
+			console.error(promises[i].error)
+			return
+		}
 	}
 
 	try {
 		accountLink = await stripe.accountLinks.create({
 			account: account.id,
-			refresh_url: baseURL + "/api/stripe/connect/reauth",
-			return_url: baseURL + "/api/stripe/connect/return",
+			refresh_url: baseURL + "/dashboard",
+			return_url: baseURL + "/dashboard",
 			type: "account_onboarding"
 		})
 	} catch (err) {
