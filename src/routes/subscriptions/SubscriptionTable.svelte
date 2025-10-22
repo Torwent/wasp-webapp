@@ -194,34 +194,32 @@
 							/>
 						</td>
 
-						{#if false}
-							<td class="text-center">
-								{#if inEarlyWindow(date_end, priceEx?.interval)}
-									{#if bundleArray[i]}
-										<RefundModal
-											name={bundleArray[i].name}
-											username={bundleArray[i].username}
-											{subscription}
-											price={priceEx}
-										/>
-									{:else}
-										{@const script = getScript(product) as ScriptProduct}
-
-										<RefundModal
-											name={script.name}
-											username={script.username}
-											{subscription}
-											price={priceEx}
-										/>
-									{/if}
+						<td class="text-center">
+							{#if inEarlyWindow(date_end, priceEx?.interval)}
+								{#if bundleArray[i]}
+									<RefundModal
+										name={bundleArray[i].name}
+										username={bundleArray[i].username}
+										{subscription}
+										price={priceEx}
+									/>
 								{:else}
-									<button disabled class="btn preset-tonal">
-										<RotateCw size="16" />
-										<span>Refund</span>
-									</button>
+									{@const script = getScript(product) as ScriptProduct}
+
+									<RefundModal
+										name={script.name}
+										username={script.username}
+										{subscription}
+										price={priceEx}
+									/>
 								{/if}
-							</td>
-						{/if}
+							{:else}
+								<button disabled class="btn preset-tonal">
+									<RotateCw size="16" />
+									<span>Refund</span>
+								</button>
+							{/if}
+						</td>
 					</tr>
 				{/each}
 			</tbody>

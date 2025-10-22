@@ -287,7 +287,6 @@ export const actions = {
 		locals: { supabaseServer, user, getProfile },
 		url: { origin, searchParams }
 	}) => {
-		return
 		if (!user) {
 			return await doLogin(supabaseServer, origin, new URLSearchParams("login&provider=discord"))
 		}
