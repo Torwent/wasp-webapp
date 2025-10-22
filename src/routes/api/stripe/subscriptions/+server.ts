@@ -75,19 +75,22 @@ export const POST = async ({ request }) => {
 			if (errDelete) error(404, "Error deleting subscription: " + errDelete)
 			const last_invoice = subscriptionDeleted.latest_invoice
 			if (last_invoice) {
-				try {
-					stripe.invoices.voidInvoice(last_invoice.toString())
-				} catch (err) {
-					console.error(err)
-					error(
-						404,
-						"Failed to void invoce: " +
-							last_invoice +
-							" for sub: " +
-							subscriptionDeleted.id +
-							"  Error: " +
-							err
-					)
+				const invoce = await stripe.invoices.retrieve(last_invoice.toString())
+				if (invoce.status != "paid") {
+					try {
+						stripe.invoices.voidInvoice(last_invoice.toString())
+					} catch (err) {
+						console.error(err)
+						error(
+							404,
+							"Failed to void invoce: " +
+								last_invoice +
+								" for sub: " +
+								subscriptionDeleted.id +
+								"  Error: " +
+								err
+						)
+					}
 				}
 			}
 			break
