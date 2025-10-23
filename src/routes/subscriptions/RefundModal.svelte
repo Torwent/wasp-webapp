@@ -15,7 +15,7 @@
 	} = $props()
 	let open = $state(false)
 
-	const value = Math.min((price?.amount ?? 0) - Math.ceil((price?.amount ?? 0) * 0.22), 500)
+	const value = price!.amount - Math.min(price!.amount * 0.15, 500)
 
 	const priceStr = new Intl.NumberFormat("pt-PT", {
 		style: "currency",
@@ -51,6 +51,7 @@
 		<article class="my-16">
 			<p>Are you sure you want to refund this product?</p>
 			<p class="my-4">You are about to refund:</p>
+
 			<b>
 				<span>{name}</span>
 				<span>
@@ -61,10 +62,16 @@
 					{/await}
 				</span>
 			</b>
-			<p class="my-4">
+			<p class="mt-8">
 				You will not be refunded the processing fees and will lose instant access to it.
 			</p>
-			<p>The total amount you will be refunded will be roughly <b>{priceStr}</b>.</p>
+			<p>
+				Please consider
+				<a href="https://discord.gg/Khp7RXpRz4" class="text-secondary-500 hover:underline">
+					asking for help on Discord if you are having technical issues
+				</a>.
+			</p>
+			<p class="my-8">The total amount you will be refunded will be roughly <b>{priceStr}</b>.</p>
 		</article>
 		<footer class="flex justify-end gap-4">
 			<form id="refundsform" method="POST" action={"?/refund&id=" + subscription}>
