@@ -79,7 +79,7 @@
 		const date = getStartDate(date_end, interval)
 		if (!date) return false
 
-		const DAY = 24 * 60 * 60 * 1000
+		const DAY = 24 * 3600000
 
 		const { startDate, endDate } = date
 
@@ -89,7 +89,7 @@
 		const windowMs = Math.min(tenPercentMs, fourteenDaysMs)
 
 		const elapsedSinceStartMs = Date.now() - startDate.getTime()
-		return elapsedSinceStartMs <= windowMs
+		return elapsedSinceStartMs >= DAY && elapsedSinceStartMs <= windowMs
 	}
 </script>
 
