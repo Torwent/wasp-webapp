@@ -341,16 +341,34 @@ export const actions = {
 			)
 		}
 
-		const anchorDate = new Date(subscription.billing_cycle_anchor * 1000)
-		const now = Date.now()
-		const diffMs = now - anchorDate.getTime()
+		const DAY = 24 * 3600000
+		const tenDayMS = 10 * DAY
+		const start_date = subscription.current_period_start * 1000
+		const end_date = subscription.current_period_end * 1000
 
-		const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+		const intervalMs = end_date - start_date
+		const tenPercentMs = intervalMs * 0.1
+		const windowMs = Math.min(tenPercentMs, tenDayMS)
 
-		if (diffDays > 0) {
+		const elapsedSinceStartMs = Date.now() - start_date
+
+		if (elapsedSinceStartMs < DAY && elapsedSinceStartMs <= windowMs) {
+			const endWindow = new Date(start_date + DAY + windowMs)
 			error(
 				500,
-				"The subscription you want to refund is outside of the refund window. Refresh the page, if this keeps happening, please contact support@waspscripts.dev"
+				"You need to wait 1 day to attempt to refund this payment and you will have until" +
+					endWindow.toLocaleString() +
+					" to request it. If you think this is an error refresh the page, if this keeps happening, please contact support@waspscripts.dev"
+			)
+		}
+
+		if (elapsedSinceStartMs <= windowMs) {
+			const endWindow = new Date(start_date + DAY + windowMs)
+			error(
+				500,
+				"The subscription you want to refund is outside of the refund window, you could only refund until " +
+					endWindow.toLocaleString() +
+					". If you think this is an error refresh the page, if this keeps happening, please contact support@waspscripts.dev"
 			)
 		}
 
