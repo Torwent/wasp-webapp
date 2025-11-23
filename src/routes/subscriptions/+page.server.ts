@@ -405,7 +405,7 @@ export const actions = {
 			)
 		}
 
-		const refund = amount - Math.min(amount * 0.15, 500)
+		const refund = amount - Math.round(Math.min(amount * 0.15, 500))
 
 		try {
 			await stripe.refunds.create({
