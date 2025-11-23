@@ -362,7 +362,7 @@ export const actions = {
 			)
 		}
 
-		if (elapsedSinceStartMs <= windowMs) {
+		if (elapsedSinceStartMs > windowMs) {
 			const endWindow = new Date(start_date + DAY + windowMs)
 			error(
 				500,
