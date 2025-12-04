@@ -31,7 +31,9 @@ export const POST = async ({ request }) => {
 				id: subscriptionCreated.metadata.user_id,
 				product: subscriptionCreated.items.data[0].price.product.toString(),
 				price: subscriptionCreated.items.data[0].price.id,
-				date_end: new Date(subscriptionCreated.current_period_end * 1000).toISOString(),
+				date_end: new Date(
+					subscriptionCreated.items.data[0].current_period_end * 1000
+				).toISOString(),
 				date_start: new Date(subscriptionCreated.start_date * 1000).toISOString(),
 				cancel: subscriptionCreated.cancel_at_period_end,
 				disabled: false
@@ -58,7 +60,9 @@ export const POST = async ({ request }) => {
 				id: subscriptionUpdated.metadata.user_id,
 				product: subscriptionUpdated.items.data[0].price.product.toString(),
 				price: subscriptionUpdated.items.data[0].price.id,
-				date_end: new Date(subscriptionUpdated.current_period_end * 1000).toISOString(),
+				date_end: new Date(
+					subscriptionUpdated.items.data[0].current_period_end * 1000
+				).toISOString(),
 				date_start: new Date(subscriptionUpdated.start_date * 1000).toISOString(),
 				cancel: subscriptionUpdated.cancel_at_period_end,
 				disabled: false
