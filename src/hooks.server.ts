@@ -1,9 +1,11 @@
-import { type Handle, redirect } from "@sveltejs/kit"
+import { error, type Handle, redirect } from "@sveltejs/kit"
 
 import { createServerClient } from "@supabase/ssr"
 import { sequence } from "@sveltejs/kit/hooks"
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from "$env/static/public"
 import type { Database } from "$lib/types/supabase"
+import { createCustomer, createStripeCustomer } from "$lib/server/stripe.server"
+import { updateCustomerID } from "$lib/server/supabase.server"
 
 const redirects: Handle = async ({ event, resolve }) => {
 	if (event.url.pathname.startsWith("/refresh_token")) {
@@ -99,6 +101,16 @@ const authGuard: Handle = async ({ event, resolve }) => {
 			.single()
 
 		if (err) return null
+
+		if (!data.customer_id) {
+			if (!user.email) error(403, "Your user account requires an email tied to it.")
+			console.log("Creating customer for " + user.id)
+			const customer = await createStripeCustomer(user.id, user.email, data.discord, data.username!)
+
+			if (!customer) error(403, "Failed to create stripe user for " + user.id)
+
+			await updateCustomerID(user.id, customer)
+		}
 		return data
 	}
 
