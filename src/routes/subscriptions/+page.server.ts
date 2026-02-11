@@ -270,8 +270,9 @@ export const actions = {
 		})
 
 		return { form, subscription: subscriptionID }
-	},
+	}
 
+	/*
 	refund: async ({
 		locals: { supabaseServer, user, getProfile },
 		url: { origin, searchParams }
@@ -429,4 +430,5 @@ export const actions = {
 
 		redirect(303, "/subscriptions")
 	}
+	*/
 }

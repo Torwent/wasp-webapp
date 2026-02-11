@@ -7,7 +7,6 @@
 	import { getPriceAmount, getPriceIntervalEx } from "$lib/utils"
 	import ExternalLink from "svelte-lucide/ExternalLink.svelte"
 	import ScriptLinks from "./ScriptLinks.svelte"
-	import RefundModal from "./RefundModal.svelte"
 
 	let {
 		data,
@@ -75,9 +74,7 @@
 		action="?/subscriptions"
 	>
 		<table class="table border-separate space-y-6 text-xs md:text-sm">
-			<TableHeader
-				headers={["Product", "Type", "Price", "Interval", "Start date", "End date", "Renew"]}
-			/>
+			<TableHeader headers={["Product", "Type", "Price", "Interval", "Start date", "End date"]} />
 			<tbody class="preset-filled-surface-200-800 [&>tr]:hover:preset-tonal">
 				{#each subscriptions as { subscription, product, price, date_start, date_end, disabled }, i (subscription)}
 					{@const priceEx = getPrice(price, prices)}
@@ -156,7 +153,7 @@
 							/>
 						</td>
 
-						<td class="text-center">
+						<!-- <td class="text-center">
 							{#if bundleArray[i]}
 								<RefundModal
 									name={bundleArray[i].name}
@@ -176,7 +173,7 @@
 									{date_end}
 								/>
 							{/if}
-						</td>
+						</td> -->
 					</tr>
 				{/each}
 			</tbody>
