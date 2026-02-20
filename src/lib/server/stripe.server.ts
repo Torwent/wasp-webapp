@@ -57,6 +57,7 @@ export async function createCheckoutSession(
 			billing_address_collection: "auto",
 			automatic_tax: { enabled: stripeUser == null },
 			payment_method_collection: "always",
+			tax_id_collection: { enabled: true, required: "never" },
 			allow_promotion_codes: true,
 			subscription_data: {
 				on_behalf_of: stripeUser ?? undefined,
