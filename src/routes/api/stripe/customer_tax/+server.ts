@@ -1,5 +1,9 @@
-import { STRIPE_WEBHOOK_SECRET_CUSTOMER_TAX } from "$env/static/private"
-import { stripe } from "$lib/server/stripe.server"
+import {
+	STRIPE_INVOICE_TEMPLATE_EU,
+	STRIPE_INVOICE_TEMPLATE_NO_EU,
+	STRIPE_WEBHOOK_SECRET_CUSTOMER_TAX
+} from "$env/static/private"
+import { stripe, updateInvoiceTemplate } from "$lib/server/stripe.server"
 import { error, json } from "@sveltejs/kit"
 import type Stripe from "stripe"
 
@@ -52,20 +56,37 @@ export const POST = async ({ request }) => {
 
 	switch (type) {
 		case "customer.tax_id.created": {
-			const subscriptionCreated = data.object
+			const { object: tax } = data
+			if (!tax.customer) break
 
+			if (tax.country == null || euCountries.has(tax.country.toUpperCase())) {
+				await updateInvoiceTemplate(tax.customer as string, STRIPE_INVOICE_TEMPLATE_EU)
+			} else {
+				await updateInvoiceTemplate(tax.customer as string, STRIPE_INVOICE_TEMPLATE_NO_EU)
+			}
 			break
 		}
 
 		case "customer.tax_id.updated": {
-			const subscriptionUpdated = data.object
+			const { object: tax } = data
+			if (!tax.customer) break
 
+			if (tax.country == null || euCountries.has(tax.country.toUpperCase())) {
+				await updateInvoiceTemplate(tax.customer as string, STRIPE_INVOICE_TEMPLATE_EU)
+			} else {
+				await updateInvoiceTemplate(tax.customer as string, STRIPE_INVOICE_TEMPLATE_NO_EU)
+			}
 			break
 		}
 
 		case "customer.tax_id.deleted": {
-			const subscriptionDeleted = data.object
-
+			const tax = data.object
+			if (!tax.customer) break
+			if (tax.country == null || euCountries.has(tax.country.toUpperCase())) {
+				await updateInvoiceTemplate(tax.customer as string, STRIPE_INVOICE_TEMPLATE_EU)
+			} else {
+				await updateInvoiceTemplate(tax.customer as string, STRIPE_INVOICE_TEMPLATE_NO_EU)
+			}
 			break
 		}
 

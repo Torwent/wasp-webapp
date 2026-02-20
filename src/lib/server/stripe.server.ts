@@ -292,6 +292,18 @@ export async function updateStripeConnectAccount(id: string, dba: string) {
 	return true
 }
 
+export async function updateInvoiceTemplate(customer: string, template: string) {
+	try {
+		await stripe.customers.update(customer, {
+			invoice_settings: {
+				rendering_options: { template }
+			}
+		})
+	} catch (error) {
+		console.error("Error updating user invoice template: " + error)
+	}
+}
+
 export async function updateStripeProduct(id: string, name: string) {
 	try {
 		await stripe.products
