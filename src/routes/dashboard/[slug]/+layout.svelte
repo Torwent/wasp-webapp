@@ -21,7 +21,7 @@
 	{#if profile.id != data.scripter.id}
 		<h3 class="text-primary-500 my-4 text-center font-bold">
 			Current user: {profile.username}
-			<small>{profile.id}</small>
+			<UUID uuid={profile.id}></UUID>
 		</h3>
 	{/if}
 
