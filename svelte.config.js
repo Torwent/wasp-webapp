@@ -36,11 +36,12 @@ const config = {
 					"ws://localhost:*",
 					"https://db.waspscripts.com",
 					"ws://db.waspscripts.com",
-					"wss://db.waspscripts.com"
+					"wss://db.waspscripts.com",
+					"https://connect-js.stripe.com",
+					"https://js.stripe.com"
 				],
 				"frame-src": [
 					"self",
-					"https://stripe-data-exports.s3.amazonaws.com/",
 					"https://js.stripe.com",
 					"https://connect-js.stripe.com",
 					"https://www.youtube.com/"

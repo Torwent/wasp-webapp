@@ -2,6 +2,7 @@
 	import { goto } from "$app/navigation"
 	import { page } from "$app/state"
 	import Head from "$lib/components/Head.svelte"
+	import UUID from "$lib/components/UUID.svelte"
 	import { Tabs } from "@skeletonlabs/skeleton-svelte"
 	import { FileCode, Landmark, Package, Settings } from "svelte-lucide"
 	const { data, children } = $props()
@@ -26,7 +27,9 @@
 
 	<h3 class="my-4 text-center">
 		Viewing user: {data.scripter.profiles.username}
-		<small>{data.scripter.id}</small>
+		<small>
+			<UUID uuid={data.scripter.id}></UUID>
+		</small>
 	</h3>
 
 	<div class="my-8 grid place-items-center">

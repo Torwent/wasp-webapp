@@ -5,7 +5,7 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 import Stripe from "stripe"
 
 //@ts-ignore
-export const stripe = new Stripe(STRIPE_KEY, { apiVersion: "2025-02-24.acacia", typescript: true })
+export const stripe = new Stripe(STRIPE_KEY, { apiVersion: "2026-03-25.dahlia", typescript: true })
 
 export async function createCustomerPortal(customer: string, origin: string) {
 	let portal: Stripe.BillingPortal.Session
@@ -93,23 +93,6 @@ export async function getStripeConnectAccount(id: string | null | undefined) {
 	}
 
 	return stripeAccount
-}
-
-export async function getStripeConnectAccountBalance(id: string | null | undefined) {
-	if (!id) return null
-	let stripeBalance: Stripe.Balance | null = null
-	try {
-		stripeBalance = await stripe.balance.retrieve({
-			stripeAccount: id
-		})
-	} catch (error) {
-		console.error(
-			"An error occurred when calling the Stripe API to create an account session",
-			error
-		)
-	}
-
-	return stripeBalance
 }
 
 export async function getStripeSession(account: string | null | undefined) {

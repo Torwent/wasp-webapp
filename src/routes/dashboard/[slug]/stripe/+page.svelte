@@ -8,7 +8,7 @@
 	import { zodClient } from "sveltekit-superforms/adapters"
 
 	const { data } = $props()
-	const { scripter, stripeAccount, stripeBalance, stripeSession } = $derived(data)
+	const { scripter, stripeAccount, stripeSession } = $derived(data)
 
 	const {
 		form: countryForm,
@@ -35,26 +35,24 @@
 		resetForm: true
 	})
 
+	async function fetchClientSecret() {
+		invalidate("dashboard:stripe_session")
+		return (await stripeSession) ?? ""
+	}
+
 	onMount(async () => {
 		if (browser && document) {
 			const connectJS = await import("@stripe/connect-js")
 
-			async function fetchClientSecret() {
-				invalidate("dashboard:stripe_session")
-				return (await stripeSession) ?? ""
-			}
-
-			const stripeConnectInstance = connectJS.loadConnectAndInitialize({
+			const stripeConnect = connectJS.loadConnectAndInitialize({
 				publishableKey: PUBLIC_STRIPE_PUBLISHABLE_KEY,
 				fetchClientSecret
 			})
 
-			if (stripeConnectInstance) {
-				let paymentContainer = document.getElementById("paymentContainer")
-				if (paymentContainer) paymentContainer.appendChild(stripeConnectInstance.create("payments"))
-				let payoutContainer = document.getElementById("payoutContainer")
-				if (payoutContainer) payoutContainer.appendChild(stripeConnectInstance.create("payouts"))
-			}
+			let payments = document.getElementById("paymentContainer")
+			if (payments) payments.appendChild(stripeConnect.create("payments"))
+			let payouts = document.getElementById("payoutContainer")
+			if (payouts) payouts.appendChild(stripeConnect.create("payouts"))
 		}
 	})
 </script>
@@ -177,20 +175,6 @@
 				</div>
 			</form>
 		</div>
-
-		{#if stripeBalance}
-			{@const available = stripeBalance?.available[0].amount ?? 0}
-			{@const pending = stripeBalance?.pending[0].amount ?? 0}
-			{@const currency = stripeBalance?.available[0].currency ?? ""}
-			<div class="my-8 flex justify-around">
-				<h4>
-					Balance: {(available + pending) / 100}
-					{currency}
-				</h4>
-				<h4>Available: {available / 100} {currency}</h4>
-				<h4>Settling: {pending / 100} {currency}</h4>
-			</div>
-		{/if}
 
 		{#if stripeAccount}
 			{#if stripeAccount.requirements?.currently_due && stripeAccount.requirements?.currently_due.length > 0}

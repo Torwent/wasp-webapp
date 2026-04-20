@@ -9,7 +9,6 @@ import {
 	createStripeConnectAccount,
 	finishStripeConnectAccountSetup,
 	getStripeConnectAccount,
-	getStripeConnectAccountBalance,
 	getStripeSession,
 	updateStripeConnectAccount
 } from "$lib/server/stripe.server"
@@ -21,8 +20,7 @@ export const load = async ({ locals: { supabaseServer }, params: { slug }, depen
 	const promises = await Promise.all([
 		superValidate(zod(countryCodeSchema)),
 		superValidate(zod(dbaSchema)),
-		getStripeConnectAccount(scripter.stripe),
-		getStripeConnectAccountBalance(scripter.stripe)
+		getStripeConnectAccount(scripter.stripe)
 	])
 
 	promises[1].data.dba = promises[2]?.business_profile?.name ?? ""
@@ -31,7 +29,6 @@ export const load = async ({ locals: { supabaseServer }, params: { slug }, depen
 		countryForm: promises[0],
 		dbaForm: promises[1],
 		stripeAccount: promises[2],
-		stripeBalance: promises[3],
 		stripeSession: getStripeSession(scripter.stripe)
 	}
 }
