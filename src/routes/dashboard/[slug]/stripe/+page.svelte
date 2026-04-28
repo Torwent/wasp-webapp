@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { browser } from "$app/environment"
 	import { invalidate } from "$app/navigation"
 	import { PUBLIC_STRIPE_PUBLISHABLE_KEY } from "$env/static/public"
 	import { countryCodeSchema, dbaSchema } from "$lib/client/schemas"
@@ -40,20 +39,20 @@
 		return (await stripeSession) ?? ""
 	}
 
+	let payouts: HTMLDivElement | undefined = $state(undefined)
+	let payments: HTMLDivElement | undefined = $state(undefined)
+
 	onMount(async () => {
-		if (browser && document) {
-			const connectJS = await import("@stripe/connect-js")
+		const connectJS = await import("@stripe/connect-js")
 
-			const stripeConnect = connectJS.loadConnectAndInitialize({
-				publishableKey: PUBLIC_STRIPE_PUBLISHABLE_KEY,
-				fetchClientSecret
-			})
+		const stripeConnect = connectJS.loadConnectAndInitialize({
+			publishableKey: PUBLIC_STRIPE_PUBLISHABLE_KEY,
+			fetchClientSecret,
+			locale: navigator.language ?? undefined
+		})
 
-			let payments = document.getElementById("paymentContainer")
-			if (payments) payments.appendChild(stripeConnect.create("payments"))
-			let payouts = document.getElementById("payoutContainer")
-			if (payouts) payouts.appendChild(stripeConnect.create("payouts"))
-		}
+		payouts?.appendChild(stripeConnect.create("payouts"))
+		payments?.appendChild(stripeConnect.create("payments"))
 	})
 </script>
 
@@ -197,9 +196,14 @@
 			{/if}
 		{/if}
 
-		<h5 class="mt-12 mb-4 text-center">Payments</h5>
-		<div id="paymentContainer" class="my-8"></div>
-		<h5 class="my-4 text-center">Payouts</h5>
-		<div id="payoutContainer" class="my-8"></div>
+		<div class="preset-outlined-surface-300-700 mx-auto my-8 min-h-24 w-8/12 rounded-md p-4">
+			<h5 class="my-4 text-center">Payouts</h5>
+			<div bind:this={payouts} class="my-8"></div>
+		</div>
+
+		<div class="preset-outlined-surface-300-700 mx-auto my-8 min-h-24 w-8/12 rounded-md p-4">
+			<h5 class="mt-12 mb-4 text-center">Payments</h5>
+			<div bind:this={payments} class="my-8"></div>
+		</div>
 	{/if}
 </main>

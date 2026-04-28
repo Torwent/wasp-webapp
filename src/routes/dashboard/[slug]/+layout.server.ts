@@ -11,6 +11,7 @@ export const load = async ({
 	depends
 }) => {
 	depends("wasp:dashboard")
+
 	if (!user) error(403, "You need to be logged in.")
 	if (!UUID_V4_REGEX.test(slug)) error(403, "Invalid dashboard UUID.")
 

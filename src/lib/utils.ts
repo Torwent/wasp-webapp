@@ -194,3 +194,10 @@ export const scriptCategories: Record<TScriptCategories[number], NameValueIcon> 
 	thieving: { name: "Thieving", value: "thieving", icon: "🦝" },
 	runecrafting: { name: "Runecrafting", value: "runecrafting", icon: "⚡" }
 }
+
+export function currency(value: number, code: string) {
+	return value.toLocaleString(navigator.language, {
+		style: "currency",
+		currency: code.toUpperCase()
+	})
+}

@@ -26,9 +26,7 @@ export const POST = async ({ request }) => {
 	const dispute = data.object as Stripe.Dispute
 	if (dispute.status != "lost") return json({ success: "true" })
 
-	console.log(dispute)
-
-	let { balance_transactions: transactions, charge: chargeID } = dispute
+	const { balance_transactions: transactions, charge: chargeID } = dispute
 
 	const charge = await stripe.charges.retrieve(chargeID as string)
 	if (!charge.on_behalf_of) return json({ success: "true" })

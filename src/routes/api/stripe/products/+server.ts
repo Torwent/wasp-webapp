@@ -43,7 +43,6 @@ export const POST = async ({ request }) => {
 		}
 
 		case "product.created": {
-			console.log(data)
 			const productCreated = data.object as Stripe.Product
 			const { name } = productCreated
 			const metadata = productCreated.metadata as unknown as ProductMetadata
