@@ -39,8 +39,8 @@
 		return (await stripeSession) ?? ""
 	}
 
-	let payouts: HTMLDivElement | undefined = $state(undefined)
 	let payments: HTMLDivElement | undefined = $state(undefined)
+	let payouts: HTMLDivElement | undefined = $state(undefined)
 
 	onMount(async () => {
 		const connectJS = await import("@stripe/connect-js")
@@ -51,8 +51,8 @@
 			locale: navigator.language ?? undefined
 		})
 
-		payouts?.appendChild(stripeConnect.create("payouts"))
 		payments?.appendChild(stripeConnect.create("payments"))
+		payouts?.appendChild(stripeConnect.create("payouts"))
 	})
 </script>
 
@@ -197,13 +197,13 @@
 		{/if}
 
 		<div class="preset-outlined-surface-300-700 mx-auto my-8 min-h-24 w-8/12 rounded-md p-4">
-			<h5 class="my-4 text-center">Payouts</h5>
-			<div bind:this={payouts} class="my-8"></div>
+			<h5 class="mt-12 mb-4 text-center">Payments</h5>
+			<div bind:this={payments} class="my-8"></div>
 		</div>
 
 		<div class="preset-outlined-surface-300-700 mx-auto my-8 min-h-24 w-8/12 rounded-md p-4">
-			<h5 class="mt-12 mb-4 text-center">Payments</h5>
-			<div bind:this={payments} class="my-8"></div>
+			<h5 class="my-4 text-center">Payouts</h5>
+			<div bind:this={payouts} class="my-8"></div>
 		</div>
 	{/if}
 </main>

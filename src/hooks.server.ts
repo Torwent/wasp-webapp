@@ -4,7 +4,7 @@ import { createServerClient } from "@supabase/ssr"
 import { sequence } from "@sveltejs/kit/hooks"
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from "$env/static/public"
 import type { Database } from "$lib/types/supabase"
-import { createCustomer, createStripeCustomer } from "$lib/server/stripe.server"
+import { createStripeCustomer } from "$lib/server/stripe.server"
 import { updateCustomerID } from "$lib/server/supabase.server"
 
 const redirects: Handle = async ({ event, resolve }) => {
@@ -14,14 +14,14 @@ const redirects: Handle = async ({ event, resolve }) => {
 
 	if (event.url.pathname.startsWith("/auth/callback")) {
 		const path = event.url.pathname.slice(14)
-		if (path === "") return resolve(event)
+		if (path === "") return await resolve(event)
 
 		const searchParams =
 			event.url.searchParams.toString() + "&path=" + encodeURI(path.replaceAll("_-_", "/"))
 
 		return redirect(303, "/auth/callback?" + searchParams)
 	}
-	return resolve(event)
+	return await resolve(event)
 }
 
 const supabase: Handle = async ({ event, resolve }) => {
@@ -78,7 +78,7 @@ const supabase: Handle = async ({ event, resolve }) => {
 		}
 	}
 
-	return resolve(event, {
+	return await resolve(event, {
 		filterSerializedResponseHeaders(name) {
 			return name === "content-range" || name === "x-supabase-api-version"
 		}
@@ -156,7 +156,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
 		return redirect(303, "/auth")
 	}
 
-	const response = resolve(event)
+	const response = await resolve(event)
 	return response
 }
 
