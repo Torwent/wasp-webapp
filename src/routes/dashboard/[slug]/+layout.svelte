@@ -4,11 +4,11 @@
 	import Head from "$lib/components/Head.svelte"
 	import UUID from "$lib/components/UUID.svelte"
 	import { Tabs } from "@skeletonlabs/skeleton-svelte"
-	import { FileCode, Landmark, Package, Settings } from "svelte-lucide"
+	import { CreditCard, FileCode, HandCoins, Landmark, Package, Settings } from "svelte-lucide"
 	const { data, children } = $props()
 
 	const profile = $derived(data.profile!)
-	let tab = $derived(page.url.pathname.split("/").pop())
+	let tab = $derived(page.url.pathname.split("/")[3])
 </script>
 
 <Head
@@ -43,7 +43,17 @@
 
 	<Tabs
 		value={tab}
-		onValueChange={(e) => goto(e.value)}
+		onValueChange={async (e) => {
+			const pathParts = page.url.pathname.split("/")
+			const { slug } = page.params
+			const len = pathParts.indexOf(slug)
+			let url = "/"
+			for (let i = 1; i < len; i++) {
+				url += pathParts[i] + "/"
+			}
+			url += slug + "/" + e.value
+			await goto(url)
+		}}
 		listJustify="justify-center flex flex-col sm:flex-row"
 	>
 		{#snippet list()}
@@ -51,6 +61,12 @@
 				{#snippet lead()}<Settings />{/snippet} General
 			</Tabs.Control>
 			<Tabs.Control value="stripe">{#snippet lead()}<Landmark />{/snippet} Stripe</Tabs.Control>
+			<Tabs.Control value="payouts">
+				{#snippet lead()}<HandCoins />{/snippet} Payouts
+			</Tabs.Control>
+			<Tabs.Control value="transactions">
+				{#snippet lead()}<CreditCard />{/snippet} Transactions
+			</Tabs.Control>
 			<Tabs.Control value="bundles">{#snippet lead()}<Package />{/snippet} Bundles</Tabs.Control>
 			<Tabs.Control value="scripts">{#snippet lead()}<FileCode />{/snippet} Scripts</Tabs.Control>
 		{/snippet}
