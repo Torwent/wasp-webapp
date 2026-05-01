@@ -1,4 +1,7 @@
+import { transactionDaysSchema } from "$lib/client/schemas"
 import { stripe } from "$lib/server/stripe.server"
+import { superValidate } from "sveltekit-superforms"
+import { zod } from "sveltekit-superforms/adapters"
 
 export const load = async ({ url: { searchParams }, parent }) => {
 	const cursor = searchParams.get("cursor") || undefined
@@ -19,7 +22,10 @@ export const load = async ({ url: { searchParams }, parent }) => {
 		stripeAccount: scripter.stripe
 	})
 
+	const daysForm = await superValidate({ days: 30 }, zod(transactionDaysSchema))
+
 	return {
+		daysForm,
 		transactionsPromise,
 		direction,
 		cursor

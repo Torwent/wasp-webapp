@@ -1,12 +1,15 @@
 <script lang="ts">
 	import { goto } from "$app/navigation"
 	import { page } from "$app/state"
+	import { transactionDaysSchema } from "$lib/client/schemas.js"
 	import Head from "$lib/components/Head.svelte"
 	import { currency } from "$lib/utils.js"
 	import Stripe from "stripe"
 	import ArrowLeft from "svelte-lucide/ArrowLeft.svelte"
 	import ArrowRight from "svelte-lucide/ArrowRight.svelte"
 	import { SvelteDate } from "svelte/reactivity"
+	import { superForm } from "sveltekit-superforms"
+	import { zodClient } from "sveltekit-superforms/adapters"
 
 	const { data, children } = $props()
 	let { transactionsPromise, direction, cursor } = $derived(data)
@@ -37,6 +40,14 @@
 
 	const next = $derived(transactionsURL + "?cursor=" + nextCursor + "&dir=next")
 	const prev = $derived(transactionsURL + "?cursor=" + prevCursor + "&dir=prev")
+
+	const { form, errors, enhance, allErrors, delayed } = superForm(data.daysForm, {
+		dataType: "json",
+		multipleSubmits: "prevent",
+		clearOnSubmit: "errors-and-message",
+		validators: zodClient(transactionDaysSchema),
+		resetForm: true
+	})
 </script>
 
 <Head
@@ -113,25 +124,75 @@
 		</table>
 	{/await}
 
-	<div class="flex justify-end-safe gap-2">
-		{#if hasPrev && prevCursor}
-			<a href={prev} class="btn preset-outlined-surface-500" data-sveltekit-noscroll>
-				<ArrowLeft class="size-4" />
-			</a>
-		{:else}
-			<button disabled class="btn preset-outlined-surface-500">
-				<ArrowLeft class="size-4" />
+	<div class="my-2 flex justify-between gap-2">
+		<form method="POST" class="flex gap-2" use:enhance>
+			<input
+				class="input w-44"
+				name="days"
+				type="number"
+				placeholder="Number of days"
+				bind:value={$form.days}
+				defaultValue={$form.days}
+				disabled={$delayed}
+			/>
+			<button
+				type="submit"
+				class="btn preset-outlined-surface-500 hover:preset-tonal"
+				disabled={$delayed}
+			>
+				{#if $delayed}
+					Loading...
+				{:else}
+					Export last {$form.days} days
+				{/if}
 			</button>
-		{/if}
+		</form>
 
-		{#if hasMore && nextCursor}
-			<a href={next} class="btn preset-outlined-surface-500" data-sveltekit-noscroll>
-				<ArrowRight class="size-4" />
-			</a>
-		{:else}
-			<button disabled class="btn preset-outlined-surface-500">
-				<ArrowRight class="size-4" />
-			</button>
-		{/if}
+		<div class="flex gap-2">
+			{#if hasPrev && prevCursor}
+				<a href={prev} class="btn preset-outlined-surface-500" data-sveltekit-noscroll>
+					<ArrowLeft class="size-4" />
+				</a>
+			{:else}
+				<button disabled class="btn preset-outlined-surface-500">
+					<ArrowLeft class="size-4" />
+				</button>
+			{/if}
+
+			{#if hasMore && nextCursor}
+				<a href={next} class="btn preset-outlined-surface-500" data-sveltekit-noscroll>
+					<ArrowRight class="size-4" />
+				</a>
+			{:else}
+				<button disabled class="btn preset-outlined-surface-500">
+					<ArrowRight class="size-4" />
+				</button>
+			{/if}
+		</div>
 	</div>
+
+	{#if $errors && $errors.days}
+		<div
+			class="bg-surface-700 text-error-500 max-h-24 overflow-x-hidden overflow-y-scroll rounded-md"
+		>
+			{$errors.days}
+		</div>
+	{/if}
+	{#if $allErrors}
+		<div
+			class="bg-surface-700 text-error-500 max-h-24 overflow-x-hidden overflow-y-scroll rounded-md"
+		>
+			{#each $allErrors as err, i (err.path)}
+				{#if i === 0}
+					Errors:
+				{/if}
+				<small class="text-error-500 mx-8 flex rounded-md">
+					Error path: {err.path}
+					{#each err.messages as message (message)}
+						{message}
+					{/each}
+				</small>
+			{/each}
+		</div>
+	{/if}
 </main>

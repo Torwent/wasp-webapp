@@ -368,6 +368,14 @@ export const dbaSchema = z.object({
 	dba: z.string().min(3, "Your name needs to be longer")
 })
 
+export const transactionDaysSchema = z.object({
+	days: z
+		.number()
+		.int()
+		.min(0, "You can only export transactions for at least one day.")
+		.max(400, "You can only export transactions for a maximum of 400 days.")
+})
+
 export const loginAsSchema = z.object({
 	refresh_token: z.string().min(2, "A refresh token should be longer.")
 })
