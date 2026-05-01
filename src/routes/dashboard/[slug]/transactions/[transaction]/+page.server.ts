@@ -6,7 +6,7 @@ const regions = new Intl.DisplayNames(["en"], { type: "region" })
 export const load = async ({ params, parent }) => {
 	const { scripter } = await parent()
 
-	const transaction = await stripe.balanceTransactions
+	const tx = await stripe.balanceTransactions
 		.retrieve(
 			params.transaction,
 			{
@@ -18,6 +18,16 @@ export const load = async ({ params, parent }) => {
 			error(500, "Failed to find transaction: " + params.transaction)
 		})
 
+	const transaction = {
+		id: tx.id,
+		amount: tx.amount,
+		fee: tx.fee,
+		net: tx.net,
+		currency: tx.currency,
+		created: tx.created,
+		available_on: tx.available_on
+	}
+
 	const user = {
 		stripe: "",
 		waspscripts: "",
@@ -26,7 +36,7 @@ export const load = async ({ params, parent }) => {
 		refunds: 0
 	}
 
-	const { source } = transaction
+	const { source } = tx
 	if (!source || typeof source === "string") {
 		return { transaction, source: source ?? "", charge: "", user }
 	}
