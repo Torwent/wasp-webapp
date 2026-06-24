@@ -4,23 +4,21 @@ import type { Bundle, Price, Scripter } from "$lib/types/collection"
 import type { SupabaseClient } from "@supabase/supabase-js"
 import Stripe from "stripe"
 
-//@ts-ignore
 export const stripe = new Stripe(STRIPE_KEY, { apiVersion: "2026-03-25.dahlia", typescript: true })
 
 export async function createCustomerPortal(customer: string, origin: string) {
-	let portal: Stripe.BillingPortal.Session
-
 	try {
-		portal = await stripe.billingPortal.sessions.create({
+		const portal = await stripe.billingPortal.sessions.create({
 			customer: customer,
 			return_url: origin + "/subscriptions"
 		})
-	} catch (error) {
-		console.error(error)
+		return portal.url
+	} catch (err) {
+		console.error(
+			"createCustomerPortal error on stripe.billingPortal.sessions.create: " + JSON.stringify(err)
+		)
 		return null
 	}
-
-	return portal.url
 }
 
 export async function createCheckoutSession(
@@ -30,27 +28,28 @@ export async function createCheckoutSession(
 	price: string,
 	origin: string
 ) {
-	let session: Stripe.Checkout.Session
-
 	let currency: string = "eur"
 
 	if (stripeUser) {
+		const start = performance.now()
 		try {
-			const start = performance.now()
 			const stripeAccount = await stripe.accounts.retrieve(stripeUser)
 			currency = stripeAccount.default_currency ?? currency
-			console.log(
-				`└────🪙 Account currency took ${(performance.now() - start).toFixed(2)} ms to check!`
+		} catch (err) {
+			console.error(
+				"createCheckoutSession error on stripe.accounts.retrieve: " + JSON.stringify(err)
 			)
-		} catch (err: unknown) {
-			console.error(err)
 			return null
 		}
+
+		console.log(
+			`└────🪙 Account currency took ${(performance.now() - start).toFixed(2)} ms to check!`
+		)
 	}
 
+	const start = performance.now()
 	try {
-		const start = performance.now()
-		session = await stripe.checkout.sessions.create({
+		const session = await stripe.checkout.sessions.create({
 			line_items: [{ price: price, quantity: 1 }],
 			customer: customer,
 			customer_update: { address: "auto", shipping: "auto" },
@@ -71,36 +70,35 @@ export async function createCheckoutSession(
 		console.log(
 			`└────🛒 Checkout session took ${(performance.now() - start).toFixed(2)} ms to create!`
 		)
-	} catch (err: unknown) {
-		console.error(err)
+
+		return session.url
+	} catch (err) {
+		console.error(
+			"createCheckoutSession error on stripe.checkout.sessions.create: " + JSON.stringify(err)
+		)
 		return null
 	}
-
-	return session.url
 }
 
-export async function getStripeConnectAccount(id: string | null | undefined) {
+export async function getStripeConnectAccount(id: string | null) {
 	if (!id) return null
-	let stripeAccount: Stripe.Account | null = null
 
 	try {
-		stripeAccount = await stripe.accounts.retrieve(id)
-	} catch (error) {
+		const stripeAccount = await stripe.accounts.retrieve(id)
+		return stripeAccount as Stripe.Account
+	} catch (err) {
 		console.error(
-			"An error occurred when calling the Stripe API to create an account session",
-			error
+			"getStripeConnectAccount error on stripe.accounts.retrieve: " + JSON.stringify(err)
 		)
+		return null
 	}
-
-	return stripeAccount
 }
 
 export async function getStripeSession(account: string | null | undefined) {
 	if (!account) return null
-	let accountSession: Stripe.Response<Stripe.AccountSession> | null = null
 
 	try {
-		accountSession = await stripe.accountSessions.create({
+		const accountSession = await stripe.accountSessions.create({
 			account: account,
 			components: {
 				payments: {
@@ -120,14 +118,11 @@ export async function getStripeSession(account: string | null | undefined) {
 				}
 			}
 		})
-	} catch (error) {
-		console.error(
-			"An error occurred when calling the Stripe API to create an account session",
-			error
-		)
+		return accountSession as Stripe.AccountSession
+	} catch (err) {
+		console.error("getStripeSession error on stripe.accountSessions.create: " + JSON.stringify(err))
+		return null
 	}
-
-	return accountSession?.client_secret ?? null
 }
 
 export async function createStripeCustomer(
@@ -136,21 +131,20 @@ export async function createStripeCustomer(
 	discord: string,
 	username: string
 ) {
-	let customer: Stripe.Customer
 	let customerSearch: Stripe.Response<Stripe.ApiSearchResult<Stripe.Customer>>
 
 	try {
 		customerSearch = await stripe.customers.search({ query: `name:"${id}"` })
-	} catch (error) {
-		console.error(error)
+	} catch (err) {
+		console.error("createStripeCustomer error on stripe.customers.search: " + JSON.stringify(err))
 		return null
 	}
 
-	if (customerSearch.data.length > 1) return false
+	if (customerSearch.data.length > 1) return null
 	if (customerSearch.data.length === 1) return customerSearch.data[0].id
 
 	try {
-		customer = await stripe.customers.create({
+		const customer = await stripe.customers.create({
 			email: email,
 			name: id,
 			metadata: {
@@ -159,11 +153,11 @@ export async function createStripeCustomer(
 				username: username
 			}
 		})
-	} catch (error) {
-		console.error(error)
+		return customer.id
+	} catch (err) {
+		console.error("createStripeCustomer error on stripe.customers.create: " + JSON.stringify(err))
 		return null
 	}
-	return customer.id
 }
 
 export async function createStripeConnectAccount(
@@ -174,7 +168,6 @@ export async function createStripeConnectAccount(
 	country: string
 ) {
 	let account: Stripe.Response<Stripe.Account>
-	let accountLink: Stripe.Response<Stripe.AccountLink>
 
 	try {
 		account = await stripe.accounts.create({
@@ -204,8 +197,10 @@ export async function createStripeConnectAccount(
 			}
 		})
 	} catch (err) {
-		console.error(err)
-		return
+		console.error(
+			"createStripeConnectAccount error on stripe.accounts.create: " + JSON.stringify(err)
+		)
+		return null
 	}
 
 	const promises = await Promise.all([
@@ -223,52 +218,50 @@ export async function createStripeConnectAccount(
 
 	for (let i = 0; i < promises.length; i++) {
 		if (promises[i].error) {
-			console.error(promises[i].error)
-			return
+			console.error(
+				"createStripeConnectAccount error on supabase: " + JSON.stringify(promises[i].error)
+			)
+			return null
 		}
 	}
 
 	try {
-		accountLink = await stripe.accountLinks.create({
+		const accountLink = await stripe.accountLinks.create({
 			account: account.id,
 			refresh_url: baseURL + "/dashboard",
 			return_url: baseURL + "/dashboard",
 			type: "account_onboarding"
 		})
-	} catch (err) {
-		console.error(err)
-		return
-	}
 
-	return accountLink.url
+		return accountLink.url
+	} catch (err) {
+		console.error(
+			"createStripeConnectAccount error on stripe.accountLinks.create: " + JSON.stringify(err)
+		)
+		return null
+	}
 }
 
 export async function finishStripeConnectAccountSetup(baseURL: string, account: string) {
-	let accountLink: Stripe.Response<Stripe.AccountLink>
-
 	try {
-		accountLink = await stripe.accountLinks.create({
+		const accountLink = await stripe.accountLinks.create({
 			account: account,
 			refresh_url: baseURL + "/api/stripe/connect/reauth",
 			return_url: baseURL + "/api/stripe/connect/return",
 			type: "account_update"
 		})
+		return accountLink.url
 	} catch (err) {
-		console.error(err)
-		return
+		console.error("finishStripeConnectAccountSetup error: " + JSON.stringify(err))
+		return null
 	}
-
-	return accountLink.url
 }
 
 export async function updateStripeConnectAccount(id: string, dba: string) {
 	try {
 		await stripe.accounts.update(id, { business_profile: { name: dba } })
-	} catch (error) {
-		console.error(
-			"An error occurred when calling the Stripe API to create an account session",
-			error
-		)
+	} catch (err) {
+		console.error("updateStripeConnectAccount error: " + JSON.stringify(err))
 		return false
 	}
 
@@ -282,68 +275,97 @@ export async function updateInvoiceTemplate(customer: string, template: string) 
 				rendering_options: { template }
 			}
 		})
-	} catch (error) {
-		console.error("Error updating user invoice template: " + error)
+	} catch (err) {
+		console.error("Error updating user invoice template: " + JSON.stringify(err))
+		return false
 	}
+	return true
 }
 
 export async function updateStripeProduct(id: string, name: string) {
 	try {
-		await stripe.products
-			.update(id, {
-				name: name
-			})
-			.catch((err: unknown) => console.error(err))
+		await stripe.products.update(id, { name: name })
 	} catch (err) {
-		console.error(err)
+		console.error(
+			`Error updating product: ${id} with name: ${name} and error: ` + JSON.stringify(err)
+		)
+		return false
 	}
+	return true
 }
 
 type Interval = "week" | "month" | "year"
 
 async function createStripePriceEx(product: string, amount: number, interval: Interval) {
-	if (amount === 0) return
-	await stripe.prices
-		.create({
+	if (amount === 0) return false
+
+	try {
+		await stripe.prices.create({
 			unit_amount: Math.round(amount * 100),
 			currency: "eur",
 			active: true,
 			product: product,
 			recurring: { interval: interval }
 		})
-		.catch((err: unknown) => console.error(err))
+	} catch (err) {
+		console.error(
+			`Error creating priceEx: ${product} with amount: ${amount}, interval: ${interval} and error: ` +
+				JSON.stringify(err)
+		)
+		return false
+	}
+	return true
 }
 
 export async function createStripePrice(price: PriceSchema, product: string) {
-	if (price.amount === 0) return
-	await stripe.prices
-		.create({
+	if (price.amount === 0) return false
+	try {
+		await stripe.prices.create({
 			unit_amount: Math.round(price.amount * 100),
 			currency: price.currency,
 			active: true,
 			product: product,
 			recurring: { interval: price.interval as Interval }
 		})
-		.catch((err: unknown) => console.error(err))
+	} catch (err) {
+		console.error(
+			`Error creating price for product: ${product} with price: ${JSON.stringify(price)} and error: ` +
+				JSON.stringify(err)
+		)
+		return false
+	}
+
+	return true
 }
 
 export async function updateStripePrice(price: Price) {
-	const promises = []
-	if (price.amount > 0)
-		promises.push(
-			stripe.prices
-				.create({
-					unit_amount: Math.round(price.amount * 100),
-					currency: "EUR",
-					active: true,
-					product: price.product,
-					recurring: { interval: price.interval as Interval }
-				})
-				.catch((err) => console.error(err))
-		)
-	promises.push(stripe.prices.update(price.id, { active: false }))
+	if (price.amount > 0) {
+		try {
+			await stripe.prices.create({
+				unit_amount: Math.round(price.amount * 100),
+				currency: "EUR",
+				active: true,
+				product: price.product,
+				recurring: { interval: price.interval as Interval }
+			})
+		} catch (err) {
+			console.error(
+				`Error updating price on create: ${JSON.stringify(price)} and error: ` + JSON.stringify(err)
+			)
+			return false
+		}
+	}
 
-	await Promise.all(promises)
+	try {
+		await stripe.prices.update(price.id, { active: false })
+	} catch (err) {
+		console.error(
+			`Error updating price on update: ${JSON.stringify(price)} and error: ` + JSON.stringify(err)
+		)
+		return false
+	}
+
+	return true
 }
 
 export async function createStripeBundleProduct(supabase: SupabaseClient, bundle: BundleSchema) {
@@ -354,36 +376,45 @@ export async function createStripeBundleProduct(supabase: SupabaseClient, bundle
 
 	bundle.prices = bundle.prices.filter((price) => price.amount > 0)
 
-	if (bundle.prices.length === 0) return
+	if (bundle.prices.length === 0) return { message: null }
 
-	const { data, error } = await supabase
+	const { data, error: err } = await supabase
 		.schema("scripts")
 		.from("bundles")
 		.insert({ name: bundle.name, user_id: bundle.user_id, scripts: scripts })
 		.select()
 		.overrideTypes<Bundle[]>()
 
-	if (error) return error
+	if (err) return err
 
-	const product = await stripe.products
-		.create({
+	let product: Stripe.Product
+
+	try {
+		product = await stripe.products.create({
 			name: data[0].name,
 			tax_code: "txcd_10202000",
 			metadata: { user_id: data[0].user_id, bundle: data[0].id }
 		})
-		.catch((err: unknown) => console.error(err))
+	} catch (err) {
+		console.error(
+			`createStripeBundleProduct error on stripe.products.create with data: ${JSON.stringify(data)} and error: ` +
+				JSON.stringify(err)
+		)
+		return { message: "Failed to create bundle product in Stripe" }
+	}
 
-	if (!product) return { message: "Failed to create bundle product in Stripe" }
+	const promises = []
 
-	const stripePromises: Promise<void>[] = []
+	for (let i = 0; i < bundle.prices.length - 1; i++) {
+		const price = bundle.prices[i]
+		promises.push(createStripePriceEx(product.id, price.amount, price.interval as Interval))
+	}
 
-	bundle.prices.forEach((price) => {
-		if (price.amount) {
-			stripePromises.push(createStripePriceEx(product.id, price.amount, price.interval as Interval))
-		}
-	})
-
-	await Promise.all(stripePromises)
+	const results = await Promise.all(promises)
+	for (let i = 0; i < results.length - 1; i++) {
+		if (!results[i]) return { message: "Failed to create a price" }
+	}
+	return { message: null }
 }
 
 export async function createStripeScriptProduct(
@@ -392,7 +423,7 @@ export async function createStripeScriptProduct(
 	user_id: string
 ) {
 	script.prices = script.prices.filter((price) => price.amount > 0)
-	if (script.prices.length === 0) return
+	if (script.prices.length === 0) return { message: null }
 
 	const product = await stripe.products
 		.create({
@@ -404,13 +435,16 @@ export async function createStripeScriptProduct(
 
 	if (!product) return { message: "Failed to create script product in Stripe" }
 
-	const stripePromises: Promise<void>[] = []
+	const promises = []
 
-	script.prices.forEach((price) => {
-		if (price.amount) {
-			stripePromises.push(createStripePriceEx(product.id, price.amount, price.interval as Interval))
-		}
-	})
+	for (let i = 0; i < script.prices.length - 1; i++) {
+		const price = script.prices[i]
+		promises.push(createStripePriceEx(product.id, price.amount, price.interval as Interval))
+	}
 
-	await Promise.all(stripePromises)
+	const results = await Promise.all(promises)
+	for (let i = 0; i < results.length - 1; i++) {
+		if (!results[i]) return { message: "Failed to create a price" }
+	}
+	return { message: null }
 }

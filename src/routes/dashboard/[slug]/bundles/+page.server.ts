@@ -263,9 +263,9 @@ export const actions = {
 
 		if (!roles?.moderator || !roles?.administrator) form.data.user_id = user.id
 
-		const err = await createStripeBundleProduct(supabaseServer, form.data)
+		const { message: err } = await createStripeBundleProduct(supabaseServer, form.data)
 
-		if (err) return setError(form, "", err.message)
+		if (err) return setError(form, "", err)
 
 		redirect(303, pathname)
 	},

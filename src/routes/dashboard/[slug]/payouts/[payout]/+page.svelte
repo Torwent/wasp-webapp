@@ -67,7 +67,6 @@
 	}
 
 	let loading = $state(true)
-	let fees = $state(0)
 	const charges = $state({ name: "Charges", amount: 0, gross: 0, fees: 0, total: 0 })
 	const refunds = $state({ name: "Refunds", amount: 0, gross: 0, fees: 0, total: 0 })
 	const adjusts = $state({
@@ -205,7 +204,7 @@
 							</tr>
 						</thead>
 						<tbody class="preset-filled-surface-100-900 [&>tr]:hover:preset-tonal-surface">
-							{#each [charges, refunds, adjusts] as entry}
+							{#each [charges, refunds, adjusts] as entry (entry.name)}
 								<tr>
 									<td>{entry.name}</td>
 									<td class="text-right">{entry.amount}</td>
@@ -238,7 +237,7 @@
 						{#await transactionsPromise}
 							Loading...
 						{:then transactions}
-							{#each transactions as transaction}
+							{#each transactions as transaction (transaction.id)}
 								<a
 									href={transactionURL + transaction.id}
 									class="border-surface-500 flex justify-between border-b-1"

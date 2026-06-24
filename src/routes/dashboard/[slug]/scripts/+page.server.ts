@@ -248,8 +248,13 @@ export const actions = {
 
 		if (errProtected) return setError(form, "", formatError(errProtected))
 
-		await createStripeScriptProduct(form.data, data.scripts.title, data.author_id)
+		const { message: createErr } = await createStripeScriptProduct(
+			form.data,
+			data.scripts.title,
+			data.author_id
+		)
 
+		if (createErr) return setError(form, "", createErr)
 		redirect(303, pathname)
 	},
 

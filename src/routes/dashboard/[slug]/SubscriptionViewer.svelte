@@ -109,11 +109,11 @@
 			</h1>
 			<h2 class="my-4 text-center">Total subscriptions: {count}</h2>
 			<div class="my-4 flex justify-evenly gap-2 text-sm">
-				{#each ["Weekly", "Monthly", "Yearly"] as interval, idx}
+				{#each ["Weekly", "Monthly", "Yearly"] as interval, idx (interval)}
 					<div class="flex flex-col gap-2">
 						<span>
 							{interval} active:
-							<span class="text-success-500">{income[idx].active.toFixed(2)}€ </span>
+							<span class="text-success-500">{income[idx].active.toFixed(2)}€</span>
 						</span>
 						<span>
 							{interval} cancelling:

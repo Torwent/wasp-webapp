@@ -45,8 +45,9 @@
 		If you are new to Simba and don't know what it is, Simba is just the oldest color botting program
 		still around, it's ancestor, SCAR dates back to RuneScape Classic.
 	</p>
-        <p class="my-6 text-center">
-		We use the most advanced image recognition and computer vision techniques like template matching, OCR, edge detection and color math to build efficient color OSRS bot scripts.
+	<p class="my-6 text-center">
+		We use the most advanced image recognition and computer vision techniques like template
+		matching, OCR, edge detection and color math to build efficient color OSRS bot scripts.
 	</p>
 	<p class="my-6 text-center">
 		For more information, help and/or questions look through the

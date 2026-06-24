@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { goto } from "$app/navigation"
-	import { page } from "$app/state"
 	import Head from "$lib/components/Head.svelte"
 	import { currency } from "$lib/utils"
 	import ArrowLeft from "svelte-lucide/ArrowLeft.svelte"
@@ -23,13 +22,6 @@
 			prevCursor = py.data.at(0)?.id ?? null
 		})
 	})
-
-	const pathParts = page.url.pathname.split("/")
-	const len = pathParts.indexOf("payouts")
-	let url = "/"
-	for (let i = 1; i < len; i++) {
-		url += pathParts[i] + "/"
-	}
 
 	const payoutsURL = "payouts/"
 
