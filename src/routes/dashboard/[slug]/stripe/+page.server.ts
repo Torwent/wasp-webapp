@@ -16,11 +16,11 @@ import {
 export const load = async ({ locals: { supabaseServer }, params: { slug }, depends }) => {
 	depends("dashboard:stripe_session")
 
-	const scripter = await getScripter(supabaseServer, slug)
+	const { stripe: stripeID } = await getScripter(supabaseServer, slug)
 	const promises = await Promise.all([
 		superValidate(zod(countryCodeSchema)),
 		superValidate(zod(dbaSchema)),
-		getStripeConnectAccount(scripter.stripe)
+		getStripeConnectAccount(stripeID)
 	])
 
 	promises[1].data.dba = promises[2]?.business_profile?.name ?? ""
@@ -29,7 +29,7 @@ export const load = async ({ locals: { supabaseServer }, params: { slug }, depen
 		countryForm: promises[0],
 		dbaForm: promises[1],
 		stripeAccount: promises[2],
-		stripeSession: getStripeSession(scripter.stripe)
+		stripeSession: getStripeSession(stripeID)
 	}
 }
 

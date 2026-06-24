@@ -80,8 +80,8 @@ export async function createCheckoutSession(
 	}
 }
 
-export async function getStripeConnectAccount(id: string | null) {
-	if (!id) return null
+export async function getStripeConnectAccount(id: string | undefined) {
+	if (id == null) return null
 
 	try {
 		const stripeAccount = await stripe.accounts.retrieve(id)
@@ -94,12 +94,12 @@ export async function getStripeConnectAccount(id: string | null) {
 	}
 }
 
-export async function getStripeSession(account: string | null | undefined) {
-	if (!account) return null
+export async function getStripeSession(id: string | undefined) {
+	if (id == null) return null
 
 	try {
 		const accountSession = await stripe.accountSessions.create({
-			account: account,
+			account: id,
 			components: {
 				payments: {
 					enabled: true,
@@ -118,7 +118,7 @@ export async function getStripeSession(account: string | null | undefined) {
 				}
 			}
 		})
-		return accountSession as Stripe.AccountSession
+		return accountSession.client_secret
 	} catch (err) {
 		console.error("getStripeSession error on stripe.accountSessions.create: " + JSON.stringify(err))
 		return null

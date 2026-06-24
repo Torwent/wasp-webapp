@@ -36,7 +36,8 @@
 
 	async function fetchClientSecret() {
 		invalidate("dashboard:stripe_session")
-		return (await stripeSession) ?? ""
+		const session = await stripeSession
+		return session ?? ""
 	}
 
 	let payments: HTMLDivElement | undefined = $state(undefined)
