@@ -67,6 +67,7 @@
 	}
 
 	let loading = $state(true)
+	let fees = $state(0)
 	const charges = $state({ name: "Charges", amount: 0, gross: 0, fees: 0, total: 0 })
 	const refunds = $state({ name: "Refunds", amount: 0, gross: 0, fees: 0, total: 0 })
 	const adjusts = $state({
@@ -79,7 +80,7 @@
 
 	$effect(() => {
 		transactionsPromise.then((txs) => {
-			for (let i = 0; i < txs.length - 1; i++) {
+			for (let i = 0; i < txs.length; i++) {
 				const tx = txs[i]
 				fees += tx.fee
 				if (tx.type == "payout") continue

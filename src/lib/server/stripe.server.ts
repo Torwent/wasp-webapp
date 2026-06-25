@@ -297,7 +297,7 @@ export async function updateStripeProduct(id: string, name: string) {
 type Interval = "week" | "month" | "year"
 
 async function createStripePriceEx(product: string, amount: number, interval: Interval) {
-	if (amount === 0) return false
+	if (amount === 0) return true
 
 	try {
 		await stripe.prices.create({
@@ -318,7 +318,8 @@ async function createStripePriceEx(product: string, amount: number, interval: In
 }
 
 export async function createStripePrice(price: PriceSchema, product: string) {
-	if (price.amount === 0) return false
+	if (price.amount === 0) return true
+
 	try {
 		await stripe.prices.create({
 			unit_amount: Math.round(price.amount * 100),
@@ -405,13 +406,13 @@ export async function createStripeBundleProduct(supabase: SupabaseClient, bundle
 
 	const promises = []
 
-	for (let i = 0; i < bundle.prices.length - 1; i++) {
+	for (let i = 0; i < bundle.prices.length; i++) {
 		const price = bundle.prices[i]
 		promises.push(createStripePriceEx(product.id, price.amount, price.interval as Interval))
 	}
 
 	const results = await Promise.all(promises)
-	for (let i = 0; i < results.length - 1; i++) {
+	for (let i = 0; i < results.length; i++) {
 		if (!results[i]) return { message: "Failed to create a price" }
 	}
 	return { message: null }
@@ -437,13 +438,13 @@ export async function createStripeScriptProduct(
 
 	const promises = []
 
-	for (let i = 0; i < script.prices.length - 1; i++) {
+	for (let i = 0; i < script.prices.length; i++) {
 		const price = script.prices[i]
 		promises.push(createStripePriceEx(product.id, price.amount, price.interval as Interval))
 	}
 
 	const results = await Promise.all(promises)
-	for (let i = 0; i < results.length - 1; i++) {
+	for (let i = 0; i < results.length; i++) {
 		if (!results[i]) return { message: "Failed to create a price" }
 	}
 	return { message: null }
