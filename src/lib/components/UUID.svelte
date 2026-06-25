@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from "$app/environment"
 	import Clipboard from "svelte-lucide/Clipboard.svelte"
 	import ClipboardCheck from "svelte-lucide/ClipboardCheck.svelte"
 	let { uuid }: { uuid: string } = $props()
@@ -10,6 +11,7 @@
 	type="button"
 	onclick={async (e) => {
 		e.preventDefault()
+		if (!browser) return
 		await navigator.clipboard.writeText(uuid)
 		copied = true
 		setTimeout(() => (copied = false), 2000)

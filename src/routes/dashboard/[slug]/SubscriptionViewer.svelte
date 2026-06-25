@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from "$app/environment"
 	import { page } from "$app/state"
 	import TableHeader from "$lib/components/TableHeader.svelte"
 	import { Modal } from "@skeletonlabs/skeleton-svelte"
@@ -86,7 +87,7 @@
 		"Action"
 	]
 
-	let userLocale = navigator.language ?? "pt-PT"
+	let userLocale = browser ? navigator.language : "pt-PT"
 	let open = $state(false)
 	let allOpen = $state(false)
 </script>

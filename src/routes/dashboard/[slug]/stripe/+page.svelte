@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from "$app/environment"
 	import { invalidate } from "$app/navigation"
 	import { PUBLIC_STRIPE_PUBLISHABLE_KEY } from "$env/static/public"
 	import { countryCodeSchema, dbaSchema } from "$lib/client/schemas"
@@ -49,7 +50,7 @@
 		const stripeConnect = connectJS.loadConnectAndInitialize({
 			publishableKey: PUBLIC_STRIPE_PUBLISHABLE_KEY,
 			fetchClientSecret,
-			locale: navigator.language ?? undefined
+			locale: browser ? navigator.language : undefined
 		})
 
 		payments?.appendChild(stripeConnect.create("payments"))

@@ -3,6 +3,7 @@
 	import type { BundleProduct, FreeAccess, ScriptProduct } from "$lib/types/collection"
 	import ExternalLink from "svelte-lucide/ExternalLink.svelte"
 	import ScriptLinks from "./ScriptLinks.svelte"
+	import { browser } from "$app/environment"
 
 	let {
 		freeAccess,
@@ -22,7 +23,7 @@
 		return scripts.find((script) => script.id === id)
 	}
 
-	let userLocale = navigator.language ?? "pt-PT"
+	let userLocale = browser ? navigator.language : "pt-PT"
 
 	let bundleArray: (BundleProduct | undefined)[] = $state([])
 	freeAccess.forEach((access) => {

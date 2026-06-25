@@ -1,8 +1,10 @@
 <script lang="ts">
+	import { browser } from "$app/environment"
+
 	const { form } = $props()
 
 	function toUnit(value: number) {
-		return `"${value.toLocaleString(navigator.language, { minimumFractionDigits: 2 })}"`
+		return `"${value.toLocaleString(browser ? navigator.language : "pt-PT", { minimumFractionDigits: 2 })}"`
 	}
 
 	function formatDate(n: number) {

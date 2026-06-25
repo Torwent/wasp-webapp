@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from "$app/environment"
 	import { page } from "$app/state"
 	import { onMount } from "svelte"
 	import { SvelteDate } from "svelte/reactivity"
@@ -7,14 +8,14 @@
 	let { payoutPromise, transactionsPromise } = $derived(data)
 
 	function currency(value: number, code: string) {
-		return value.toLocaleString(navigator.language, {
+		return value.toLocaleString(browser ? navigator.language : "pt-PT", {
 			style: "currency",
 			currency: code.toUpperCase()
 		})
 	}
 
 	function toUnit(value: number) {
-		return `"${value.toLocaleString(navigator.language, { minimumFractionDigits: 2 })}"`
+		return `"${value.toLocaleString(browser ? navigator.language : "pt-PT", { minimumFractionDigits: 2 })}"`
 	}
 
 	function formatDate(n: number) {

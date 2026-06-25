@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { browser } from "$app/environment"
 	import { page } from "$app/state"
 	import TableHeader from "$lib/components/TableHeader.svelte"
 	import { Modal } from "@skeletonlabs/skeleton-svelte"
@@ -38,7 +39,7 @@
 
 	const headers = ["WaspScripts ID", "Username", "Start Date", "End Date", "Action"]
 
-	let userLocale = navigator.language ?? "pt-PT"
+	let userLocale = browser ? navigator.language : "pt-PT"
 	let open = $state(false)
 </script>
 

@@ -1,5 +1,6 @@
 import type { AuthError, PostgrestError } from "@supabase/supabase-js"
 import type { Price, TScriptCategories, TScriptStatus, TScriptTypes } from "./types/collection"
+import { browser } from "$app/environment"
 
 export const API_URL = "https://api.waspscripts.com" //http://localhost:8080
 export const UUID_V4_REGEX =
@@ -196,7 +197,7 @@ export const scriptCategories: Record<TScriptCategories[number], NameValueIcon> 
 }
 
 export function currency(value: number, code: string) {
-	return value.toLocaleString(navigator.language, {
+	return value.toLocaleString(browser ? navigator.language : "pt-PT", {
 		style: "currency",
 		currency: code.toUpperCase()
 	})

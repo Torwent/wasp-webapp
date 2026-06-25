@@ -7,6 +7,7 @@
 	import { getPriceAmount, getPriceIntervalEx } from "$lib/utils"
 	import ExternalLink from "svelte-lucide/ExternalLink.svelte"
 	import ScriptLinks from "./ScriptLinks.svelte"
+	import { browser } from "$app/environment"
 
 	let {
 		data,
@@ -42,7 +43,7 @@
 		return scripts.find((script) => script.id === id)
 	}
 
-	let userLocale = navigator.language ?? "pt-PT"
+	let userLocale = browser ? navigator.language : "pt-PT"
 
 	let bundleArray: (BundleProduct | undefined)[] = $state([])
 	subscriptions.forEach((sub) => {
