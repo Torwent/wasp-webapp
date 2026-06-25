@@ -162,6 +162,11 @@
 							{currency(payout.amount / 100, payout.currency)}
 						</span>
 
+						<span>Fees</span>
+						<span>
+							{currency(fees / 100, payout.currency)}
+						</span>
+
 						<span>Type</span>
 						<span>
 							{#if payout.type == "bank_account"}
