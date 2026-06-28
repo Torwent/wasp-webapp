@@ -1,4 +1,4 @@
-import { error, type Handle, redirect } from "@sveltejs/kit"
+import { error, type Handle, type HandleServerError, redirect } from "@sveltejs/kit"
 
 import { createServerClient } from "@supabase/ssr"
 import { sequence } from "@sveltejs/kit/hooks"
@@ -206,3 +206,18 @@ export const handle: Handle = sequence(
 	authGuard,
 	performanceCheck
 )
+
+export const handleError: HandleServerError = ({ error }) => {
+	if (
+		error instanceof Error &&
+		error.constructor.name === "SvelteKitError" &&
+		"status" in error &&
+		error.status === 404
+	) {
+		console.log(error.message)
+		return
+	}
+
+	console.error("Unexpected error ocurred: ", error)
+	return { message: "An unexpected error occurred" }
+}
