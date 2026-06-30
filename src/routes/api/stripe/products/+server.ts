@@ -14,7 +14,7 @@ export const POST = async ({ request }) => {
 		event = stripe.webhooks.constructEvent(body, sig, STRIPE_WEBHOOK_SECRET_PRODUCTS)
 	} catch (err) {
 		console.log(err)
-		throw error(404, "Event is not valid! Body: " + body + " Error: " + err)
+		error(404, "Event is not valid! Body: " + body + " Error: " + err)
 	}
 
 	const { data, type } = event
@@ -59,7 +59,7 @@ export const POST = async ({ request }) => {
 		}
 
 		default:
-			throw error(404, "Product event doesn't have a valid type! Type: " + type)
+			error(404, "Product event doesn't have a valid type! Type: " + type)
 	}
 
 	return json({

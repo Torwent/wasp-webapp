@@ -118,7 +118,10 @@ export async function getUsername(id: string) {
 		.eq("id", id)
 		.single()
 
-	if (err) throw error(500, formatError(err))
+	if (err) {
+		console.error("getUsername error: " + formatError(err))
+		return null
+	}
 	return data.username
 }
 
@@ -149,7 +152,10 @@ export async function updateCustomerID(id: string, customer_id: string) {
 		.update({ customer_id: customer_id })
 		.eq("id", id)
 
-	if (err) throw error(500, formatError(err))
+	if (err) {
+		console.error("updateCustomerID error: " + formatError(err))
+		return false
+	}
 
 	return true
 }
@@ -166,12 +172,12 @@ export async function removeScriptBroken(script: string) {
 		.eq(isUUID ? "id" : "url", script)
 
 	if (err) {
-		error(
-			500,
+		console.error(
 			"Server error, this is probably not an issue on your end!\n" +
 				"UPDATE scripts.protected failed!\n\n" +
 				formatError(err)
 		)
+		return false
 	}
 
 	return true
@@ -183,12 +189,12 @@ export async function updateReporters(script: string, user: string) {
 		.rpc("add_reporter", { script_id: script, user_id: user })
 
 	if (err) {
-		error(
-			500,
+		console.error(
 			"Server error, this is probably not an issue on your end!\n" +
 				"UPDATE scripts.add_reporter postgres function failed!\n\n" +
 				formatError(err)
 		)
+		return false
 	}
 
 	return true
@@ -200,12 +206,12 @@ export async function updateDownloaders(script: string, user: string) {
 		.rpc("add_downloader", { script_id: script, user_id: user })
 
 	if (err) {
-		error(
-			500,
+		console.error(
 			"Server error, this is probably not an issue on your end!\n" +
 				"UPDATE scripts.stats_site failed!\n\n" +
 				formatError(err)
 		)
+		return false
 	}
 
 	return true
@@ -222,7 +228,7 @@ export async function updateScriptNotification(id: string) {
 
 	if (err) {
 		console.error("scripts.stats_site.notified UPDATE failed: " + formatError(err))
-		error(500, formatError(err))
+		return false
 	}
 
 	return true
@@ -262,7 +268,10 @@ export async function updateScripterAccount(id: string, account_id: string) {
 		.update({ stripe: account_id })
 		.eq("id", id)
 
-	if (err) error(500, formatError(err))
+	if (err) {
+		console.error(formatError(err))
+		return false
+	}
 
 	return true
 }
@@ -369,9 +378,14 @@ export class WaspProduct {
 		})
 
 		if (errProducts) {
-			console.error(errProducts)
-			console.log("object: ", product)
-			error(500, errProducts)
+			console.error(
+				"WaspProduct.insert error with product: " +
+					JSON.stringify(product) +
+					" and error: " +
+					formatError(errProducts)
+			)
+
+			return false
 		}
 
 		return true
@@ -387,8 +401,15 @@ export class WaspProduct {
 			.eq("id", id)
 
 		if (err) {
-			console.error(err)
-			error(500, err)
+			console.error(
+				"WaspProduct.update error with id: " +
+					id +
+					", name: " +
+					name +
+					" and error: " +
+					formatError(err)
+			)
+			return false
 		}
 
 		return true
@@ -397,15 +418,15 @@ export class WaspProduct {
 	static async delete(id: string) {
 		console.log("DELETE scripts.products: ", id)
 
-		const { error: errProduct } = await supabaseAdmin
+		const { error: err } = await supabaseAdmin
 			.schema("scripts")
 			.from("products")
 			.delete()
 			.eq("id", id)
 
-		if (errProduct) {
-			console.error(errProduct)
-			error(500, errProduct)
+		if (err) {
+			console.error("WaspProduct.delete error with id: " + id + " and error: " + formatError(err))
+			return false
 		}
 
 		return true
@@ -426,14 +447,19 @@ export class WaspPrice {
 			const { error: err } = await supabaseAdmin.schema("scripts").from("prices").insert(price)
 
 			if (err) {
-				console.error(err)
-				console.log("object: ", price)
+				console.error(
+					"WaspPrice.insert error with price: " +
+						JSON.stringify(price) +
+						" and error: " +
+						formatError(err)
+				)
+
 				if (attempt < 2) {
 					await sleep(1000)
 					continue
 				}
 
-				error(500, err)
+				return false
 			}
 			break
 		}
@@ -451,9 +477,13 @@ export class WaspPrice {
 			.eq("id", price.id)
 
 		if (err) {
-			console.error(err)
-			console.log("object: ", price)
-			error(500, err)
+			console.error(
+				"WaspPrice.update error with price: " +
+					JSON.stringify(price) +
+					" and error: " +
+					formatError(err)
+			)
+			return false
 		}
 
 		return true
@@ -469,8 +499,8 @@ export class WaspPrice {
 			.eq("id", id)
 
 		if (err) {
-			console.error(err)
-			throw error(500, err)
+			console.error("WaspPrice.delete error for id: " + id + " and error: " + formatError(err))
+			return false
 		}
 
 		return true

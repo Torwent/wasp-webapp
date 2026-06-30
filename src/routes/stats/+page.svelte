@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { invalidate } from "$app/navigation"
 	import { page } from "$app/state"
-	import { onMount } from "svelte"
+	import { onDestroy, onMount } from "svelte"
 	import { formatTime, formatNumber } from "$lib/utils"
 	import StatsTable from "./StatsTable.svelte"
 	import { replaceQuery } from "$lib/client/utils"
 	import Head from "$lib/components/Head.svelte"
+	import type { RealtimeChannel } from "@supabase/supabase-js"
 
 	const { data } = $props()
 
@@ -18,8 +19,9 @@
 
 	let search = $state(decodeURIComponent(page.url.searchParams.get("search") || "").trim())
 
+	let realtimeChannel: RealtimeChannel | null = null
 	onMount(() => {
-		const subscription = supabaseClient
+		realtimeChannel = supabaseClient
 			.channel("stats-changed")
 			.on(
 				"postgres_changes",
@@ -31,8 +33,10 @@
 				() => invalidate("supabase:stats")
 			)
 			.subscribe()
+	})
 
-		return () => subscription.unsubscribe()
+	onDestroy(() => {
+		if (realtimeChannel) realtimeChannel.unsubscribe()
 	})
 </script>
 

@@ -20,7 +20,9 @@
 	async function canDownloadScript() {
 		if (script.metadata.type === "free") return true
 		const result = await canDownload(supabaseClient, roles, script.id)
-		if (!result) products = await getProducts(supabaseClient, script.id)
+		if (!result) {
+			products = await getProducts(supabaseClient, script.id)
+		}
 		return result
 	}
 </script>

@@ -9,12 +9,13 @@ export const POST = async ({ request }) => {
 
 	if (hookPassword !== SUPABASE_WEBHOOK_PASSWORD) {
 		console.error("Webhook password doesn't match")
-		throw Error("Webhook password doesn't match")
+		error(403, "Webhook password doesn't match")
 	}
 
 	if (req.type !== "INSERT" || req.schema !== "profiles" || req.table !== "private") {
 		console.error("Webhook sent doesn't match this endpoint.")
-		throw Error(
+		error(
+			404,
 			"Webhook sent doesn't match this endpoint. Type: " +
 				req.type +
 				" Schema: " +

@@ -340,30 +340,37 @@ async function getBundles(supabase: SupabaseClient<Database>, script: string) {
 		.select(`id`)
 		.contains("scripts", [script])
 
-	if (err) {
-		throw error(
-			500,
-			"Server error, this is probably not an issue on your end!\n" +
-				"SELECT scripts.bundles failed!\n\n" +
-				formatError(err)
-		)
-	}
+	if (err) return { data: null, error: err }
 
-	return data.map((bundle) => bundle.id)
+	return { data: data.map((bundle) => bundle.id), error: null }
 }
 
 export async function getProducts(supabase: SupabaseClient<Database>, script: string) {
-	const bundles = await getBundles(supabase, script)
+	const promises = await Promise.all([
+		getBundles(supabase, script),
+		supabase
+			.schema("scripts")
+			.from("products")
+			.select(`id, name`)
+			.eq("active", true)
+			.eq("script", script)
+			.order("name", { ascending: true })
+	])
 
-	const scriptQuery = supabase
-		.schema("scripts")
-		.from("products")
-		.select(`id, name`)
-		.eq("active", true)
-		.eq("script", script)
-		.order("name", { ascending: true })
+	const { data: bundles, error: bundleErr } = promises[0]
+	const { data: scripts, error: scriptErr } = promises[1]
 
-	const bundleQuery = supabase
+	if (bundleErr) {
+		console.error(bundleErr)
+		return null
+	}
+
+	if (scriptErr) {
+		console.error(scriptErr)
+		return null
+	}
+
+	const { data: products, error: productErr } = await supabase
 		.schema("scripts")
 		.from("products")
 		.select(`id, name`)
@@ -371,31 +378,14 @@ export async function getProducts(supabase: SupabaseClient<Database>, script: st
 		.in("bundle", bundles)
 		.order("name", { ascending: true })
 
-	const promises = await Promise.all([scriptQuery, bundleQuery])
-	const { data: scriptData, error: scriptErr } = promises[0]
-	const { data: bundleData, error: bundleErr } = promises[1]
-
-	if (scriptErr) {
-		throw error(
-			500,
-			"Server error, this is probably not an issue on your end!\n" +
-				"SELECT scripts.products failed!\n\n" +
-				formatError(scriptErr)
-		)
-	}
-
-	if (bundleErr) {
-		throw error(
-			500,
-			"Server error, this is probably not an issue on your end!\n" +
-				"SELECT scripts.products failed!\n\n" +
-				formatError(bundleErr)
-		)
+	if (productErr) {
+		console.error(productErr)
+		return null
 	}
 
 	let available: number = 0
 	const formatedScriptData = await Promise.all(
-		scriptData.map(async (product) => {
+		scripts.map(async (product) => {
 			const prices = await getPrices(supabase, product.id)
 			available += prices.length
 			return {
@@ -407,7 +397,7 @@ export async function getProducts(supabase: SupabaseClient<Database>, script: st
 	)
 
 	const formatedBundleData = await Promise.all(
-		bundleData.map(async (product) => {
+		products.map(async (product) => {
 			const prices = await getPrices(supabase, product.id)
 			available += prices.length
 			return {
