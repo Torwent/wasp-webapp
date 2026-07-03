@@ -69,8 +69,8 @@ importers:
         specifier: ^3.2.1
         version: 3.2.1
       stripe:
-        specifier: ^22.0.2
-        version: 22.0.2(@types/node@22.14.0)
+        specifier: ^22.3.0
+        version: 22.3.0(@types/node@22.14.0)
       svelte-lucide:
         specifier: ^2.0.1
         version: 2.0.1(svelte@5.25.7)
@@ -2393,8 +2393,8 @@ packages:
     resolution: {integrity: sha512-6fPc+R4ihwqP6N/aIv2f1gMH8lOVtWQHoqC4yK6oSDVVocumAsfCqjkXnqiYMhmMwS/mEHLp7Vehlt3ql6lEig==}
     engines: {node: '>=8'}
 
-  stripe@22.0.2:
-    resolution: {integrity: sha512-2/BLrQ3oB1zlNfeL/LfHFjTGx6EQn0j+ztrrTJHuDjV5VVIpk92oSDaxyKLUr3pG3dnee2LZqhFUv2Bf0G1/3g==}
+  stripe@22.3.0:
+    resolution: {integrity: sha512-ypO6xjVrMWs9SmIMeHr8naCx3dAQ0clxMdUTxn7Ejd7hmY9meBGfE+N4pVHkf9sUNebAHp6uJo6mV3GxDIc2cA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@types/node': '>=18'
@@ -4977,7 +4977,7 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  stripe@22.0.2(@types/node@22.14.0):
+  stripe@22.3.0(@types/node@22.14.0):
     optionalDependencies:
       '@types/node': 22.14.0
 
