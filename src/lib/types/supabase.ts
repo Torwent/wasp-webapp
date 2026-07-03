@@ -28,10 +28,10 @@ export type Database = {
 		Functions: {
 			graphql: {
 				Args: {
+					extensions?: Json
 					operationName?: string
 					query?: string
 					variables?: Json
-					extensions?: Json
 				}
 				Returns: Json
 			}
@@ -153,7 +153,7 @@ export type Database = {
 					content: string
 					created_at: string
 					description: string
-					fts: unknown | null
+					fts: unknown
 					id: string
 					level: number
 					order: number
@@ -168,7 +168,7 @@ export type Database = {
 					content: string
 					created_at?: string
 					description: string
-					fts?: unknown | null
+					fts?: unknown
 					id?: string
 					level?: number
 					order: number
@@ -183,7 +183,7 @@ export type Database = {
 					content?: string
 					created_at?: string
 					description?: string
-					fts?: unknown | null
+					fts?: unknown
 					id?: string
 					level?: number
 					order?: number
@@ -222,19 +222,8 @@ export type Database = {
 		}
 		Functions: {
 			is_author:
-				| {
-						Args: {
-							tutorial_id: string
-						}
-						Returns: boolean
-				  }
-				| {
-						Args: {
-							tutorial_id: string
-							user_id: string
-						}
-						Returns: boolean
-				  }
+				| { Args: { tutorial_id: string }; Returns: boolean }
+				| { Args: { tutorial_id: string; user_id: string }; Returns: boolean }
 		}
 		Enums: {
 			[_ in never]: never
@@ -252,12 +241,10 @@ export type Database = {
 		}
 		Functions: {
 			get_auth: {
-				Args: {
-					p_usename: string
-				}
+				Args: { p_usename: string }
 				Returns: {
-					username: string
 					password: string
+					username: string
 				}[]
 			}
 		}
@@ -635,7 +622,7 @@ export type Database = {
 				Row: {
 					content: string | null
 					description: string | null
-					fts: unknown | null
+					fts: unknown
 					github: string | null
 					id: string | null
 					paypal_id: string | null
@@ -655,145 +642,90 @@ export type Database = {
 			}
 		}
 		Functions: {
-			auth_get_avatar: {
-				Args: {
-					user_id: string
-				}
-				Returns: string
-			}
-			auth_get_discord: {
-				Args: {
-					user_id: string
-				}
-				Returns: string
-			}
-			auth_get_username: {
-				Args: {
-					user_id: string
-				}
-				Returns: string
-			}
+			auth_get_avatar: { Args: { user_id: string }; Returns: string }
+			auth_get_discord: { Args: { user_id: string }; Returns: string }
+			auth_get_username: { Args: { user_id: string }; Returns: string }
 			can_access:
-				| {
-						Args: {
-							accesser_id: string
-							script_id: string
-						}
-						Returns: boolean
-				  }
-				| {
-						Args: {
-							script_id: string
-						}
-						Returns: boolean
-				  }
+				| { Args: { accesser_id: string; script_id: string }; Returns: boolean }
+				| { Args: { script_id: string }; Returns: boolean }
 			can_view_subscription: {
-				Args: {
-					accesser: string
-					product: string
-				}
+				Args: { accesser: string; product: string }
 				Returns: boolean
 			}
 			create_stripe_customer: {
 				Args: {
-					id: string
-					email: string
 					discord_id: string
+					email: string
+					id: string
 					username: string
 				}
 				Returns: number
 			}
-			cron_check_subscriptions: {
-				Args: Record<PropertyKey, never>
-				Returns: undefined
-			}
-			get_avatar: {
-				Args: {
-					user_id: string
-				}
-				Returns: string
-			}
-			get_discord: {
-				Args: {
-					user_id: string
-				}
-				Returns: string
-			}
-			get_email: {
-				Args: {
-					user_id: string
-				}
-				Returns: string
-			}
+			cron_check_subscriptions: { Args: never; Returns: undefined }
+			get_avatar: { Args: { user_id: string }; Returns: string }
+			get_discord: { Args: { user_id: string }; Returns: string }
+			get_email: { Args: { user_id: string }; Returns: string }
 			get_profile:
 				| {
-						Args: Record<PropertyKey, never>
+						Args: never
 						Returns: Database["public"]["CompositeTypes"]["profile_data_type"]
+						SetofOptions: {
+							from: "*"
+							to: "profile_data_type"
+							isOneToOne: true
+							isSetofReturn: false
+						}
 				  }
 				| {
-						Args: {
-							user_id: string
-						}
+						Args: { user_id: string }
 						Returns: Database["public"]["CompositeTypes"]["profile_data_type"]
+						SetofOptions: {
+							from: "*"
+							to: "profile_data_type"
+							isOneToOne: true
+							isSetofReturn: false
+						}
 				  }
-			get_stripe_user: {
-				Args: {
-					user_id: string
-				}
-				Returns: string
+			get_stripe_user: { Args: { user_id: string }; Returns: string }
+			get_subscriptions: {
+				Args: { p_amount: number; p_page: number; p_user_id: string }
+				Returns: {
+					cancel: boolean
+					date_end: string
+					date_start: string
+					id: string
+					product: string
+					total_count: number
+				}[]
 			}
-			get_user_id: {
-				Args: {
-					disc_id: string
-				}
-				Returns: string
-			}
+			get_user_id: { Args: { disc_id: string }; Returns: string }
 			get_username:
-				| {
-						Args: Record<PropertyKey, never>
-						Returns: string
-				  }
-				| {
-						Args: {
-							user_id: string
-						}
-						Returns: string
-				  }
+				| { Args: never; Returns: string }
+				| { Args: { user_id: string }; Returns: string }
 			is_role:
-				| {
-						Args: {
-							role: string
-						}
-						Returns: boolean
-				  }
-				| {
-						Args: {
-							user_id: string
-							role: string
-						}
-						Returns: boolean
-				  }
+				| { Args: { role: string }; Returns: boolean }
+				| { Args: { role: string; user_id: string }; Returns: boolean }
 			set_roles: {
 				Args: {
 					discord_id: string
 					param_developer: boolean
-					param_premium: boolean
-					param_vip: boolean
-					param_tester: boolean
 					param_mod: boolean
+					param_premium: boolean
+					param_tester: boolean
+					param_vip: boolean
 				}
 				Returns: undefined
 			}
 			set_user_roles: {
 				Args: {
-					user_id: string
-					param_developer: boolean
-					param_premium: boolean
-					param_vip: boolean
-					param_tester: boolean
-					param_scripter: boolean
-					param_moderator: boolean
 					param_administrator: boolean
+					param_developer: boolean
+					param_moderator: boolean
+					param_premium: boolean
+					param_scripter: boolean
+					param_tester: boolean
+					param_vip: boolean
+					user_id: string
 				}
 				Returns: undefined
 			}
@@ -887,65 +819,25 @@ export type Database = {
 		}
 		Functions: {
 			_array_remove: {
-				Args: {
-					arr: unknown
-					values_to_remove: unknown
-				}
+				Args: { arr: unknown; values_to_remove: unknown }
 				Returns: unknown
 			}
-			_array_reverse: {
-				Args: {
-					"": unknown
-				}
-				Returns: unknown
-			}
-			_strip_html: {
-				Args: {
-					input_text: string
-				}
-				Returns: string
-			}
-			array_unique: {
-				Args: {
-					a: string[]
-				}
-				Returns: string[]
-			}
-			delete_user: {
-				Args: {
-					user_to_delete: string
-				}
-				Returns: undefined
-			}
-			encode_seo: {
-				Args: {
-					url: string
-				}
-				Returns: string
-			}
+			_strip_html: { Args: { input_text: string }; Returns: string }
+			array_unique: { Args: { a: string[] }; Returns: string[] }
+			delete_user: { Args: { user_to_delete: string }; Returns: undefined }
+			encode_seo: { Args: { url: string }; Returns: string }
 			generate_search_vector: {
-				Args: {
-					id: string
-					data: string[]
-				}
+				Args: { data: string[]; id: string }
 				Returns: unknown
 			}
 			get_common_words:
+				| { Args: { text_array: string[] }; Returns: string[] }
 				| {
-						Args: {
-							text_array: string[]
-						}
-						Returns: string[]
-				  }
-				| {
-						Args: {
-							text_array: string[]
-							limit_val: number
-						}
+						Args: { limit_val: number; text_array: string[] }
 						Returns: string[]
 				  }
 			get_stats_total: {
-				Args: Record<PropertyKey, never>
+				Args: never
 				Returns: {
 					experience: number
 					gold: number
@@ -954,36 +846,11 @@ export type Database = {
 				}[]
 			}
 			insert_ten_year_sub:
-				| {
-						Args: {
-							start: number
-							user_ids: string[]
-						}
-						Returns: undefined
-				  }
-				| {
-						Args: {
-							start: number
-							user_ids: string[]
-						}
-						Returns: undefined
-				  }
-			is_dashboard: {
-				Args: Record<PropertyKey, never>
-				Returns: boolean
-			}
-			is_owner: {
-				Args: {
-					id: string
-				}
-				Returns: boolean
-			}
-			normalize_nfkc: {
-				Args: {
-					input: string
-				}
-				Returns: string
-			}
+				| { Args: { start: number; user_ids: string[] }; Returns: undefined }
+				| { Args: { start: number; user_ids: string[] }; Returns: undefined }
+			is_dashboard: { Args: never; Returns: boolean }
+			is_owner: { Args: { id: string }; Returns: boolean }
+			normalize_nfkc: { Args: { input: string }; Returns: string }
 		}
 		Enums: {
 			script_category:
@@ -1274,7 +1141,7 @@ export type Database = {
 					content: string
 					created_at: string
 					description: string
-					fts: unknown | null
+					fts: unknown
 					id: string
 					max_gp: number | null
 					max_xp: number | null
@@ -1294,7 +1161,7 @@ export type Database = {
 					content: string
 					created_at?: string
 					description: string
-					fts?: unknown | null
+					fts?: unknown
 					id?: string
 					max_gp?: number | null
 					max_xp?: number | null
@@ -1314,7 +1181,7 @@ export type Database = {
 					content?: string
 					created_at?: string
 					description?: string
-					fts?: unknown | null
+					fts?: unknown
 					id?: string
 					max_gp?: number | null
 					max_xp?: number | null
@@ -1503,175 +1370,69 @@ export type Database = {
 		}
 		Functions: {
 			add_botter: {
-				Args: {
-					script_id: string
-					user_id: string
-				}
+				Args: { script_id: string; user_id: string }
 				Returns: undefined
 			}
 			add_downloader: {
-				Args: {
-					script_id: string
-					user_id: string
-				}
+				Args: { script_id: string; user_id: string }
 				Returns: undefined
 			}
 			add_reporter: {
-				Args: {
-					script_id: string
-					user_id: string
-				}
+				Args: { script_id: string; user_id: string }
 				Returns: undefined
 			}
 			bundle_contains: {
-				Args: {
-					bundle: string
-					script: string
-				}
+				Args: { bundle: string; script: string }
 				Returns: boolean
 			}
-			cron_refresh_featured: {
-				Args: Record<PropertyKey, never>
-				Returns: undefined
-			}
+			cron_refresh_featured: { Args: never; Returns: undefined }
 			fix_categories:
-				| {
-						Args: {
-							categories: string[]
-						}
-						Returns: string[]
-				  }
-				| {
-						Args: {
-							user_id: string
-							categories: string[]
-						}
-						Returns: string[]
-				  }
-			get_assets: {
-				Args: {
-					script_id: string
-				}
-				Returns: string
-			}
-			get_bundle_scripts: {
-				Args: {
-					ids: string[]
-				}
-				Returns: string[]
-			}
-			get_month_downloads_total: {
-				Args: Record<PropertyKey, never>
-				Returns: number
-			}
-			get_month_premium_downloads_total: {
-				Args: Record<PropertyKey, never>
-				Returns: number
-			}
-			get_revision: {
-				Args: {
-					script_id: string
-				}
-				Returns: number
-			}
-			get_script_owner: {
-				Args: {
-					script_id: string
-				}
-				Returns: string
-			}
+				| { Args: { categories: string[] }; Returns: string[] }
+				| { Args: { categories: string[]; user_id: string }; Returns: string[] }
+			get_assets: { Args: { script_id: string }; Returns: string }
+			get_bundle_scripts: { Args: { ids: string[] }; Returns: string[] }
+			get_month_downloads_total: { Args: never; Returns: number }
+			get_month_premium_downloads_total: { Args: never; Returns: number }
+			get_revision: { Args: { script_id: string }; Returns: number }
+			get_script_owner: { Args: { script_id: string }; Returns: string }
 			get_site_stats: {
-				Args: {
-					user_id: string
-				}
+				Args: { user_id: string }
 				Returns: {
-					total_scripts: number
-					total_user_scripts: number
-					user_scripts: string[]
-					total_premium_scripts: number
-					total_user_premium_scripts: number
 					month_downloads: number
-					month_user_downloads: number
 					month_premium_downloads: number
 					month_premium_user_downloads: number
+					month_user_downloads: number
+					total_premium_scripts: number
+					total_scripts: number
+					total_user_premium_scripts: number
+					total_user_scripts: number
+					user_scripts: string[]
 				}[]
 			}
 			get_tooltip_emojis: {
-				Args: {
-					categories: string[]
-					subcategories: string[]
-				}
+				Args: { categories: string[]; subcategories: string[] }
 				Returns: string[]
 			}
 			get_tooltip_names: {
-				Args: {
-					categories: string[]
-					subcategories: string[]
-				}
+				Args: { categories: string[]; subcategories: string[] }
 				Returns: string[]
 			}
 			get_user_scripts: {
-				Args: {
-					user_id: string
-				}
+				Args: { user_id: string }
 				Returns: {
 					id: string
 				}[]
 			}
-			get_virtual_level: {
-				Args: {
-					experience: number
-				}
-				Returns: number
-			}
+			get_virtual_level: { Args: { experience: number }; Returns: number }
 			is_author:
-				| {
-						Args: {
-							script_id: string
-						}
-						Returns: boolean
-				  }
-				| {
-						Args: {
-							script_id: string
-							user_id: string
-						}
-						Returns: boolean
-				  }
-			is_premium_script: {
-				Args: {
-					script_id: string
-				}
-				Returns: boolean
-			}
-			script_exists: {
-				Args: {
-					script_id: string
-				}
-				Returns: boolean
-			}
-			stats_site_monthly_reset: {
-				Args: Record<PropertyKey, never>
-				Returns: undefined
-			}
-			storage_can_download: {
-				Args: {
-					file_path: string
-				}
-				Returns: boolean
-			}
-			storage_can_edit: {
-				Args: {
-					file_path: string
-				}
-				Returns: boolean
-			}
-			storage_img_can_edit: {
-				Args: {
-					file_path: string
-				}
-				Returns: boolean
-			}
+				| { Args: { script_id: string }; Returns: boolean }
+				| { Args: { script_id: string; user_id: string }; Returns: boolean }
+			is_premium_script: { Args: { script_id: string }; Returns: boolean }
+			script_exists: { Args: { script_id: string }; Returns: boolean }
+			stats_site_monthly_reset: { Args: never; Returns: undefined }
+			storage_can_download: { Args: { file_path: string }; Returns: boolean }
+			storage_can_edit: { Args: { file_path: string }; Returns: boolean }
+			storage_img_can_edit: { Args: { file_path: string }; Returns: boolean }
 		}
 		Enums: {
 			status: "Official" | "Community"
@@ -1693,6 +1454,7 @@ export type Database = {
 					owner: string | null
 					owner_id: string | null
 					public: boolean | null
+					type: Database["storage"]["Enums"]["buckettype"]
 					updated_at: string | null
 				}
 				Insert: {
@@ -1705,6 +1467,7 @@ export type Database = {
 					owner?: string | null
 					owner_id?: string | null
 					public?: boolean | null
+					type?: Database["storage"]["Enums"]["buckettype"]
 					updated_at?: string | null
 				}
 				Update: {
@@ -1717,9 +1480,153 @@ export type Database = {
 					owner?: string | null
 					owner_id?: string | null
 					public?: boolean | null
+					type?: Database["storage"]["Enums"]["buckettype"]
 					updated_at?: string | null
 				}
 				Relationships: []
+			}
+			buckets_analytics: {
+				Row: {
+					created_at: string
+					deleted_at: string | null
+					format: string
+					id: string
+					name: string
+					type: Database["storage"]["Enums"]["buckettype"]
+					updated_at: string
+				}
+				Insert: {
+					created_at?: string
+					deleted_at?: string | null
+					format?: string
+					id?: string
+					name: string
+					type?: Database["storage"]["Enums"]["buckettype"]
+					updated_at?: string
+				}
+				Update: {
+					created_at?: string
+					deleted_at?: string | null
+					format?: string
+					id?: string
+					name?: string
+					type?: Database["storage"]["Enums"]["buckettype"]
+					updated_at?: string
+				}
+				Relationships: []
+			}
+			buckets_vectors: {
+				Row: {
+					created_at: string
+					id: string
+					type: Database["storage"]["Enums"]["buckettype"]
+					updated_at: string
+				}
+				Insert: {
+					created_at?: string
+					id: string
+					type?: Database["storage"]["Enums"]["buckettype"]
+					updated_at?: string
+				}
+				Update: {
+					created_at?: string
+					id?: string
+					type?: Database["storage"]["Enums"]["buckettype"]
+					updated_at?: string
+				}
+				Relationships: []
+			}
+			iceberg_namespaces: {
+				Row: {
+					bucket_name: string
+					catalog_id: string
+					created_at: string
+					id: string
+					metadata: Json
+					name: string
+					updated_at: string
+				}
+				Insert: {
+					bucket_name: string
+					catalog_id: string
+					created_at?: string
+					id?: string
+					metadata?: Json
+					name: string
+					updated_at?: string
+				}
+				Update: {
+					bucket_name?: string
+					catalog_id?: string
+					created_at?: string
+					id?: string
+					metadata?: Json
+					name?: string
+					updated_at?: string
+				}
+				Relationships: [
+					{
+						foreignKeyName: "iceberg_namespaces_catalog_id_fkey"
+						columns: ["catalog_id"]
+						referencedRelation: "buckets_analytics"
+						referencedColumns: ["id"]
+					}
+				]
+			}
+			iceberg_tables: {
+				Row: {
+					bucket_name: string
+					catalog_id: string
+					created_at: string
+					id: string
+					location: string
+					name: string
+					namespace_id: string
+					remote_table_id: string | null
+					shard_id: string | null
+					shard_key: string | null
+					updated_at: string
+				}
+				Insert: {
+					bucket_name: string
+					catalog_id: string
+					created_at?: string
+					id?: string
+					location: string
+					name: string
+					namespace_id: string
+					remote_table_id?: string | null
+					shard_id?: string | null
+					shard_key?: string | null
+					updated_at?: string
+				}
+				Update: {
+					bucket_name?: string
+					catalog_id?: string
+					created_at?: string
+					id?: string
+					location?: string
+					name?: string
+					namespace_id?: string
+					remote_table_id?: string | null
+					shard_id?: string | null
+					shard_key?: string | null
+					updated_at?: string
+				}
+				Relationships: [
+					{
+						foreignKeyName: "iceberg_tables_catalog_id_fkey"
+						columns: ["catalog_id"]
+						referencedRelation: "buckets_analytics"
+						referencedColumns: ["id"]
+					},
+					{
+						foreignKeyName: "iceberg_tables_namespace_id_fkey"
+						columns: ["namespace_id"]
+						referencedRelation: "iceberg_namespaces"
+						referencedColumns: ["id"]
+					}
+				]
 			}
 			migrations: {
 				Row: {
@@ -1748,7 +1655,6 @@ export type Database = {
 					created_at: string | null
 					id: string
 					last_accessed_at: string | null
-					level: number | null
 					metadata: Json | null
 					name: string | null
 					owner: string | null
@@ -1763,7 +1669,6 @@ export type Database = {
 					created_at?: string | null
 					id?: string
 					last_accessed_at?: string | null
-					level?: number | null
 					metadata?: Json | null
 					name?: string | null
 					owner?: string | null
@@ -1778,7 +1683,6 @@ export type Database = {
 					created_at?: string | null
 					id?: string
 					last_accessed_at?: string | null
-					level?: number | null
 					metadata?: Json | null
 					name?: string | null
 					owner?: string | null
@@ -1791,37 +1695,6 @@ export type Database = {
 				Relationships: [
 					{
 						foreignKeyName: "objects_bucketId_fkey"
-						columns: ["bucket_id"]
-						referencedRelation: "buckets"
-						referencedColumns: ["id"]
-					}
-				]
-			}
-			prefixes: {
-				Row: {
-					bucket_id: string
-					created_at: string | null
-					level: number
-					name: string
-					updated_at: string | null
-				}
-				Insert: {
-					bucket_id: string
-					created_at?: string | null
-					level?: number
-					name: string
-					updated_at?: string | null
-				}
-				Update: {
-					bucket_id?: string
-					created_at?: string | null
-					level?: number
-					name?: string
-					updated_at?: string | null
-				}
-				Relationships: [
-					{
-						foreignKeyName: "prefixes_bucketId_fkey"
 						columns: ["bucket_id"]
 						referencedRelation: "buckets"
 						referencedColumns: ["id"]
@@ -1923,192 +1796,195 @@ export type Database = {
 					}
 				]
 			}
+			vector_indexes: {
+				Row: {
+					bucket_id: string
+					created_at: string
+					data_type: string
+					dimension: number
+					distance_metric: string
+					id: string
+					metadata_configuration: Json | null
+					name: string
+					updated_at: string
+				}
+				Insert: {
+					bucket_id: string
+					created_at?: string
+					data_type: string
+					dimension: number
+					distance_metric: string
+					id?: string
+					metadata_configuration?: Json | null
+					name: string
+					updated_at?: string
+				}
+				Update: {
+					bucket_id?: string
+					created_at?: string
+					data_type?: string
+					dimension?: number
+					distance_metric?: string
+					id?: string
+					metadata_configuration?: Json | null
+					name?: string
+					updated_at?: string
+				}
+				Relationships: [
+					{
+						foreignKeyName: "vector_indexes_bucket_id_fkey"
+						columns: ["bucket_id"]
+						referencedRelation: "buckets_vectors"
+						referencedColumns: ["id"]
+					}
+				]
+			}
 		}
 		Views: {
 			[_ in never]: never
 		}
 		Functions: {
-			add_prefixes: {
-				Args: {
-					_bucket_id: string
-					_name: string
-				}
-				Returns: undefined
-			}
 			can_insert_object: {
-				Args: {
-					bucketid: string
-					name: string
-					owner: string
-					metadata: Json
-				}
+				Args: { bucketid: string; metadata: Json; name: string; owner: string }
 				Returns: undefined
 			}
-			delete_prefix: {
-				Args: {
-					_bucket_id: string
-					_name: string
-				}
-				Returns: boolean
-			}
-			extension: {
-				Args: {
-					name: string
-				}
+			extension: { Args: { name: string }; Returns: string }
+			filename: { Args: { name: string }; Returns: string }
+			foldername: { Args: { name: string }; Returns: string[] }
+			get_common_prefix: {
+				Args: { p_delimiter: string; p_key: string; p_prefix: string }
 				Returns: string
 			}
-			filename: {
-				Args: {
-					name: string
-				}
-				Returns: string
-			}
-			foldername: {
-				Args: {
-					name: string
-				}
-				Returns: string[]
-			}
-			get_level: {
-				Args: {
-					name: string
-				}
-				Returns: number
-			}
-			get_prefix: {
-				Args: {
-					name: string
-				}
-				Returns: string
-			}
-			get_prefixes: {
-				Args: {
-					name: string
-				}
-				Returns: string[]
-			}
+			get_level: { Args: { name: string }; Returns: number }
+			get_prefix: { Args: { name: string }; Returns: string }
+			get_prefixes: { Args: { name: string }; Returns: string[] }
 			get_size_by_bucket: {
-				Args: Record<PropertyKey, never>
+				Args: never
 				Returns: {
-					size: number
 					bucket_id: string
+					size: number
 				}[]
 			}
 			list_multipart_uploads_with_delimiter: {
 				Args: {
 					bucket_id: string
-					prefix_param: string
 					delimiter_param: string
 					max_keys?: number
 					next_key_token?: string
 					next_upload_token?: string
+					prefix_param: string
 				}
 				Returns: {
-					key: string
-					id: string
 					created_at: string
+					id: string
+					key: string
 				}[]
 			}
 			list_objects_with_delimiter: {
 				Args: {
-					bucket_id: string
-					prefix_param: string
+					_bucket_id: string
 					delimiter_param: string
 					max_keys?: number
-					start_after?: string
 					next_token?: string
+					prefix_param: string
+					sort_order?: string
+					start_after?: string
 				}
 				Returns: {
-					name: string
+					created_at: string
 					id: string
+					last_accessed_at: string
 					metadata: Json
+					name: string
 					updated_at: string
 				}[]
 			}
-			operation: {
-				Args: Record<PropertyKey, never>
-				Returns: string
-			}
+			operation: { Args: never; Returns: string }
 			search: {
 				Args: {
-					prefix: string
 					bucketname: string
-					limits?: number
 					levels?: number
+					limits?: number
 					offsets?: number
+					prefix: string
 					search?: string
 					sortcolumn?: string
 					sortorder?: string
 				}
 				Returns: {
-					name: string
-					id: string
-					updated_at: string
 					created_at: string
+					id: string
 					last_accessed_at: string
 					metadata: Json
+					name: string
+					updated_at: string
+				}[]
+			}
+			search_by_timestamp: {
+				Args: {
+					p_bucket_id: string
+					p_level: number
+					p_limit: number
+					p_prefix: string
+					p_sort_column: string
+					p_sort_column_after: string
+					p_sort_order: string
+					p_start_after: string
+				}
+				Returns: {
+					created_at: string
+					id: string
+					key: string
+					last_accessed_at: string
+					metadata: Json
+					name: string
+					updated_at: string
 				}[]
 			}
 			search_legacy_v1: {
 				Args: {
-					prefix: string
 					bucketname: string
-					limits?: number
 					levels?: number
+					limits?: number
 					offsets?: number
+					prefix: string
 					search?: string
 					sortcolumn?: string
 					sortorder?: string
 				}
 				Returns: {
-					name: string
-					id: string
-					updated_at: string
 					created_at: string
+					id: string
 					last_accessed_at: string
 					metadata: Json
-				}[]
-			}
-			search_v1_optimised: {
-				Args: {
-					prefix: string
-					bucketname: string
-					limits?: number
-					levels?: number
-					offsets?: number
-					search?: string
-					sortcolumn?: string
-					sortorder?: string
-				}
-				Returns: {
 					name: string
-					id: string
 					updated_at: string
-					created_at: string
-					last_accessed_at: string
-					metadata: Json
 				}[]
 			}
 			search_v2: {
 				Args: {
-					prefix: string
 					bucket_name: string
-					limits?: number
 					levels?: number
+					limits?: number
+					prefix: string
+					sort_column?: string
+					sort_column_after?: string
+					sort_order?: string
 					start_after?: string
 				}
 				Returns: {
-					key: string
-					name: string
-					id: string
-					updated_at: string
 					created_at: string
+					id: string
+					key: string
+					last_accessed_at: string
 					metadata: Json
+					name: string
+					updated_at: string
 				}[]
 			}
 		}
 		Enums: {
-			[_ in never]: never
+			buckettype: "STANDARD" | "ANALYTICS" | "VECTOR"
 		}
 		CompositeTypes: {
 			[_ in never]: never
@@ -2255,25 +2131,31 @@ export type Database = {
 	}
 }
 
-type PublicSchema = Database[Extract<keyof Database, "public">]
+type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
-	PublicTableNameOrOptions extends
-		| keyof (PublicSchema["Tables"] & PublicSchema["Views"])
-		| { schema: keyof Database },
-	TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-		? keyof (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-				Database[PublicTableNameOrOptions["schema"]]["Views"])
+	DefaultSchemaTableNameOrOptions extends
+		| keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+		| { schema: keyof DatabaseWithoutInternals },
+	TableName extends DefaultSchemaTableNameOrOptions extends {
+		schema: keyof DatabaseWithoutInternals
+	}
+		? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+				DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
 		: never = never
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-	? (Database[PublicTableNameOrOptions["schema"]]["Tables"] &
-			Database[PublicTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+	schema: keyof DatabaseWithoutInternals
+}
+	? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+			DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
 			Row: infer R
 		}
 		? R
 		: never
-	: PublicTableNameOrOptions extends keyof (PublicSchema["Tables"] & PublicSchema["Views"])
-		? (PublicSchema["Tables"] & PublicSchema["Views"])[PublicTableNameOrOptions] extends {
+	: DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+		? (DefaultSchema["Tables"] & DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
 				Row: infer R
 			}
 			? R
@@ -2281,18 +2163,24 @@ export type Tables<
 		: never
 
 export type TablesInsert<
-	PublicTableNameOrOptions extends keyof PublicSchema["Tables"] | { schema: keyof Database },
-	TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-		? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+	DefaultSchemaTableNameOrOptions extends
+		| keyof DefaultSchema["Tables"]
+		| { schema: keyof DatabaseWithoutInternals },
+	TableName extends DefaultSchemaTableNameOrOptions extends {
+		schema: keyof DatabaseWithoutInternals
+	}
+		? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
 		: never = never
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-	? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+	schema: keyof DatabaseWithoutInternals
+}
+	? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
 			Insert: infer I
 		}
 		? I
 		: never
-	: PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-		? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+	: DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+		? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
 				Insert: infer I
 			}
 			? I
@@ -2300,18 +2188,24 @@ export type TablesInsert<
 		: never
 
 export type TablesUpdate<
-	PublicTableNameOrOptions extends keyof PublicSchema["Tables"] | { schema: keyof Database },
-	TableName extends PublicTableNameOrOptions extends { schema: keyof Database }
-		? keyof Database[PublicTableNameOrOptions["schema"]]["Tables"]
+	DefaultSchemaTableNameOrOptions extends
+		| keyof DefaultSchema["Tables"]
+		| { schema: keyof DatabaseWithoutInternals },
+	TableName extends DefaultSchemaTableNameOrOptions extends {
+		schema: keyof DatabaseWithoutInternals
+	}
+		? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
 		: never = never
-> = PublicTableNameOrOptions extends { schema: keyof Database }
-	? Database[PublicTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+> = DefaultSchemaTableNameOrOptions extends {
+	schema: keyof DatabaseWithoutInternals
+}
+	? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
 			Update: infer U
 		}
 		? U
 		: never
-	: PublicTableNameOrOptions extends keyof PublicSchema["Tables"]
-		? PublicSchema["Tables"][PublicTableNameOrOptions] extends {
+	: DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
+		? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
 				Update: infer U
 			}
 			? U
@@ -2319,27 +2213,97 @@ export type TablesUpdate<
 		: never
 
 export type Enums<
-	PublicEnumNameOrOptions extends keyof PublicSchema["Enums"] | { schema: keyof Database },
-	EnumName extends PublicEnumNameOrOptions extends { schema: keyof Database }
-		? keyof Database[PublicEnumNameOrOptions["schema"]]["Enums"]
+	DefaultSchemaEnumNameOrOptions extends
+		| keyof DefaultSchema["Enums"]
+		| { schema: keyof DatabaseWithoutInternals },
+	EnumName extends DefaultSchemaEnumNameOrOptions extends {
+		schema: keyof DatabaseWithoutInternals
+	}
+		? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
 		: never = never
-> = PublicEnumNameOrOptions extends { schema: keyof Database }
-	? Database[PublicEnumNameOrOptions["schema"]]["Enums"][EnumName]
-	: PublicEnumNameOrOptions extends keyof PublicSchema["Enums"]
-		? PublicSchema["Enums"][PublicEnumNameOrOptions]
+> = DefaultSchemaEnumNameOrOptions extends {
+	schema: keyof DatabaseWithoutInternals
+}
+	? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
+	: DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
+		? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
 		: never
 
 export type CompositeTypes<
 	PublicCompositeTypeNameOrOptions extends
-		| keyof PublicSchema["CompositeTypes"]
-		| { schema: keyof Database },
+		| keyof DefaultSchema["CompositeTypes"]
+		| { schema: keyof DatabaseWithoutInternals },
 	CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-		schema: keyof Database
+		schema: keyof DatabaseWithoutInternals
 	}
-		? keyof Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+		? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
 		: never = never
-> = PublicCompositeTypeNameOrOptions extends { schema: keyof Database }
-	? Database[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-	: PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
-		? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+> = PublicCompositeTypeNameOrOptions extends {
+	schema: keyof DatabaseWithoutInternals
+}
+	? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
+	: PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
+		? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
 		: never
+
+export const Constants = {
+	_supavisor: {
+		Enums: {}
+	},
+	graphql_public: {
+		Enums: {}
+	},
+	info: {
+		Enums: {}
+	},
+	pgbouncer: {
+		Enums: {}
+	},
+	profiles: {
+		Enums: {}
+	},
+	public: {
+		Enums: {
+			script_category: [
+				"combat",
+				"boss",
+				"minigame",
+				"moneymaker",
+				"tool",
+				"magic",
+				"prayer",
+				"mining",
+				"fishing",
+				"woodcutting",
+				"hunter",
+				"farming",
+				"cooking",
+				"smithing",
+				"fletching",
+				"firemaking",
+				"herblore",
+				"crafting",
+				"construction",
+				"agility",
+				"slayer",
+				"thieving",
+				"runecrafting"
+			],
+			script_status: ["official", "community"],
+			script_type: ["premium", "free"]
+		}
+	},
+	scripts: {
+		Enums: {
+			status: ["Official", "Community"]
+		}
+	},
+	storage: {
+		Enums: {
+			buckettype: ["STANDARD", "ANALYTICS", "VECTOR"]
+		}
+	},
+	stripe: {
+		Enums: {}
+	}
+} as const

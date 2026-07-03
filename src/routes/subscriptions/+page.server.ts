@@ -1,4 +1,4 @@
-import { PUBLIC_SUPER_USER_ID } from "$env/static/public"
+import { PUBLIC_CHECKOUT_DISABLED, PUBLIC_SUPER_USER_ID } from "$env/static/public"
 import { stripe, createCheckoutSession, createCustomerPortal } from "$lib/server/stripe.server"
 import { subscriptionsSchema, checkoutSchema } from "$lib/client/schemas"
 import { doLogin, updateCustomerID } from "$lib/server/supabase.server"
@@ -7,6 +7,10 @@ import { setError, superValidate } from "sveltekit-superforms/server"
 import { zod } from "sveltekit-superforms/adapters"
 
 export const load = async ({ locals: { getSubscriptions, getFreeAccess } }) => {
+	if (PUBLIC_CHECKOUT_DISABLED === "true") {
+		redirect(302, "/subscriptions/disabled")
+	}
+
 	const subscriptions = await getSubscriptions()
 
 	const states = subscriptions.map((sub) => ({
@@ -146,6 +150,10 @@ export const actions = {
 		}
 
 		const stripeUser = data.user_id !== PUBLIC_SUPER_USER_ID ? data.stripe_user : null
+
+		if (PUBLIC_CHECKOUT_DISABLED === "true") {
+			redirect(302, "/subscriptions/disabled")
+		}
 
 		const url = await createCheckoutSession(
 			profile.id,
