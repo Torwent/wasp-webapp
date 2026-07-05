@@ -7,7 +7,7 @@
 	<span
 		class="inline-block rounded-full bg-stone-500 px-2.5 py-1 text-center align-baseline text-xs leading-none font-bold whitespace-nowrap text-white xl:px-7 xl:py-5"
 	>
-		OSRS Botter
+		Botter
 	</span>
 	{#if roles}
 		{#if roles.premium}

@@ -26,7 +26,7 @@
 
 <Head
 	title="{meta.title} - Tutorials"
-	description="OSRS Botting tutorial: {meta.description}"
+	description="Botting tutorial: {meta.description}"
 	keywords="Tutorial, Tutorials, Guide, Guides, Learn, Coding"
 	author={meta.username}
 />

@@ -25,7 +25,7 @@
 
 <Head
 	title="Tutorials"
-	description="Guides and tutorials to bot and develop scripts for OldSchool RuneScape. Find the large collection of Simba tutorials available and unleach the power of Simba and max on osrs."
+	description="Guides and tutorials to bot and develop scripts for Simba. Find the large collection of Simba tutorials available, unleach the power of Simba and max."
 	keywords="Tutorial, Tutorials, Guide, Guides, Learn, Coding"
 />
 

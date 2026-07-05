@@ -104,7 +104,7 @@
 				</div>
 				<div>
 					<span class="text-lg font-semibold text-blue-400">{$form.title} - WaspScripts</span>
-					<p>{cropString("RuneScape OSRS Color Bot - " + $form.description, 160)}</p>
+					<p>{cropString("Color Bot - " + $form.description, 160)}</p>
 				</div>
 			</div>
 			<div class="mx-auto my-8 w-[40rem]">

@@ -38,7 +38,7 @@ export const baseScriptSchema = z.object({
 	xp_min: z
 		.number()
 		.int("Only whole numbers are allowed.")
-		.gte(0, "There's no way to lose experience in OSRS."),
+		.gte(0, "There's no way to lose experience in game."),
 	xp_max: z
 		.number()
 		.int("Only whole numbers are allowed.")

@@ -10,7 +10,7 @@
 
 <Head
 	title="FAQs and Errors"
-	description="Need help botting osrs? See if what you are looking for is in this list."
+	description="Need help botting? See if what you are looking for is in this list."
 />
 
 <main class="container mx-auto my-16 max-w-2xl flex-grow">

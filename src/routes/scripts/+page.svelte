@@ -66,7 +66,7 @@
 
 <Head
 	title="Scripts"
-	description="The best open source OSRS botting scripts."
+	description="The best open source botting scripts."
 	keywords="Premium, Free, Automation, ComputerVision"
 />
 

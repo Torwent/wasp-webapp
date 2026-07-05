@@ -29,7 +29,7 @@
 
 <Head
 	title="{script.title} - Scripts"
-	description="The best open source OSRS botting scripts."
+	description="The best open source botting scripts."
 	keywords="Premium, Free, Automation, ComputerVision"
 	author={script.protected.username}
 	img={script.protected.assets + "banner.jpg"}
