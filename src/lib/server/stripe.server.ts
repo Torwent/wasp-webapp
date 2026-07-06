@@ -408,6 +408,7 @@ export async function createStripeBundleProduct(supabase: SupabaseClient, bundle
 
 	for (let i = 0; i < bundle.prices.length; i++) {
 		const price = bundle.prices[i]
+		if (price.interval === "year") continue
 		promises.push(createStripePriceEx(product.id, price.amount, price.interval as Interval))
 	}
 
@@ -440,6 +441,7 @@ export async function createStripeScriptProduct(
 
 	for (let i = 0; i < script.prices.length; i++) {
 		const price = script.prices[i]
+		if (price.interval === "year") continue
 		promises.push(createStripePriceEx(product.id, price.amount, price.interval as Interval))
 	}
 
