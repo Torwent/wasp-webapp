@@ -23,7 +23,7 @@ export const load = async ({ locals: { supabaseServer }, params: { slug }, paren
 
 	const newPrices = [
 		{ amount: 4, currency: "eur", interval: "week" },
-		{ amount: 7.5, currency: "eur", interval: "month" },
+		{ amount: 0, currency: "eur", interval: "month" },
 		{ amount: 0, currency: "eur", interval: "year" }
 	]
 
@@ -190,7 +190,7 @@ export const actions = {
 			const currentPrice = pricesData[i]
 			const j = product.prices.findIndex((price) => price.id === currentPrice.id)
 			if (j === -1) continue
-			if (currentPrice.interval === "year") continue
+            if (currentPrice.interval === "year" || currentPrice.interval === "month") continue
 
 			const newPrice = product.prices[j]
 

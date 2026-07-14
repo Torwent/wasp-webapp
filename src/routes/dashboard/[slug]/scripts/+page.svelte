@@ -99,7 +99,7 @@
 									type="number"
 									bind:value={$scriptsForm.scripts[i].prices[j].amount}
 									step="0.01"
-									disabled={$scriptsForm.scripts[i].prices[j].interval === "year"}
+									disabled={$scriptsForm.scripts[i].prices[j].interval === "year" || $scriptsForm.scripts[i].prices[j].interval === "month"}
 									class:ring-error-500={$scriptErrors.scripts &&
 										$scriptErrors.scripts[i].prices &&
 										$scriptErrors.scripts[i].prices[j].amount}
