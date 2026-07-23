@@ -256,3 +256,7 @@
 <!-- <a href="https://waspscripts.dev" class="bg-surface-300-700 hover:preset-tonal py-2 text-center">
 	This website is for <b>Simba 1400</b>. Click here to visit the <b>Simba 2000</b> version of the website.
 </a> -->
+
+<div class="bg-surface-300-700 hover:preset-tonal py-2 text-center text-error-500">
+New subscriptions are disabled, read announcements on discord!
+</div>

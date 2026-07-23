@@ -105,7 +105,7 @@
 									type="number"
 									bind:value={$bundlesForm.bundles[i].prices[j].amount}
 									step="0.01"
-									disabled={$bundlesForm.bundles[i].prices[j].interval === "year" || $bundlesForm.bundles[i].prices[j].interval === "month" }
+									disabled
 									class:ring-error-500={$bundlesErrors.bundles &&
 										$bundlesErrors.bundles[i].prices &&
 										$bundlesErrors.bundles[i].prices[j].amount}

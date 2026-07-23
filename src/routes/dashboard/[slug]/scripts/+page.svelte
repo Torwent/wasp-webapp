@@ -99,7 +99,7 @@
 									type="number"
 									bind:value={$scriptsForm.scripts[i].prices[j].amount}
 									step="0.01"
-									disabled={$scriptsForm.scripts[i].prices[j].interval === "year" || $scriptsForm.scripts[i].prices[j].interval === "month"}
+									disabled
 									class:ring-error-500={$scriptErrors.scripts &&
 										$scriptErrors.scripts[i].prices &&
 										$scriptErrors.scripts[i].prices[j].amount}
@@ -164,6 +164,7 @@
 			<select
 				class="select"
 				bind:value={$newScriptForm.id}
+				disabled={available.length === 0}
 				class:disabled={available.length === 0}
 				class:ring-error-500={$newScriptErrors.id}
 			>
@@ -187,7 +188,7 @@
 						class="input"
 						step="0.01"
 						bind:value={$newScriptForm.prices[i].amount}
-						disabled={available.length === 0 || interval === "Yearly"}
+						disabled
 						class:ring-error-500={$newScriptErrors.prices && $newScriptErrors.prices[i]?.amount}
 					/>
 					{#if $newScriptErrors.prices && $newScriptErrors.prices[i]?.amount}

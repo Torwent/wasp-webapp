@@ -20,6 +20,7 @@
 	keywords="Stats, Scores, Premium, Subscribe, Member"
 />
 
+
 <main class="my-8 grid">
 	{#if profile}
 		{#await subscriptions then subscriptions}
@@ -45,8 +46,11 @@
 		</form>
 	{/if}
 
+	<h1 class="text-error-500 mx-auto my-24 text-4xl">New subscriptions are disabled, read announcements on discord!</h1>
+
 	<CheckoutTable data={data.checkoutForm} {bundles} {scripts} />
 </main>
+
 
 <h5 class="my-8 text-center">
 	By making any purchase you automatically accept the
